@@ -73,11 +73,11 @@ def source_grist() -> None:
         normalisation_process_func=process.normalize_dataframe,
         process_func=process.process_agent_rem_variable,
     )
-    # agent_experience_pro = create_grist_etl_task(
-    #     selecteur="agent_experience_pro",
-    #     normalisation_process_func=process.normalize_dataframe,
-    #     process_func=process.process_agent_experience_pro,
-    # )
+    agent_experience_pro = create_grist_etl_task(
+        selecteur="agent_experience_pro",
+        normalisation_process_func=process.normalize_dataframe,
+        process_func=process.process_agent_experience_pro,
+    )
 
     # ordre des tâches
     chain(
@@ -86,7 +86,7 @@ def source_grist() -> None:
             agent_revalorisation(),
             agent_contrat(),
             agent_rem_variable(),
-            # agent_experience_pro(),
+            agent_experience_pro(),
         ]
     )
 
@@ -141,11 +141,11 @@ def referentiels() -> None:
         normalisation_process_func=process.normalize_dataframe,
         process_func=process.process_ref_base_revalorisation,
     )
-    ref_experience_pro = create_grist_etl_task(
-        selecteur="ref_experience_pro",
-        normalisation_process_func=process.normalize_dataframe,
-        process_func=process.process_ref_experience_pro,
-    )
+    # ref_experience_pro = create_grist_etl_task(
+    #     selecteur="ref_experience_pro",
+    #     normalisation_process_func=process.normalize_dataframe,
+    #     process_func=process.process_ref_experience_pro,
+    # )
     ref_niveau_diplome = create_grist_etl_task(
         selecteur="ref_niveau_diplome",
         normalisation_process_func=process.normalize_dataframe,
@@ -162,7 +162,7 @@ def referentiels() -> None:
         [
             ref_base_remuneration(),
             ref_base_revalorisation(),
-            ref_experience_pro(),
+            # ref_experience_pro(),
             ref_niveau_diplome(),
             ref_valeur_point_indice(),
         ]
