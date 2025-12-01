@@ -111,7 +111,7 @@ def process_agent_fonction_anais(df: pd.DataFrame) -> pd.DataFrame:
 def process_agent_diplome(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=["agent"])
     df = df.rename(columns={"niveau_diplome": "id_niveau_diplome"})
-    df["libelle_diplome"] = df["libelle_diplome"].str.strip().str.split().str.join(" ")
+    df["libelle_diplome"] = df["libelle_diplome"].replace({0: None})
     df["id_niveau_diplome"] = df["id_niveau_diplome"].replace({0: None})
     df = df.reset_index(drop=True)
     df["id"] = df.index
