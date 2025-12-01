@@ -83,7 +83,7 @@ def cartographie_remuneration() -> None:
         ),
         [source_files(), referentiels(), source_grist()],
         output_files(),
-        create_tmp_tables(),
+        create_tmp_tables(reset_id_seq=False),
         import_file_to_db.partial(keep_file_id_col=True).expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
