@@ -34,7 +34,7 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
                 WHERE snapshot_id = %s
             );
         """,
-        parameters=(snapshot_id,),
+        parameters=(snapshot_id, snapshot_id),
     )
 
     api_host = "https://france-chaleur-urbaine.beta.gouv.fr"
