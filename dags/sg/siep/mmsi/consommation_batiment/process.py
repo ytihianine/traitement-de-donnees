@@ -307,6 +307,84 @@ def process_conso_annuelle_unpivot(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def process_facture_annuelle_unpivot(df: pd.DataFrame) -> pd.DataFrame:
+    correspondance_facture = {
+        "facture_elec_ht": "elec",
+        "facture_elec_ttc": "elec",
+        "facture_gaz_ht": "gaz",
+        "facture_gaz_ttc": "gaz",
+        "facture_eau_htva": "eau",
+        "facture_eau_ttc": "eau",
+        "facture_reseau_chaleur_htva": "RCU",
+        "facture_reseau_chaleur_ttc": "RCU",
+        "facture_reseau_froid_htva": "RFU",
+        "facture_reseau_froid_ttc": "RFU",
+        "facture_fioul_htva": "FIOUL",
+        "facture_fioul_ttc": "FIOUL",
+        "facture_granule_bois_htva": "granule bois",
+        "facture_granule_bois_ttc": "granule bois",
+        "facture_propane_htva": "propane",
+        "facture_propane_ttc": "propane",
+        "facture_photovoltaique_ht": "photovoltaique",
+        "facture_photovoltaique_ttc": "photovoltaique",
+    }
+
+    cols_id = ["code_bat_gestionnaire", "annee"]
+    cols_to_pivot = list(set(df.columns) - set(cols_id))
+
+    # Unpivot du dataset source
+    df = pd.melt(
+        frame=df,
+        id_vars=cols_id,
+        value_vars=cols_to_pivot,
+        var_name="fluide",
+        value_name="montant_facture",
+    )
+    df = df.loc[df["fluide"].isin(list(correspondance_facture.keys()))]
+    df["type_facture"] = np.where(
+        df["fluide"].str.contains("htva|ht", regex=True), "HT/HTVA", "TTC"
+    )
+    df["fluide"] = df["fluide"].replace(correspondance_facture)
+
+    return df
+
+
+def process_facture_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFrame:
+    # Générer les données de comparaisons
+    df_comp = df.loc[df["annee"] >= 2019].copy()
+
+    # Renommer les colonnes
+    df_comp = df_comp.rename(
+        columns={
+            "annee": "annee_comparaison",
+            "montant_facture": "montant_facture_comparaison",
+        }
+    )
+
+    # Fusionner les dataframes
+    df = pd.merge(
+        left=df,
+        right=df_comp,
+        on=["code_bat_gestionnaire", "fluide", "type_conso"],
+        how="left",
+    )
+
+    # Calculer les évolutions de facture
+    df["diff_vs_comparaison"] = (
+        df["montant_facture"] - df["montant_facture_comparaison"]
+    )
+    valid = df["montant_facture_comparaison"].notna() & (
+        df["montant_facture_comparaison"] != 0
+    )
+    df["diff_vs_comparaison_pct"] = np.nan
+    df.loc[valid, "diff_vs_comparaison_pct"] = (
+        df.loc[valid, "diff_vs_comparaison"]
+        / df.loc[valid, "montant_facture_comparaison"]
+    )
+
+    return df
+
+
 def process_conso_statut_par_fluide(df: pd.DataFrame) -> pd.DataFrame:
     colonnes_fluides = [
         "conso_elec",

@@ -60,6 +60,16 @@ def additionnal_files():
         input_selecteurs=["conso_mens"],
         process_func=process.process_conso_annuelle_unpivot,
     )
+    facture_annuelle_unpivot = create_multi_files_input_etl_task(
+        output_selecteur="facture_annuelle_unpivot",
+        input_selecteurs=["conso_annuelle"],
+        process_func=process.process_facture_annuelle_unpivot,
+    )
+    facture_annuelle_unpivot_comparaison = create_multi_files_input_etl_task(
+        output_selecteur="facture_annuelle_unpivot_comparaison",
+        input_selecteurs=["facture_annuelle_unpivot"],
+        process_func=process.process_facture_annuelle_unpivot_comparaison,
+    )
     conso_statut_par_fluide = create_multi_files_input_etl_task(
         output_selecteur="conso_statut_par_fluide",
         input_selecteurs=["conso_annuelle"],
@@ -88,6 +98,8 @@ def additionnal_files():
             conso_annuelle(),
             conso_annuelle_unpivot(),
         ],
+        facture_annuelle_unpivot(),
+        facture_annuelle_unpivot_comparaison(),
         conso_statut_par_fluide(),
         conso_avant_2019(),
         conso_statut_fluide_global(),
