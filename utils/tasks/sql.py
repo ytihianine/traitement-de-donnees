@@ -97,7 +97,6 @@ def get_snapshot_id(nom_projet: str, pg_conn_id: str) -> str:
         SELECT snapshot_id
         FROM ranked_snapshots
         WHERE rank = 1;
-        );
     """
 
     # Paramètres pour la requête
