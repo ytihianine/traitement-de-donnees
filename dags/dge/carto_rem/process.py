@@ -223,6 +223,7 @@ def process_agent(
     cols_to_keep = [
         "corps",
         "date_de_naissance",
+        "age",
         "echelon",
         "genre",
         "grade",
