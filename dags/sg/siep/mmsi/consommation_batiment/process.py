@@ -355,7 +355,8 @@ def process_facture_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFra
     cols_to_drop = ["import_date", "import_timestamp", "snapshot_id"]
     df = df.drop(columns=cols_to_drop)
 
-    # Générer les données de comparaisons
+    # Conserver les données qu'à partir de 2019
+    df = df.loc[df["annee"] >= 2019].copy()
     df_comp = df.loc[df["annee"] >= 2019].copy()
 
     # Renommer les colonnes
