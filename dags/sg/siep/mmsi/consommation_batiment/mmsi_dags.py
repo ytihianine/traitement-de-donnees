@@ -89,7 +89,7 @@ def consommation_des_batiments():
     chain(
         validate_params(),
         looking_for_files,
-        # get_projet_snapshot(nom_projet="Outil aide diagnostic"),
+        get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         # conso_mens_parquet(),
         source_files(),
         additionnal_files(),
