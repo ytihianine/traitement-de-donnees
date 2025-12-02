@@ -60,6 +60,11 @@ def additionnal_files():
         input_selecteurs=["conso_mens"],
         process_func=process.process_conso_annuelle_unpivot,
     )
+    conso_annuelle_unpivot_comparaison = create_multi_files_input_etl_task(
+        output_selecteur="conso_annuelle_unpivot_comparaison",
+        input_selecteurs=["facture_annuelle_unpivot"],
+        process_func=process.process_conso_annuelle_unpivot_comparaison,
+    )
     facture_annuelle_unpivot = create_multi_files_input_etl_task(
         output_selecteur="facture_annuelle_unpivot",
         input_selecteurs=["conso_annuelle"],
@@ -97,6 +102,7 @@ def additionnal_files():
             unpivot_conso_mens_brute(),
             conso_annuelle(),
             conso_annuelle_unpivot(),
+            conso_annuelle_unpivot_comparaison(),
         ],
         facture_annuelle_unpivot(),
         facture_annuelle_unpivot_comparaison(),

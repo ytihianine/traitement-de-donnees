@@ -248,62 +248,52 @@ def process_conso_annuelle_unpivot(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_pivot = list(set(df.columns) - set(cols_id))
 
     df = pd.melt(
-        df,
+        frame=df,
         id_vars=cols_id,
         value_vars=cols_to_pivot,
         var_name="fluide",
-        value_name="conso_actuelle",
+        value_name="conso",
     )
 
-    df = df[df["fluide"].isin(list(correspondance_fluide.keys()))]
+    df = df.loc[df["fluide"].isin(list(correspondance_fluide.keys()))]
     df["type_conso"] = np.where(df["fluide"].str.contains("corr"), "CORRIGEE", "BRUTE")
     df["fluide"] = df["fluide"].replace(correspondance_fluide)
 
-    df = df.sort_values(["code_bat_gestionnaire", "fluide", "type_conso", "annee"])
+    return df
 
-    df["annee_precedente"] = df.groupby(
-        ["code_bat_gestionnaire", "fluide", "type_conso"]
-    )["annee"].shift(1)
 
-    # Calculer les consommations des années précédentes
-    df = df.sort_values(["code_bat_gestionnaire", "fluide", "type_conso", "annee"])
+def process_conso_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFrame:
+    cols_to_drop = ["import_date", "import_timestamp", "snapshot_id"]
+    df = df.drop(columns=cols_to_drop)
 
-    df["conso_precedente"] = df.groupby(
-        ["code_bat_gestionnaire", "fluide", "type_conso"]
-    )["conso_actuelle"].shift(1)
+    # Conserver les données qu'à partir de 2019
+    df = df.loc[df["annee"] >= 2019].copy()
+    df_comp = df.loc[df["annee"] >= 2019].copy()
 
-    # Absolute and relative differences
-    df["diff_vs_prev"] = df["conso_actuelle"] - df["conso_precedente"]
-    valid = df["conso_precedente"].notna() & (df["conso_precedente"] != 0)
-    df["diff_vs_prev_pct"] = np.nan
-    df.loc[valid, "diff_vs_prev_pct"] = (
-        df.loc[valid, "diff_vs_prev"] / df.loc[valid, "conso_precedente"]
-    )
-
-    # Calculer les évolutions de consommations par rapport à 2019
-    ref = df.loc[
-        df["annee"] == 2019,
-        ["code_bat_gestionnaire", "fluide", "type_conso", "conso_actuelle"],
-    ].rename(columns={"conso_actuelle": "conso_ref_2019"})
-
-    df = df.merge(ref, on=["code_bat_gestionnaire", "fluide", "type_conso"], how="left")
-
-    df["diff_vs_2019"] = df["conso_actuelle"] - df["conso_ref_2019"]
-    valid = df["conso_ref_2019"].notna() & (df["conso_ref_2019"] != 0)
-    df["diff_vs_2019_pct"] = np.nan
-    df.loc[valid, "diff_vs_2019_pct"] = (
-        df.loc[valid, "diff_vs_2019"] / df.loc[valid, "conso_ref_2019"]
-    )
-
-    # Round values
-    df = df.round(
-        {
-            "diff_vs_prev": 2,
-            "diff_vs_2019": 2,
-            "diff_vs_prev_pct": 4,
-            "diff_vs_2019_pct": 4,
+    # Renommer les colonnes
+    df_comp = df_comp.rename(
+        columns={
+            "annee": "annee_comparaison",
+            "conso": "conso_comparaison",
         }
     )
+
+    # Fusionner les dataframes
+    df = pd.merge(
+        left=df,
+        right=df_comp,
+        on=["code_bat_gestionnaire", "fluide", "type_conso"],
+        how="left",
+    )
+
+    # Calculer les évolutions de facture
+    df["diff_vs_comparaison"] = df["conso"] - df["conso_comparaison"]
+    valid = df["conso_comparaison"].notna() & (df["conso_comparaison"] != 0)
+    df["diff_vs_comparaison_pct"] = np.nan
+    df.loc[valid, "diff_vs_comparaison_pct"] = (
+        df.loc[valid, "diff_vs_comparaison"] / df.loc[valid, "conso_comparaison"]
+    )
+
     return df
 
 
