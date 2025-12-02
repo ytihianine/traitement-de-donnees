@@ -164,7 +164,7 @@ def referentiels() -> None:
     ref_libelle_diplome = create_grist_etl_task(
         selecteur="ref_libelle_diplome",
         normalisation_process_func=process.normalize_dataframe,
-        process_func=process.process_ref_categorie_ecole,
+        process_func=process.process_ref_libelle_diplome,
     )
 
     # ordre des tâches
