@@ -1,7 +1,7 @@
 from typing import Any
 import pandas as pd
 
-from infra.http_client.adapters import HttpxClient, ClientConfig
+from infra.http_client.adapters import HttpxClient, ClientConfig, RequestsClient
 from utils.config.vars import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
 from infra.database.factory import create_db_handler
 
@@ -15,7 +15,7 @@ from utils.dataframe import df_info
 def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
     # Http client
     client_config = ClientConfig(user_agent=AGENT, proxy=PROXY)
-    httpx_internet_client = HttpxClient(config=client_config)
+    httpx_internet_client = RequestsClient(config=client_config)
 
     # Hooks
     db_hook = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
