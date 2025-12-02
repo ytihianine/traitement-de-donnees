@@ -25,7 +25,7 @@ def process_ref_categorie_ecole(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_ref_libelle_diplome(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(
-        {
+        columns={
             "categorie_ecole": "id_categorie_ecole",
             "niveau_diplome_associe": "id_niveau_diplome_associe",
         }
