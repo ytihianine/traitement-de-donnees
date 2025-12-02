@@ -140,7 +140,7 @@ def process_agent_revalorisation(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_agent_contrat(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(columns=["agent", "duree_contrat_en_cours"])
+    df = df.drop(columns=["agent", "duree_contrat_en_cours_auto", "id"])
     # df["duree_cumulee_contrats_tout_contrat_mef"] = (
     #     df["duree_cumulee_contrats_tout_contrat_mef"]
     #     .apply(lambda x: x.decode("utf-8") if isinstance(x, bytes) else x)
