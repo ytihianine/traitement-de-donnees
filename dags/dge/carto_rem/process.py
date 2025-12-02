@@ -16,6 +16,12 @@ def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 """
 
 
+def process_ref_position(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.rename(columns={"niveau_diplome": "id_niveau_diplome"})
+    df["id_niveau_diplome"].replace(0, np.nan, inplace=True)
+    return df
+
+
 def process_ref_categorie_ecole(df: pd.DataFrame) -> pd.DataFrame:
     df["categorie_d_ecole"] = (
         df["categorie_d_ecole"].str.strip().str.split().str.join(" ")
