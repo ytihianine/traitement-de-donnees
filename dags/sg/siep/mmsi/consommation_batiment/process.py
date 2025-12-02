@@ -285,6 +285,7 @@ def process_conso_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFrame
         on=["code_bat_gestionnaire", "fluide", "type_conso"],
         how="left",
     )
+    df = df.loc[df["annee_comparaison"] <= df["annee"]]
 
     # Calculer les évolutions de facture
     df["diff_vs_comparaison"] = df["conso"] - df["conso_comparaison"]
@@ -364,6 +365,7 @@ def process_facture_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFra
         on=["code_bat_gestionnaire", "fluide", "type_facture"],
         how="left",
     )
+    df = df.loc[df["annee_comparaison"] <= df["annee"]]
 
     # Calculer les évolutions de facture
     df["diff_vs_comparaison"] = (
