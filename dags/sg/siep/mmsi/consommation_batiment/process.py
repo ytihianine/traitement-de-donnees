@@ -308,6 +308,8 @@ def process_conso_annuelle_unpivot(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_facture_annuelle_unpivot(df: pd.DataFrame) -> pd.DataFrame:
+    cols_to_drop = ["import_date", "import_timestamp", "snapshot_id"]
+    df = df.drop(columns=cols_to_drop)
     correspondance_facture = {
         "facture_elec_ht": "elec",
         "facture_elec_ttc": "elec",
@@ -350,6 +352,9 @@ def process_facture_annuelle_unpivot(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_facture_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFrame:
+    cols_to_drop = ["import_date", "import_timestamp", "snapshot_id"]
+    df = df.drop(columns=cols_to_drop)
+
     # Générer les données de comparaisons
     df_comp = df.loc[df["annee"] >= 2019].copy()
 
