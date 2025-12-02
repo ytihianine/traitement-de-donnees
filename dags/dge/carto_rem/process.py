@@ -114,8 +114,8 @@ def process_agent_diplome(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"niveau_diplome_associe": "id_niveau_diplome_associe"})
     df["libelle_diplome"] = df["libelle_diplome"].replace({0: None})
     df["id_niveau_diplome_associe"] = df["id_niveau_diplome_associe"].replace({0: None})
-    df = df.reset_index(drop=True)
-    df["id"] = df.index
+    # df = df.reset_index(drop=True)
+    # df["id"] = df.index
     return df
 
 
@@ -128,8 +128,8 @@ def process_agent_revalorisation(df: pd.DataFrame) -> pd.DataFrame:
         df[date_col] = pd.to_datetime(df[date_col], unit="s", errors="coerce")
     df["id_base_revalorisation"] = df["id_base_revalorisation"].replace({0: None})
     df = df.loc[df["matricule_agent"] != 0]
-    df = df.reset_index(drop=True)
-    df["id"] = df.index
+    # df = df.reset_index(drop=True)
+    # df["id"] = df.index
     return df
 
 
@@ -156,8 +156,8 @@ def process_agent_contrat(df: pd.DataFrame) -> pd.DataFrame:
         df[date_col] = pd.to_datetime(df[date_col], unit="s")
     for col in df.select_dtypes(include=["object", "string"]).columns:
         df[col] = df[col].astype(str).str.replace("\x00", "", regex=False)
-    df = df.reset_index(drop=True)
-    df["id"] = df.index
+    # df = df.reset_index(drop=True)
+    # df["id"] = df.index
     return df
 
 
@@ -197,8 +197,8 @@ def process_agent_experience_pro(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = df.loc[:, cols_to_keep]
     df = df.loc[df["matricule_agent"] != 0]
-    df = df.reset_index(drop=True)
-    df["id"] = df.index
+    # df = df.reset_index(drop=True)
+    # df["id"] = df.index
     return df
 
 
@@ -227,8 +227,8 @@ def process_agent(
         "date_acces_corps",
     ]
     df = df.loc[:, cols_to_keep]
-    df = df.reset_index(drop=True)
-    df["id"] = df.index
+    # df = df.reset_index(drop=True)
+    # df["id"] = df.index
 
     return df
 
@@ -252,8 +252,8 @@ def process_agent_poste(
     ]
     df = df.loc[:, cols_to_keep]
     df["date_recrutement_structure"] = None
-    df = df.reset_index(drop=True)
-    df["id"] = df.index
+    # df = df.reset_index(drop=True)
+    # df["id"] = df.index
     return df
 
 
@@ -311,6 +311,6 @@ def process_agent_remuneration(
         .apply(lambda x: x.decode(encoding="utf-8") if isinstance(x, bytes) else x)
         .map({"T": True, "F": False})
     )
-    df = df.reset_index(drop=True)
-    df["id"] = df.index
+    # df = df.reset_index(drop=True)
+    # df["id"] = df.index
     return df
