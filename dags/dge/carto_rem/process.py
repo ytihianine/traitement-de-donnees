@@ -36,6 +36,7 @@ def process_ref_experience_pro(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_niveau_diplome(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.drop(columns=["label_selection"])
     df["niveau_diplome"] = df["niveau_diplome"].str.strip().str.split().str.join(" ")
     return df
 
