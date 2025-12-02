@@ -1,3 +1,4 @@
+from typing import Any
 import pandas as pd
 
 from infra.http_client.adapters import HttpxClient, ClientConfig
@@ -11,22 +12,29 @@ from dags.sg.siep.mmsi.eligibilite_fcu.process import (
 from utils.dataframe import df_info
 
 
-def eligibilite_fcu():
+def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
     # Http client
     client_config = ClientConfig(user_agent=AGENT, proxy=PROXY)
-    httpx_internet_client = HttpxClient(client_config)
+    httpx_internet_client = HttpxClient(config=client_config)
 
     # Hooks
     db_hook = create_db_handler(connection_id="db_depose_fichier")
 
     # Storage paths
-
+    snapshot_id = context["ti"].xcom_pull(
+        key="snapshot_id", task_ids="get_projet_snapshot"
+    )
     df_oad = db_hook.fetch_df(
-        query="""SELECT sp.code_bat_ter, sbl.latitude, sbl.longitude
-            FROM siep.bien sp
-            JOIN siep.bien_localisation sbl
-                ON sp.code_bat_ter = sbl.code_bat_ter;
-        """
+        query="""SELECT sbl.code_bat_ter, sbl.latitude, sbl.longitude
+            FROM siep.bien_localisation sbl
+            WHERE sbl.snapshot_id = %s
+            AND sbl.import_timestamp = (
+                SELECT MAX(import_timestamp)
+                FROM siep.bien_localisation
+                WHERE snapshot_id = %s
+            );
+        """,
+        parameters=(snapshot_id,),
     )
 
     api_host = "https://france-chaleur-urbaine.beta.gouv.fr"
@@ -47,8 +55,8 @@ def eligibilite_fcu():
         api_results.append(api_result)
         print(api_result)
 
-    df_result = pd.DataFrame(api_results)
-    df_result = process_result(df_result)
+    df_result = pd.DataFrame(data=api_results)
+    df_result = process_result(df=df_result)
     df_info(df=df_result, df_name="Result API - After processing")
 
     return df_result

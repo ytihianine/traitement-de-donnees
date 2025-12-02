@@ -1,7 +1,6 @@
 from datetime import timedelta
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
@@ -9,6 +8,7 @@ from utils.config.tasks import get_projet_config
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
+    get_projet_snapshot,
     import_file_to_db,
 )
 
@@ -27,12 +27,12 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
 
 # Définition du DAG
 @dag(
-    "eligibilite_fcu",
+    dag_id="eligibilite_fcu",
     schedule_interval=None,
     max_active_runs=1,
     catchup=False,
     tags=["SG", "SIEP", "PRODUCTION", "BATIMENT", "FCU"],
-    description="Récupérer pour chaque bâtiment de l'OAD son éligibilité au réseau Franche Chaleur Urbaine (FCU)",  # noqa
+    description="Récupérer pour chaque bâtiment son éligibilité au réseau Franche Chaleur Urbaine (FCU)",  # noqa
     max_consecutive_failed_dag_runs=1,
     default_args=create_default_args(retries=1, retry_delay=timedelta(seconds=20)),
     params=create_dag_params(
@@ -47,9 +47,10 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
         mail_status=MailStatus.ERROR,
     ),
 )
-def eligibilite_fcu_dag():
+def eligibilite_fcu_dag() -> None:
 
     chain(
+        get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         eligibilite_fcu_to_file(),
         create_tmp_tables(),
         import_file_to_db.expand(
