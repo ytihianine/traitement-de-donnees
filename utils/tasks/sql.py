@@ -83,17 +83,20 @@ def create_snapshot_id(
 
 def get_snapshot_id(nom_projet: str, pg_conn_id: str) -> str:
     query = """
-        SELECT psi.snapshot_id
-        FROM conf_projets.projet_snapshot psi
-        WHERE
-            id_projet = (
-                SELECT id
-                FROM conf_projets.projet p
-                WHERE p.nom_projet = %(nom_projet)s
-            )
-        AND psi.creation_timestamp = (
-            SELECT MAX(creation_timestamp)
-            FROM conf_projets.projet_snapshot
+        WITH cte_id_projet AS (
+            SELECT id as id_projet
+            FROM conf_projets.projet
+            WHERE nom_projet = %(nom_projet)s
+        ),
+        ranked_snapshots AS (
+            SELECT psi.snapshot_id,
+                    ROW_NUMBER() OVER (ORDER BY psi.creation_timestamp DESC) as rank
+            FROM conf_projets.projet_snapshot psi
+            WHERE psi.id_projet = (SELECT id_projet FROM cte_id_projet)
+        )
+        SELECT snapshot_id
+        FROM ranked_snapshots
+        WHERE rank = 1;
         );
     """
 
