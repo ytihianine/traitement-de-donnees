@@ -160,21 +160,34 @@ CREATE TABLE IF NOT EXISTS siep.conso_annuelle_unpivot (
     id BIGSERIAL,
     code_bat_gestionnaire TEXT,
     annee INT,
-    annee_precedente INT,
     fluide TEXT,
     type_conso TEXT,
-    conso_actuelle DOUBLE PRECISION,
-    conso_ref_2019 DOUBLE PRECISION,
-    conso_precedente DOUBLE PRECISION,
-    diff_vs_2019 DOUBLE PRECISION,
-    diff_vs_2019_pct DOUBLE PRECISION,
-    diff_vs_prev DOUBLE PRECISION,
-    diff_vs_prev_pct DOUBLE PRECISION,
+    conso DOUBLE PRECISION,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
     snapshot_id UUID,
     PRIMARY KEY (code_bat_gestionnaire, annee, fluide, type_conso, import_timestamp)
 ) PARTITION BY RANGE (import_timestamp);
+
+
+DROP TABLE IF EXISTS siep.conso_annuelle_unpivot_comparaison;
+CREATE TABLE IF NOT EXISTS siep.conso_annuelle_unpivot (
+    id BIGSERIAL,
+    code_bat_gestionnaire TEXT,
+    annee INT,
+    annee_comparaison INT,
+    fluide TEXT,
+    type_conso TEXT,
+    conso DOUBLE PRECISION,
+    conso_comparaison DOUBLE PRECISION,
+    diff_vs_comparaison DOUBLE PRECISION,
+    diff_vs_comparaison_pct DOUBLE PRECISION,
+    import_timestamp TIMESTAMP NOT NULL,
+    import_date DATE NOT NULL,
+    snapshot_id UUID,
+    PRIMARY KEY (code_bat_gestionnaire, annee, fluide, type_conso, import_timestamp)
+) PARTITION BY RANGE (import_timestamp);
+
 
 DROP TABLE IF EXISTS siep.conso_statut_par_fluide;
 CREATE TABLE IF NOT EXISTS siep.conso_statut_par_fluide (
@@ -255,4 +268,39 @@ CREATE TABLE IF NOT EXISTS siep.conso_mensuelle_corr_unpivot (
     import_date DATE NOT NULL,
     snapshot_id UUID,
     PRIMARY KEY (code_bat_gestionnaire, date_conso, type_energie, import_timestamp)
+) PARTITION BY RANGE (import_timestamp);
+
+
+DROP TABLE IF EXISTS siep.facture_annuelle_unpivot;
+CREATE TABLE IF NOT EXISTS siep.facture_annuelle_unpivot (
+    id BIGSERIAL,
+    code_bat_gestionnaire TEXT,
+    annee INT,
+    annee_comparaison INT,
+    fluide TEXT,
+    type_conso TEXT,
+    montant_facture DOUBLE PRECISION,
+    import_timestamp TIMESTAMP NOT NULL,
+    import_date DATE NOT NULL,
+    snapshot_id UUID,
+    PRIMARY KEY (code_bat_gestionnaire, annee, fluide, type_conso, import_timestamp)
+) PARTITION BY RANGE (import_timestamp);
+
+
+DROP TABLE IF EXISTS siep.facture_annuelle_unpivot_comparaison;
+CREATE TABLE IF NOT EXISTS siep.facture_annuelle_unpivot_comparaison (
+    id BIGSERIAL,
+    code_bat_gestionnaire TEXT,
+    annee INT,
+    annee_comparaison INT,
+    fluide TEXT,
+    type_conso TEXT,
+    montant_facture DOUBLE PRECISION,
+    montant_facture_comparaison DOUBLE PRECISION,
+    diff_vs_comparaison DOUBLE PRECISION,
+    diff_vs_comparaison_pct DOUBLE PRECISION,
+    import_timestamp TIMESTAMP NOT NULL,
+    import_date DATE NOT NULL,
+    snapshot_id UUID,
+    PRIMARY KEY (code_bat_gestionnaire, annee, fluide, type_conso, import_timestamp)
 ) PARTITION BY RANGE (import_timestamp);
