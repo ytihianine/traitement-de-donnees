@@ -126,7 +126,7 @@ def process_agent_diplome(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_agent_revalorisation(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(columns=["agent"])
+    df = df.drop(columns=["agent", "id"])
     df = df.rename(columns={"base_revalorisation": "id_base_revalorisation"})
     df["historique"] = df["historique"].str.strip().str.split().str.join(" ")
     date_cols = ["date_dernier_renouvellement", "date_derniere_revalorisation"]
