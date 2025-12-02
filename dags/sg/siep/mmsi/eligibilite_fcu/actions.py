@@ -2,7 +2,7 @@ from typing import Any
 import pandas as pd
 
 from infra.http_client.adapters import HttpxClient, ClientConfig
-from utils.config.vars import AGENT, PROXY
+from utils.config.vars import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
 from infra.database.factory import create_db_handler
 
 from dags.sg.siep.mmsi.eligibilite_fcu.process import (
@@ -18,7 +18,7 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
     httpx_internet_client = HttpxClient(config=client_config)
 
     # Hooks
-    db_hook = create_db_handler(connection_id="db_depose_fichier")
+    db_hook = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
 
     # Storage paths
     snapshot_id = context["ti"].xcom_pull(
