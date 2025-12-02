@@ -140,6 +140,7 @@ def process_agent_diplome(df: pd.DataFrame) -> pd.DataFrame:
     )
     df["id_libelle_diplome"] = df["id_libelle_diplome"].replace({0: None})
     df["id_niveau_diplome_associe"] = df["id_niveau_diplome_associe"].replace({0: None})
+    df["id_categorie_d_ecole"] = df["id_categorie_d_ecole"].replace({0: None})
     # df = df.reset_index(drop=True)
     # df["id"] = df.index
     return df
