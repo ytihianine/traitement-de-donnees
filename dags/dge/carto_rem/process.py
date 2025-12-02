@@ -31,6 +31,8 @@ def process_ref_libelle_diplome(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     df["libelle_diplome"] = df["libelle_diplome"].str.strip().str.split().str.join(" ")
+    df["id_categorie_ecole"].replace(0, np.nan, inplace=True)
+    df["id_niveau_diplome_associe"].replace(0, np.nan, inplace=True)
     return df
 
 
