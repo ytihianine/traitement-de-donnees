@@ -16,6 +16,13 @@ def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 """
 
 
+def process_ref_categorie_ecole(df: pd.DataFrame) -> pd.DataFrame:
+    df["categorie_d_ecole"] = (
+        df["categorie_d_ecole"].str.strip().str.split().str.join(" ")
+    )
+    return df
+
+
 def process_ref_base_remuneration(df: pd.DataFrame) -> pd.DataFrame:
     df["base_remuneration"] = (
         df["base_remuneration"].str.strip().str.split().str.join(" ")
