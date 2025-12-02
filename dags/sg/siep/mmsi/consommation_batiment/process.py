@@ -365,7 +365,7 @@ def process_facture_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFra
     df = pd.merge(
         left=df,
         right=df_comp,
-        on=["code_bat_gestionnaire", "fluide", "type_conso"],
+        on=["code_bat_gestionnaire", "fluide", "type_facture"],
         how="left",
     )
 
