@@ -17,6 +17,17 @@ def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_categorie_ecole(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.rename(
+        {
+            "categorie_ecole": "id_categorie_ecole",
+            "niveau_diplome_associe": "id_niveau_diplome_associe",
+        }
+    )
+    df["libelle_diplome"] = df["libelle_diplome"].str.strip().str.split().str.join(" ")
+    return df
+
+
+def process_ref_libelle_diplome(df: pd.DataFrame) -> pd.DataFrame:
     df["categorie_d_ecole"] = (
         df["categorie_d_ecole"].str.strip().str.split().str.join(" ")
     )

@@ -161,6 +161,11 @@ def referentiels() -> None:
         normalisation_process_func=process.normalize_dataframe,
         process_func=process.process_ref_categorie_ecole,
     )
+    ref_libelle_diplome = create_grist_etl_task(
+        selecteur="ref_libelle_diplome",
+        normalisation_process_func=process.normalize_dataframe,
+        process_func=process.process_ref_categorie_ecole,
+    )
 
     # ordre des tâches
     chain(
@@ -171,5 +176,6 @@ def referentiels() -> None:
             ref_niveau_diplome(),
             ref_valeur_point_indice(),
             ref_categorie_ecole(),
+            ref_libelle_diplome(),
         ]
     )
