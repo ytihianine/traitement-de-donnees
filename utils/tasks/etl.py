@@ -314,6 +314,8 @@ def create_action_to_file_etl_task(
     action_args: Optional[tuple] = None,
     action_kwargs: Optional[dict[str, Any]] = None,
     use_context: bool = False,
+    add_import_date: bool = True,
+    add_snapshot_id: bool = True,
 ) -> Task[..., None]:
     """
     Create an ETL task that executes a given action function with parameters. The action
@@ -350,10 +352,15 @@ def create_action_to_file_etl_task(
 
         # Execute action
         if use_context:
-            merged_kwargs = {**action_kwargs, **context}
+            df = action_func(*action_args, **action_kwargs, context=context)
         else:
-            merged_kwargs = {**action_kwargs}
-        df = action_func(*action_args, **merged_kwargs)
+            df = action_func(*action_args, **action_kwargs)
+
+        if add_import_date:
+            df = _add_import_metadata(df=df, context=context)
+
+        if add_snapshot_id:
+            df = _add_snapshot_id_metadata(df=df, context=context)
 
         # Export
         s3_handler.write(
