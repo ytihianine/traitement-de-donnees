@@ -181,6 +181,8 @@ def process_agent_rem_variable(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_agent_experience_pro(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.drop(columns=["agent", "id", "int_niv_diplome"])
+    df = df.rename(columns={"position_grille": "id_position_grille"})
     # Convertir les mois en valeurs décimales
     df["exp_pro_totale_mois"] = (df["exp_pro_totale_mois"] / 12).round(1)
     df["exp_qualifiante_sur_le_poste_mois"] = (
@@ -197,6 +199,7 @@ def process_agent_experience_pro(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     df = df.loc[df["matricule_agent"] != 0]
+    df["id_position_grille"].replace(0, np.nan, inplace=True)
     # df = df.reset_index(drop=True)
     # df["id"] = df.index
     return df
