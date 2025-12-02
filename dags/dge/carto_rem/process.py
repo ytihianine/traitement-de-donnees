@@ -196,12 +196,6 @@ def process_agent_experience_pro(df: pd.DataFrame) -> pd.DataFrame:
         + df.loc[:, "exp_qualifiante_sur_le_poste_mois"]
     )
 
-    cols_to_keep = [
-        "matricule_agent",
-        "experience_pro_totale",
-        "experience_pro_qualifiante_sur_poste",
-    ]
-    df = df.loc[:, cols_to_keep]
     df = df.loc[df["matricule_agent"] != 0]
     # df = df.reset_index(drop=True)
     # df["id"] = df.index
