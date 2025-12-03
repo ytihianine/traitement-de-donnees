@@ -38,15 +38,11 @@ def process_ref_pole(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_ref_profil_correspondant(df: pd.DataFrame) -> pd.DataFrame:
     txt_cols = ["profil_correspondant", "intitule_long", "created_by", "updated_by"]
-    date_cols = ["updated_at", "created_at"]
     other_cols = ["id"]
 
     # Retirer les colonnes non-utiles
-    cols_to_drop = list(set(df.columns) - set(txt_cols + date_cols + other_cols))
+    cols_to_drop = list(set(df.columns) - set(txt_cols + other_cols))
     df = df.drop(columns=cols_to_drop)
-
-    # Convertir les types
-    df = convert_grist_date_to_date(df=df, columns=date_cols)
 
     # Nettoyer les données
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
@@ -185,12 +181,11 @@ def process_bilaterale(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_bilaterale_remontee(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(columns=["id_direction"])
+    df = df.drop(columns=["int_direction"])
     df = df.rename(
         columns={
             "bilaterale": "id_bilaterale",
             "bureau": "id_bureau",
-            "int_direction": "id_direction",
         }
     )
     df["information_a_remonter"] = (
