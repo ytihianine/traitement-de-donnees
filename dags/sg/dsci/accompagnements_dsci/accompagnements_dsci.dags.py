@@ -1,4 +1,3 @@
-from datetime import timedelta
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
 
