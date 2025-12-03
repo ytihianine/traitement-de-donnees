@@ -32,6 +32,7 @@ LINK_DOC_DATA = (
     schedule_interval="*/5 8-13,14-19 * * 1-5",
     default_args=create_default_args(),
     max_consecutive_failed_dag_runs=1,
+    max_active_runs=1,
     catchup=False,
     params=create_dag_params(
         nom_projet=nom_projet,
