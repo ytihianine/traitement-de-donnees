@@ -39,7 +39,8 @@ LINK_DOC_DATA = (
         prod_schema="activite_dsci",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
+        mail_enable=True,
+        mail_to=["arthur.lemonnier@finances.gouv.fr"],
     ),
 )
 def accompagnements_dsci_dag() -> None:
