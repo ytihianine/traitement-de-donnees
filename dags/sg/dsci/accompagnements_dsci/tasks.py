@@ -94,53 +94,53 @@ def referentiels() -> None:
 
 @task_group
 def bilaterales() -> None:
-    struc_bilaterales = create_grist_etl_task(
-        selecteur="struc_bilaterales",
+    bilaterale = create_grist_etl_task(
+        selecteur="bilaterale",
         normalisation_process_func=process.normalize_dataframe,
-        process_func=process.process_struc_bilaterales,
+        process_func=process.process_bilaterale,
     )
-    struc_bilaterale_remontee = create_grist_etl_task(
-        selecteur="struc_bilaterale_remontee",
+    bilaterale_remontee = create_grist_etl_task(
+        selecteur="bilaterale_remontee",
         normalisation_process_func=process.normalize_dataframe,
-        process_func=process.process_struc_bilaterale_remontee,
+        process_func=process.process_bilaterale_remontee,
     )
     # Ordre des tâches
-    chain([struc_bilaterales(), struc_bilaterale_remontee()])
+    chain([bilaterale(), bilaterale_remontee()])
 
 
 @task_group
 def correspondant() -> None:
-    struc_correspondant = create_grist_etl_task(
-        selecteur="struc_correspondant",
+    correspondant = create_grist_etl_task(
+        selecteur="correspondant",
         normalisation_process_func=process.normalize_dataframe,
-        process_func=process.process_struc_correspondant,
+        process_func=process.process_correspondant,
     )
-    struc_correspondant_profil = create_grist_etl_task(
-        selecteur="struc_correspondant_profil",
+    correspondant_profil = create_grist_etl_task(
+        selecteur="correspondant_profil",
         normalisation_process_func=process.normalize_dataframe,
-        process_func=process.process_struc_correspondant_profil,
+        process_func=process.process_correspondant_profil,
     )
-    # struc_correspondant_certification = create_grist_etl_task(
-    #     selecteur="struc_correspondant_certification",
-    #     process_func=process.process_struc_correspondant_certification,
+    # correspondant_certification = create_grist_etl_task(
+    #     selecteur="correspondant_certification",
+    #     process_func=process.process_correspondant_certification,
     # )
 
     # Ordre des tâches
-    chain([struc_correspondant(), struc_correspondant_profil()])
+    chain([correspondant(), correspondant_profil()])
 
 
 @task_group
 def mission_innovation() -> None:
-    struc_accompagnement_mi = create_grist_etl_task(
-        selecteur="struc_accompagnement_mi",
+    accompagnement_mi = create_grist_etl_task(
+        selecteur="accompagnement_mi",
         normalisation_process_func=process.normalize_dataframe,
-        process_func=process.process_struc_accompagnement_mi,
+        process_func=process.process_accompagnement_mi,
     )
-    struc_accompagnement_mi_satisfaction = create_grist_etl_task(
-        selecteur="struc_accompagnement_mi_satisfaction",
+    accompagnement_mi_satisfaction = create_grist_etl_task(
+        selecteur="accompagnement_mi_satisfaction",
         normalisation_process_func=process.normalize_dataframe,
-        process_func=process.process_struc_accompagnement_mi_satisfaction,
+        process_func=process.process_accompagnement_mi_satisfaction,
     )
 
     # Ordre des tâches
-    chain([struc_accompagnement_mi(), struc_accompagnement_mi_satisfaction()])
+    chain([accompagnement_mi(), accompagnement_mi_satisfaction()])
