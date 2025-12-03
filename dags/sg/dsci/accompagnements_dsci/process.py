@@ -1,8 +1,10 @@
 import pandas as pd
 
 from utils.config.vars import NO_PROCESS_MSG
-from utils.control.dates import convert_grist_date_to_date
-from utils.control.structures import convert_str_of_list_to_list
+from utils.control.structures import (
+    convert_str_of_list_to_list,
+    handle_grist_null_references,
+)
 from utils.control.text import normalize_whitespace_columns
 
 
@@ -78,6 +80,11 @@ def process_ref_region(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_ref_type_accompagnement(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"pole": "id_pole"})
+
+    # Gérer les références
+    ref_cols = ["id_pole"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
     return df
 
 
@@ -124,9 +131,10 @@ def process_accompagnement_mi(df: pd.DataFrame) -> pd.DataFrame:
     df["informations_complementaires"] = (
         df["informations_complementaires"].str.strip().str.split().str.join(" ")
     )
-    df[["id_direction", "id_pole", "id_type_d_accompagnement"]] = df[
-        ["id_direction", "id_pole", "id_type_d_accompagnement"]
-    ].replace(0, None)
+
+    # Gérer les références
+    ref_cols = ["id_direction", "id_pole", "id_type_d_accompagnement"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
 
     return df
 
@@ -138,9 +146,11 @@ def process_accompagnement_mi_satisfaction(df: pd.DataFrame) -> pd.DataFrame:
             "type_d_accompagnement": "id_type_d_accompagnement",
         }
     )
-    df[["id_accompagnement", "id_type_d_accompagnement"]] = df[
-        ["id_accompagnement", "id_type_d_accompagnement"]
-    ].replace(0, None)
+
+    # Gérer les références
+    ref_cols = ["id_accompagnement", "id_type_d_accompagnement"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
     return df
 
 
@@ -191,6 +201,11 @@ def process_bilaterale_remontee(df: pd.DataFrame) -> pd.DataFrame:
     df["information_a_remonter"] = (
         df["information_a_remonter"].str.strip().str.split().str.join(" ")
     )
+
+    # Gérer les références
+    ref_cols = ["id_bilaterale", "id_bureau"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
     return df
 
 
@@ -248,6 +263,10 @@ def process_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
             "type_de_correspondant": "id_type_de_correspondant",
         }
     )
+
+    # Gérer les références
+    ref_cols = ["id_correspondant", "id_type_de_correspondant"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
 
     # Convert str of list to python list
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_type_de_correspondant")
