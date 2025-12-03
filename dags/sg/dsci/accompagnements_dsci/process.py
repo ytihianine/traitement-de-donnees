@@ -1,7 +1,9 @@
 import pandas as pd
 
 from utils.config.vars import NO_PROCESS_MSG
+from utils.control.dates import convert_grist_date_to_date
 from utils.control.structures import convert_str_of_list_to_list
+from utils.control.text import normalize_whitespace_columns
 
 
 """
@@ -30,14 +32,25 @@ def process_ref_direction(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_pole(df: pd.DataFrame) -> pd.DataFrame:
-    print(NO_PROCESS_MSG)
+    df = df.rename(columns={"bureau": "id_bureau"})
     return df
 
 
 def process_ref_profil_correspondant(df: pd.DataFrame) -> pd.DataFrame:
-    cols_to_keep = ["id", "profil_correspondant", "intitule_long"]
-    cols_to_drop = list(set(df.columns) - set(cols_to_keep))
+    txt_cols = ["profil_correspondant", "intitule_long", "created_by", "updated_by"]
+    date_cols = ["updated_at", "created_at"]
+    other_cols = ["id"]
+
+    # Retirer les colonnes non-utiles
+    cols_to_drop = list(set(df.columns) - set(txt_cols + date_cols + other_cols))
     df = df.drop(columns=cols_to_drop)
+
+    # Convertir les types
+    df = convert_grist_date_to_date(df=df, columns=date_cols)
+
+    # Nettoyer les données
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
     return df
 
 
@@ -48,7 +61,7 @@ def process_ref_promotion_fac(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_ref_semainier(df: pd.DataFrame) -> pd.DataFrame:
     df["date_semaine"] = pd.to_datetime(df["date_semaine"], unit="s")
-    df = df.drop(columns=["annee", "trimestre", "mois", "is_duplicate"])
+    df = df.drop(columns=["is_duplicate"])
     return df
 
 
@@ -85,6 +98,7 @@ def process_ref_typologie_accompagnement(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_accompagnement_mi(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = [
         "id",
         "intitule",
@@ -99,6 +113,7 @@ def process_accompagnement_mi(df: pd.DataFrame) -> pd.DataFrame:
         "places_restantes",
         "est_ouvert_notation",
         "informations_complementaires",
+        "id_type_accompagnement",
     ]
     cols_to_drop = list(set(df.columns) - set(cols_to_keep))
     df = df.drop(columns=cols_to_drop)
@@ -106,15 +121,15 @@ def process_accompagnement_mi(df: pd.DataFrame) -> pd.DataFrame:
         columns={
             "direction": "id_direction",
             "pole": "id_pole",
-            "type_d_accompagnement": "id_type_accompagnement",
+            "type_d_accompagnement": "id_type_d_accompagnement",
         }
     )
     df["date_de_realisation"] = pd.to_datetime(df["date_de_realisation"], unit="s")
     df["informations_complementaires"] = (
         df["informations_complementaires"].str.strip().str.split().str.join(" ")
     )
-    df[["id_direction", "id_pole", "id_type_accompagnement"]] = df[
-        ["id_direction", "id_pole", "id_type_accompagnement"]
+    df[["id_direction", "id_pole", "id_type_d_accompagnement"]] = df[
+        ["id_direction", "id_pole", "id_type_d_accompagnement"]
     ].replace(0, None)
 
     return df
@@ -124,11 +139,11 @@ def process_accompagnement_mi_satisfaction(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(
         columns={
             "accompagnement": "id_accompagnement",
-            "type_d_accompagnement": "id_type_accompagnement",
+            "type_d_accompagnement": "id_type_d_accompagnement",
         }
     )
-    df[["id_accompagnement", "id_type_accompagnement"]] = df[
-        ["id_accompagnement", "id_type_accompagnement"]
+    df[["id_accompagnement", "id_type_d_accompagnement"]] = df[
+        ["id_accompagnement", "id_type_d_accompagnement"]
     ].replace(0, None)
     return df
 
@@ -170,6 +185,7 @@ def process_bilaterale(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_bilaterale_remontee(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.drop(columns=["id_direction"])
     df = df.rename(
         columns={
             "bilaterale": "id_bilaterale",
@@ -201,6 +217,10 @@ def process_correspondant(df: pd.DataFrame) -> pd.DataFrame:
             "is_duplicate",
             "check_mail",
             "fac_certifications_realisees",
+            "poste",
+            "cause_inactivite",
+            "old_promotion_fac",
+            "connaissance_communaute",
         ]
     )
     df = df.rename(
@@ -223,19 +243,21 @@ def process_correspondant(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
-    cols_to_keep = ["mail", "type_de_correspondant"]
+    # Gérer les colonnes
+    cols_to_keep = ["id", "type_de_correspondant"]
     cols_to_drop = list(set(df.columns) - set(cols_to_keep))
     df = df.drop(columns=cols_to_drop)
-    df = df.rename(columns={"type_de_correspondant": "id_type_correspondant"})
-    df = df.drop_duplicates(subset=["mail"], keep="last")
-    df = df.dropna(subset=["mail"])
-    df["mail"] = df["mail"].str.strip()
-    df = df.loc[df["mail"] != ""]
+    df = df.rename(
+        columns={
+            "id": "id_correspondant",
+            "type_de_correspondant": "id_type_de_correspondant",
+        }
+    )
+
     # Convert str of list to python list
-    df = convert_str_of_list_to_list(df=df, col_to_convert="id_type_correspondant")
-    df = df.explode("id_type_correspondant")
-    df = df.reset_index(drop=True)
-    df["id"] = df.index
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_type_de_correspondant")
+    df = df.explode(column="id_type_de_correspondant")
+
     return df
 
 
