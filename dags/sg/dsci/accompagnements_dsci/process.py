@@ -216,24 +216,24 @@ def process_bilaterale_remontee(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_correspondant(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(
-        columns=[
-            "type_de_correspondant",
-            "type_correspondant_text",
-            "competence_particuliere",
-            "created_by",
-            "created_at",
-            "updated_at",
-            "updated_by",
-            "is_duplicate",
-            "check_mail",
-            "fac_certifications_realisees",
-            "poste",
-            "cause_inactivite",
-            "old_promotion_fac",
-            "connaissance_communaute",
-        ]
-    )
+    cols_to_keep = [
+        "id",
+        "mail",
+        "nom_complet",
+        "direction",
+        "entite",
+        "region",
+        "actif",
+        "promotion_fac",
+        "est_certifie_fac",
+        "actif_communaute_fac",
+        "direction_hors_mef",
+        "prenom",
+        "nom",
+        "date_debut_inactivite",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     df = df.rename(
         columns={
             "direction": "id_direction",
