@@ -1,21 +1,7 @@
 import pandas as pd
-import ast
 
 from utils.config.vars import NO_PROCESS_MSG
-
-
-def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    print("Normalizing dataframe")
-    df.columns = map(str.lower, df.columns)
-    df = df.drop(df.filter(regex="^(grist|manual)").columns, axis=1)
-    return df
-
-
-def convert_str_of_list_to_list(df: pd.DataFrame, col_to_convert: str) -> pd.DataFrame:
-    df[col_to_convert] = df[col_to_convert].apply(
-        lambda x: ast.literal_eval(x) if isinstance(x, str) else x
-    )
-    return df
+from utils.control.structures import convert_str_of_list_to_list
 
 
 """
