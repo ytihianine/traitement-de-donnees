@@ -1,6 +1,7 @@
 import pandas as pd
 
 from utils.config.vars import NO_PROCESS_MSG
+from utils.control.dates import convert_grist_date_to_date
 from utils.control.structures import (
     convert_str_of_list_to_list,
     handle_grist_null_references,
@@ -240,15 +241,23 @@ def process_correspondant(df: pd.DataFrame) -> pd.DataFrame:
             "promotion_fac": "id_promotion_fac",
         }
     )
-    df = df.dropna(subset=["mail"])
-    df["mail"] = df["mail"].str.strip()
-    df = df.loc[df["mail"] != ""]
-    df = df.drop_duplicates(subset=["mail"], keep="last")
-    df["date_debut_inactivite"] = pd.to_datetime(df["date_debut_inactivite"], unit="s")
-    df["id_region"] = df["id_region"].replace(0.0, None)
-    df["id_region"] = df["id_region"].replace(0, None)
-    df["id_direction"] = df["id_direction"].replace(0.0, None)
-    df["id_direction"] = df["id_direction"].replace(0, None)
+
+    # Convert date
+    date_cols = ["date_debut_inactivite"]
+    df = convert_grist_date_to_date(df=df, columns=date_cols)
+
+    # Cleaning
+    txt_cols = ["mails"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Filtrer les lignes
+    # rows_to_drop = df.loc[(df["mail"] != "") | (df["mail"].isna())].index()
+    df = df.loc[(df["mail"] != "") & (~df["mail"].isna())]
+
+    # Gérer les références
+    ref_cols = ["id_region", "id_direction"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
     return df
 
 
