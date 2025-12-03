@@ -98,7 +98,7 @@ def process_ref_typologie_accompagnement(df: pd.DataFrame) -> pd.DataFrame:
 """
 
 
-def process_struc_accompagnement_mi(df: pd.DataFrame) -> pd.DataFrame:
+def process_accompagnement_mi(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_keep = [
         "id",
         "intitule",
@@ -134,7 +134,7 @@ def process_struc_accompagnement_mi(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_accompagnement_mi_satisfaction(df: pd.DataFrame) -> pd.DataFrame:
+def process_accompagnement_mi_satisfaction(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(
         columns={
             "accompagnement": "id_accompagnement",
@@ -152,23 +152,23 @@ def process_struc_accompagnement_mi_satisfaction(df: pd.DataFrame) -> pd.DataFra
 """
 
 
-def process_struc_accompagnement_dsci(df: pd.DataFrame) -> pd.DataFrame:
+def process_accompagnement_dsci(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_accompagnement_opportunite_cci(df: pd.DataFrame) -> pd.DataFrame:
+def process_accompagnement_opportunite_cci(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_animateur_externe(df: pd.DataFrame) -> pd.DataFrame:
+def process_animateur_externe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_animateur_fac(df: pd.DataFrame) -> pd.DataFrame:
+def process_animateur_fac(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_animateur_interne(df: pd.DataFrame) -> pd.DataFrame:
+def process_animateur_interne(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
@@ -177,13 +177,13 @@ def process_struc_animateur_interne(df: pd.DataFrame) -> pd.DataFrame:
 """
 
 
-def process_struc_bilaterales(df: pd.DataFrame) -> pd.DataFrame:
+def process_bilaterale(df: pd.DataFrame) -> pd.DataFrame:
     df["date_de_rencontre"] = pd.to_datetime(df["date_de_rencontre"], unit="s")
     df = df.rename(columns={"direction": "id_direction"})
     return df
 
 
-def process_struc_bilaterale_remontee(df: pd.DataFrame) -> pd.DataFrame:
+def process_bilaterale_remontee(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(
         columns={
             "bilaterale": "id_bilaterale",
@@ -202,7 +202,7 @@ def process_struc_bilaterale_remontee(df: pd.DataFrame) -> pd.DataFrame:
 """
 
 
-def process_struc_correspondant(df: pd.DataFrame) -> pd.DataFrame:
+def process_correspondant(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(
         columns=[
             "type_de_correspondant",
@@ -236,7 +236,7 @@ def process_struc_correspondant(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
+def process_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_keep = ["mail", "type_de_correspondant"]
     cols_to_drop = list(set(df.columns) - set(cols_to_keep))
     df = df.drop(columns=cols_to_drop)
@@ -253,7 +253,7 @@ def process_struc_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_correspondant_certification(df: pd.DataFrame) -> pd.DataFrame:
+def process_correspondant_certification(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_keep = ["mail", "type_de_correspondant"]
     cols_to_drop = list(set(df.columns) - set(cols_to_keep))
     df = df.drop(columns=cols_to_drop)
@@ -268,37 +268,37 @@ def process_struc_correspondant_certification(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_effectif_dsci(df: pd.DataFrame) -> pd.DataFrame:
+def process_effectif_dsci(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_laboratoires_territoriaux(df: pd.DataFrame) -> pd.DataFrame:
+def process_laboratoires_territoriaux(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_quest_accompagnement_fac_hors_bercylab(
+def process_quest_accompagnement_fac_hors_bercylab(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
     return df
 
 
-def process_struc_quest_inscription_passinnov(df: pd.DataFrame) -> pd.DataFrame:
+def process_quest_inscription_passinnov(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_quest_satisfaction_accompagnement_cci(
+def process_quest_satisfaction_accompagnement_cci(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
     return df
 
 
-def process_struc_quest_satisfaction_formation_fac(df: pd.DataFrame) -> pd.DataFrame:
+def process_quest_satisfaction_formation_fac(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_quest_satisfaction_passinnov(df: pd.DataFrame) -> pd.DataFrame:
+def process_quest_satisfaction_passinnov(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_struc_charge_agent_cci(df: pd.DataFrame) -> pd.DataFrame:
+def process_charge_agent_cci(df: pd.DataFrame) -> pd.DataFrame:
     return df
