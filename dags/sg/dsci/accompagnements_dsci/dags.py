@@ -53,7 +53,7 @@ def accompagnements_dsci_dag() -> None:
             doc_id_key="grist_doc_id_accompagnements_dsci",
         ),
         [referentiels(), bilaterales(), correspondant(), mission_innovation()],
-        create_tmp_tables(),
+        create_tmp_tables(reset_id_seq=False),
         import_file_to_db.partial(keep_file_id_col=True).expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
