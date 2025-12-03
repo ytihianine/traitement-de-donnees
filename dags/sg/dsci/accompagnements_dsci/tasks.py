@@ -43,11 +43,6 @@ def referentiels() -> None:
         normalisation_process_func=process.normalize_dataframe,
         process_func=process.process_ref_profil_correspondant,
     )
-    ref_promotion_fac = create_grist_etl_task(
-        selecteur="ref_promotion_fac",
-        normalisation_process_func=process.normalize_dataframe,
-        process_func=process.process_ref_promotion_fac,
-    )
     ref_qualite_service = create_grist_etl_task(
         selecteur="ref_qualite_service",
         normalisation_process_func=process.normalize_dataframe,
@@ -87,7 +82,6 @@ def referentiels() -> None:
             ref_competence_particuliere(),
             ref_direction(),
             ref_profil_correspondant(),
-            ref_promotion_fac(),
             ref_qualite_service(),
             ref_region(),
             ref_semainier(),
