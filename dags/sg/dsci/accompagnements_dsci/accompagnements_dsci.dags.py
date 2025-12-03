@@ -1,7 +1,6 @@
 from datetime import timedelta
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
 
 from utils.tasks.sql import (
     create_tmp_tables,
@@ -32,7 +31,8 @@ LINK_DOC_DATA = (
 @dag(
     dag_id="accompagnements_dsci",
     schedule_interval="*/5 8-13,14-19 * * 1-5",
-    default_args=create_default_args(retries=1, retry_delay=timedelta(seconds=30)),
+    default_args=create_default_args(),
+    max_consecutive_failed_dag_runs=1,
     catchup=False,
     params=create_dag_params(
         nom_projet=nom_projet,
@@ -42,7 +42,7 @@ LINK_DOC_DATA = (
         mail_enable=False,
     ),
 )
-def accompagnements_dsci_dag():
+def accompagnements_dsci_dag() -> None:
 
     # Ordre des tâches
     chain(
