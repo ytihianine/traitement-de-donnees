@@ -247,7 +247,7 @@ def process_correspondant(df: pd.DataFrame) -> pd.DataFrame:
     df = convert_grist_date_to_date(df=df, columns=date_cols)
 
     # Cleaning
-    txt_cols = ["mails"]
+    txt_cols = ["mail"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     # Filtrer les lignes
