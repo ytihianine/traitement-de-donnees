@@ -345,10 +345,33 @@ def process_demande_paiement_complet(
     df_dp_sfp: pd.DataFrame,
 ) -> pd.DataFrame:
     # Fusionner les datasets
-    df = pd.merge(left=df_dp, right=df_dp_journal_pieces, how="left", on=["id_dp"])
-    df = pd.merge(left=df, right=df_dp_carte_achat, how="left", on=["id_dp"])
-    df = pd.merge(left=df, right=df_dp_flux, how="left", on=["id_dp"])
-    df = pd.merge(left=df, right=df_dp_sfp, how="left", on=["id_dp"])
+    df = pd.merge(
+        left=df_dp,
+        right=df_dp_journal_pieces,
+        how="left",
+        on=["id_dp", "annee_exercice"],
+    )
+    df = pd.merge(
+        left=df,
+        right=df_dp_carte_achat,
+        how="left",
+        on=["id_dp", "annee_exercice"],
+        suffixes=("_a", "_b"),
+    )
+    df = pd.merge(
+        left=df,
+        right=df_dp_flux,
+        how="left",
+        on=["id_dp", "annee_exercice"],
+        suffixes=("_c", "_d"),
+    )
+    df = pd.merge(
+        left=df,
+        right=df_dp_sfp,
+        how="left",
+        on=["id_dp", "annee_exercice"],
+        suffixes=("_e", "_f"),
+    )
 
     # Supprimer les colonnes
     df = df.drop(df.filter(regex="import_timestamp|import_date").columns, axis=1)  # type: ignore
