@@ -96,6 +96,8 @@ get_sp = create_action_to_file_etl_task(
     output_selecteur="service_prescripteur",
     task_id="get_service_prescripteur",
     action_func=actions.get_sp,
+    add_import_date=False,
+    add_snapshot_id=False,
 )
 
 
