@@ -396,6 +396,5 @@ def add_service_prescripteurs(df: pd.DataFrame, df_sp: pd.DataFrame) -> pd.DataF
         left_on=["cf_cc"],
         right_on=["couple_cf_cc"],
     )
-    df = df.rename({"service_prescripteur_choisi_selon_cf_cc": "service_prescripteur"})
 
     return df
