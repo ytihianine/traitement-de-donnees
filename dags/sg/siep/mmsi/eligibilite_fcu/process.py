@@ -12,8 +12,11 @@ def can_perform_api_call(lat: float, lon: float) -> bool:
     Returns:
         bool: True if both lat and lon are defined
     """
-    if isinstance(lat, float) and isinstance(lon, float):
-        return True
+    if lat == pd.NA or lon == pd.NA:
+        return False
+
+    if not isinstance(lat, float) or isinstance(lon, float):
+        return False
 
     return False
 

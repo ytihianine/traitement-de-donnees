@@ -33,8 +33,6 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
                 FROM siep.bien_localisation
                 WHERE snapshot_id = %s
             )
-            AND sbl.latitude IS NOT NULL
-            AND sbl.longitude IS NOT NULL
             ;
         """,
         parameters=(snapshot_id, snapshot_id),
