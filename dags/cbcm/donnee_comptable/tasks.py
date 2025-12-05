@@ -136,8 +136,8 @@ def ajout_sp() -> None:
 
 @task_group(group_id="dataset_additionnel")
 def datasets_additionnels() -> None:
-    demande_paiement_complet = create_multi_files_input_etl_task(
-        output_selecteur="demande_paiement_complet",
+    demande_paiement_complet_sp = create_multi_files_input_etl_task(
+        output_selecteur="demande_paiement_complet_sp",
         input_selecteurs=[
             "demande_paiement",
             "demande_paiement_carte_achat",
@@ -145,7 +145,7 @@ def datasets_additionnels() -> None:
             "demande_paiement_journal_pieces",
             "demande_paiement_sfp",
         ],
-        process_func=process.process_demande_paiement_complet,
+        process_func=process.process_demande_paiement_complet_sp,
     )
 
-    chain(demande_paiement_complet())
+    chain(demande_paiement_complet_sp())

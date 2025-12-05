@@ -337,7 +337,7 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_demande_paiement_complet(
+def process_demande_paiement_complet_sp(
     df_dp: pd.DataFrame,
     df_dp_carte_achat: pd.DataFrame,
     df_dp_flux: pd.DataFrame,
