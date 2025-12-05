@@ -1,18 +1,28 @@
 DROP TABLE IF EXISTS siep.bien_eligibilite_fcu;
 CREATE TABLE IF NOT EXISTS siep.bien_eligibilite_fcu (
-    id BIGSERIAL,
     code_bat_ter BIGINT NOT NULL,
     is_eligible BOOLEAN,
     distance INT,
+    distance_rattachement TEXT,
     in_pdp BOOLEAN,
-    is_based_on_iris BOOLEAN,
+    pdp TEXT,
+    -- is_based_on_iris BOOLEAN,
     futur_network BOOLEAN,
+    rcu_etat TEXT,
     id_fcu TEXT,
     name TEXT,
     gestionnaire_fcu TEXT,
-    rate_enrr DOUBLE PRECISION,
+    -- rate_enrr DOUBLE PRECISION,
+    taux_enrr_rcu DOUBLE PRECISION,
     rate_co2 DOUBLE PRECISION,
+    contenu_rcu_gco2 DOUBLE PRECISION,
     api_status TEXT,
     api_status_code INT,
-    api_raison TEXT
-);
+    api_raison TEXT,
+    import_timestamp TIMESTAMP,
+    import_date DATE,
+    snapshot_id TEXT,
+    import_timestamp_oad TIMESTAMP,
+    PRIMARY KEY (snapshot_id, import_timestamp, code_bat_ter),
+    FOREIGN KEY(code_bat_ter, import_timestamp_oad, snapshot_id) REFERENCES siep.bien(code_bat_ter, import_timestamp, snapshot_id)
+)PARTITION BY RANGE (import_timestamp);
