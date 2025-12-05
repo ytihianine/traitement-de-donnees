@@ -52,21 +52,21 @@ corr_type_ej = {
 }
 
 corr_nature_sous_nature = {
-    "2.1": "2.1 : Locations et charges immobilières",
-    "2.2": "2.2 : Télécommunications, énergie, eau",
-    "2.3": "2.3 : Marches publics",
-    "3.1": "3.1 : Frais de déplacement",
-    "3.2": "3.2 : Bourses",
-    "3.3": "3.3 : Autres Dépenses barêmées",
-    "3.4": "3.4 : Frais de changement de résidence",
-    "5.0": "5.0 : Paie / Capitaux décès",
-    "9.9": "9.9 : Autres",
-    "3.0": "3.0 : Code technique",
-    "4.1": "4.1 : Subventions aux ménages",
-    "4.2": "4.2 : Subventions aux entreprises",
-    "4.3": "4.3 : Subventions aux collectivités",
-    "4.4": "4.4 : Subventions européennes",
-    "6.0": "6.0 : Dépenses sans ordonnancement",
+    2.1: "2.1 : Locations et charges immobilières",
+    2.2: "2.2 : Télécommunications, énergie, eau",
+    2.3: "2.3 : Marches publics",
+    3.1: "3.1 : Frais de déplacement",
+    3.2: "3.2 : Bourses",
+    3.3: "3.3 : Autres Dépenses barêmées",
+    3.4: "3.4 : Frais de changement de résidence",
+    5.0: "5.0 : Paie / Capitaux décès",
+    9.9: "9.9 : Autres",
+    3.0: "3.0 : Code technique",
+    4.1: "4.1 : Subventions aux ménages",
+    4.2: "4.2 : Subventions aux entreprises",
+    4.3: "4.3 : Subventions aux collectivités",
+    4.4: "4.4 : Subventions européennes",
+    6.0: "6.0 : Dépenses sans ordonnancement",
 }
 
 
