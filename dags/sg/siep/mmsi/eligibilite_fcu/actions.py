@@ -53,6 +53,7 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
             longitude=row.longitude,
         )
         api_result["code_bat_ter"] = row.code_bat_ter
+        api_result["import_timestamp_oad"] = row.import_timestamp_oad
         api_results.append(api_result)
         print(api_result)
 
