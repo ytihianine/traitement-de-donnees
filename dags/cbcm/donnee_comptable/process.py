@@ -218,7 +218,7 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
         .fillna("non determine")
     )
     df["nat_snat_groupe"] = np.where(
-        df["nature_sous_nature"].isin(["2.1", "2.2", "2.3"]),
+        df["nature_sous_nature"].isin([2.1, 2.2, 2.3]),
         "Commande publique",
         "Hors Commande publique",
     )
