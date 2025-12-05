@@ -21,7 +21,7 @@ def can_perform_api_call(lat: float, lon: float) -> bool:
     if not isinstance(lat, float) or isinstance(lon, float):
         return False
 
-    return False
+    return True
 
 
 def process_result(df: pd.DataFrame) -> pd.DataFrame:
