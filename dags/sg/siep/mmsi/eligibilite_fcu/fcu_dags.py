@@ -5,6 +5,7 @@ from airflow.models.baseoperator import chain
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_projet_config
+from utils.config.types import LoadStrategy
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
@@ -56,11 +57,11 @@ def eligibilite_fcu_dag() -> None:
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         get_eligibilite_fcu(),
         process_fcu_result(),
-        create_tmp_tables(),
+        create_tmp_tables(reset_id_seq=False),
         import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
-        copy_tmp_table_to_real_table(),
+        copy_tmp_table_to_real_table(load_strategy=LoadStrategy.APPEND),
         copy_s3_files(bucket="dsci"),
         del_s3_files(bucket="dsci"),
     )
