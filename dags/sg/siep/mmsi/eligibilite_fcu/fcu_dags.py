@@ -17,7 +17,10 @@ from utils.tasks.s3 import (
     del_s3_files,
 )
 
-from dags.sg.siep.mmsi.eligibilite_fcu.task import eligibilite_fcu_to_file
+from dags.sg.siep.mmsi.eligibilite_fcu.task import (
+    get_eligibilite_fcu,
+    process_fcu_result,
+)
 
 
 nom_projet = "France Chaleur Urbaine (FCU)"
@@ -51,7 +54,8 @@ def eligibilite_fcu_dag() -> None:
 
     chain(
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
-        eligibilite_fcu_to_file(),
+        get_eligibilite_fcu(),
+        process_fcu_result(),
         create_tmp_tables(),
         import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)

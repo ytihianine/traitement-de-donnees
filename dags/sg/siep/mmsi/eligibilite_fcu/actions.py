@@ -57,7 +57,6 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
         print(api_result)
 
     df_result = pd.DataFrame(data=api_results)
-    df_result = process_result(df=df_result)
     df_info(df=df_result, df_name="Result API - After processing")
 
     return df_result

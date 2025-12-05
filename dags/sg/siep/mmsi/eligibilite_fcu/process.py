@@ -1,5 +1,8 @@
 import pandas as pd
+import numpy as np
+
 from infra.http_client.base import AbstractHTTPClient
+from utils.control.text import normalize_whitespace_columns
 
 
 def can_perform_api_call(lat: float, lon: float) -> bool:
@@ -31,13 +34,18 @@ def process_result(df: pd.DataFrame) -> pd.DataFrame:
         "id": "id_fcu",
         "name": "name",
         "gestionnaire": "gestionnaire_fcu",
-        "rateENRR": "rate_enrr",
+        "rateENRR": "taux_enrr_rcu",
         "rateCO2": "rate_co2",
     }
 
     df = df.rename(columns=cols_mapping)
-    df["name"] = df["name"].str.split().str.join(" ")
-    df["gestionnaire_fcu"] = df["gestionnaire_fcu"].str.split().str.join(" ")
+    txt_cols = ["name", "gestionnaire_fcu"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Colonnes additionnelles
+    df["pdp"] = np.where(df["in_pdp"], "PDP", "HORS PDP")
+    df["rcu_etat"] = np.where(df["futur_network"], "En construction", "En service")
+    df["contenu_rcu_gco2"] = df["rate_co2"] * 1000
 
     return df.convert_dtypes()
 
