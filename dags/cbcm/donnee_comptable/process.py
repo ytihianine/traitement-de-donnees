@@ -393,8 +393,7 @@ def add_service_prescripteurs(df: pd.DataFrame, df_sp: pd.DataFrame) -> pd.DataF
         left=df,
         right=df_sp,
         how="left",
-        left_on=["cf_cc"],
-        right_on=["couple_cf_cc"],
+        on=["cf_cc"],
     )
 
     return df

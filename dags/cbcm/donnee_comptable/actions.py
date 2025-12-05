@@ -70,7 +70,7 @@ def get_sp() -> pd.DataFrame:
     # Récupérer les SP déjà connus
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
     df = db_handler.fetch_df(
-        query="""SELECT dcsp.couple_cf_cc, dcrspc.service_prescripteur
+        query="""SELECT dcsp.couple_cf_cc as cf_cc, dcrspc.service_prescripteur
             FROM donnee_comptable.service_prescripteur dcsp
             LEFT JOIN donnee_comptable.ref_service_prescripteur_choisi dcrspc
                 ON dcsp.service_prescripteur_choisi_selon_cf_cc = dcrspc.id;"""
