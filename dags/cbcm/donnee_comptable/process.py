@@ -388,14 +388,10 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
 # ======================================================
 # Ajout des services prescipteurs
 # ======================================================
-def add_service_prescripteurs(dfs: list[pd.DataFrame]) -> pd.DataFrame:
-    dfs_needed = 2
-    if len(dfs) != dfs_needed:
-        raise ValueError(f"Cette fonction a besoin de {dfs_needed} dataframes.")
-
+def add_service_prescripteurs(df: pd.DataFrame, df_sp: pd.DataFrame) -> pd.DataFrame:
     df = pd.merge(
-        left=dfs[0],
-        right=dfs[1],
+        left=df,
+        right=df_sp,
         how="left",
         left_on=["cf_cc"],
         right_on=["couple_cf_cc"],
