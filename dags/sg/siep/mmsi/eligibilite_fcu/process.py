@@ -47,6 +47,16 @@ def process_result(df: pd.DataFrame) -> pd.DataFrame:
     df["rcu_etat"] = np.where(df["futur_network"], "En construction", "En service")
     df["contenu_rcu_gco2"] = df["rate_co2"] * 1000
 
+    palier = [0, 50, 100, 150, np.inf]
+    labels = ["RCU à 50m", "RCU à 100m", "RCU à 150m", "SUP 150m"]
+    df["distance_rattachement"] = pd.cut(
+        x=df["distance"],
+        bins=palier,
+        labels=labels,
+        right=True,
+        include_lowest=False,
+    )
+
     return df.convert_dtypes()
 
 
