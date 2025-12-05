@@ -375,7 +375,7 @@ def process_demande_paiement_complet(
     )
 
     # Supprimer les colonnes en doublon
-    duplicate_to_drop = "societe_|centre_financier_|import_timestamp_|import_date_"
+    duplicate_to_drop = "societe_|centre_financier_|automatisation_wf_cpt_|import_timestamp_|import_date_"
     df = df.drop(df.filter(regex=duplicate_to_drop).columns, axis=1)  # type: ignore
 
     return df
