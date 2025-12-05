@@ -9,6 +9,7 @@ from utils.config.types import LoadStrategy
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
+    delete_tmp_tables,
     ensure_partition,
     get_projet_snapshot,
     import_file_to_db,
@@ -56,8 +57,8 @@ def eligibilite_fcu_dag() -> None:
 
     chain(
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
-        # get_eligibilite_fcu(),
-        # process_fcu_result(),
+        get_eligibilite_fcu(),
+        process_fcu_result(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
@@ -66,6 +67,7 @@ def eligibilite_fcu_dag() -> None:
         copy_tmp_table_to_real_table(load_strategy=LoadStrategy.APPEND),
         copy_s3_files(bucket="dsci"),
         del_s3_files(bucket="dsci"),
+        delete_tmp_tables(),
     )
 
 
