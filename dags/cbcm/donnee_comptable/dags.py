@@ -32,6 +32,7 @@ from dags.cbcm.donnee_comptable.tasks import (
     add_new_sp,
     get_sp,
     ajout_sp,
+    datasets_additionnels,
 )
 
 
@@ -87,6 +88,7 @@ def chorus_donnees_comptables() -> None:
         add_new_sp(),
         get_sp(),
         ajout_sp(),
+        datasets_additionnels(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)

@@ -337,14 +337,21 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_demande_paiement_complet(dfs: list[pd.DataFrame]) -> pd.DataFrame:
-    dfs_needed = 4
-    if len(dfs) != dfs_needed:
-        raise ValueError(f"Cette fonction a besoin de {dfs_needed} dataframes.")
+def process_demande_paiement_complet(
+    df_dp: pd.DataFrame,
+    df_dp_carte_achat: pd.DataFrame,
+    df_dp_flux: pd.DataFrame,
+    df_dp_journal_pieces: pd.DataFrame,
+    df_dp_sfp: pd.DataFrame,
+) -> pd.DataFrame:
+    # Fusionner les datasets
+    df = pd.merge(left=df_dp, right=df_dp_journal_pieces, how="left", on=["id_dp"])
+    df = pd.merge(left=df, right=df_dp_carte_achat, how="left", on=["id_dp"])
+    df = pd.merge(left=df, right=df_dp_flux, how="left", on=["id_dp"])
+    df = pd.merge(left=df, right=df_dp_sfp, how="left", on=["id_dp"])
 
-    df = pd.merge(left=dfs[0], right=dfs[1], how="left", on=["id_dp"])
-    df = pd.merge(left=df, right=dfs[2], how="left", on=["id_dp"])
-    df = pd.merge(left=df, right=dfs[3], how="left", on=["id_dp"])
+    # Supprimer les colonnes
+    df = df.drop(df.filter(regex="import_timestamp|import_date").columns, axis=1)  # type: ignore
 
     return df
 
