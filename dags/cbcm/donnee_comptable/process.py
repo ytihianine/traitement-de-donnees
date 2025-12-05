@@ -1,3 +1,4 @@
+from infra.database.factory import create_db_handler
 import pandas as pd
 import numpy as np
 
@@ -151,7 +152,7 @@ def process_engagement_juridique(df: pd.DataFrame) -> pd.DataFrame:
         df["id_ej"].astype(str) + "_" + df["centre_financier"] + "_" + df["centre_cout"]
     )
     df["annee_exercice"] = df.loc[:, "date_creation_ej"].dt.year
-    df["mois_ej"] = df.loc[:, "date_creation_ej"].dt.month
+    df["mois_nombre"] = df.loc[:, "date_creation_ej"].dt.month
 
     # Suppression des doublons
     df = df.drop_duplicates(subset=["ej_cf_cc"])
@@ -336,6 +337,18 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def process_demande_paiement_complet(dfs: list[pd.DataFrame]) -> pd.DataFrame:
+    dfs_needed = 4
+    if len(dfs) != dfs_needed:
+        raise ValueError(f"Cette fonction a besoin de {dfs_needed} dataframes.")
+
+    df = pd.merge(left=dfs[0], right=dfs[1], how="left", on=["id_dp"])
+    df = pd.merge(left=df, right=dfs[2], how="left", on=["id_dp"])
+    df = pd.merge(left=df, right=dfs[3], how="left", on=["id_dp"])
+
+    return df
+
+
 # ======================================================
 # Délai global de paiement (DGP)
 # ======================================================
@@ -368,5 +381,25 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
 
     # Arrondir les valeurs
     df["delai_global_paiement"] = df["delai_global_paiement"].round(2)
+
+    return df
+
+
+# ======================================================
+# Ajout des services prescipteurs
+# ======================================================
+def add_service_prescripteurs(dfs: list[pd.DataFrame]) -> pd.DataFrame:
+    dfs_needed = 2
+    if len(dfs) != dfs_needed:
+        raise ValueError(f"Cette fonction a besoin de {dfs_needed} dataframes.")
+
+    df = pd.merge(
+        left=dfs[0],
+        right=dfs[1],
+        how="left",
+        left_on=["cf_cc"],
+        right_on=["couple_cf_cc"],
+    )
+    df = df.rename({"service_prescripteur_choisi_selon_cf_cc": "service_prescripteur"})
 
     return df

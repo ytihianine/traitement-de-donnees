@@ -5,7 +5,9 @@ from utils.tasks.validation import create_validate_params_task
 from utils.config.types import ALL_PARAM_PATHS
 from utils.tasks.etl import (
     create_action_from_multi_input_files_etl_task,
+    create_action_to_file_etl_task,
     create_file_etl_task,
+    create_multi_files_input_etl_task,
 )
 
 from dags.cbcm.donnee_comptable import process
@@ -89,3 +91,61 @@ add_new_sp = create_action_from_multi_input_files_etl_task(
     ],
     action_func=actions.load_new_sp,
 )
+
+get_sp = create_action_to_file_etl_task(
+    output_selecteur="service_prescripteur",
+    task_id="get_service_prescripteur",
+    action_func=actions.get_sp,
+)
+
+
+@task_group(group_id="ajout_sp")
+def ajout_sp() -> None:
+    demande_achat_sp = create_multi_files_input_etl_task(
+        output_selecteur="demande_achat_sp",
+        input_selecteurs=["demande_achat", "service_prescripteur"],
+        process_func=process.add_service_prescripteurs,
+    )
+    engagement_juridique_sp = create_multi_files_input_etl_task(
+        output_selecteur="engagement_juridique_sp",
+        input_selecteurs=["engagement_juridique", "service_prescripteur"],
+        process_func=process.add_service_prescripteurs,
+    )
+    demande_paiement_journal_pieces_sp = create_multi_files_input_etl_task(
+        output_selecteur="demande_paiement_journal_pieces_sp",
+        input_selecteurs=["demande_paiement_journal_pieces", "service_prescripteur"],
+        process_func=process.add_service_prescripteurs,
+    )
+    delai_global_paiement_sp = create_multi_files_input_etl_task(
+        output_selecteur="delai_global_paiement_sp",
+        input_selecteurs=["delai_global_paiement", "service_prescripteur"],
+        process_func=process.add_service_prescripteurs,
+    )
+
+    chain(
+        [
+            demande_achat_sp(),
+            engagement_juridique_sp(),
+            demande_paiement_journal_pieces_sp(),
+            delai_global_paiement_sp(),
+        ]
+    )
+
+
+# @task_group(group_id="dataset_additionnel")
+# def dataset_additionnel() -> None:
+#     demande_paiement_complet = create_multi_files_input_etl_task(
+#         output_selecteur="demande_paiement_complet",
+#         input_selecteurs=[
+#             "demande_paiement",
+#             "demande_paiement_carte_achat",
+#             "demande_paiement_flux",
+#             "demande_paiement_journal_pieces",
+#             "demande_paiement_sfp",
+#         ],
+#         process_func=process.process_demande_paiement_complet
+#     )
+
+#     chain(
+#         demande_paiement_complet()
+#     )

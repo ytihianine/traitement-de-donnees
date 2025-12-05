@@ -64,3 +64,14 @@ def load_new_sp(dfs: list[pd.DataFrame]) -> None:
             print("Les nouveaux couples à ajouter existent déjà dans Grist !!")
     else:
         print("Aucun nouveau couple CF-CC ... Skipping")
+
+
+def get_sp() -> pd.DataFrame:
+    # Récupérer les SP déjà connus
+    db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
+    df = db_handler.fetch_df(
+        query="""SELECT couple_cf_cc, service_prescripteur_choisi_selon_cf_cc
+            FROM donnee_comptable.service_prescripteur;"""
+    )
+
+    return df
