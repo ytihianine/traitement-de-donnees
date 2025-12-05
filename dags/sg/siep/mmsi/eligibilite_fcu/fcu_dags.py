@@ -9,6 +9,7 @@ from utils.config.types import LoadStrategy
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
+    ensure_partition,
     get_projet_snapshot,
     import_file_to_db,
 )
@@ -61,6 +62,7 @@ def eligibilite_fcu_dag() -> None:
         import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
+        ensure_partition(),
         copy_tmp_table_to_real_table(load_strategy=LoadStrategy.APPEND),
         copy_s3_files(bucket="dsci"),
         del_s3_files(bucket="dsci"),
