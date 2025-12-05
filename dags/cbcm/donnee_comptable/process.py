@@ -125,46 +125,6 @@ def process_demande_achat(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_demande_achat_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
-    """fichier ZJDP"""
-    # Remplacer les valeurs nulles
-    df[["centre_financier", "centre_cout"]] = df[
-        ["centre_financier", "centre_cout"]
-    ].fillna("Ind")
-
-    # Nettoyer les champs textuels
-    txt_cols = ["societe", "centre_cout", "centre_financier"]
-    df = normalize_whitespace_columns(df, columns=txt_cols)
-
-    # Ajouter les colonnes complémentaires
-    df["id_dp"] = (
-        df["annee_exercice_piece_fi"].astype(str)
-        + df["societe"]
-        + df["num_piece_reference"].astype(str)
-    )
-    df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
-    df["id_dp_cf_cc"] = df["id_dp"] + df["cf_cc"]
-
-    # Suppression des doublons
-    df = df.drop_duplicates(subset=["id_dp_cf_cc"])
-
-    # Regroupement
-    df_grouped = df.groupby(by=["id_dp"], as_index=False)["id_dp_cf_cc"].count()
-    df_grouped = df_grouped.rename(columns={"id_dp_cf_cc": "nb_poste"})
-
-    # Catégoriser les données
-    df_grouped["unique_multi"] = np.where(
-        df_grouped["nb_poste"] == 1,
-        "Unique",
-        "Multiple",
-    )
-
-    # Ajout des colonnes calculées
-    df = pd.merge(left=df, right=df_grouped, how="left", on="id_dp")
-
-    return df
-
-
 # ======================================================
 # Engagement juridique (EJ)
 # ======================================================
@@ -333,6 +293,46 @@ def process_demande_paiement_carte_achat(df: pd.DataFrame) -> pd.DataFrame:
 
     # Suppression des doublons
     df = df.drop_duplicates(subset=["id_dp"])
+    return df
+
+
+def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
+    """fichier ZJDP"""
+    # Remplacer les valeurs nulles
+    df[["centre_financier", "centre_cout"]] = df[
+        ["centre_financier", "centre_cout"]
+    ].fillna("Ind")
+
+    # Nettoyer les champs textuels
+    txt_cols = ["societe", "centre_cout", "centre_financier"]
+    df = normalize_whitespace_columns(df, columns=txt_cols)
+
+    # Ajouter les colonnes complémentaires
+    df["id_dp"] = (
+        df["annee_exercice_piece_fi"].astype(str)
+        + df["societe"]
+        + df["num_piece_reference"].astype(str)
+    )
+    df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
+    df["id_dp_cf_cc"] = df["id_dp"] + df["cf_cc"]
+
+    # Suppression des doublons
+    df = df.drop_duplicates(subset=["id_dp_cf_cc"])
+
+    # Regroupement
+    df_grouped = df.groupby(by=["id_dp"], as_index=False)["id_dp_cf_cc"].count()
+    df_grouped = df_grouped.rename(columns={"id_dp_cf_cc": "nb_poste"})
+
+    # Catégoriser les données
+    df_grouped["unique_multi"] = np.where(
+        df_grouped["nb_poste"] == 1,
+        "Unique",
+        "Multiple",
+    )
+
+    # Ajout des colonnes calculées
+    df = pd.merge(left=df, right=df_grouped, how="left", on="id_dp")
+
     return df
 
 

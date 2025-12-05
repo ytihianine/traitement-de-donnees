@@ -53,9 +53,9 @@ def source_files() -> None:
         process_func=process.process_demande_paiement_carte_achat,
         add_snapshot_id=False,
     )
-    demande_achat_journal_pieces = create_file_etl_task(
-        selecteur="demande_achat_journal_pieces",
-        process_func=process.process_demande_achat_journal_pieces,
+    demande_paiement_journal_pieces = create_file_etl_task(
+        selecteur="demande_paiement_journal_pieces",
+        process_func=process.process_demande_paiement_journal_pieces,
         add_snapshot_id=False,
     )
     delai_global_paiement = create_file_etl_task(
@@ -73,7 +73,7 @@ def source_files() -> None:
             demande_paiement_flux(),
             demande_paiement_sfp(),
             demande_paiement_carte_achat(),
-            demande_achat_journal_pieces(),
+            demande_paiement_journal_pieces(),
             delai_global_paiement(),
         ]
     )
