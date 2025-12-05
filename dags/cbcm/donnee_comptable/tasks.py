@@ -84,7 +84,7 @@ add_new_sp = create_action_from_multi_input_files_etl_task(
     input_selecteurs=[
         "demande_achat",
         "engagement_juridique",
-        "demande_achat_journal_pieces",
+        "demande_paiement_journal_pieces",
         "delai_global_paiement",
     ],
     action_func=actions.load_new_sp,
