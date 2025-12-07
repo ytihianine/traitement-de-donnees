@@ -8,6 +8,7 @@ from utils.tasks.sql import create_tmp_tables, copy_tmp_table_to_real_table
 from utils.tasks.s3 import copy_s3_files, del_s3_files
 
 from dags.applications.catalogue.grist.tasks import (
+    validate_params,
     referentiels_grist,
     source_grist,
 )
@@ -44,6 +45,7 @@ LINK_DOC_DATA = ""  # noqa
 def catalogue() -> None:
     """Task order"""
     chain(
+        validate_params(),
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="catalogue",
