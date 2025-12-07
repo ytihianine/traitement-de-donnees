@@ -15,8 +15,8 @@ from dags.applications.catalogue.grist.tasks import (
 
 
 nom_projet = "Catalogue"
-LINK_DOC_PIPELINE = ""  # noqa
-LINK_DOC_DATA = ""  # noqa
+LINK_DOC_PIPELINE = "Non-défini"  # noqa
+LINK_DOC_DATA = "Non-défini"  # noqa
 
 
 # Définition du DAG
