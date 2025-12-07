@@ -2,7 +2,7 @@ import pandas as pd
 
 from infra.database.factory import create_db_handler
 
-from dags.applications.catalogue import process
+from dags.applications.catalogue.grist import process
 
 
 def extract_pg_catalog() -> pd.DataFrame:
