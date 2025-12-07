@@ -41,7 +41,7 @@ LINK_DOC_DATA = ""  # noqa
     ),
     on_success_callback=create_airflow_callback(mail_status=MailStatus.SUCCESS),
 )
-def catalogue_dag() -> None:
+def catalogue() -> None:
     """Task order"""
     chain(
         download_grist_doc_to_s3(
@@ -60,4 +60,4 @@ def catalogue_dag() -> None:
     )
 
 
-catalogue_dag()
+catalogue()
