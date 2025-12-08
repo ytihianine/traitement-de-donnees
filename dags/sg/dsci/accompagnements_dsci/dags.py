@@ -1,6 +1,7 @@
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
 
+from infra.mails.default_smtp import MailStatus, create_airflow_callback
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -41,6 +42,9 @@ LINK_DOC_DATA = (
         lien_donnees=LINK_DOC_DATA,
         mail_enable=True,
         mail_to=["arthur.lemonnier@finances.gouv.fr"],
+    ),
+    on_failure_callback=create_airflow_callback(
+        mail_status=MailStatus.ERROR,
     ),
 )
 def accompagnements_dsci_dag() -> None:
