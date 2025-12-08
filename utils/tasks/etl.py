@@ -362,6 +362,8 @@ def create_action_to_file_etl_task(
         if add_snapshot_id:
             df = _add_snapshot_id_metadata(df=df, context=context)
 
+        df_info(df=df, df_name=f"{output_selecteur} - df to export")
+
         # Export
         s3_handler.write(
             file_path=str(output_config.filepath_tmp_s3),
