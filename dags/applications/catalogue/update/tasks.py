@@ -36,7 +36,7 @@ def source_database() -> None:
         add_snapshot_id=False,
     )
     pg_info_extract_dictionnaire = create_multi_files_input_etl_task(
-        input_selecteurs=["pg_catalog"],
+        input_selecteurs=["pg_info_scan"],
         output_selecteur="pg_info_extract_dictionnaire",
         process_func=process.pg_info_extract_dictionnaire,
         add_import_date=False,
