@@ -1,3 +1,4 @@
+from datetime import datetime
 import pandas as pd
 
 
@@ -11,6 +12,9 @@ def pg_info_extract_catalogue(df: pd.DataFrame) -> pd.DataFrame:
     # Remove duplicate
     df = df.drop_duplicates(subset=cols_to_keep)
 
+    # Process
+    df = process_catalogue(df=df)
+
     return df
 
 
@@ -19,6 +23,9 @@ def pg_info_extract_dictionnaire(df: pd.DataFrame) -> pd.DataFrame:
 
     cols_to_keep = ["table_schema", "table_name", "variable", "type"]
     df = df.loc[:, cols_to_keep]
+
+    # Process
+    df = process_dictionnaire(df=df)
 
     return df
 
@@ -52,10 +59,31 @@ def compare_dictionnaire(df_db: pd.DataFrame, df_grist) -> pd.DataFrame:
 # Process new rows
 # ======================================================
 def process_catalogue(df: pd.DataFrame) -> pd.DataFrame:
+    # Renommer les colonnes
+    df = df.rename(
+        columns={
+            "table_schema": "schema_name",
+            "table_name": "table_name",
+        }
+    )
+
+    # Ajouter les colonnes additionnelles
+    df["Public"] = False
+    df["Est_visible"] = False
+    df["Titre"] = df.loc[:, "table_name"].str.split("_").str.join(" ").str.capitalize()
+    date_cols = ["created_at", "updated_at"]
+    df[date_cols] = datetime.now()
 
     return df
 
 
 def process_dictionnaire(df: pd.DataFrame) -> pd.DataFrame:
+    # Renommer les colonnes
+    df = df.rename(
+        columns={
+            "table_schema": "schema_name",
+            "table_name": "table_name",
+        }
+    )
 
     return df
