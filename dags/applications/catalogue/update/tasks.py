@@ -25,16 +25,22 @@ def source_database() -> None:
         output_selecteur="pg_info_scan",
         task_id="pg_info_scan",
         action_func=actions.pg_info_scan,
+        add_import_date=False,
+        add_snapshot_id=False,
     )
     pg_info_extract_catalogue = create_multi_files_input_etl_task(
         input_selecteurs=["pg_info_scan"],
         output_selecteur="pg_info_extract_catalogue",
         process_func=process.pg_info_extract_catalogue,
+        add_import_date=False,
+        add_snapshot_id=False,
     )
     pg_info_extract_dictionnaire = create_multi_files_input_etl_task(
         input_selecteurs=["pg_catalog"],
         output_selecteur="pg_info_extract_dictionnaire",
         process_func=process.pg_info_extract_dictionnaire,
+        add_import_date=False,
+        add_snapshot_id=False,
     )
 
     """ Tasks order """
@@ -53,11 +59,15 @@ def update_catalogue() -> None:
         output_selecteur="get_catalogue",
         task_id="get_catalogue",
         action_func=actions.get_catalogue,
+        add_import_date=False,
+        add_snapshot_id=False,
     )
     compare_catalogue = create_multi_files_input_etl_task(
         input_selecteurs=["pg_info_extract_catalogue", "get_catalogue"],
         output_selecteur="compare_catalogue",
         process_func=process.compare_catalogue,
+        add_import_date=False,
+        add_snapshot_id=False,
     )
     process_catalogue = create_multi_files_input_etl_task(
         output_selecteur="process_catalogue",
@@ -80,11 +90,15 @@ def update_dictionnaire() -> None:
         output_selecteur="get_dictionnaire",
         task_id="get_dictionnaire",
         action_func=actions.get_dictionnaire,
+        add_import_date=False,
+        add_snapshot_id=False,
     )
     compare_dictionnaire = create_multi_files_input_etl_task(
         input_selecteurs=["pg_info_extract_dictionnaire", "get_dictionnaire"],
         output_selecteur="compare_dictionnaire",
         process_func=process.compare_dictionnaire,
+        add_import_date=False,
+        add_snapshot_id=False,
     )
     process_dictionnaire = create_multi_files_input_etl_task(
         output_selecteur="process_dictionnaire",
