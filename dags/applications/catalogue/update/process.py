@@ -6,26 +6,39 @@ import pandas as pd
 # Process db catalogue
 # ======================================================
 def pg_info_extract_catalogue(df: pd.DataFrame) -> pd.DataFrame:
-    cols_to_keep = ["table_schema", "table_name"]
+    # Default processing
+    df = df.rename(
+        columns={
+            "table_schema": "schema_name",
+            "table_name": "table_name",
+        }
+    )
+
+    cols_to_keep = ["schema_name", "table_name"]
     df = df.loc[:, cols_to_keep]
 
     # Remove duplicate
     df = df.drop_duplicates(subset=cols_to_keep)
 
-    # Process
-    df = process_catalogue(df=df)
-
     return df
 
 
 def pg_info_extract_dictionnaire(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.rename(columns={"column_name": "variable", "data_type": "type"})
+    # Default processing
+    df = df.rename(
+        columns={
+            "table_schema": "schema_name",
+            "table_name": "table_name",
+            "column_name": "variable",
+            "data_type": "type",
+        }
+    )
 
-    cols_to_keep = ["table_schema", "table_name", "variable", "type"]
+    cols_to_keep = ["schema_name", "table_name", "variable", "type"]
     df = df.loc[:, cols_to_keep]
 
-    # Process
-    df = process_dictionnaire(df=df)
+    # Remove duplicate
+    df = df.drop_duplicates(subset=cols_to_keep)
 
     return df
 
@@ -41,7 +54,11 @@ def compare_catalogue(df_db: pd.DataFrame, df_grist) -> pd.DataFrame:
         left=df_grist, right=df_db, on=cols_to_keep, how="outer", indicator=True
     )
 
-    return df.loc[df["_merge"] == "right_only"]
+    # Filter
+    df = df.loc[df["_merge"] == "right_only"]
+    df = df.drop(columns=["_merge"])
+
+    return df
 
 
 def compare_dictionnaire(df_db: pd.DataFrame, df_grist) -> pd.DataFrame:
@@ -52,21 +69,17 @@ def compare_dictionnaire(df_db: pd.DataFrame, df_grist) -> pd.DataFrame:
         left=df_grist, right=df_db, on=cols_to_keep, how="outer", indicator=True
     )
 
-    return df.loc[df["_merge"] == "right_only"]
+    # Filter
+    df = df.loc[df["_merge"] == "right_only"]
+    df = df.drop(columns=["_merge"])
+
+    return df
 
 
 # ======================================================
 # Process new rows
 # ======================================================
 def process_catalogue(df: pd.DataFrame) -> pd.DataFrame:
-    # Renommer les colonnes
-    df = df.rename(
-        columns={
-            "table_schema": "schema_name",
-            "table_name": "table_name",
-        }
-    )
-
     # Ajouter les colonnes additionnelles
     df["Public"] = False
     df["Est_visible"] = False
@@ -78,12 +91,6 @@ def process_catalogue(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_dictionnaire(df: pd.DataFrame) -> pd.DataFrame:
-    # Renommer les colonnes
-    df = df.rename(
-        columns={
-            "table_schema": "schema_name",
-            "table_name": "table_name",
-        }
-    )
+    # Correspondance des types
 
     return df
