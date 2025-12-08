@@ -59,12 +59,19 @@ def update_catalogue() -> None:
         output_selecteur="compare_catalogue",
         process_func=process.compare_catalogue,
     )
+    process_catalogue = create_multi_files_input_etl_task(
+        output_selecteur="process_catalogue",
+        input_selecteurs=["compare_catalogue"],
+        process_func=process.process_catalogue,
+        add_import_date=False,
+        add_snapshot_id=False,
+    )
     load_catalogue = create_action_from_multi_input_files_etl_task(
         task_id="load_catalogue",
-        input_selecteurs=["compare_catalogue"],
+        input_selecteurs=["process_catalogue"],
         action_func=actions.load_catalogue,
     )
-    chain(get_catalogue(), compare_catalogue(), load_catalogue())
+    chain(get_catalogue(), compare_catalogue(), process_catalogue(), load_catalogue())
 
 
 @task_group()
@@ -79,10 +86,22 @@ def update_dictionnaire() -> None:
         output_selecteur="compare_dictionnaire",
         process_func=process.compare_dictionnaire,
     )
+    process_dictionnaire = create_multi_files_input_etl_task(
+        output_selecteur="process_dictionnaire",
+        input_selecteurs=["compare_dictionnaire"],
+        process_func=process.process_dictionnaire,
+        add_import_date=False,
+        add_snapshot_id=False,
+    )
     load_dictionnaire = create_action_from_multi_input_files_etl_task(
         task_id="load_dictionnaire",
-        input_selecteurs=["compare_dictionnaire"],
+        input_selecteurs=["process_dictionnaire"],
         action_func=actions.load_catalogue,
     )
 
-    chain(get_dictionnaire(), compare_dictionnaire(), load_dictionnaire())
+    chain(
+        get_dictionnaire(),
+        compare_dictionnaire(),
+        process_dictionnaire(),
+        load_dictionnaire(),
+    )

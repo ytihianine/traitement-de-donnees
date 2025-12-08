@@ -46,3 +46,16 @@ def compare_dictionnaire(df_db: pd.DataFrame, df_grist) -> pd.DataFrame:
     )
 
     return df.loc[df["indicator"] == "right_only"]
+
+
+# ======================================================
+# Process new rows
+# ======================================================
+def process_catalogue(df: pd.DataFrame) -> pd.DataFrame:
+
+    return df
+
+
+def process_dictionnaire(df: pd.DataFrame) -> pd.DataFrame:
+
+    return df
