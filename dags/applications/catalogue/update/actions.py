@@ -90,7 +90,7 @@ def load_catalogue(df: pd.DataFrame) -> None:
         grist_client = GristAPI(
             http_client=request_client,
             base_url=DEFAULT_GRIST_HOST,
-            workspace_id="dsci",
+            workspace_id="catalogue",
             doc_id=Variable.get(key="grist_doc_id_catalogue"),
             api_token=Variable.get(key="grist_secret_key"),
         )
@@ -116,7 +116,7 @@ def load_dictionnaire(df: pd.DataFrame) -> None:
         grist_client = GristAPI(
             http_client=request_client,
             base_url=DEFAULT_GRIST_HOST,
-            workspace_id="dsci",
+            workspace_id="catalogue",
             doc_id=Variable.get(key="grist_doc_id_catalogue"),
             api_token=Variable.get(key="grist_secret_key"),
         )
