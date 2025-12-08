@@ -85,7 +85,7 @@ def process_catalogue(df: pd.DataFrame) -> pd.DataFrame:
     df["Est_visible"] = False
     df["Titre"] = df.loc[:, "table_name"].str.split("_").str.join(" ").str.capitalize()
     date_cols = ["created_at", "updated_at"]
-    df[date_cols] = datetime.now()
+    df[date_cols] = datetime.now().timestamp()
 
     return df
 

@@ -94,12 +94,8 @@ def load_catalogue(df: pd.DataFrame) -> None:
             doc_id=Variable.get(key="grist_doc_id_catalogue"),
             api_token=Variable.get(key="grist_secret_key"),
         )
-        try:
-            grist_client.post_records(tbl_name="Catalogue", json=data)
-        except Exception as e:
-            print(
-                f"Une erreur est survenu lors de l'ajout des nouvelles lignes !!\n {e}"
-            )
+
+        grist_client.post_records(tbl_name="Catalogue", json=data)
     else:
         print("Aucune ligne à ajouter dans le catalogue ...")
 
@@ -124,11 +120,7 @@ def load_dictionnaire(df: pd.DataFrame) -> None:
             doc_id=Variable.get(key="grist_doc_id_catalogue"),
             api_token=Variable.get(key="grist_secret_key"),
         )
-        try:
-            grist_client.post_records(tbl_name="Dictionnaire", json=data)
-        except Exception as e:
-            print(
-                f"Une erreur est survenu lors de l'ajout des nouvelles lignes !!\n {e}"
-            )
+
+        grist_client.post_records(tbl_name="Dictionnaire", json=data)
     else:
         print("Aucune ligne à ajouter dans le dictionnaire ...")
