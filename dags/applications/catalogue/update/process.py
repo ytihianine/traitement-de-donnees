@@ -41,7 +41,7 @@ def compare_catalogue(df_db: pd.DataFrame, df_grist) -> pd.DataFrame:
         left=df_grist, right=df_db, on=cols_to_keep, how="outer", indicator=True
     )
 
-    return df.loc[df["indicator"] == "right_only"]
+    return df.loc[df["_merge"] == "right_only"]
 
 
 def compare_dictionnaire(df_db: pd.DataFrame, df_grist) -> pd.DataFrame:
@@ -52,7 +52,7 @@ def compare_dictionnaire(df_db: pd.DataFrame, df_grist) -> pd.DataFrame:
         left=df_grist, right=df_db, on=cols_to_keep, how="outer", indicator=True
     )
 
-    return df.loc[df["indicator"] == "right_only"]
+    return df.loc[df["_merge"] == "right_only"]
 
 
 # ======================================================
