@@ -377,7 +377,6 @@ def create_action_from_multi_input_files_etl_task(
     task_id: str,
     input_selecteurs: list[str],
     action_func: Callable[..., None],
-    action_args: Optional[tuple] = None,
     action_kwargs: Optional[dict[str, Any]] = None,
 ) -> Callable[..., XComArg]:
     """
@@ -398,8 +397,6 @@ def create_action_from_multi_input_files_etl_task(
         Callable: Airflow task function
     """
 
-    if action_args is None:
-        action_args = ()
     if action_kwargs is None:
         action_kwargs = {}
 
@@ -422,6 +419,6 @@ def create_action_from_multi_input_files_etl_task(
             df_info(df=df, df_name=f"{sel} - Source normalisée")
             dfs.append(df)
 
-        action_func(dfs=dfs, *action_args, **action_kwargs)
+        action_func(*dfs, **action_kwargs)
 
     return _task
