@@ -30,7 +30,7 @@ LINK_DOC_DATA = (
 
 @dag(
     dag_id="accompagnements_dsci",
-    schedule_interval="*/5 8-13,14-19 * * 1-5",
+    schedule_interval="*/8 8-13,14-19 * * 1-5",
     default_args=create_default_args(),
     max_consecutive_failed_dag_runs=1,
     max_active_runs=1,
