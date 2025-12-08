@@ -76,12 +76,7 @@ def get_dictionnaire() -> pd.DataFrame:
 
 def load_catalogue(df: pd.DataFrame) -> None:
     # Intégrer ces lignes dans Grist
-    new_rows = df.rename(
-        columns={
-            "centre_cout": "Centre_de_cout",
-            "centre_financier": "Centre_financier",
-        }
-    ).to_dict(orient="records")
+    new_rows = df.to_dict(orient="records")
     print(f"Nombre de nouvelles lignes: {len(new_rows)}")
 
     if len(new_rows) > 0:
@@ -101,20 +96,17 @@ def load_catalogue(df: pd.DataFrame) -> None:
         )
         try:
             grist_client.post_records(tbl_name="Catalogue", json=data)
-        except Exception:
-            print("Une erreur est survenu lors de l'ajout des nouvelles lignes !!")
+        except Exception as e:
+            print(
+                f"Une erreur est survenu lors de l'ajout des nouvelles lignes !!\n {e}"
+            )
     else:
         print("Aucune ligne à ajouter dans le catalogue ...")
 
 
 def load_dictionnaire(df: pd.DataFrame) -> None:
     # Intégrer ces lignes dans Grist
-    new_rows = df.rename(
-        columns={
-            "centre_cout": "Centre_de_cout",
-            "centre_financier": "Centre_financier",
-        }
-    ).to_dict(orient="records")
+    new_rows = df.to_dict(orient="records")
     print(f"Nombre de nouvelles lignes: {len(new_rows)}")
 
     if len(new_rows) > 0:
@@ -133,8 +125,10 @@ def load_dictionnaire(df: pd.DataFrame) -> None:
             api_token=Variable.get(key="grist_secret_key"),
         )
         try:
-            grist_client.post_records(tbl_name="Catalogue", json=data)
-        except Exception:
-            print("Une erreur est survenu lors de l'ajout des nouvelles lignes !!")
+            grist_client.post_records(tbl_name="Dictionnaire", json=data)
+        except Exception as e:
+            print(
+                f"Une erreur est survenu lors de l'ajout des nouvelles lignes !!\n {e}"
+            )
     else:
         print("Aucune ligne à ajouter dans le dictionnaire ...")
