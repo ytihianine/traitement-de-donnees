@@ -5,7 +5,7 @@ import pandas as pd
 # Process db catalogue
 # ======================================================
 def pg_info_extract_catalogue(df: pd.DataFrame) -> pd.DataFrame:
-    cols_to_keep = ["table_name", "schema_name"]
+    cols_to_keep = ["table_schema", "table_name"]
     df = df.loc[:, cols_to_keep]
 
     # Remove duplicate
@@ -17,7 +17,7 @@ def pg_info_extract_catalogue(df: pd.DataFrame) -> pd.DataFrame:
 def pg_info_extract_dictionnaire(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"column_name": "variable", "data_type": "type"})
 
-    cols_to_keep = ["schema_name", "table_name", "variable", "type"]
+    cols_to_keep = ["table_schema", "table_name", "variable", "type"]
     df = df.loc[:, cols_to_keep]
 
     return df
