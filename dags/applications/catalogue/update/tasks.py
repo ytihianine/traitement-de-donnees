@@ -108,7 +108,7 @@ def update_grist_catalogue() -> None:
     load_dictionnaire = create_action_from_multi_input_files_etl_task(
         task_id="load_dictionnaire",
         input_selecteurs=["process_dictionnaire"],
-        action_func=actions.load_catalogue,
+        action_func=actions.load_dictionnaire,
     )
 
     chain(
