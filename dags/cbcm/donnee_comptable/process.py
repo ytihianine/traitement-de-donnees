@@ -212,7 +212,7 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
 
     # Catégoriser les données
     df["mois_nombre"] = df["date_comptable"].dt.month
-    df["mois_nom"] = df.loc[:, "mois"].map(corr_num_mois).fillna("Non déterminé")
+    df["mois_nom"] = df.loc[:, "mois_nombre"].map(corr_num_mois).fillna("Non déterminé")
     df["nat_snat_nom"] = (
         df.loc[:, "nature_sous_nature"]
         .map(corr_nature_sous_nature)
