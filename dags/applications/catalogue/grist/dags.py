@@ -3,8 +3,13 @@ from airflow.models.baseoperator import chain
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
+from utils.config.tasks import get_projet_config
 from utils.tasks.grist import download_grist_doc_to_s3
-from utils.tasks.sql import create_tmp_tables, copy_tmp_table_to_real_table
+from utils.tasks.sql import (
+    create_tmp_tables,
+    copy_tmp_table_to_real_table,
+    import_file_to_db,
+)
 from utils.tasks.s3 import copy_s3_files, del_s3_files
 
 from dags.applications.catalogue.grist.tasks import (
@@ -55,8 +60,11 @@ def catalogue() -> None:
             referentiels_grist(),
             source_grist(),
         ],
-        # create_tmp_tables(),
-        # copy_tmp_table_to_real_table(),
+        create_tmp_tables(),
+        import_file_to_db.expand(
+            selecteur_config=get_projet_config(nom_projet=nom_projet)
+        ),
+        copy_tmp_table_to_real_table(),
         # copy_s3_files(bucket="dsci"),
         # del_s3_files(bucket="dsci"),
     )

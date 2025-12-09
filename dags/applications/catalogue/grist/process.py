@@ -38,7 +38,7 @@ def process_ref_service(df: pd.DataFrame) -> pd.DataFrame:
 def process_ref_people(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"service": "id_service"})
 
-    txt_cols = ["contact", "mail", "commentaire"]
+    txt_cols = ["contact", "mail", "commentaire", "profil"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     ref_cols = ["id_service"]

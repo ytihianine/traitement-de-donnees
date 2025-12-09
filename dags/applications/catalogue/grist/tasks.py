@@ -38,6 +38,11 @@ def referentiels_grist() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_ref_contactpoint,
     )
+    ref_people = create_grist_etl_task(
+        selecteur="ref_people",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_people,
+    )
     ref_geographicalcoverage = create_grist_etl_task(
         selecteur="ref_geographicalcoverage",
         normalisation_process_func=normalize_grist_dataframe,
@@ -84,6 +89,7 @@ def referentiels_grist() -> None:
         [
             ref_frequency(),
             ref_contactpoint(),
+            ref_people(),
             ref_geographicalcoverage(),
             ref_licence(),
             ref_service(),
