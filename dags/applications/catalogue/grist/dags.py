@@ -8,6 +8,7 @@ from utils.tasks.grist import download_grist_doc_to_s3
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
+    delete_tmp_tables,
     import_file_to_db,
 )
 from utils.tasks.s3 import copy_s3_files, del_s3_files
@@ -65,8 +66,9 @@ def catalogue() -> None:
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
         copy_tmp_table_to_real_table(),
-        # copy_s3_files(bucket="dsci"),
-        # del_s3_files(bucket="dsci"),
+        copy_s3_files(bucket="dsci"),
+        del_s3_files(bucket="dsci"),
+        delete_tmp_tables(),
     )
 
 
