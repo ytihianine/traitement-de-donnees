@@ -81,14 +81,14 @@ def chorus_donnees_comptables() -> None:
     # Ordre des tâches
     chain(
         validate_params(),
-        # looking_for_files,
-        # create_projet_snapshot(nom_projet=nom_projet),
-        # get_projet_snapshot(nom_projet=nom_projet),
-        # source_files(),
-        # add_new_sp(),
-        # get_sp(),
-        # ajout_sp(),
-        # datasets_additionnels(),
+        looking_for_files,
+        create_projet_snapshot(nom_projet=nom_projet),
+        get_projet_snapshot(nom_projet=nom_projet),
+        source_files(),
+        add_new_sp(),
+        get_sp(),
+        ajout_sp(),
+        datasets_additionnels(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
