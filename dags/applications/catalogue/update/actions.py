@@ -71,7 +71,7 @@ def get_dictionnaire() -> pd.DataFrame:
                 docdic.variable
             FROM documentation."catalogue" doccat
             LEFT JOIN documentation."dictionnaire" docdic
-            ON doccat.id = docdic.id_jeu_de_donnees
+            ON doccat.id = docdic.id_catalogue
             ;
         """
     )
