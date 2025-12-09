@@ -119,6 +119,8 @@ def process_catalogue(df: pd.DataFrame) -> pd.DataFrame:
             "frequence_maj": "id_frequency",
             "couverture_geo": "id_geographicalcoverage",
             "licence": "id_licence",
+            "theme": "id_theme",
+            "format": "id_format",
         },
         errors="raise",
     )
