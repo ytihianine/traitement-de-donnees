@@ -8,18 +8,32 @@ from infra.database.factory import create_db_handler
 from utils.config.vars import AGENT, DEFAULT_GRIST_HOST, DEFAULT_PG_DATA_CONN_ID, PROXY
 
 
-def load_new_sp(dfs: list[pd.DataFrame]) -> None:
+def load_new_sp(
+    df_demande_achat: pd.DataFrame,
+    df_engagement_juridique: pd.DataFrame,
+    df_demande_paiement_justificatif_piece: pd.DataFrame,
+    df_delai_global_paiement: pd.DataFrame,
+) -> None:
     # Concaténer tous les CF et CC
     cols_to_keep = ["centre_financier", "centre_cout"]
-    df_source = pd.concat(objs=[df[cols_to_keep] for df in dfs])
+    df_source = pd.concat(
+        objs=[
+            df_demande_achat,
+            df_engagement_juridique,
+            df_demande_paiement_justificatif_piece,
+            df_delai_global_paiement,
+        ]
+    )
 
     # Supprimer les doublons
+    df_source = df_source.loc[:, cols_to_keep]
     df_source = df_source.drop_duplicates(subset=cols_to_keep)  # type: ignore
 
     # Récupérer les SP déjà connus
     db = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
     df_sp = db.fetch_df(
-        query="SELECT DISTINCT centre_financier, centre_cout FROM donnee_comptable.service_prescripteur;"
+        query="""SELECT DISTINCT centre_financier, centre_cout
+            FROM donnee_comptable.service_prescripteur;"""
     )
     print(f"Nombre de SP connus: {len(df_sp)}")
 
