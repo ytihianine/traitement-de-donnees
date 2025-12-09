@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 
 # Chemin du dossier contenant les fichiers
-DOSSIER_PARQUET = "/home/onyxia/work/traitement-des-donnees/scripts/generate_sql/tmp"
+DOSSIER_PARQUET = "/home/onyxia/work/traitement-des-donnees/scripts/generate_tables/tmp"
 
 # Fichier de sortie pour les scripts SQL
 FICHIER_SQL = "create_tables.sql"
