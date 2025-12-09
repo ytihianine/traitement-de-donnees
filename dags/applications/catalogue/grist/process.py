@@ -148,6 +148,9 @@ def process_catalogue(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = handle_grist_null_references(df=df, columns=ref_cols)
 
+    date_cols = ["created_at", "updated_at"]
+    df = convert_grist_date_to_date(df=df, columns=date_cols)
+
     return df
 
 
