@@ -9,8 +9,9 @@ from utils.config.dag_params import create_dag_params, create_default_args
 from dags.applications.catalogue.update.tasks import (
     validate_params,
     source_database,
-    update_catalogue,
-    update_dictionnaire,
+    update_grist_catalogue,
+    # update_catalogue,
+    # update_dictionnaire,
 )
 
 
@@ -47,10 +48,11 @@ def catalogue_update() -> None:
     chain(
         validate_params(),
         source_database(),
-        [
-            update_catalogue(),
-            update_dictionnaire(),
-        ],
+        update_grist_catalogue(),
+        # [
+        #     update_catalogue(),
+        #     update_dictionnaire(),
+        # ],
         # copy_s3_files(bucket="dsci"),
         # del_s3_files(bucket="dsci"),
     )
