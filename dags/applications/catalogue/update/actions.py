@@ -25,11 +25,16 @@ def pg_info_scan() -> pd.DataFrame:
             JOIN information_schema.columns c
                 ON t.table_schema = c.table_schema
                 AND t.table_name = c.table_name
-            WHERE
-                t.table_schema NOT IN ('pg_catalog', 'information_schema',
-                    'documentation', 'temporaire')
-                AND t.table_type = 'BASE TABLE'
-                AND t.table_schema NOT LIKE '%_file_upload';
+            JOIN pg_class cls
+                ON cls.relname = t.table_name
+            JOIN pg_namespace ns
+                ON ns.oid = cls.relnamespace
+                AND ns.nspname = t.table_schema
+            WHERE t.table_type = 'BASE TABLE'
+                AND ns.nspname NOT IN ('pg_catalog', 'information_schema', 'documentation', 'temporaire')
+                AND ns.nspname NOT LIKE '%_file_upload'
+                AND cls.relispartition = FALSE      -- EXCLUDE PARTITION CHILD TABLES
+            ORDER BY t.table_schema, t.table_name, c.ordinal_position;
         """
     )
 
