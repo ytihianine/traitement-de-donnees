@@ -60,7 +60,7 @@ def catalogue() -> None:
             referentiels_grist(),
             source_grist(),
         ],
-        create_tmp_tables(),
+        create_tmp_tables(reset_id_seq=False),
         import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
