@@ -23,7 +23,7 @@ CREATE TABLE documentation."ref_service" (
   "nom" text,
   "acronyme" text,
   "id_organisation" int,
-	FOREIGN KEY ("id_direction") REFERENCES documentation."ref_organisation" ("id")
+	FOREIGN KEY ("id_organisation") REFERENCES documentation."ref_organisation" ("id")
 );
 
 CREATE TABLE documentation."ref_people" (
@@ -78,28 +78,32 @@ CREATE TABLE documentation."ref_catalogue" (
   "dataset_id" text
 );
 
+DROP TABLE documentation."ref_typedonnees" CASCADE;
 CREATE TABLE documentation."ref_typedonnees" (
   "id" integer PRIMARY KEY,
-  "valeur" text
+  "type_donnee" text
 );
 
 /*
     Données
 */
 
+DROP TABLE documentation."catalogue" CASCADE;
 CREATE TABLE documentation."catalogue" (
   "id" integer PRIMARY KEY,
-  "title" text,
+  "titre" text,
   "description" text,
-  "keyword" text[],
-  "is_public" boolean,
-  "id_structure" int,
+  "mots_cles" text[],
+  "public" boolean,
+  "id_organisation" int,
+  -- "id_structure" int,
   "id_service" int,
-  "id_system_information" int,
+  "id_systeme_information" int,
   "id_contactpoint" int,
-  "issued" date,
-  "modified" date,
+  "date_publication" date,
+  "date_maj" date,
   "id_frequency" int,
+  "couverture_temporelle" text,
   "id_geographicalcoverage" int,
   "url" text,
   "id_format" int[],
@@ -112,30 +116,35 @@ CREATE TABLE documentation."catalogue" (
   "mail_contact_service" text,
   "table_name" text,
   "schema_name" text,
-  "temporal" text,
-  "updated_at" datetime,
+  -- "temporal" text,
+  "created_at" TIMESTAMP,
+  "updated_at" TIMESTAMP,
   "est_visible" boolean,
-	FOREIGN KEY ("id_structure") REFERENCES documentation."ref_organisation" ("id"),
+	FOREIGN KEY ("id_organisation") REFERENCES documentation."ref_organisation" ("id"),
 	FOREIGN KEY ("id_service") REFERENCES documentation."ref_service" ("id"),
-	FOREIGN KEY ("id_system_information") REFERENCES documentation."ref_informationsystem" ("id"),
-	FOREIGN KEY ("id_contact_point") REFERENCES documentation."ref_contactpoint" ("id"),
+	FOREIGN KEY ("id_systeme_information") REFERENCES documentation."ref_informationsystem" ("id"),
+	FOREIGN KEY ("id_contactpoint") REFERENCES documentation."ref_contactpoint" ("id"),
 	FOREIGN KEY ("id_frequency") REFERENCES documentation."ref_frequency" ("id"),
-	FOREIGN KEY ("id_spatiale") REFERENCES documentation."ref_geographicalcoverage" ("id"),
-	FOREIGN KEY ("id_format") REFERENCES documentation."ref_format" ("id"),
-	FOREIGN KEY ("id_licence") REFERENCES documentation."ref_licence" ("id"),
-	FOREIGN KEY ("id_theme") REFERENCES documentation."ref_theme" ("id")
+	FOREIGN KEY ("id_geographicalcoverage") REFERENCES documentation."ref_geographicalcoverage" ("id"),
+	-- FOREIGN KEY ("id_format") REFERENCES documentation."ref_format" ("id"),
+	FOREIGN KEY ("id_licence") REFERENCES documentation."ref_licence" ("id")
+	-- FOREIGN KEY ("id_theme") REFERENCES documentation."ref_theme" ("id")
 );
 
-
+DROP TABLE documentation."dictionnaire" CASCADE;
 CREATE TABLE documentation."dictionnaire" (
   "id" integer PRIMARY KEY,
-  "id_jeu_de_donnees" int,
+  "id_catalogue" int,
   "variable" text,
   "unite" text,
   "commentaire" text,
-  "id_data_type" int,
-  "row_created_at" date,
-  "row_last_updated_at" date,
-	FOREIGN KEY ("id_jeu_de_donnees") REFERENCES documentation."catalogue" ("id"),
-	FOREIGN KEY ("id_data_type") REFERENCES documentation."ref_typedonnees" ("id")
+  "id_typedonnees" int,
+  "created_at" timestamp,
+  "updated_at" timestamp,
+  "id_service" int,
+  "schema_name" text,
+  "table_name" text,
+	FOREIGN KEY ("id_catalogue") REFERENCES documentation."catalogue" ("id"),
+	FOREIGN KEY ("id_service") REFERENCES documentation."ref_service" ("id"),
+	FOREIGN KEY ("id_typedonnees") REFERENCES documentation."ref_typedonnees" ("id")
 );
