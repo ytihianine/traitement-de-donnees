@@ -94,9 +94,9 @@ def chorus_donnees_comptables() -> None:
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
         # ensure_partition(),
-        # copy_tmp_table_to_real_table(
-        #     load_strategy=LoadStrategy.APPEND,
-        # ),
+        copy_tmp_table_to_real_table(
+            load_strategy=LoadStrategy.FULL_LOAD,
+        ),
         # refresh_views(),
         # copy_s3_files(bucket="dsci"),
         # del_s3_files(bucket="dsci"),
