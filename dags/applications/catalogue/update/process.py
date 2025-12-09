@@ -34,7 +34,7 @@ def pg_info_extract_dictionnaire(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
 
-    cols_to_keep = ["schema_name", "table_name", "variable", "type"]
+    cols_to_keep = ["schema_name", "table_name", "variable"]  # , "type"]
     df = df.loc[:, cols_to_keep]
 
     # Remove duplicate
