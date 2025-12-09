@@ -159,7 +159,7 @@ def process_dictionnaire(df: pd.DataFrame) -> pd.DataFrame:
         errors="raise",
     )
 
-    txt_cols = ["variable", "unite", "commentaire"]
+    txt_cols = ["variable", "unite", "commentaire", "schema_name", "table_name"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     date_cols = ["created_at", "updated_at"]
