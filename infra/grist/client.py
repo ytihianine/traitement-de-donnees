@@ -151,7 +151,8 @@ class GristAPI:
         data: Optional[dict[str, Any]] = None,
         json: Optional[dict[str, Any]] = None,
         api_token: Optional[str] = None,
-    ) -> HTTPResponse:
+        batch_size: int = 400,
+    ) -> None:
         """_summary_
 
         Args:
@@ -172,11 +173,42 @@ class GristAPI:
             url = url + "?" + "&".join(query_params)
 
         headers = self._build_headers(api_token=api_token)
-        grist_response = self.http_client.post(
-            endpoint=url, headers=headers, data=data, json=json
-        )
 
-        return grist_response
+        # Determine which payload is being used
+        payload = json if json is not None else data
+        if payload is None or "records" not in payload:
+            raise ValueError("Either 'data' or 'json' must contain a 'records' list.")
+
+        records = payload["records"]
+
+        total = len(records)
+        total_batches = (total + batch_size - 1) // batch_size
+
+        print(f"Starting upload of {total} records in {total_batches} batches...")
+
+        # Process in batches
+        for batch_index in range(total_batches):
+            start = batch_index * batch_size
+            end = start + batch_size
+            batch = records[start:end]
+
+            print(
+                f"Sending batch {batch_index + 1}/{total_batches} "
+                f"({len(batch)} records, indexes {start}-{end-1})"
+            )
+
+            batch_payload = {"records": batch}
+
+            response = self.http_client.post(
+                endpoint=url,
+                headers=headers,
+                json=batch_payload,
+                data=batch_payload if data is not None else None,
+            )
+            print(response.status_code)
+            print(f"Batch {batch_index + 1}/{total_batches} completed.")
+
+        print("All batches sent successfully.")
 
     def put_records(
         self,
