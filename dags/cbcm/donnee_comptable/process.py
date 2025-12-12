@@ -238,14 +238,14 @@ def process_demande_paiement_flux(df: pd.DataFrame) -> pd.DataFrame:
     # Filtrer les lignes
     df = df.loc[df["type_flux"] == "Flux 3"]
 
+    # Renommer les colonnes
+    df = df.rename(columns={"type_flux": "dp_flux_3"})
+
     # Ajouter les colonnes complémentaires
     df["id_dp"] = (
         df["annee_exercice"].astype(str) + df["societe"] + df["num_dp_flux"].astype(str)
     )
     df["id"] = list(df.reset_index(drop=True).index.values)
-
-    # Renommer les colonnes
-    df = df.rename(columns={"type_flux": "dp_flux_3"})
 
     return df
 
@@ -379,6 +379,16 @@ def process_demande_paiement_complet_sp(
     # Supprimer les colonnes en doublon
     duplicate_to_drop = "societe_|centre_financier_|automatisation_wf_cpt_|import_timestamp_|import_date_"
     df = df.drop(df.filter(regex=duplicate_to_drop).columns, axis=1)  # type: ignore
+
+    # Ajout des colonnes calculées
+    conditions = [
+        (df["dp_flux_3"] == "Flux 3") & (df["automatisation_wf_cpt"] == "X"),
+        (df["dp_flux_3"] == "Flux 3"),
+    ]
+    choices = ["DP automatisées", "DP non automatisées"]
+    df["flux_3_automatisation_compta"] = np.select(
+        condlist=conditions, choicelist=choices, default=None
+    )
 
     return df
 
