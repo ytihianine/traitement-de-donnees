@@ -146,12 +146,14 @@ def process_engagement_juridique(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Ajouter les colonnes complémentaires
+    df["mois"] = df["date_creation_ej"].dt.month
+    df["mois_nom"] = df.loc[:, "mois_nombre"].map(corr_num_mois).fillna("Non déterminé")
+    df["mois_nombre"] = df.loc[:, "mois_nom"].map(corr_mois).fillna(-1)
     df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
     df["ej_cf_cc"] = (
         df["id_ej"].astype(str) + "_" + df["centre_financier"] + "_" + df["centre_cout"]
     )
     df["annee_exercice"] = df.loc[:, "date_creation_ej"].dt.year
-    df["mois_nombre"] = df.loc[:, "date_creation_ej"].dt.month
 
     # Suppression des doublons
     df = df.drop_duplicates(subset=["ej_cf_cc"])
