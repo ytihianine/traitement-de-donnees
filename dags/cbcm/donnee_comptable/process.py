@@ -103,7 +103,7 @@ def process_demande_achat(df: pd.DataFrame) -> pd.DataFrame:
     # Catégoriser les données
     df["mois"] = df["date_creation_da"].dt.month
     df["mois_nom"] = df.loc[:, "mois"].map(corr_num_mois).fillna("Non déterminé")
-    df["mois_nombre"] = df.loc[:, "mois_nom"].map(corr_mois).fillna(-1)
+    df["mois_nombre_nom"] = df.loc[:, "mois_nom"].map(corr_mois).fillna(-1)
 
     palier = [0, 3, 6, 9, 12, 15, np.inf]
     labels = [
@@ -147,8 +147,8 @@ def process_engagement_juridique(df: pd.DataFrame) -> pd.DataFrame:
 
     # Ajouter les colonnes complémentaires
     df["mois"] = df["date_creation_ej"].dt.month
-    df["mois_nom"] = df.loc[:, "mois_nombre"].map(corr_num_mois).fillna("Non déterminé")
-    df["mois_nombre"] = df.loc[:, "mois_nom"].map(corr_mois).fillna(-1)
+    df["mois_nom"] = df.loc[:, "mois"].map(corr_num_mois).fillna("Non déterminé")
+    df["mois_nombre_nom"] = df.loc[:, "mois_nom"].map(corr_mois).fillna(-1)
     df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
     df["ej_cf_cc"] = (
         df["id_ej"].astype(str) + "_" + df["centre_financier"] + "_" + df["centre_cout"]
@@ -213,8 +213,8 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
 
     # Catégoriser les données
     df["mois"] = df["date_comptable"].dt.month
-    df["mois_nom"] = df.loc[:, "mois_nombre"].map(corr_num_mois).fillna("Non déterminé")
-    df["mois_nombre"] = df.loc[:, "mois_nom"].map(corr_mois).fillna(-1)
+    df["mois_nom"] = df.loc[:, "mois"].map(corr_num_mois).fillna("Non déterminé")
+    df["mois_nombre_nom"] = df.loc[:, "mois_nom"].map(corr_mois).fillna(-1)
     df["nat_snat_nom"] = (
         df.loc[:, "nature_sous_nature"]
         .map(corr_nature_sous_nature)
@@ -409,8 +409,9 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[df["societe"].isin(["ADCE", "CSND"])]
 
     # Ajouter les colonnes complémentaires
+    df["mois_nom"] = df.loc[:, "mois"].map(corr_num_mois).fillna("Non déterminé")
+    df["mois_nombre_nom"] = df.loc[:, "mois_nom"].map(corr_mois).fillna(-1)
     df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
-    df["mois_nom"] = df.loc[:, "periode_comptable"].map(corr_num_mois).fillna("inconnu")
     df["id"] = list(df.reset_index(drop=True).index.values)
 
     # Arrondir les valeurs
