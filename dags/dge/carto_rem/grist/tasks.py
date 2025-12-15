@@ -124,6 +124,8 @@ def get_db_data() -> None:
         output_selecteur="agent_contrat_db",
         action_func=actions.get_agent_contrat,
         use_context=True,
+        add_import_date=False,
+        add_snapshot_id=False,
     )
 
     chain(agent_contrat_db())
