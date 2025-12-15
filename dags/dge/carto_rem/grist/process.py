@@ -175,7 +175,7 @@ def process_agent_remuneration_autres_elements(df: pd.DataFrame) -> pd.DataFrame
 
 
 def process_agent_experience_pro(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(columns=["agent", "id", "int_niv_diplome"])
+    df = df.drop(columns=["agent", "id", "id_int_niv_diplome"])
     df = df.rename(columns={"position_grille": "id_position_grille"})
     # Convertir les mois en valeurs décimales
     df["exp_pro_totale_mois"] = (df["exp_pro_totale_mois"] / 12).round(1)
