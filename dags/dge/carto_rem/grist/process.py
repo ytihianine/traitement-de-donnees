@@ -75,6 +75,12 @@ def process_ref_valeur_point_indice(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def process_ref_fonction_dge(df: pd.DataFrame) -> pd.DataFrame:
+    txt_cols = ["fonction_dge", "fonction_dge_libelle_long"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    return df
+
+
 """
     Functions de processing des Grist source
 """
