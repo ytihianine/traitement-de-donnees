@@ -140,6 +140,8 @@ def datasets_additionnels() -> None:
             "agent_contrat_db",
         ],
         process_func=process.process_agent_contrat_complet,
+        add_import_date=False,
+        add_snapshot_id=False,
     )
 
     chain(agent_contrat_complet())
