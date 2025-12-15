@@ -127,7 +127,7 @@ def process_agent_contrat_grist(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_agent_rem_variable(df: pd.DataFrame) -> pd.DataFrame:
+def process_agent_remuneration_autres_elements(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=["agent"])
     df = df.rename(
         columns={

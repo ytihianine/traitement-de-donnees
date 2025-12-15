@@ -92,10 +92,10 @@ def source_grist() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_agent_contrat_grist,
     )
-    agent_rem_variable = create_grist_etl_task(
-        selecteur="agent_rem_variable",
+    agent_remuneration_autres_elements = create_grist_etl_task(
+        selecteur="agent_remuneration_autres_elements",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_agent_rem_variable,
+        process_func=process.process_agent_remuneration_autres_elements,
     )
     agent_experience_pro = create_grist_etl_task(
         selecteur="agent_experience_pro",
@@ -109,7 +109,7 @@ def source_grist() -> None:
             agent_diplome(),
             agent_revalorisation(),
             agent_contrat(),
-            agent_rem_variable(),
+            agent_remuneration_autres_elements(),
             agent_experience_pro(),
         ]
     )
