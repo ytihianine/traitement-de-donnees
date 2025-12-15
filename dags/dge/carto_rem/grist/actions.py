@@ -7,7 +7,7 @@ from utils.config.vars import DEFAULT_PG_DATA_CONN_ID
 
 
 def get_agent_contrat(context: dict[str, Any]) -> pd.DataFrame:
-    schema = get_db_info(context=context)
+    schema = get_db_info(context=context)["prod_schema"]
 
     # Hook
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
