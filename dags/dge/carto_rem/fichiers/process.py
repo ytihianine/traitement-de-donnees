@@ -99,6 +99,6 @@ def process_agent_carriere(df_info_car: pd.DataFrame) -> pd.DataFrame:
     df = df_info_car.loc[:, cols_to_keep]
 
     # Convert column
-    df["echelon"] = df["echelon"].astype(int64)
+    df["echelon"] = pd.to_numeric(arg=df["echelon"])
 
     return df
