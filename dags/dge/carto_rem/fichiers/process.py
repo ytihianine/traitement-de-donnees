@@ -1,4 +1,4 @@
-from numpy import float64, int64
+from numpy import float64
 import pandas as pd
 
 from utils.control.text import convert_str_cols_to_date, normalize_whitespace_columns
