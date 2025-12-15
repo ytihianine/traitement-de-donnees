@@ -128,7 +128,12 @@ def process_agent_contrat_grist(df: pd.DataFrame) -> pd.DataFrame:
     #     .str.join(" ")
     #     .fillna("")
     # )
-    df = df.rename(columns={"date_d_entree_a_la_dge": "date_entree_dge"})
+    df = df.rename(
+        columns={
+            "date_d_entree_a_la_dge": "date_entree_dge",
+            "fonction_dge": "id_fonction_dge",
+        }
+    )
     date_cols = [
         "date_premier_contrat_mef",
         "date_debut_contrat_actuel_dge",
