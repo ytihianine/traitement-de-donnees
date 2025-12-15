@@ -1,3 +1,4 @@
+from numpy import float64
 import pandas as pd
 
 from utils.control.text import convert_str_cols_to_date, normalize_whitespace_columns
@@ -26,6 +27,14 @@ def process_agent_elem_rem(df: pd.DataFrame) -> pd.DataFrame:
         "IND. COMPENSATRICE CSG",
     ]
     df = df.loc[df["libelle_element"].isin(elems_to_keep)]
+
+    # Data processing
+    df["montant_a_payer"] = (
+        df["montant_a_payer"].str.replace(",", ".", regex=False).astype(float64)
+    )
+    df["montant_a_deduire"] = (
+        df["montant_a_deduire"].str.replace(",", ".", regex=False).astype(float64)
+    )
 
     return df
 
