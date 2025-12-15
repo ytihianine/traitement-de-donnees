@@ -5,7 +5,6 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
-from utils.tasks.grist import download_grist_doc_to_s3
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
@@ -72,11 +71,6 @@ def cartographie_remuneration() -> None:
     chain(
         validate_params(),
         looking_for_files,
-        download_grist_doc_to_s3(
-            selecteur="grist_doc",
-            workspace_id="dsci",
-            doc_id_key="grist_doc_id_carto_rem",
-        ),
         source_files(),
         output_files(),
         create_tmp_tables(reset_id_seq=False),
