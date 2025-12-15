@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from utils.control.structures import handle_grist_null_references
+from utils.control.text import normalize_whitespace_columns
 
 
 """
@@ -135,8 +137,14 @@ def process_agent_remuneration_autres_elements(df: pd.DataFrame) -> pd.DataFrame
             "base_remuneration": "id_base_remuneration",
         }
     )
-    df["observations"] = df["observations"].str.strip().str.split().str.join(" ")
-    df["id_base_remuneration"].replace(0, np.nan, inplace=True)
+    # Process txt columns
+    txt_cols = ["observations"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Handle references columns
+    ref_cols = ["id_base_remuneration"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
     return df
 
 
