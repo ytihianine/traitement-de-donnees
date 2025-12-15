@@ -24,6 +24,7 @@ from dags.dge.carto_rem.grist.tasks import (
     referentiels,
     source_grist,
     get_db_data,
+    datasets_additionnels,
 )
 
 
@@ -63,6 +64,7 @@ def cartographie_remuneration_grist() -> None:
         ),
         [referentiels(), source_grist()],
         get_db_data(),
+        datasets_additionnels(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.partial(keep_file_id_col=True).expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)

@@ -131,15 +131,15 @@ def get_db_data() -> None:
     chain(agent_contrat_db())
 
 
-# @task_group(group_id="dataset_additionnel")
-# def datasets_additionnels() -> None:
-#     agent_contrat_complet = create_multi_files_input_etl_task(
-#         output_selecteur="agent_contrat_complet",
-#         input_selecteurs=[
-#             "agent_contrat",
-#             "agent_contrat_db",
-#         ],
-#         process_func=process.process_agent_contrat_complet,
-#     )
+@task_group(group_id="dataset_additionnel")
+def datasets_additionnels() -> None:
+    agent_contrat_complet = create_multi_files_input_etl_task(
+        output_selecteur="agent_contrat_complet",
+        input_selecteurs=[
+            "agent_contrat",
+            "agent_contrat_db",
+        ],
+        process_func=process.process_agent_contrat_complet,
+    )
 
-#     chain(agent_contrat_complet())
+    chain(agent_contrat_complet())

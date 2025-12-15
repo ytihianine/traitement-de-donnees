@@ -176,3 +176,22 @@ def process_agent_experience_pro(df: pd.DataFrame) -> pd.DataFrame:
     # df = df.reset_index(drop=True)
     # df["id"] = df.index
     return df
+
+
+"""
+    Functions de processing des datasets additionnels
+"""
+
+
+def process_agent_contrat_complet(
+    df_agent_contrat: pd.DataFrame, df_agent_contrat_db: pd.DataFrame
+) -> pd.DataFrame:
+    # Merge des dataframes
+    df = pd.merge(
+        left=df_agent_contrat,
+        right=df_agent_contrat_db,
+        how="left",
+        on=["matricule_agent"],
+    )
+
+    return df
