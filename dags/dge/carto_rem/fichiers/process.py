@@ -88,6 +88,7 @@ def process_agent_carriere(df_info_car: pd.DataFrame) -> pd.DataFrame:
     # Keep only needed columns
     cols_to_keep = [
         "matricule_agent",
+        "categorie",
         "qualite_statutaire",
         "corps",
         "grade",
