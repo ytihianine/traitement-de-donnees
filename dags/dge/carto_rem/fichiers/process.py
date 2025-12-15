@@ -13,9 +13,7 @@ def process_agent_elem_rem(df: pd.DataFrame) -> pd.DataFrame:
     # Clean columns
     df["matricule_agent"] = df["matricule_agent"].astype("int64")
 
-    txt_cols = [
-        "libelle_element",
-    ]
+    txt_cols = ["libelle_element", "uuid"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     # Filter les lignes
