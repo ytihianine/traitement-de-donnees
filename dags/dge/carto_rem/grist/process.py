@@ -148,6 +148,10 @@ def process_agent_contrat_grist(df: pd.DataFrame) -> pd.DataFrame:
     for col in df.select_dtypes(include=["object", "string"]).columns:
         df[col] = df[col].astype(str).str.replace("\x00", "", regex=False)
 
+    # Handle ref cols
+    ref_cols = ["id_fonction_dge"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
     return df
 
 
