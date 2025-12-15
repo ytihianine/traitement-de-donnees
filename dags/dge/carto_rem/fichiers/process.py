@@ -1,4 +1,4 @@
-from numpy import float64
+from numpy import float64, int64
 import pandas as pd
 
 from utils.control.text import convert_str_cols_to_date, normalize_whitespace_columns
@@ -38,11 +38,7 @@ def process_agent_elem_rem(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_agent_info_carriere(df: pd.DataFrame) -> pd.DataFrame:
-    txt_cols = [
-        "dge_perimetre",
-        "nom_usuel",
-        "prenom",
-    ]
+    txt_cols = ["dge_perimetre", "nom_usuel", "prenom", "echelon"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
     return df
 
@@ -101,5 +97,8 @@ def process_agent_carriere(df_info_car: pd.DataFrame) -> pd.DataFrame:
         "indice_majore",
     ]
     df = df_info_car.loc[:, cols_to_keep]
+
+    # Convert column
+    df["echelon"] = df["echelon"].astype(int64)
 
     return df
