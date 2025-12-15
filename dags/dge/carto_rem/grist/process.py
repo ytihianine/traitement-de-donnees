@@ -10,6 +10,9 @@ from utils.control.text import normalize_whitespace_columns
 
 
 def process_ref_position(df: pd.DataFrame) -> pd.DataFrame:
+    cols_to_drop = ["exp_pro_prise_en_compte", "label_selection"]
+    df = df.drop(columns=cols_to_drop)
+
     df = df.rename(columns={"niveau_diplome": "id_niveau_diplome"})
     df["id_niveau_diplome"].replace(0, np.nan, inplace=True)
     return df
@@ -55,7 +58,14 @@ def process_ref_experience_pro(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_niveau_diplome(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(columns=["label_selection"])
+    cols_to_drop = [
+        "label_selection",
+        "titre_du_diplome_decret",
+        "niveau_decret",
+        "ancien_nom_decret",
+    ]
+    df = df.drop(columns=cols_to_drop)
+
     df["niveau_diplome"] = df["niveau_diplome"].str.strip().str.split().str.join(" ")
     return df
 
