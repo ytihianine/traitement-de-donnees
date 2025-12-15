@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from utils.control.dates import convert_grist_date_to_date
 from utils.control.structures import handle_grist_null_references
 from utils.control.text import normalize_whitespace_columns
 
@@ -118,16 +119,15 @@ def process_agent_revalorisation(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_agent_contrat_grist(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(columns=["agent", "duree_contrat_en_cours_auto", "id"])
-    # df["duree_cumulee_contrats_tout_contrat_mef"] = (
-    #     df["duree_cumulee_contrats_tout_contrat_mef"]
-    #     .apply(lambda x: x.decode("utf-8") if isinstance(x, bytes) else x)
-    #     .astype(str)
-    #     .str.strip()
-    #     .str.split()
-    #     .str.join(" ")
-    #     .fillna("")
-    # )
+    df = df.drop(
+        columns=[
+            "agent",
+            "duree_contrat_en_cours_auto",
+            "id",
+            "date_debut_contrat_actuel_dge",
+            "date_fin_contrat_cdd_en_cours_au_soir",
+        ]
+    )
     df = df.rename(
         columns={
             "date_d_entree_a_la_dge": "date_entree_dge",
@@ -136,17 +136,17 @@ def process_agent_contrat_grist(df: pd.DataFrame) -> pd.DataFrame:
     )
     date_cols = [
         "date_premier_contrat_mef",
-        "date_debut_contrat_actuel_dge",
+        # "date_debut_contrat_actuel_dge",
         "date_entree_dge",
-        "date_fin_contrat_cdd_en_cours_au_soir",
+        # "date_fin_contrat_cdd_en_cours_au_soir",
         "date_de_cdisation",
     ]
-    for date_col in date_cols:
-        df[date_col] = pd.to_datetime(df[date_col], unit="s")
+    df = convert_grist_date_to_date(df=df, columns=date_cols)
+
+    # Handle null byte values
     for col in df.select_dtypes(include=["object", "string"]).columns:
         df[col] = df[col].astype(str).str.replace("\x00", "", regex=False)
-    # df = df.reset_index(drop=True)
-    # df["id"] = df.index
+
     return df
 
 
