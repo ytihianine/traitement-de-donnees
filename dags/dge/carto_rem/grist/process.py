@@ -132,6 +132,7 @@ def process_agent_contrat_grist(df: pd.DataFrame) -> pd.DataFrame:
         columns={
             "date_d_entree_a_la_dge": "date_entree_dge",
             "fonction_dge": "id_fonction_dge",
+            "duree_contrat_en_cours": "duree_contrat_en_cours_dge",
         }
     )
     date_cols = [
