@@ -58,7 +58,6 @@ def process_agent_contrat(df: pd.DataFrame) -> pd.DataFrame:
         "date_de_cdisation",
         "duree_en_jours_si_coupure_de_contrat",
         "date_entree_dge",
-        "duree_contrat_en_cours",
         "id_fonction_dge",
     ]
     df[cols_to_init] = pd.NA
