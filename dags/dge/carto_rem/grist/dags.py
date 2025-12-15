@@ -70,7 +70,7 @@ def cartographie_remuneration_grist() -> None:
         import_file_to_db.partial(keep_file_id_col=True).expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
-        copy_tmp_table_to_real_table(load_strategy=LoadStrategy.INCREMENTAL),
+        copy_tmp_table_to_real_table(load_strategy=LoadStrategy.FULL_LOAD),
         refresh_views(),
         copy_s3_files(bucket="dsci"),
         del_s3_files(bucket="dsci"),
