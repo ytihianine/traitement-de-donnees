@@ -145,6 +145,11 @@ def process_agent_remuneration_autres_elements(df: pd.DataFrame) -> pd.DataFrame
     ref_cols = ["id_base_remuneration"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
 
+    # Handle boolean columns
+    df["present_cartographie"] = df["present_cartographie"].map(
+        {b"T": True, b"F": False, None: None}
+    )
+
     return df
 
 
