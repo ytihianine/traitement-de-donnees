@@ -214,8 +214,8 @@ def process_agent_contrat_complet(
 ) -> pd.DataFrame:
     # Merge des dataframes
     df = pd.merge(
-        left=df_agent_contrat,
-        right=df_agent_contrat_db,
+        left=df_agent_contrat_db,
+        right=df_agent_contrat,
         how="left",
         on=["matricule_agent"],
     )
