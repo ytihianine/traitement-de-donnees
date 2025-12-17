@@ -1,3 +1,4 @@
+from typing import Any
 import pandas as pd
 import json
 
@@ -83,9 +84,7 @@ def process_code_iso(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def transform_multipolygon_to_polygon(
-    geojson_feature: dict[str, any]
-) -> list[list[float, float]]:
+def transform_multipolygon_to_polygon(geojson_feature: dict[str, Any]) -> str:
     type_contour = geojson_feature["geometry"]["type"]
     raw_coords = geojson_feature["geometry"]["coordinates"]
 
