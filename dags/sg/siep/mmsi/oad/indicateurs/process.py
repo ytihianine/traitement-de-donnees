@@ -1,5 +1,6 @@
 from datetime import datetime
 import pandas as pd
+import numpy as np
 from utils.control.text import normalize_whitespace_columns
 
 
@@ -295,6 +296,14 @@ def process_localisation(
     ]
     df = df.loc[:, cols_to_keep]
 
+    # Filtrer les lignes
+    df = df.drop_duplicates(
+        subset=["code_bat_ter"],
+        keep="first",
+        ignore_index=True,
+    )
+    df = filter_bien(df=df, df_bien=df_biens)
+
     # Cleaning data
     txt_cols = [
         "adresse_normalisee",
@@ -311,14 +320,17 @@ def process_localisation(
     ]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
-    # Filtrer les lignes
-    df = df.drop_duplicates(
-        subset=["code_bat_ter"],
-        keep="first",
-        ignore_index=True,
+    # Ajout des colonnes additionnelles
+    conditions = [
+        (df["num_departement_normalisee"] == "Etranger"),
+        (df["num_departement_normalisee"].str.len() == 2),
+        (df["num_departement_normalisee"].str.len() == 3),
+    ]
+    choices = ["Etranger", "Métropole", "Outre-mer"]
+    df["metropole_outremer"] = np.select(
+        condlist=conditions, choicelist=choices, default="Indéterminé"
     )
 
-    df = filter_bien(df=df, df_bien=df_biens)
     return df
 
 
