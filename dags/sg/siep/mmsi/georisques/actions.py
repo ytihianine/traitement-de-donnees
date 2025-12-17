@@ -1,14 +1,11 @@
+from typing import Optional
 import pandas as pd
 
 from infra.database.factory import create_db_handler
-from infra.file_handling.factory import create_file_handler
-from infra.http_client.adapters import HttpxClient
+from infra.http_client.adapters import AbstractHTTPClient, RequestsClient
 from infra.http_client.config import ClientConfig
 from utils.config.dag_params import get_db_info
-from utils.config.types import FileHandlerType
-from utils.config.vars import AGENT, DEFAULT_S3_CONN_ID, DEFAULT_S3_BUCKET, PROXY
-from utils.config.tasks import get_selecteur_config
-from utils.dataframe import df_info
+from utils.config.vars import AGENT, PROXY, DEFAULT_PG_DATA_CONN_ID
 
 from dags.sg.siep.mmsi.georisques.process import (
     format_query_param,
@@ -18,7 +15,7 @@ from dags.sg.siep.mmsi.georisques.process import (
 
 def get_bien_from_db(context: dict) -> pd.DataFrame:
     # Hook & config
-    db_handler = create_db_handler(connection_id="db_data_store")
+    db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
     schema = get_db_info(context=context)["prod_schema"]
     snapshot_id = context["ti"].xcom_pull(
         key="snapshot_id", task_ids="get_projet_snapshot"
@@ -45,21 +42,20 @@ def get_bien_from_db(context: dict) -> pd.DataFrame:
     return df
 
 
-def get_risque(url: str, query_param: str) -> dict[str, str]:
-    # Http client
-    http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
-    httpx_internet_client = HttpxClient(config=http_config)
+def get_risque(
+    http_client: AbstractHTTPClient, url: str, query_param: Optional[str]
+) -> dict[str, str]:
     result_json = {}
 
-    if query_param == "no geo data":
+    if not query_param:
         result_json["statut"] = "Echec"
         result_json["statut_code"] = None
-        result_json["raison"] = "no geo data"
+        result_json["raison"] = "Ce bien n'a pas de données de localisation"
         return result_json
 
     full_url = f"{url}?{query_param}"
 
-    response = httpx_internet_client.get(full_url, timeout=180)
+    response = http_client.get(endpoint=full_url, timeout=180)
 
     if response.status_code == 200:
         result_json["statut"] = "Succès"
@@ -74,38 +70,10 @@ def get_risque(url: str, query_param: str) -> dict[str, str]:
         return result_json
 
 
-def get_georisques(
-    nom_projet: str, selecteur_risques: str, selecteur_risques_info: str
-) -> None:
+def get_georisques(df_bien: pd.DataFrame) -> pd.DataFrame:
     # Http client
     http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
-    httpx_internet_client = HttpxClient(config=http_config)
-
-    # Hooks
-    db_handler = create_db_handler(connection_id="db_data_store")
-    s3_handler = create_file_handler(
-        handler_type=FileHandlerType.S3,
-        connection_id=DEFAULT_S3_CONN_ID,
-        bucket=DEFAULT_S3_BUCKET,
-    )
-
-    # Storage paths
-    config_risques = get_selecteur_config(
-        nom_projet=nom_projet, selecteur=selecteur_risques
-    )
-    config_risques_info = get_selecteur_config(
-        nom_projet=nom_projet, selecteur=selecteur_risques_info
-    )
-
-    # Get data from AOD
-    df_oad = db_handler.fetch_df(
-        query="""SELECT sp.code_bat_ter, sbl.latitude, sbl.longitude, sbl.adresse
-            FROM siep.bien sp
-            JOIN siep.bien_localisation sbl
-                ON sp.code_bat_ter = sbl.code_bat_ter
-            ;
-        """
-    )
+    http_internet_client = RequestsClient(config=http_config)
 
     # Get result from API
     api_host = "https://www.georisques.gouv.fr"
@@ -114,19 +82,18 @@ def get_georisques(
 
     risques_api_info = []
     risques_results = []
-    nb_rows = len(df_oad)
-    for row in df_oad.itertuples():
-        print(f"{row.Index + 1}/{nb_rows}")
+    nb_rows = len(df_bien)
+    for index, row in df_bien.itertuples():
+        print(f"{index + 1}/{nb_rows}")
         query_param = format_query_param(
             adresse=row.adresse, latitude=row.latitude, longitude=row.longitude
         )
         risque_api_result = get_risque(
-            api_client=httpx_internet_client, url=url, query_param=query_param
+            http_client=http_internet_client, url=url, query_param=query_param
         )
         risque_api_result["code_bat_ter"] = row.code_bat_ter
+        print(risque_api_result)
         formated_risques = format_risque_results(risques=risque_api_result)
-        # print(risque_api_result)
-        # print(formated_risques)
         risques_api_info.append(
             {
                 "code_bat_ter": risque_api_result["code_bat_ter"],
@@ -137,20 +104,6 @@ def get_georisques(
         )
         risques_results.extend(formated_risques)
 
-    df_risques = pd.DataFrame(risques_results)
-    df_risques_info = pd.DataFrame(risques_api_info)
-    # Logs
-    df_info(df=df_risques, df_name="Risque results - After processing")
-    df_info(df=df_risques_info, df_name="Risques API Info - After processing")
+    df = pd.DataFrame(data=risques_results)
 
-    # Process results - Pas besoin
-    # Export results - Risques
-    s3_handler.write(
-        content=df_risques.to_parquet(path=None, index=False),
-        file_path=config_risques.filepath_tmp_s3,
-    )
-    # Export results - API Info
-    s3_handler.write(
-        content=df_risques_info.to_parquet(path=None, index=False),
-        file_path=config_risques_info.filepath_tmp_s3,
-    )
+    return df

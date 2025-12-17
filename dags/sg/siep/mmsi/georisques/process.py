@@ -1,9 +1,9 @@
-import pandas as pd
-
 from typing import Optional
 
+import pandas as pd
 
-def format_risque_results(risques: dict[str, str]) -> dict[str, str]:
+
+def format_risque_results(risques: dict[str, str]) -> list[dict[str, str]]:
     formated_risques = []
     code_bat_ter = risques.get("code_bat_ter")
 
