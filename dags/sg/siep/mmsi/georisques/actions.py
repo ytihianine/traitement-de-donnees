@@ -4,6 +4,7 @@ from infra.database.factory import create_db_handler
 from infra.file_handling.factory import create_file_handler
 from infra.http_client.adapters import HttpxClient
 from infra.http_client.config import ClientConfig
+from utils.config.dag_params import get_db_info
 from utils.config.types import FileHandlerType
 from utils.config.vars import AGENT, DEFAULT_S3_CONN_ID, DEFAULT_S3_BUCKET, PROXY
 from utils.config.tasks import get_selecteur_config
@@ -13,6 +14,35 @@ from dags.sg.siep.mmsi.georisques.process import (
     format_query_param,
     format_risque_results,
 )
+
+
+def get_bien_from_db(context: dict) -> pd.DataFrame:
+    # Hook & config
+    db_handler = create_db_handler(connection_id="db_data_store")
+    schema = get_db_info(context=context)["prod_schema"]
+    snapshot_id = context["ti"].xcom_pull(
+        key="snapshot_id", task_ids="get_projet_snapshot"
+    )
+
+    # Retrieve data
+    df = db_handler.fetch_df(
+        query=f"""SELECT sb.code_bat_ter, sbl.latitude, sbl.longitude, sbl.adresse_normalisee,
+                sbl.import_timestamp as import_timestamp_oad
+            FROM {schema}.bien sb
+            JOIN {schema}.bien_localisation sbl
+                ON sb.code_bat_ter = sbl.code_bat_ter
+            WHERE
+                sb.snapshot_id = %s
+                AND sbl.import_timestamp = (
+                    SELECT MAX(import_timestamp)
+                    FROM siep.bien_localisation
+                    WHERE snapshot_id = %s
+            );
+        """,
+        parameters=(snapshot_id, snapshot_id),
+    )
+
+    return df
 
 
 def get_risque(url: str, query_param: str) -> dict[str, str]:
