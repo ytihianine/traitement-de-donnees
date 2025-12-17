@@ -4,7 +4,7 @@ import numpy as np
 from airflow.models.variable import Variable
 
 from infra.grist.client import GristAPI
-from infra.http_client.adapters import ClientConfig, HttpxClient
+from infra.http_client.adapters import ClientConfig, RequestsClient
 from utils.config.vars import AGENT, DEFAULT_GRIST_HOST, PROXY
 from utils.dataframe import df_info
 
@@ -20,9 +20,9 @@ ID_DATASET_COMMUNE = "91a95bee-c7c8-45f9-a8aa-f14cc4697545"
 ID_DATASET_COMMUNE_OUTRE_MER = "b797d73d-663c-4d3d-baf0-2d24b2d3a321"
 
 
-def make_httpx_client() -> HttpxClient:
+def make_httpx_client() -> RequestsClient:
     config = ClientConfig(timeout=60, proxy=PROXY, user_agent=AGENT)
-    return HttpxClient(config=config)
+    return RequestsClient(config=config)
 
 
 def communes() -> pd.DataFrame:
