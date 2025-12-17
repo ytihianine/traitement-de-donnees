@@ -83,8 +83,8 @@ def get_georisques(df_bien: pd.DataFrame) -> pd.DataFrame:
     risques_api_info = []
     risques_results = []
     nb_rows = len(df_bien)
-    for index, row in df_bien.itertuples():
-        print(f"{index + 1}/{nb_rows}")
+    for row in df_bien.itertuples():
+        print(f"{row.Index + 1}/{nb_rows}")
         query_param = format_query_param(
             adresse=row.adresse, latitude=row.latitude, longitude=row.longitude
         )
