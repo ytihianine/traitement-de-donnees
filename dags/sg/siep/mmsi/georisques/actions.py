@@ -1,3 +1,4 @@
+import time
 from typing import Optional
 from infra.http_client.types import HTTPResponse
 import pandas as pd
@@ -44,13 +45,60 @@ def get_bien_from_db(context: dict) -> pd.DataFrame:
 
 
 def get_risque(
-    http_client: AbstractHTTPClient, url: str, query_param: Optional[str]
-) -> HTTPResponse:
+    http_client, url: str, query_param: str, max_retries: int = 3, retry_delay: int = 15
+) -> Optional[HTTPResponse]:
+    """
+    Effectue une requête avec retry en cas d'erreur.
 
-    full_url = f"{url}?{query_param}"
-    response = http_client.get(endpoint=full_url, timeout=180)
+    Args:
+        http_client: Client HTTP
+        url: URL de l'API
+        query_param: Paramètres de la requête
+        max_retries: Nombre maximum de tentatives
+        retry_delay: Délai d'attente entre chaque tentative (en secondes)
 
-    return response
+    Returns:
+        HTTPResponse ou None en cas d'échec après tous les retries
+    """
+    retry_status_codes = {429, 500, 502, 503, 504}  # Codes d'erreur à retry
+
+    for attempt in range(max_retries):
+        try:
+            full_url = f"{url}?{query_param}"
+            response = response = http_client.get(endpoint=full_url, timeout=180)
+
+            # Si succès, retourner la réponse
+            if response and response.status_code == 200:
+                return response
+
+            # Si erreur à retry et pas la dernière tentative
+            if (
+                response
+                and response.status_code in retry_status_codes
+                and attempt < max_retries - 1
+            ):
+                wait_time = retry_delay * (attempt + 1)  # Backoff exponentiel optionnel
+                print(
+                    f"⚠️ Erreur {response.status_code}, nouvelle tentative dans {wait_time}s... ({attempt + 1}/{max_retries})"
+                )
+                time.sleep(wait_time)
+                continue
+
+            # Sinon retourner la réponse (même en erreur)
+            return response
+
+        except Exception as e:
+            if attempt < max_retries - 1:
+                wait_time = retry_delay * (attempt + 1)
+                print(
+                    f"⚠️ Exception: {str(e)}, nouvelle tentative dans {wait_time}s... ({attempt + 1}/{max_retries})"
+                )
+                time.sleep(wait_time)
+            else:
+                print(f"❌ Échec après {max_retries} tentatives: {str(e)}")
+                return None
+
+    return None
 
 
 def get_georisques(df_bien: pd.DataFrame) -> pd.DataFrame:
@@ -63,7 +111,6 @@ def get_georisques(df_bien: pd.DataFrame) -> pd.DataFrame:
     api_endpoint = "api/v1/resultats_rapport_risque"
     url = "/".join([api_host, api_endpoint])
 
-    risques_api_info = []
     risques_results = []
     nb_rows = len(df_bien)
     for row in df_bien.itertuples():
