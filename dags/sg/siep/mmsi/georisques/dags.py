@@ -18,7 +18,6 @@ from utils.tasks.s3 import (
 )
 from dags.sg.siep.mmsi.georisques.task import georisques_group
 
-
 # Mails
 nom_projet = "Géorisques"
 LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/sg/siep/mmsi/eligibilite_fcu?ref_type=heads"  # noqa
@@ -50,7 +49,7 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
 def bien_georisques() -> None:
     """Task order"""
     chain(
-        get_projet_snapshot(),
+        get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         georisques_group(),
         create_tmp_tables(),
         import_file_to_db.expand(
