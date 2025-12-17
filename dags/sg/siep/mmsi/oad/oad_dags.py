@@ -75,7 +75,7 @@ default_args = {
         mail_status=MailStatus.ERROR,
     ),
 )
-def oad():
+def oad() -> None:
     looking_for_files = S3KeySensor(
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
@@ -109,7 +109,7 @@ def oad():
     chain(
         validate_params(),
         looking_for_files,
-        create_projet_snapshot(),
+        # create_projet_snapshot(),
         get_projet_snapshot(),
         convert_file_to_parquet(),
         tasks_oad_caracteristiques(),
@@ -118,13 +118,13 @@ def oad():
         import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
-        ensure_partition(),
-        copy_tmp_table_to_real_table(
-            load_strategy=LoadStrategy.APPEND,
-        ),
-        refresh_views(),
-        copy_s3_files(bucket="dsci"),
-        del_s3_files(bucket="dsci"),
+        # ensure_partition(),
+        # copy_tmp_table_to_real_table(
+        #     load_strategy=LoadStrategy.APPEND,
+        # ),
+        # refresh_views(),
+        # copy_s3_files(bucket="dsci"),
+        # del_s3_files(bucket="dsci"),
         delete_tmp_tables(),
         # end_task,
     )
