@@ -1,7 +1,5 @@
-from datetime import timedelta
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
 
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
@@ -9,6 +7,7 @@ from utils.config.dag_params import create_dag_params, create_default_args
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
+    get_projet_snapshot,
     import_file_to_db,
 )
 from utils.config.tasks import get_projet_config
@@ -28,7 +27,7 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
 
 # Définition du DAG
 @dag(
-    "georisques_batiments",
+    dag_id="georisques_batiments",
     schedule_interval=None,
     max_active_runs=1,
     catchup=False,
@@ -48,9 +47,10 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
         mail_status=MailStatus.ERROR,
     ),
 )
-def bien_georisques():
+def bien_georisques() -> None:
     """Task order"""
     chain(
+        get_projet_snapshot(),
         georisques_group(),
         create_tmp_tables(),
         import_file_to_db.expand(
