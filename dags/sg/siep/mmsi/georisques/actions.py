@@ -1,4 +1,5 @@
 from typing import Optional
+from infra.http_client.types import HTTPResponse
 import pandas as pd
 
 from infra.database.factory import create_db_handler
@@ -44,30 +45,12 @@ def get_bien_from_db(context: dict) -> pd.DataFrame:
 
 def get_risque(
     http_client: AbstractHTTPClient, url: str, query_param: Optional[str]
-) -> dict[str, str]:
-    result_json = {}
-
-    if not query_param:
-        result_json["statut"] = "Echec"
-        result_json["statut_code"] = None
-        result_json["raison"] = "Ce bien n'a pas de données de localisation"
-        return result_json
+) -> HTTPResponse:
 
     full_url = f"{url}?{query_param}"
-
     response = http_client.get(endpoint=full_url, timeout=180)
 
-    if response.status_code == 200:
-        result_json["statut"] = "Succès"
-        result_json["statut_code"] = response.status_code
-        result_json["raison"] = None
-        result_json.update(response.json())
-        return result_json
-    else:
-        result_json["statut"] = "Echec"
-        result_json["statut_code"] = response.status_code
-        result_json["raison"] = response.content
-        return result_json
+    return response
 
 
 def get_georisques(df_bien: pd.DataFrame) -> pd.DataFrame:
@@ -90,20 +73,17 @@ def get_georisques(df_bien: pd.DataFrame) -> pd.DataFrame:
             latitude=row.latitude,
             longitude=row.longitude,
         )
-        risque_api_result = get_risque(
-            http_client=http_internet_client, url=url, query_param=query_param
+
+        api_response = None
+        if query_param:
+            api_response = get_risque(
+                http_client=http_internet_client, url=url, query_param=query_param
+            )
+
+        formated_risques = format_risque_results(
+            code_bat_ter=row.code_bat_ter, api_response=api_response
         )
-        risque_api_result["code_bat_ter"] = row.code_bat_ter
-        print(risque_api_result)
-        formated_risques = format_risque_results(risques=risque_api_result)
-        risques_api_info.append(
-            {
-                "code_bat_ter": risque_api_result["code_bat_ter"],
-                "statut": risque_api_result["statut"],
-                "statut_code": risque_api_result["statut_code"],
-                "raison": risque_api_result["raison"],
-            }
-        )
+        print(formated_risques)
         risques_results.extend(formated_risques)
 
     df = pd.DataFrame(data=risques_results)
