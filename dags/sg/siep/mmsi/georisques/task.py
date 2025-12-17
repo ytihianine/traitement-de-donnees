@@ -17,6 +17,7 @@ def georisques_group() -> None:
         output_selecteur="bien_db",
         task_id="bien_db",
         action_func=actions.get_bien_from_db,
+        use_context=True,
     )
 
     georisques = create_action_from_multi_input_files_etl_task(
