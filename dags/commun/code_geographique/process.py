@@ -4,16 +4,17 @@ import json
 
 
 def process_communes(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.set_axis([colname.lower() for colname in df.columns], axis="columns").drop(
-        columns=["__id"]
-    )
+    df = df.set_axis(
+        labels=[colname.lower() for colname in df.columns], axis="columns"
+    ).drop(columns=["__id"])
+    df["com"] = df["com"].astype(str)
     return df
 
 
 def process_communes_outre_mer(df: pd.DataFrame) -> pd.DataFrame:
     cols_mapping = {"com_comer": "com", "nature_zonage": "typecom"}
     df = (
-        df.set_axis([colname.lower() for colname in df.columns], axis="columns")
+        df.set_axis(labels=[colname.lower() for colname in df.columns], axis="columns")
         .rename(columns=cols_mapping, errors="raise")
         .assign(
             dep=lambda df: df["comer"],
