@@ -410,7 +410,7 @@ def process_strategie(
         "segmentation_theorique_sdir_spsi",
         "statut_osc",
     ]
-    df = df[cols_to_keep]
+    df = df.loc[:, cols_to_keep]
     df = filter_bien(df=df, df_bien=df_biens)
 
     return df
