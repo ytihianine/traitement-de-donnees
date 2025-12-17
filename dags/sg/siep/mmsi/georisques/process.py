@@ -1,8 +1,6 @@
 import pandas as pd
 
-
-def clean_rename(df: pd.DataFrame) -> pd.DataFrame:
-    return df
+from typing import Optional
 
 
 def format_risque_results(risques: dict[str, str]) -> dict[str, str]:
@@ -34,11 +32,16 @@ def format_risque_results(risques: dict[str, str]) -> dict[str, str]:
     return formated_risques
 
 
-def format_query_param(adresse: str, latitude: float, longitude: float) -> str:
+def format_query_param(
+    adresse: str, latitude: float, longitude: float
+) -> Optional[str]:
+    if pd.isna(latitude) or pd.isna(longitude) or pd.isna(adresse):
+        return None
+
     if isinstance(latitude, float) and isinstance(longitude, float):
         return f"latlon={longitude},{latitude}"
 
     if adresse:
         return f"adresse={adresse}"
 
-    return "no geo data"
+    return None
