@@ -1,5 +1,6 @@
 from datetime import datetime
 import pandas as pd
+from utils.control.text import normalize_whitespace_columns
 
 
 def filter_bien(df: pd.DataFrame, df_bien: pd.DataFrame) -> pd.DataFrame:
@@ -286,17 +287,31 @@ def process_localisation(
         "commune_normalisee",
         "commune_source",
         "france_etranger",
+        "metropole_outremer",
         "num_departement_normalisee",
         "num_departement_source",
+        "code_iso_departement_normalise",
+        "code_iso_region_normalise",
     ]
-    df = df[cols_to_keep]
+    df = df.loc[:, cols_to_keep]
 
     # Cleaning data
-    df = df.assign(
-        adresse_source=df["adresse_source"].str.split().str.join(" "),
-        commune_source=df["commune_source"].str.split().str.join(" "),
-        num_departement_source=df["num_departement_source"].str.split().str.join(" "),
-    )
+    txt_cols = [
+        "adresse_normalisee",
+        "adresse_source",
+        "commune_mef_hmef",
+        "commune_normalisee",
+        "commune_source",
+        "france_etranger",
+        "metropole_outremer",
+        "num_departement_normalisee",
+        "num_departement_source",
+        "code_iso_departement_normalise",
+        "code_iso_region_normalise",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Filtrer les lignes
     df = df.drop_duplicates(
         subset=["code_bat_ter"],
         keep="first",
