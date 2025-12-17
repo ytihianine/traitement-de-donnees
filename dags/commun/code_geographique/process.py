@@ -44,9 +44,7 @@ def get_code_iso_departement(df: pd.DataFrame) -> pd.DataFrame:
     departement_division = [
         "metropolitan department",
         "metropolitan collectivity with special status",
-        "overseas territory",
-        "overseas departmental collectivity",
-        "overseas unique territorial collectivity",
+        "overseas superset department entries",
     ]
     df_departement = df.loc[df["categorie_division"].isin(departement_division)].copy()
     # Retrait de Paris et Lyon dans la liste des régions
