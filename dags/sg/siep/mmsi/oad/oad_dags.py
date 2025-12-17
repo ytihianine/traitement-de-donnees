@@ -125,7 +125,7 @@ def oad() -> None:
         # refresh_views(),
         # copy_s3_files(bucket="dsci"),
         # del_s3_files(bucket="dsci"),
-        delete_tmp_tables(),
+        # delete_tmp_tables(),
         # end_task,
     )
 
