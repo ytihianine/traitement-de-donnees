@@ -7,7 +7,7 @@ def process_communes(df: pd.DataFrame) -> pd.DataFrame:
     df = df.set_axis(
         labels=[colname.lower() for colname in df.columns], axis="columns"
     ).drop(columns=["__id"])
-    df["com"] = df["com"].astype(str)
+    df["com"] = df["com"].to_string()
     return df
 
 
@@ -22,6 +22,7 @@ def process_communes_outre_mer(df: pd.DataFrame) -> pd.DataFrame:
         )
     )
     df = df.drop(columns=["__id", "libelle_comer", "comer"])
+    df["com"] = df["com"].to_string()
     return df
 
 
