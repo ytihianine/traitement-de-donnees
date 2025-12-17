@@ -7,6 +7,8 @@ from utils.config.dag_params import create_dag_params, create_default_args
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
+    get_projet_snapshot,
+    create_projet_snapshot,
     refresh_views,
     # set_dataset_last_update_date,
 )
@@ -46,6 +48,8 @@ def informations_geographiques() -> None:
 
     # Ordre des tâches
     chain(
+        create_projet_snapshot(),
+        get_projet_snapshot(),
         code_geographique(),
         geojson(),
         code_iso(),
