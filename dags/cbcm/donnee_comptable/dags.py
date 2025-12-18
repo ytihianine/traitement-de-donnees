@@ -97,10 +97,10 @@ def chorus_donnees_comptables() -> None:
         copy_tmp_table_to_real_table(
             load_strategy=LoadStrategy.APPEND,
         ),
-        # refresh_views(),
-        # copy_s3_files(bucket="dsci"),
-        # del_s3_files(bucket="dsci"),
-        # delete_tmp_tables(),
+        refresh_views(),
+        copy_s3_files(bucket="dsci"),
+        del_s3_files(bucket="dsci"),
+        delete_tmp_tables(),
         # set_dataset_last_update_date(
         #     dataset_ids=[49, 50, 51, 52, 53, 54],
         # ),
