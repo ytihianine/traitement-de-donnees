@@ -93,7 +93,7 @@ CREATE TABLE donnee_comptable.demande_achat_sp (
 -- Nombre de lignes: 14776
 DROP TABLE donnee_comptable."demande_paiement_flux" CASCADE;
 CREATE TABLE donnee_comptable.demande_paiement_flux (
-	num_dp_flux int4 NULL,
+	num_dp_flux bigint,
 	annee_exercice int4 NULL,
 	societe text NULL,
 	dp_flux_3 text NULL,
