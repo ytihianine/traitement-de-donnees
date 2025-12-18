@@ -95,7 +95,7 @@ def chorus_donnees_comptables() -> None:
         ),
         # ensure_partition(),
         copy_tmp_table_to_real_table(
-            load_strategy=LoadStrategy.FULL_LOAD,
+            load_strategy=LoadStrategy.APPEND,
         ),
         # refresh_views(),
         # copy_s3_files(bucket="dsci"),
