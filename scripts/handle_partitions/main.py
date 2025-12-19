@@ -14,18 +14,18 @@ from scripts.handle_partitions.partitions import (
 # VARIABLES
 ENV = os.environ.copy()
 schema = "siep"
-tbl_to_excludes = ("conso", "bien_info", "ref", "bien_georisque", "facture")
-action = Actions.UPDATE_SNAPSHOT
+tbl_to_keep = ("conso", "bien_info", "facture")
+action = Actions.UPDATE_TIMESTAMP
 
 # Si Actions.CREATE
-str_date = "31/07/2025 00:00:00"
+str_date = "01/11/2025 00:00:00"
 from_date = datetime.strptime(str_date, "%d/%m/%Y %H:%M:%S")
 to_date = from_date + timedelta(days=1)
 print(from_date, to_date)
 
 # Si Actions.UPDATE_TIMESTAMP
-curr_import_timestamp = datetime.strptime("2025-12-19 15:15:00", "%Y-%m-%d %H:%M:%S")
-new_import_timestamp = datetime.strptime("2025-07-31 00:00:00", "%Y-%m-%d %H:%M:%S")
+curr_import_timestamp = datetime.strptime("2025-12-19 17:16:43", "%Y-%m-%d %H:%M:%S")
+new_import_timestamp = datetime.strptime("2025-11-01 12:00:00", "%Y-%m-%d %H:%M:%S")
 print(curr_import_timestamp, new_import_timestamp)
 
 # Si Actions.UPDATE_SNAPSHOT
@@ -53,7 +53,7 @@ if __name__ == "__main__":
             partition_names = [
                 partition
                 for partition in partition_names
-                if not partition[1].startswith(tbl_to_excludes)
+                if partition[1].startswith(tbl_to_keep)
             ]
             drop_partitions(partitions=partition_names, cursor=pg_cur, dry_run=True)
             pg_conn.commit()
@@ -67,9 +67,7 @@ if __name__ == "__main__":
         try:
             # Récupérer la liste des tables
             table_names = get_tbl_names(schema=schema, curseur=pg_cur)
-            table_names = [
-                tbl for tbl in table_names if not tbl[0].startswith(tbl_to_excludes)
-            ]
+            table_names = [tbl for tbl in table_names if tbl[0].startswith(tbl_to_keep)]
 
             create_partitions(
                 tbl_names=table_names,
@@ -89,9 +87,7 @@ if __name__ == "__main__":
         try:
             # Récupérer la liste des tables
             table_names = get_tbl_names(schema=schema, curseur=pg_cur)
-            table_names = [
-                tbl for tbl in table_names if not tbl[0].startswith(tbl_to_excludes)
-            ]
+            table_names = [tbl for tbl in table_names if tbl[0].startswith(tbl_to_keep)]
 
             update_import_timestamp(
                 tbl_names=table_names,
@@ -111,9 +107,7 @@ if __name__ == "__main__":
         try:
             # Récupérer la liste des tables
             table_names = get_tbl_names(schema=schema, curseur=pg_cur)
-            table_names = [
-                tbl for tbl in table_names if not tbl[0].startswith(tbl_to_excludes)
-            ]
+            table_names = [tbl for tbl in table_names if tbl[0].startswith(tbl_to_keep)]
 
             update_snapshot_id(
                 tbl_names=table_names,
