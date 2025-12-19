@@ -28,11 +28,6 @@ def process_source_conso_mens(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_source_bien_info_comp(df: pd.DataFrame) -> pd.DataFrame:
-    # Convert
-    df["gestion_mono_multi_min"] = df["gestion_mono_multi_min"].replace(
-        {"FAUX": False, "TRUE": True}
-    )
-
     # Cleaning
     txt_cols = [
         "code_site",
@@ -40,7 +35,6 @@ def process_source_bien_info_comp(df: pd.DataFrame) -> pd.DataFrame:
         "famille_de_bien",
         "etat_bat",
         "efa",
-        "gestion_mono_multi_min",
     ]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
