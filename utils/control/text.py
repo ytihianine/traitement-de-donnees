@@ -4,6 +4,7 @@ import re
 import unicodedata
 import logging
 from typing import List
+from numpy import isin
 from pandas._typing import DateTimeErrorChoices
 
 import pandas as pd
@@ -44,7 +45,13 @@ def normalize_whitespace_columns(df: pd.DataFrame, columns: list[str]) -> pd.Dat
     for col in columns:
         if col in df.columns:
             logging.info(msg=f"Normalizing whitespace in column : {col}")
-            df[col] = normalize_txt_column(series=df.loc[:, col])
+            series = df[col]
+            if isinstance(series, pd.Series):
+                df[col] = normalize_txt_column(series=series)
+            else:
+                raise TypeError(
+                    f"df[col] with column name {col} is of type {type(df[col])}. Must be a pd.Series."
+                )
     return df
 
 
