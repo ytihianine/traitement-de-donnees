@@ -4,6 +4,8 @@ from typing import Union
 import pandas as pd
 import numpy as np
 
+from utils.control.text import normalize_whitespace_columns
+
 
 class Statuts(str, Enum):
     debut_exp = "DEBUT EXP"
@@ -26,7 +28,63 @@ def process_source_conso_mens(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_source_bien_info_comp(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
+    # Convert
+    df["gestion_mono_multi_min"] = df["gestion_mono_multi_min"].replace(
+        {"FAUX": False, "TRUE": True}
+    )
+
+    # Cleaning
+    txt_cols = [
+        "code_site",
+        "usage_detaille_du_bien",
+        "famille_de_bien",
+        "etat_bat",
+        "efa",
+        "gestion_mono_multi_min",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Regroupement
+    df_grouped = df.groupby(by=["code_bat_ter"], as_index=False)[
+        "code_bat_gestionnaire"
+    ].count()
+    df_grouped = df_grouped.rename(
+        columns={"code_bat_gestionnaire": "nb_code_bat_gestionnaire"}
+    )
+
+    # Catégoriser les données
+    df_grouped["gestion_mono_multi_mef"] = np.where(
+        df_grouped["nb_code_bat_gestionnaire"] > 1,
+        "Multi gest MEF",
+        "Mono gest MEF",
+    )
+
+    # Jointure pour récupérer gestion_mono_multi_mef dans df
+    df = pd.merge(
+        left=df,
+        right=df_grouped[["code_bat_ter", "gestion_mono_multi_mef"]],
+        on="code_bat_ter",
+        how="left",
+    )
+
+    # Colonnes additionnelles
+    df["gestion_mono_multi_min"] = np.where(
+        df["gestion_mono_multi_min"], "Multi", "Mono"
+    )
+    conditions = [
+        (df["gestion_mono_multi_min"] == "Mono")
+        & (df["gestion_mono_multi_mef"] == "Mono gest MEF"),
+        (df["gestion_mono_multi_min"] == "Mono")
+        & (df["gestion_mono_multi_mef"] == "MEF multi gest"),
+        (df["gestion_mono_multi_min"] == "Multi")
+        & (df["gestion_mono_multi_mef"] == "Mixte dont MEF mono gest"),
+        (df["gestion_mono_multi_min"] == "Multi")
+        & (df["gestion_mono_multi_mef"] == "Mixte dont MEF multi gest"),
+    ]
+    choices = ["MEF mono gest", "DP non automatisées", "", ""]
+    df["gestion_categorie"] = np.select(
+        condlist=conditions, choicelist=choices, default="Indéterminé"
+    )
 
     return df
 
