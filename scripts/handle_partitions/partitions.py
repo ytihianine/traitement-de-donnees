@@ -41,6 +41,41 @@ def drop_partitions(
 
 
 def create_partitions(
+    tbl_names: list[tuple[Any, ...]],
+    range_start: datetime,
+    range_end: datetime,
+    cursor: extensions.cursor,
+    dry_run: bool = True,
+) -> None:
+    print(f"{len(tbl_names)} table(s) trouvée(s)")
+
+    created_count = 0
+    for tbl_name, schema in tbl_names:
+        # Nom de la partition : parenttable_YYYY_MM
+        partition_name = "_".join(
+            [
+                tbl_name,
+                range_start.strftime(format="%Y%m%d"),
+                range_end.strftime(format="%Y%m%d"),
+            ]
+        )
+
+        print(f"Creating partition {partition_name} for {tbl_name}.")
+        create_query = f"""
+            CREATE TABLE IF NOT EXISTS {schema}.{partition_name}
+            PARTITION OF {schema}.{tbl_name}
+            FOR VALUES FROM ('{range_start}') TO ('{range_end}');
+        """
+
+        if dry_run:
+            print(f"[DRY RUN] {create_query}")
+        else:
+            cursor.execute(query=create_query)
+            print(f"✓ Partition {partition_name} created successfully.")
+            created_count += 1
+
+
+def update_import_timestamp(
     schema: str,
     tbl_name: str,
     range_start: datetime,
