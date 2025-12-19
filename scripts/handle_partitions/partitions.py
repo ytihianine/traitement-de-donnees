@@ -48,7 +48,13 @@ def create_partitions(
     curseur: extensions.cursor,
 ) -> None:
     # Nom de la partition : parenttable_YYYY_MM
-    partition_name = f"{tbl_name}_{range_start.strftime(format='%Y%m%d')}_{range_end.strftime(format='%Y%m%d')}"
+    partition_name = "_".join(
+        [
+            tbl_name,
+            range_start.strftime(format="%Y%m%d"),
+            range_end.strftime(format="%Y%m%d"),
+        ]
+    )
 
     try:
         print(f"Creating partition {partition_name} for {tbl_name}.")
