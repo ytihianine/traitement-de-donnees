@@ -5,6 +5,7 @@ from psycopg2 import extensions
 class Actions(Enum):
     DROP = auto()
     CREATE = auto()
+    UPDATE = auto()
 
 
 def get_partitions(schema: str, curseur: extensions.cursor) -> list[tuple[str, ...]]:
