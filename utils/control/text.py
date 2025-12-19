@@ -2,6 +2,7 @@
 
 import re
 import unicodedata
+import logging
 from typing import List
 from pandas._typing import DateTimeErrorChoices
 
@@ -42,6 +43,7 @@ def normalize_whitespace_columns(df: pd.DataFrame, columns: list[str]) -> pd.Dat
     df = df.copy()
     for col in columns:
         if col in df.columns:
+            logging.info(msg=f"Normalizing whitespace in column : {col}")
             df[col] = normalize_txt_column(series=df.loc[:, col])
     return df
 
