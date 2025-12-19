@@ -1,6 +1,8 @@
-DROP TABLE IF EXISTS siep.bien_information_complementaire;
+DROP TABLE IF EXISTS siep.bien_information_complementaire CASCADE;
 CREATE TABLE IF NOT EXISTS siep.bien_information_complementaire (
-    id BIGSERIAL PRIMARY KEY,
+    code_site BIGINT,
+    code_bat_ter BIGINT,
+    code_gestionnaire BIGINT,
     code_bat_gestionnaire TEXT,
     etat_bat TEXT,
     date_sortie_bat DATE,
@@ -8,8 +10,18 @@ CREATE TABLE IF NOT EXISTS siep.bien_information_complementaire (
     date_derniere_renovation TEXT,
     annee_reference INT,
     efa TEXT,
+    bat_assujettis_deet BOOLEAN,
+    gestion_mono_multi_min TEXT,
+    gestion_mono_multi_mef TEXT,
+    gestion_categorie TEXT,
+    famille_de_bien TEXT,
+    usage_detaille_du_bien TEXT,
+    indicateur_sub_occ_source DOUBLE PRECISION,
+    indicateur_poste_occ_source DOUBLE PRECISION,
+    indicateur_poste_occ DOUBLE PRECISION,
+    indicateur_resident_occ DOUBLE PRECISION,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
-    snapshot_id UUID,
-    PRIMARY KEY (code_bat_gestionnaire, import_timestamp)
+    snapshot_id TEXT,
+    PRIMARY KEY (snapshot_id, code_bat_gestionnaire, import_timestamp)
 ) PARTITION BY RANGE (import_timestamp);
