@@ -74,6 +74,11 @@ def create_partitions(
             print(f"✓ Partition {partition_name} created successfully.")
             created_count += 1
 
+    if not dry_run:
+        print(f"\n{created_count}/{len(tbl_names)} partitions(s) créé(s) avec succès")
+    else:
+        print(f"\n[DRY RUN] {len(tbl_names)} partitions(s) seraient créées")
+
 
 def update_import_timestamp(
     schema: str,
