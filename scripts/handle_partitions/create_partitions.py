@@ -21,7 +21,9 @@ def get_tbl_names(schema: str, curseur) -> list[str]:
     return [tbl[1] for tbl in tbl_names]
 
 
-def create_partition(schema: str, tbl: str, range_start: datetime, range_end: datetime, curseur) -> None:
+def create_partition(
+    schema: str, tbl: str, range_start: datetime, range_end: datetime, curseur
+) -> None:
     # Nom de la partition : parenttable_YYYY_MM
     partition_name = (
         f"{tbl_name}_{range_start.strftime('%Y%m%d')}_{range_end.strftime('%Y%m%d')}"
@@ -37,9 +39,7 @@ def create_partition(schema: str, tbl: str, range_start: datetime, range_end: da
         pg_cur.execute(create_sql)
         print(f"Partition {partition_name} created successfully.")
     except psycopg2.errors.DuplicateTable:
-        print(
-            f"Partition {partition_name} already exists. Skipping creation."
-        )
+        print(f"Partition {partition_name} already exists. Skipping creation.")
     except Exception as e:
         print(f"Error creating partition {partition_name}: {str(e)}")
         raise
@@ -61,7 +61,7 @@ tbl_names = get_tbl_names(schema=schema, curseur=pg_cur)
 
 
 # Définir la date de début et de fin pour la range de la partition
-from_date = datetime.strptime('31/07/2025 00:00:00', '%d/%m/%Y %H:%M:%S')
+from_date = datetime.strptime("31/07/2025 00:00:00", "%d/%m/%Y %H:%M:%S")
 to_date = from_date + timedelta(days=1)
 print(from_date, to_date)
 
@@ -69,11 +69,7 @@ print(from_date, to_date)
 for tbl in tbl_names:
     tbl_name = tbl
     create_partition(
-        schema=schema,
-        tbl=tbl,
-        range_start=from_date,
-        range_end=to_date,
-        curseur=pg_cur
+        schema=schema, tbl=tbl, range_start=from_date, range_end=to_date, curseur=pg_cur
     )
 
 
