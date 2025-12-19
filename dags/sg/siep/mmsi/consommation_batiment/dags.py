@@ -93,10 +93,10 @@ def consommation_des_batiments():
         # conso_mens_parquet(),
         source_files(),
         additionnal_files(),
-        # create_tmp_tables(),
-        # import_file_to_db.expand(
-        #     selecteur_config=get_projet_config(nom_projet=nom_projet)
-        # ),
+        create_tmp_tables(),
+        import_file_to_db.expand(
+            selecteur_config=get_projet_config(nom_projet=nom_projet)
+        ),
         # ensure_partition(),
         # copy_tmp_table_to_real_table(
         #     load_strategy=LoadStrategy.APPEND,
