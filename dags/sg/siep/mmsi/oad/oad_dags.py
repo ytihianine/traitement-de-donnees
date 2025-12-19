@@ -109,7 +109,7 @@ def oad() -> None:
     chain(
         validate_params(),
         looking_for_files,
-        # create_projet_snapshot(),
+        create_projet_snapshot(),
         get_projet_snapshot(),
         # convert_file_to_parquet(),
         tasks_oad_caracteristiques(),
@@ -118,10 +118,10 @@ def oad() -> None:
         import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
-        # ensure_partition(),
-        # copy_tmp_table_to_real_table(
-        #     load_strategy=LoadStrategy.APPEND,
-        # ),
+        ensure_partition(),
+        copy_tmp_table_to_real_table(
+            load_strategy=LoadStrategy.APPEND,
+        ),
         # refresh_views(),
         # copy_s3_files(bucket="dsci"),
         # del_s3_files(bucket="dsci"),
