@@ -6,4 +6,4 @@ source .env
 set +a
 
 # Execute python script
-python3 create_partitions.py
+python3 main.py
