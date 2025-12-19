@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS siep.bien_deet_energie_ges (
     emission_ges_annee2 FLOAT,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
-	snapshot_id UUID,
+	snapshot_id TEXT,
     PRIMARY KEY (code_bat_ter, import_timestamp),
     FOREIGN KEY(code_bat_ter, import_timestamp) REFERENCES siep.bien(code_bat_ter, import_timestamp)
 ) PARTITION BY RANGE (import_timestamp);

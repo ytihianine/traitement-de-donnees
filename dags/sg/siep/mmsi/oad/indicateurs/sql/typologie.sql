@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS siep.bien_typologie (
 	usage_detaille_du_bien TEXT,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
-	snapshot_id UUID,
+	snapshot_id TEXT,
     PRIMARY KEY (code_bat_ter, import_timestamp),
     FOREIGN KEY(code_bat_ter, import_timestamp) REFERENCES siep.bien(code_bat_ter, import_timestamp),
     FOREIGN KEY(usage_detaille_du_bien) REFERENCES siep.ref_typologie(usage_detaille_du_bien)
