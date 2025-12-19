@@ -110,3 +110,34 @@ def update_import_timestamp(
         print(f"\n{updated_count}/{len(tbl_names)} table(s) mise(s) à jour avec succès")
     else:
         print(f"\n[DRY RUN] {len(tbl_names)} table(s) seraient misees à jour")
+
+
+def update_snapshot_id(
+    tbl_names: list[tuple[Any, ...]],
+    current_snapshot_id: str,
+    new_snapshot_id: str,
+    cursor: extensions.cursor,
+    dry_run: bool = True,
+) -> None:
+    print(f"{len(tbl_names)} table(s) trouvée(s)")
+
+    updated_count = 0
+    for tbl_name, schema in tbl_names:
+        print(f"Updating table {tbl_name}.")
+        create_query = f"""
+            UPDATE {schema}.{tbl_name}
+            SET snapshot_id = '{new_snapshot_id}'
+            WHERE snapshot_id = '{current_snapshot_id}';
+        """
+
+        if dry_run:
+            print(f"[DRY RUN] {create_query}")
+        else:
+            cursor.execute(query=create_query)
+            print(f"✓ Table {tbl_name} updated successfully.")
+            updated_count += 1
+
+    if not dry_run:
+        print(f"\n{updated_count}/{len(tbl_names)} table(s) mise(s) à jour avec succès")
+    else:
+        print(f"\n[DRY RUN] {len(tbl_names)} table(s) seraient misees à jour")
