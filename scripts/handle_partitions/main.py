@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import psycopg2
 
-from scripts.handle_partitions.commun import get_partitions, Actions
+from scripts.handle_partitions.commun import get_tbl_names, get_partitions, Actions
 from scripts.handle_partitions.partitions import drop_partitions, create_partitions
 
 ENV = os.environ.copy()
@@ -20,8 +20,8 @@ pg_cur = pg_conn.cursor()
 if __name__ == "__main__":
     # User variables
     schema = "siep"
-    tbl_to_excludes = ("conso", "bien_info")
-    action = Actions.DROP
+    tbl_to_excludes = ("conso", "bien_info", "ref")
+    action = Actions.CREATE
 
     # Si Actions.CREATE
     str_date = "31/07/2025 00:00:00"
@@ -49,15 +49,18 @@ if __name__ == "__main__":
     if action == Actions.CREATE:
         try:
             # Récupérer la liste des tables
-            table_names = ["", ""]
-            for tbl in table_names:
-                create_partitions(
-                    schema=schema,
-                    tbl_name=tbl,
-                    range_start=from_date,
-                    range_end=to_date,
-                    curseur=pg_cur,
-                )
+            table_names = get_tbl_names(schema=schema, curseur=pg_cur)
+            table_names = [
+                tbl for tbl in table_names if not tbl[0].startswith(tbl_to_excludes)
+            ]
+
+            create_partitions(
+                tbl_names=table_names,
+                range_start=from_date,
+                range_end=to_date,
+                cursor=pg_cur,
+                dry_run=True,
+            )
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
