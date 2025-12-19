@@ -1,6 +1,6 @@
 from typing import Any
 from datetime import datetime
-from psycopg2 import extensions, sql, errors
+from psycopg2 import extensions, sql
 
 
 def drop_partitions(
@@ -81,32 +81,32 @@ def create_partitions(
 
 
 def update_import_timestamp(
-    schema: str,
-    tbl_name: str,
-    range_start: datetime,
-    range_end: datetime,
-    curseur: extensions.cursor,
+    tbl_names: list[tuple[Any, ...]],
+    current_import_timestamp: datetime,
+    new_import_timestamp: datetime,
+    cursor: extensions.cursor,
+    dry_run: bool = True,
 ) -> None:
-    # Nom de la partition : parenttable_YYYY_MM
-    partition_name = "_".join(
-        [
-            tbl_name,
-            range_start.strftime(format="%Y%m%d"),
-            range_end.strftime(format="%Y%m%d"),
-        ]
-    )
+    print(f"{len(tbl_names)} table(s) trouvée(s)")
 
-    try:
-        print(f"Creating partition {partition_name} for {tbl_name}.")
-        create_sql = f"""
-            CREATE TABLE IF NOT EXISTS {schema}.{partition_name}
-            PARTITION OF {schema}.{tbl_name}
-            FOR VALUES FROM ('{range_start}') TO ('{range_end}');
+    updated_count = 0
+    for tbl_name, schema in tbl_names:
+        print(f"Updating table {tbl_name}.")
+        create_query = f"""
+            UPDATE {schema}.{tbl_name}
+            SET import_timestamp = '{new_import_timestamp}',
+                import_date = '{new_import_timestamp.strftime(format="%Y-%m-%d")}'
+            WHERE import_timestamp = '{current_import_timestamp}';
         """
-        curseur.execute(query=create_sql)
-        print(f"Partition {partition_name} created successfully.")
-    except errors.DuplicateTable:
-        print(f"Partition {partition_name} already exists. Skipping creation.")
-    except Exception as e:
-        print(f"Error creating partition {partition_name}: {str(e)}")
-        raise
+
+        if dry_run:
+            print(f"[DRY RUN] {create_query}")
+        else:
+            cursor.execute(query=create_query)
+            print(f"✓ Table {tbl_name} updated successfully.")
+            updated_count += 1
+
+    if not dry_run:
+        print(f"\n{updated_count}/{len(tbl_names)} table(s) mise(s) à jour avec succès")
+    else:
+        print(f"\n[DRY RUN] {len(tbl_names)} table(s) seraient misees à jour")
