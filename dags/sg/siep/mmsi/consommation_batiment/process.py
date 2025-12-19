@@ -65,6 +65,8 @@ def process_source_bien_info_comp(df: pd.DataFrame) -> pd.DataFrame:
     df["gestion_mono_multi_min"] = np.where(
         df["gestion_mono_multi_min"], "Multi", "Mono"
     )
+    df["code_site"] = df["code_site"].str.split().str[-1]
+
     conditions = [
         (df["gestion_mono_multi_min"] == "Mono")
         & (df["gestion_mono_multi_mef"] == "Mono gest MEF"),
