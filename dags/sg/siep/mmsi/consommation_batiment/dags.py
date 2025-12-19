@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
@@ -39,19 +38,9 @@ LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow
 LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.fr/app/dataset?datasetId=49"  # noqa
 
 
-default_args = {
-    "owner": "airflow",
-    "depends_on_past": False,
-    "start_date": days_ago(1),
-    "email_on_failure": False,
-    "email_on_retry": False,
-    "retries": 0,
-}
-
-
 # Définition du DAG
 @dag(
-    "consommation_des_batiments",
+    dag_id="consommation_des_batiments",
     schedule_interval="*/15 8-19 * * 1-5",
     max_active_runs=1,
     max_consecutive_failed_dag_runs=1,
@@ -70,7 +59,7 @@ default_args = {
         mail_status=MailStatus.ERROR,
     ),
 )
-def consommation_des_batiments():
+def consommation_des_batiments() -> None:
     """Task definition"""
     looking_for_files = S3KeySensor(
         task_id="looking_for_files",
