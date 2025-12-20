@@ -1,10 +1,13 @@
-from typing import Any
+from typing import Any, Optional
 from datetime import datetime
 from psycopg2 import extensions, sql
 
 
 def drop_partitions(
-    partitions: list[tuple[Any, ...]], cursor: extensions.cursor, dry_run: bool = True
+    partitions: list[tuple[Any, ...]],
+    cursor: extensions.cursor,
+    dry_run: bool = True,
+    from_date: Optional[datetime] = None,
 ) -> None:
     """
     Supprime toutes les partitions d'un schéma spécifique.
@@ -15,6 +18,13 @@ def drop_partitions(
         dry_run (bool): Si True, affiche les commandes sans les exécuter
     """
     print(f"{len(partitions)} partition(s) trouvée(s)")
+
+    if from_date is not None:
+        partitions = [
+            partition
+            for partition in partitions
+            if from_date.strftime(format="%Y%m%d") in partition
+        ]
 
     # Suppression des partitions
     dropped_count = 0
