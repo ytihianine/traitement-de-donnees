@@ -39,7 +39,10 @@ if __name__ == "__main__":
                 if partition[1].startswith(config.tbl_to_keep)
             ]
             drop_partitions(
-                partitions=partition_names, cursor=pg_cur, dry_run=config.dry_run
+                partitions=partition_names,
+                cursor=pg_cur,
+                dry_run=config.dry_run,
+                from_date=config.drop_from_date,
             )
             pg_conn.commit()
         except Exception as e:
@@ -58,7 +61,7 @@ if __name__ == "__main__":
 
             create_partitions(
                 tbl_names=table_names,
-                range_start=config.from_date,
+                range_start=config.create_from_date,
                 range_end=config.to_date,
                 cursor=pg_cur,
                 dry_run=config.dry_run,
