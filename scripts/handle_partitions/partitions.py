@@ -24,7 +24,7 @@ def drop_partitions(
             partition
             for partition in partitions
             if any(
-                substring.strftime(format="%Y%m%d") in partition
+                substring.strftime(format="%Y%m%d") in partition[0]
                 for substring in from_date
             )
         ]
