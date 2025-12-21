@@ -6,6 +6,6 @@ CREATE TABLE IF NOT EXISTS siep.site (
 	site_mef_hmef TEXT,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
-	snapshot_id UUID,
+	snapshot_id TEXT,
     PRIMARY KEY (code_site, import_timestamp)
 ) PARTITION BY RANGE (import_timestamp);

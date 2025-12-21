@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS siep.bien (
     presence_mef_bat TEXT,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
-	  snapshot_id UUID,
+	  snapshot_id TEXT,
     PRIMARY KEY (code_bat_ter, import_timestamp),
     FOREIGN KEY(code_site, import_timestamp) REFERENCES siep.site(code_site, import_timestamp),
     FOREIGN KEY(gestionnaire_principal_code, import_timestamp) REFERENCES siep.gestionnaire(code_gestionnaire, import_timestamp)
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS siep.bien_gestionnaire (
     indicateur_sub_gest_source FLOAT,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
-	  snapshot_id UUID,
+	  snapshot_id TEXT,
     PRIMARY KEY (code_bat_ter, code_gestionnaire, code_bat_gestionnaire, import_timestamp),
     FOREIGN KEY(code_bat_ter, import_timestamp) REFERENCES siep.bien(code_bat_ter, import_timestamp),
     FOREIGN KEY(code_gestionnaire, import_timestamp) REFERENCES siep.gestionnaire(code_gestionnaire, import_timestamp)
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS siep.bien_occupant (
     indicateur_surface_spsi_m_sub_occ_maj FLOAT,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
-	  snapshot_id UUID,
+    snapshot_id TEXT,
     PRIMARY KEY (code_bat_ter, code_gestionnaire, code_bat_gestionnaire, occupant, service_occupant, import_timestamp),
     FOREIGN KEY(code_bat_ter, code_gestionnaire, code_bat_gestionnaire, import_timestamp)
       REFERENCES siep.bien_gestionnaire(code_bat_ter, code_gestionnaire, code_bat_gestionnaire, import_timestamp)
