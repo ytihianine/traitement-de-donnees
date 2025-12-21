@@ -168,6 +168,7 @@ CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
     COALESCE(sb.gestion_categorie, sbic.gestion_categorie) as gestion_categorie,
     -- siep.gestionnaire
     sgest.ministere AS ministere,
+    sgest.libelle_gestionnaire AS libelle_gestionnaire,
     COALESCE(sgest.libelle_simplifie, 'Indéterminé') AS libelle_simplifie,
     sgest.libelle_abrege AS libelle_abrege,
     sgest.lien_mef_gestionnaire AS lien_mef_gestionnaire,
