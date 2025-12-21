@@ -1,7 +1,5 @@
-DROP TABLE IF EXISTS temporaire.tmp_ref_typologie;
-DROP TABLE IF EXISTS siep.ref_typologie;
+DROP TABLE IF EXISTS siep.ref_typologie CASCADE;
 CREATE TABLE IF NOT EXISTS siep.ref_typologie (
-    id BIGSERIAL PRIMARY KEY,
     bati_non_bati TEXT,
     famille_de_bien_simplifiee TEXT,
     famille_de_bien TEXT,
@@ -9,4 +7,6 @@ CREATE TABLE IF NOT EXISTS siep.ref_typologie (
     usage_detaille_du_bien TEXT UNIQUE NOT NULL,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
+    snapshot_id TEXT,
+    PRIMARY KEY (snapshot_id, code_bat_ter, usage_detaille_du_bien)
 );
