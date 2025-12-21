@@ -93,41 +93,62 @@ CREATE TABLE IF NOT EXISTS siep.bien_occupant (
 ---=========== Vues ===========---
 DROP MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw;
 CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
-	WITH cte_bien_typologie_simplifie AS (
-        SELECT sbt.code_bat_ter,
-            sbt.usage_detaille_du_bien,
-            sbt.import_timestamp,
-            sbt.snapshot_id,
-            srt.bati_non_bati,
-            srt.type_de_bien,
-            srt.famille_de_bien,
-            srt.famille_de_bien_simplifiee
-        FROM siep.bien_typologie sbt
-        LEFT JOIN siep.ref_typologie srt ON srt.usage_detaille_du_bien = sbt.usage_detaille_du_bien
-        ), cte_bien_occupant_agrege AS (
+    WITH oad_timestamps AS (
+        SELECT DISTINCT snapshot_id, import_timestamp
+        FROM siep.bien
+    ),
+    osfi_timestamps AS (
+        SELECT DISTINCT snapshot_id, import_timestamp
+        FROM siep.bien_information_complementaire
+    ),
+    couples_timestamps AS (
+        -- Produit cartésien uniquement sur les timestamps par snapshot
         SELECT
-          sbo.code_bat_gestionnaire,
-        	sbo.snapshot_id,
-        	sbo.import_timestamp,
-            sum(sbo.indicateur_sub_occ) AS sum_indicateur_sub_occ,
-            sum(sbo.indicateur_surface_mef_occ) AS sum_indicateur_surface_mef_occ,
-            sum(sbo.indicateur_poste_occ) AS sum_indicateur_poste_occ,
-            sum(sbo.indicateur_resident_occ) AS sum_indicateur_resident_occ,
-            sum(sbo.indicateur_resident_reconstitue_occ) AS sum_indicateur_resident_reconstitue_occ,
-            sum(sbo.indicateur_sub_occ_source) AS sum_indicateur_sub_occ_source,
-            sum(sbo.indicateur_poste_occ_source) AS sum_indicateur_poste_occ_source,
-            sum(sbo.indicateur_resident_occ_source) AS sum_indicateur_resident_occ_source
+            oad.snapshot_id,
+            oad.import_timestamp as oad_import_timestamp,
+            osfi.import_timestamp as osfi_import_timestamp
+        FROM oad_timestamps oad
+        JOIN osfi_timestamps osfi
+            ON oad.snapshot_id = osfi.snapshot_id
+    ),
+    cte_bien_gest_oad_osfi AS (
+        SELECT DISTINCT
+            code_bat_ter,
+            code_gestionnaire,
+            code_bat_gestionnaire,
+            snapshot_id
+        FROM siep.bien_gestionnaire
+        UNION
+        SELECT DISTINCT
+            code_bat_ter,
+            code_gestionnaire,
+            code_bat_gestionnaire,
+            snapshot_id
+        FROM siep.bien_information_complementaire
+    ), cte_bien_occupant_agrege AS (
+        SELECT
+        sbo.code_bat_gestionnaire,
+        sbo.snapshot_id,
+        sbo.import_timestamp,
+        sum(sbo.indicateur_sub_occ) AS sum_indicateur_sub_occ,
+        sum(sbo.indicateur_surface_mef_occ) AS sum_indicateur_surface_mef_occ,
+        sum(sbo.indicateur_poste_occ) AS sum_indicateur_poste_occ,
+        sum(sbo.indicateur_resident_occ) AS sum_indicateur_resident_occ,
+        sum(sbo.indicateur_resident_reconstitue_occ) AS sum_indicateur_resident_reconstitue_occ,
+        sum(sbo.indicateur_sub_occ_source) AS sum_indicateur_sub_occ_source,
+        sum(sbo.indicateur_poste_occ_source) AS sum_indicateur_poste_occ_source,
+        sum(sbo.indicateur_resident_occ_source) AS sum_indicateur_resident_occ_source
         FROM siep.bien_occupant sbo
         GROUP BY sbo.snapshot_id, sbo.import_timestamp, sbo.code_bat_gestionnaire
-        )
- SELECT
-    sbg.snapshot_id as snapshot_id,
-    sb.import_timestamp as oad_import_timestamp,
-    sbic.import_timestamp as osfi_import_timestamp,
-    sbg.code_gestionnaire as code_gestionnaire,
-    sbg.code_bat_gestionnaire as code_bat_gestionnaire,
-    sb.code_site as code_site,
-    sb.code_bat_ter as code_bat_ter,
+    )
+    SELECT
+    -- bien_gestionnaire issues de l'OAD et OSFI
+    cte_bgoo.code_bat_ter,
+    cte_bgoo.code_bat_gestionnaire,
+    cte_bgoo.code_gestionnaire,
+    cte_bgoo.snapshot_id,
+    -- siep.bien sb && siep.bien_information_complementaire sbic
+    COALESCE(sb.code_site, sbic.code_site) as code_site,
     sb.categorie_administrative_liste_bat as categorie_administrative_liste_bat,
     sb.categorie_administrative_principale_bat as categorie_administrative_principale_bat,
     sb.date_construction_annee_corrigee as date_construction_annee_corrigee,
@@ -142,83 +163,104 @@ CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
     sb.gestionnaire_principal_lien_mef as gestionnaire_principal_lien_mef,
     sb.gestionnaire_principal_ministere as gestionnaire_principal_ministere,
     sb.libelle_bat_ter as libelle_bat_ter,
-    sb.gestion_mono_multi_mef as gestion_mono_multi_mef,
-    sb.gestion_categorie as gestion_categorie,
-    sb.gestion_mono_multi_min as gestion_mono_multi_min,
+    COALESCE(sb.gestion_mono_multi_min, sbic.gestion_mono_multi_min) as gestion_mono_multi_min,
+    COALESCE(sb.gestion_mono_multi_mef, sbic.gestion_mono_multi_mef) as gestion_mono_multi_mef,
+    COALESCE(sb.gestion_categorie, sbic.gestion_categorie) as gestion_categorie,
+    -- siep.gestionnaire
+    sgest.ministere AS ministere,
+    COALESCE(sgest.libelle_simplifie, 'Indéterminé') AS libelle_simplifie,
+    sgest.libelle_abrege AS libelle_abrege,
+    sgest.lien_mef_gestionnaire AS lien_mef_gestionnaire,
+    sgest.personnalite_juridique AS gestionnaire_personnalite_juridique,
+    sgest.personnalite_juridique_precision AS gestionnaire_personnalite_juridique_precision,
+    sgest.personnalite_juridique_simplifiee AS gestionnaire_personnalite_juridique_simplifie,
+    -- siep.bien_strategie sbs
+    sbs.perimetre_spsi_initial as perimetre_spsi_initial,
+    sbs.perimetre_spsi_maj as perimetre_spsi_maj,
+    -- siep.bien_deet_energie_ges sbdeg && siep.bien_information_complementaire sbic
+    COALESCE(sbdeg.bat_assujettis_deet, sbic.bat_assujettis_deet) as bat_assujettis_deet,
+    -- siep.bien_proprietaire sbp
+    sbp.locatif_domanial as locatif_domanial,
+    -- siep.bien_reglementation sbr
+    sbr.reglementation_corrigee as reglementation_corrigee,
+    -- siep.bien_typologie sbt && siep.bien_information_complementaire sbic
+    COALESCE(sbt.usage_detaille_du_bien, sbic.usage_detaille_du_bien, 'Indéterminé') as usage_detaille_du_bien,
+    -- siep.ref_typologie srt
+    srt.bati_non_bati as bati_non_bati,
+    srt.type_de_bien as type_de_bien,
+    srt.famille_de_bien as famille_de_bien,
+    srt.famille_de_bien_simplifiee as famille_de_bien_simplifiee,
+    -- cte_bien_occupant_agrege cte_boa && siep.bien_information_complementaire sbic
+    cte_boa.sum_indicateur_sub_occ as sum_indicateur_sub_occ,
+    cte_boa.sum_indicateur_surface_mef_occ as sum_indicateur_surface_mef_occ,
+    COALESCE(cte_boa.sum_indicateur_poste_occ, sbic.indicateur_poste_occ) as sum_indicateur_poste_occ,
+    COALESCE(cte_boa.sum_indicateur_resident_occ, sbic.indicateur_resident_occ) as sum_indicateur_resident_occ,
+    cte_boa.sum_indicateur_resident_reconstitue_occ as sum_indicateur_resident_reconstitue_occ,
+    COALESCE(cte_boa.sum_indicateur_sub_occ_source, sbic.indicateur_sub_occ_source) as sum_indicateur_sub_occ_source,
+    COALESCE(cte_boa.sum_indicateur_poste_occ_source, sbic.indicateur_poste_occ_source) as sum_indicateur_poste_occ_source,
+    cte_boa.sum_indicateur_resident_occ_source  as sum_indicateur_resident_occ_source,
+    -- siep.bien_information_complementaire sbic
     sbic.etat_bat as etat_bat,
     sbic.date_sortie_bat as date_sortie_bat,
     sbic.date_sortie_site as date_sortie_site,
     sbic.date_derniere_renovation as date_derniere_renovation,
     sbic.annee_reference as annee_reference,
     sbic.efa as efa,
-    sg.libelle_gestionnaire AS libelle_gestionnaire,
-    sg.ministere AS ministere,
-    sg.libelle_simplifie AS libelle_simplifie,
-    sg.libelle_abrege AS libelle_abrege,
-    sg.lien_mef_gestionnaire AS lien_mef_gestionnaire,
-    sg.personnalite_juridique AS gestionnaire_personnalite_juridique,
-    sg.personnalite_juridique_precision AS gestionnaire_personnalite_juridique_precision,
-    sg.personnalite_juridique_simplifiee AS gestionnaire_personnalite_juridique_simplifie,
-    sbdeg.bat_assujettis_deet as bat_assujettis_deet,
-    sbs.perimetre_spsi_initial as perimetre_spsi_initial,
-    sbs.perimetre_spsi_maj as perimetre_spsi_maj,
-    sbp.locatif_domanial as locatif_domanial,
-    sbr.reglementation_corrigee as reglementation_corrigee,
+    -- siep.conso_statut_batiment scsb
     scsb.statut_conso_avant_2019 as statut_conso_avant_2019,
     scsb.statut_fluide_global as statut_fluide_global,
     scsb.statut_batiment as statut_batiment,
-    cte_bts.usage_detaille_du_bien as usage_detaille_du_bien,
-    cte_bts.bati_non_bati as bati_non_bati,
-    cte_bts.type_de_bien as type_de_bien,
-    cte_bts.famille_de_bien as famille_de_bien,
-    cte_bts.famille_de_bien_simplifiee as famille_de_bien_simplifiee,
-    cte_boa.sum_indicateur_sub_occ as sum_indicateur_sub_occ,
-    cte_boa.sum_indicateur_surface_mef_occ as sum_indicateur_surface_mef_occ,
-    cte_boa.sum_indicateur_poste_occ as sum_indicateur_poste_occ,
-    cte_boa.sum_indicateur_resident_occ as sum_indicateur_resident_occ,
-    cte_boa.sum_indicateur_resident_reconstitue_occ as sum_indicateur_resident_reconstitue_occ,
-    cte_boa.sum_indicateur_sub_occ_source as sum_indicateur_sub_occ_source,
-    cte_boa.sum_indicateur_poste_occ_source as sum_indicateur_poste_occ_source,
-    cte_boa.sum_indicateur_resident_occ_source  as sum_indicateur_resident_occ_source
-   FROM siep.bien_gestionnaire sbg
+    -- Date d'import
+    ct.oad_import_timestamp,
+    ct.osfi_import_timestamp
+    FROM cte_bien_gest_oad_osfi cte_bgoo
+    LEFT JOIN couples_timestamps ct
+    ON ct.snapshot_id = cte_bgoo.snapshot_id
+    -- Jointures datasets issus de l'OAD
     LEFT JOIN siep.bien sb
-    	ON sbg.code_bat_ter = sb.code_bat_ter
-        AND sbg.import_timestamp = sb.import_timestamp
-        AND sbg.snapshot_id = sb.snapshot_id
-    LEFT JOIN siep.bien_information_complementaire sbic
-    	ON sbic.code_bat_gestionnaire = sbg.code_bat_gestionnaire
-        AND sbg.snapshot_id = sbic.snapshot_id
-    LEFT JOIN siep.conso_statut_batiment scsb
-    	ON scsb.code_bat_gestionnaire = sbg.code_bat_gestionnaire
-        AND sbg.import_timestamp = scsb.import_timestamp
-        AND sbg.snapshot_id = scsb.snapshot_id
+        ON sb.snapshot_id = cte_bgoo.snapshot_id
+        AND sb.import_timestamp = ct.oad_import_timestamp
+        AND sb.code_bat_ter = cte_bgoo.code_bat_ter
+    LEFT JOIN siep.gestionnaire sgest
+        ON sgest.snapshot_id = cte_bgoo.snapshot_id
+        AND sgest.import_timestamp = ct.oad_import_timestamp
+        AND sgest.code_gestionnaire = cte_bgoo.code_gestionnaire
     LEFT JOIN siep.bien_strategie sbs
-    	ON sbs.code_bat_ter = sbg.code_bat_ter
-        AND sbg.import_timestamp = sbs.import_timestamp
-        AND sbg.snapshot_id = sbs.snapshot_id
-    LEFT JOIN siep.gestionnaire sg
-    	ON sg.code_gestionnaire = sbg.code_gestionnaire
-        AND sbg.import_timestamp = sg.import_timestamp
-        AND sbg.snapshot_id = sg.snapshot_id
+        ON sbs.snapshot_id = cte_bgoo.snapshot_id
+        AND sbs.import_timestamp = ct.oad_import_timestamp
+        AND sbs.code_bat_ter = cte_bgoo.code_bat_ter
     LEFT JOIN siep.bien_deet_energie_ges sbdeg
-    	ON sbdeg.code_bat_ter = sbg.code_bat_ter
-        AND sbg.import_timestamp = sbdeg.import_timestamp
-        AND sbg.snapshot_id = sbdeg.snapshot_id
+        ON sbdeg.snapshot_id = cte_bgoo.snapshot_id
+        AND sbdeg.import_timestamp = ct.oad_import_timestamp
+        AND sbdeg.code_bat_ter = cte_bgoo.code_bat_ter
     LEFT JOIN siep.bien_proprietaire sbp
-    	ON sbg.code_bat_ter = sbp.code_bat_ter
-        AND sbg.import_timestamp = sbp.import_timestamp
-        AND sbg.snapshot_id = sbp.snapshot_id
+        ON sbp.snapshot_id = cte_bgoo.snapshot_id
+        AND sbp.import_timestamp = ct.oad_import_timestamp
+        AND sbp.code_bat_ter = cte_bgoo.code_bat_ter
     LEFT JOIN siep.bien_reglementation sbr
-    	ON sbg.code_bat_ter = sbr.code_bat_ter
-        AND sbg.import_timestamp = sbr.import_timestamp
-        AND sbg.snapshot_id = sbr.snapshot_id
-    LEFT JOIN cte_bien_typologie_simplifie cte_bts
-    	ON cte_bts.code_bat_ter = sbg.code_bat_ter
-        AND sbg.import_timestamp = cte_bts.import_timestamp
-        AND sbg.snapshot_id = cte_bts.snapshot_id
+        ON sbr.snapshot_id = cte_bgoo.snapshot_id
+        AND sbr.import_timestamp = ct.oad_import_timestamp
+        AND sbr.code_bat_ter = cte_bgoo.code_bat_ter
+    LEFT JOIN siep.bien_typologie sbt
+        ON sbt.snapshot_id = cte_bgoo.snapshot_id
+        AND sbt.import_timestamp = ct.oad_import_timestamp
+        AND sbt.code_bat_ter = cte_bgoo.code_bat_ter
+    -- Jointures datasets issus de l'OSFI
+    LEFT JOIN siep.bien_information_complementaire sbic
+        ON sbic.snapshot_id = cte_bgoo.snapshot_id
+        AND sbic.import_timestamp = ct.osfi_import_timestamp
+        AND sbic.code_bat_gestionnaire = cte_bgoo.code_bat_gestionnaire
+    LEFT JOIN siep.conso_statut_batiment scsb
+        ON scsb.snapshot_id = cte_bgoo.snapshot_id
+        AND scsb.import_timestamp = ct.osfi_import_timestamp
+        AND scsb.code_bat_gestionnaire = cte_bgoo.code_bat_gestionnaire
+    -- Jointure avec ref_typologie basée sur usage_detaille_du_bien coalescé
+    LEFT JOIN siep.ref_typologie srt
+        ON srt.snapshot_id = cte_bgoo.snapshot_id
+        AND srt.usage_detaille_du_bien = COALESCE(sbt.usage_detaille_du_bien, sbic.usage_detaille_du_bien)
+    -- Jointure avec cte_bien_occupant_agrege
     LEFT JOIN cte_bien_occupant_agrege cte_boa
-    	ON cte_boa.code_bat_gestionnaire = sbg.code_bat_gestionnaire
-        AND sbg.import_timestamp = cte_boa.import_timestamp
-        AND sbg.snapshot_id = cte_boa.snapshot_id
-  WHERE sb.snapshot_id IS NOT NULL
-;
+        ON cte_boa.snapshot_id = cte_bgoo.snapshot_id
+        AND cte_boa.import_timestamp = ct.oad_import_timestamp
+        AND cte_boa.code_bat_gestionnaire = cte_bgoo.code_bat_gestionnaire
+    ;
