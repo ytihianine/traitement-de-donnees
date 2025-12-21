@@ -7,7 +7,7 @@ def drop_partitions(
     partitions: list[tuple[Any, ...]],
     cursor: extensions.cursor,
     dry_run: bool = True,
-    from_date: Optional[datetime] = None,
+    from_date: Optional[list[datetime]] = None,
 ) -> None:
     """
     Supprime toutes les partitions d'un schéma spécifique.
@@ -23,7 +23,10 @@ def drop_partitions(
         partitions = [
             partition
             for partition in partitions
-            if from_date.strftime(format="%Y%m%d") in partition
+            if any(
+                substring.strftime(format="%Y%m%d") in partition
+                for substring in from_date
+            )
         ]
 
     # Suppression des partitions
