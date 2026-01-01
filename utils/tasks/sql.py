@@ -25,8 +25,12 @@ from utils.config.vars import (
     DEFAULT_S3_CONN_ID,
 )
 
+# ------------------------------------------------------------------------------
+# Internal functions
+# ------------------------------------------------------------------------------
 
-def get_primary_keys(
+
+def _get_primary_keys(
     schema: str, table: str, pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID
 ) -> list[str]:
     """Get primary key columns of a table."""
@@ -46,14 +50,7 @@ def get_primary_keys(
     return df.loc[:, "column_name"].tolist()
 
 
-@task(task_id="get_tbl_names_from_postgresql")
-def get_tbl_names_from_postgresql(**context) -> list[str]:
-    nom_projet = get_project_name(context=context)
-    tbl_names = get_tbl_names(nom_projet=nom_projet)
-    return tbl_names
-
-
-def create_snapshot_id(
+def _create_snapshot_id(
     nom_projet: str, execution_date: datetime, pg_conn_id: str
 ) -> None:
 
@@ -81,7 +78,7 @@ def create_snapshot_id(
     db.execute(query, parameters=params)
 
 
-def get_snapshot_id(nom_projet: str, pg_conn_id: str) -> str:
+def _get_snapshot_id(nom_projet: str, pg_conn_id: str) -> str:
     query = """
         WITH cte_id_projet AS (
             SELECT id as id_projet
@@ -117,45 +114,6 @@ def get_snapshot_id(nom_projet: str, pg_conn_id: str) -> str:
     return snapshot_id
 
 
-@task
-def create_projet_snapshot(
-    pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID, **context
-) -> None:
-    """ """
-    nom_projet = get_project_name(context=context)
-    execution_date = get_execution_date(context=context)
-
-    create_snapshot_id(
-        nom_projet=nom_projet, execution_date=execution_date, pg_conn_id=pg_conn_id
-    )
-
-
-@task
-def get_projet_snapshot(
-    nom_projet: Optional[str] = None,
-    pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID,
-    **context,
-) -> None:
-    """
-    Récupérer le dernier snapshot_id d'un projet.
-
-    Args:
-        nom_projet (optionnel): Le nom du projet. A spécifier lorsque le nom du projet
-            dans le DAG est différent de celui qui génère le snapshot_id,
-        pg_conn_id: Connexion Postgres. Valeur par défaut
-
-    Returns:
-        None. Ajoute le snapshot_id dans le context du DAG
-    """
-    if nom_projet is None:
-        nom_projet = get_project_name(context=context)
-
-    snapshot_id = get_snapshot_id(nom_projet=nom_projet, pg_conn_id=pg_conn_id)
-    print(f"Adding snapshot_id {snapshot_id} to context")
-    context["ti"].xcom_push(key="snapshot_id", value=snapshot_id)
-    print("Snapshot_id added to context.")
-
-
 def determine_partition_period(
     time_period: PartitionTimePeriod, execution_date: datetime
 ) -> tuple[datetime, datetime]:
@@ -189,6 +147,57 @@ def determine_partition_period(
     else:
         raise ValueError(f"Unsupported time period: {time_period}")
     return (from_date_period, to_date_period)
+
+
+# ------------------------------------------------------------------------------
+# SQL tasks
+# ------------------------------------------------------------------------------
+
+
+@task(task_id="get_tbl_names_from_postgresql")
+def get_tbl_names_from_postgresql(**context) -> list[str]:
+    nom_projet = get_project_name(context=context)
+    tbl_names = get_tbl_names(nom_projet=nom_projet)
+    return tbl_names
+
+
+@task
+def create_projet_snapshot(
+    pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID, **context
+) -> None:
+    """ """
+    nom_projet = get_project_name(context=context)
+    execution_date = get_execution_date(context=context)
+
+    _create_snapshot_id(
+        nom_projet=nom_projet, execution_date=execution_date, pg_conn_id=pg_conn_id
+    )
+
+
+@task
+def get_projet_snapshot(
+    nom_projet: Optional[str] = None,
+    pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID,
+    **context,
+) -> None:
+    """
+    Récupérer le dernier snapshot_id d'un projet.
+
+    Args:
+        nom_projet (optionnel): Le nom du projet. A spécifier lorsque le nom du projet
+            dans le DAG est différent de celui qui génère le snapshot_id,
+        pg_conn_id: Connexion Postgres. Valeur par défaut
+
+    Returns:
+        None. Ajoute le snapshot_id dans le context du DAG
+    """
+    if nom_projet is None:
+        nom_projet = get_project_name(context=context)
+
+    snapshot_id = _get_snapshot_id(nom_projet=nom_projet, pg_conn_id=pg_conn_id)
+    print(f"Adding snapshot_id {snapshot_id} to context")
+    context["ti"].xcom_push(key="snapshot_id", value=snapshot_id)
+    print("Snapshot_id added to context.")
 
 
 @task
@@ -372,7 +381,7 @@ def copy_tmp_table_to_real_table(
             prod_table = f"{prod_schema}.{table}"
             tmp_table = f"{tmp_schema}.tmp_{table}"
 
-            pk_cols = get_primary_keys(
+            pk_cols = _get_primary_keys(
                 schema=prod_schema, table=table, pg_conn_id=pg_conn_id
             )
             col_list = sort_db_colnames(tbl_name=table, pg_conn_id=pg_conn_id)
