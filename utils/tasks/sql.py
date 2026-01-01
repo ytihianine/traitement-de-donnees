@@ -9,6 +9,7 @@ import psycopg2
 from airflow.decorators import task
 from airflow.operators.python import get_current_context
 
+from infra.database.base import BaseDBHandler
 from infra.database.factory import create_db_handler
 
 from infra.file_handling.dataframe import read_dataframe
@@ -30,11 +31,8 @@ from utils.config.vars import (
 # ------------------------------------------------------------------------------
 
 
-def _get_primary_keys(
-    schema: str, table: str, pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID
-) -> list[str]:
+def _get_primary_keys(schema: str, table: str, db_handler: BaseDBHandler) -> list[str]:
     """Get primary key columns of a table."""
-    db = create_db_handler(connection_id=pg_conn_id)
     query = """
         SELECT kcu.column_name
         FROM information_schema.table_constraints tc
@@ -46,12 +44,12 @@ def _get_primary_keys(
             AND tc.constraint_type = 'PRIMARY KEY'
         ORDER BY kcu.ordinal_position;
     """
-    df = db.fetch_df(query, parameters=(schema, table))
+    df = db_handler.fetch_df(query, parameters=(schema, table))
     return df.loc[:, "column_name"].tolist()
 
 
 def _create_snapshot_id(
-    nom_projet: str, execution_date: datetime, pg_conn_id: str
+    nom_projet: str, execution_date: datetime, db_handler: BaseDBHandler
 ) -> None:
 
     snapshot_id = execution_date.strftime(format="%Y%m%d_%H:%M:%S")
@@ -74,11 +72,10 @@ def _create_snapshot_id(
     }
 
     # Exécution de la requête
-    db = create_db_handler(connection_id=pg_conn_id)
-    db.execute(query, parameters=params)
+    db_handler.execute(query, parameters=params)
 
 
-def _get_snapshot_id(nom_projet: str, pg_conn_id: str) -> str:
+def _get_snapshot_id(nom_projet: str, db_handler: BaseDBHandler) -> str:
     query = """
         WITH cte_id_projet AS (
             SELECT id as id_projet
@@ -100,8 +97,7 @@ def _get_snapshot_id(nom_projet: str, pg_conn_id: str) -> str:
     params = {"nom_projet": nom_projet}
 
     # Exécution de la requête
-    db = create_db_handler(connection_id=pg_conn_id)
-    db_result = db.fetch_one(query, parameters=params)
+    db_result = db_handler.fetch_one(query, parameters=params)
 
     if db_result is None:
         raise ValueError(f"No db_result found for project {nom_projet}")
@@ -169,8 +165,11 @@ def create_projet_snapshot(
     nom_projet = get_project_name(context=context)
     execution_date = get_execution_date(context=context)
 
+    # Hook
+    db_handler = create_db_handler(connection_id=pg_conn_id)
+
     _create_snapshot_id(
-        nom_projet=nom_projet, execution_date=execution_date, pg_conn_id=pg_conn_id
+        nom_projet=nom_projet, execution_date=execution_date, db_handler=db_handler
     )
 
 
@@ -194,7 +193,10 @@ def get_projet_snapshot(
     if nom_projet is None:
         nom_projet = get_project_name(context=context)
 
-    snapshot_id = _get_snapshot_id(nom_projet=nom_projet, pg_conn_id=pg_conn_id)
+    # Hook
+    db_handler = create_db_handler(connection_id=pg_conn_id)
+
+    snapshot_id = _get_snapshot_id(nom_projet=nom_projet, db_handler=db_handler)
     print(f"Adding snapshot_id {snapshot_id} to context")
     context["ti"].xcom_push(key="snapshot_id", value=snapshot_id)
     print("Snapshot_id added to context.")
@@ -354,7 +356,7 @@ def copy_tmp_table_to_real_table(
     tmp_schema = db_info.get("tmp_schema", None)
 
     # Hook
-    db = create_db_handler(pg_conn_id)
+    db_handler = create_db_handler(pg_conn_id)
 
     tbl_names = get_tbl_names(nom_projet=nom_projet, order_tbl=True)
     print(f"Tables to copy: {', '.join(tbl_names)}")
@@ -382,7 +384,7 @@ def copy_tmp_table_to_real_table(
             tmp_table = f"{tmp_schema}.tmp_{table}"
 
             pk_cols = _get_primary_keys(
-                schema=prod_schema, table=table, pg_conn_id=pg_conn_id
+                schema=prod_schema, table=table, db_handler=db_handler
             )
             col_list = sort_db_colnames(tbl_name=table, pg_conn_id=pg_conn_id)
 
@@ -427,7 +429,7 @@ def copy_tmp_table_to_real_table(
 
     if queries:
         for q in queries:
-            db.execute(query=q)
+            db_handler.execute(query=q)
     else:
         print("No query to execute")
 
