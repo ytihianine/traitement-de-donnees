@@ -19,7 +19,7 @@ from utils.config.tasks import (
     get_required_cols,
 )
 from utils.config.dag_params import get_execution_date, get_project_name
-from utils.config.types import R, DatabaseType
+from utils.config.types import R, DatabaseType, ETLStep, TaskConfig
 
 
 def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
@@ -420,5 +420,108 @@ def create_action_from_multi_input_files_etl_task(
             dfs.append(df)
 
         action_func(*dfs, **action_kwargs)
+
+    return _task
+
+
+def _execute_step(
+    *,
+    step: ETLStep,
+    previous_output: Any,
+    context: dict,
+    s3_handler,
+    nom_projet: str,
+    input_selecteurs: list[str] | None,
+) -> Any:
+    fn = step.fn
+    kwargs = dict(step.kwargs or {})
+
+    # Inject context if required
+    if step.use_context:
+        kwargs["context"] = context
+
+    # Read data if required
+    if step.read_data:
+        for sel in input_selecteurs or []:
+            cfg = get_selecteur_config(nom_projet=nom_projet, selecteur=sel)
+            df = read_dataframe(
+                file_handler=s3_handler,
+                file_path=cfg.filepath_tmp_s3,
+            )
+            df_info(df=df, df_name=f"{sel} - Input dataframe")
+            kwargs[f"df_{sel}"] = df
+
+    # Execute function
+    print(f"Executing function: {fn.__name__} with kwargs: {kwargs.keys()}")
+    if step.use_previous_output:
+        return fn(previous_output, **kwargs)
+
+    return fn(**kwargs)
+
+
+def create_task(
+    task_config: TaskConfig,
+    output_selecteur: str,
+    steps: list[ETLStep],
+    input_selecteurs: Optional[list[str]] = None,
+    add_import_date: bool = True,
+    add_snapshot_id: bool = True,
+    export_output: bool = True,
+) -> Task[..., None]:
+    """Create a generic Airflow task based on the provided TaskConfig."""
+
+    @task(**task_config.__dict__)
+    def _task(**context) -> None:
+        """The actual generic task function."""
+        # Get project name from context
+        nom_projet = get_project_name(context=context)
+
+        # Initialize handler
+        s3_handler = create_default_s3_handler()
+
+        # Resolve configs
+        output_config = get_selecteur_config(
+            nom_projet=nom_projet, selecteur=output_selecteur
+        )
+
+        # Execute steps
+        result: Any = None
+        for idx, step in enumerate(steps):
+            print(f"▶ Executing step: step_{idx}")
+            print(f"Step information: {step}")
+
+            result = _execute_step(
+                step=step,
+                previous_output=result,
+                context=context,
+                s3_handler=s3_handler,
+                nom_projet=nom_projet,
+                input_selecteurs=input_selecteurs,
+            )
+
+            if isinstance(result, pd.DataFrame):
+                df_info(df=result, df_name=f"step_{idx} - output")
+
+        # Export final result - always a DataFrame and the last step output
+        if not export_output:
+            return
+
+        if not isinstance(result, pd.DataFrame):
+            raise ValueError(
+                "Final output must be a pandas DataFrame when export_output=True"
+            )
+
+        if add_import_date:
+            result = _add_import_metadata(df=result, context=context)
+
+        if add_snapshot_id:
+            result = _add_snapshot_id_metadata(df=result, context=context)
+
+        df_info(df=result, df_name=f"{output_selecteur} - df to export")
+
+        s3_handler.write(
+            file_path=str(output_config.filepath_tmp_s3),
+            content=result.to_parquet(path=None, index=False),
+        )
 
     return _task
