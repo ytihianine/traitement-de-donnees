@@ -567,40 +567,6 @@ def _process_and_import_file(
     local_handler.delete(file_path=local_filepath)
 
 
-@task(task_id="import_files_to_db")
-def import_files_to_db(
-    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
-    s3_conn_id: str = DEFAULT_S3_CONN_ID,
-    keep_file_id_col: bool = False,
-    **context,
-) -> None:
-    nom_projet = get_project_name(context=context)
-    schema = get_db_info(context=context)["prod_schema"]
-
-    projet_config = get_projet_config(nom_projet=nom_projet)
-
-    for config in projet_config:
-        selecteur = config.selecteur
-        local_filepath = config.filepath_local
-        s3_filepath = config.filepath_tmp_s3
-        tbl_name = config.tbl_name
-
-        if tbl_name is None or tbl_name == "":
-            print(
-                f"Sélecteur {selecteur}: La table n'est pas définie. Skipping insertion !"
-            )
-        else:
-            _process_and_import_file(
-                s3_filepath=s3_filepath,
-                local_filepath=local_filepath,
-                tbl_name=tbl_name,
-                pg_conn_id=pg_conn_id,
-                db_schema=schema,
-                s3_conn_id=s3_conn_id,
-                keep_file_id_col=keep_file_id_col,
-            )
-
-
 @task(map_index_template="{{ import_task_name }}")
 def import_file_to_db(
     selecteur_config: SelecteurConfig,

@@ -10,7 +10,7 @@ from utils.config.dag_params import create_dag_params, create_default_args
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
-    import_files_to_db,
+    import_file_to_db,
     # set_dataset_last_update_date,
 )
 
@@ -19,6 +19,7 @@ from utils.tasks.s3 import (
     del_s3_files,
 )
 from utils.config.tasks import (
+    get_projet_config,
     get_s3_keys_source,
 )
 
@@ -88,7 +89,9 @@ def barometre():
         looking_for_files,
         source_files(),
         create_tmp_tables(),
-        import_files_to_db(pg_conn_id="db_data_store"),
+        import_file_to_db.expand(
+            selecteur_config=get_projet_config(nom_projet=nom_projet)
+        ),
         copy_tmp_table_to_real_table(),
         # set_dataset_last_update_date(db_hook=POSTGRE_HOOK, dataset_ids=[3]),
         copy_s3_files(bucket="dsci"),
