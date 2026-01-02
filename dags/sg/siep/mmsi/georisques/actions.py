@@ -101,7 +101,7 @@ def get_risque(
     return None
 
 
-def get_georisques(df_bien: pd.DataFrame) -> pd.DataFrame:
+def get_georisques(df_bien_db: pd.DataFrame) -> pd.DataFrame:
     # Http client
     http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
     http_internet_client = RequestsClient(config=http_config)

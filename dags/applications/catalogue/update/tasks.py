@@ -3,7 +3,6 @@ from airflow.models.baseoperator import chain
 
 from utils.config.types import ALL_PARAM_PATHS, ETLStep, TaskConfig
 from utils.tasks.etl import (
-    create_action_from_multi_input_files_etl_task,
     create_task,
     create_multi_files_input_etl_task,
 )
@@ -85,10 +84,16 @@ def update_grist_catalogue() -> None:
         add_import_date=False,
         add_snapshot_id=False,
     )
-    load_catalogue = create_action_from_multi_input_files_etl_task(
-        task_id="load_catalogue",
+    load_catalogue = create_task(
+        task_config=TaskConfig(task_id="load_catalogue"),
+        output_selecteur="load_catalogue",
         input_selecteurs=["process_catalogue"],
-        action_func=actions.load_catalogue,
+        steps=[
+            ETLStep(
+                fn=actions.load_catalogue,
+            )
+        ],
+        export_output=False,
     )
 
     # Dictionnaire
@@ -117,10 +122,16 @@ def update_grist_catalogue() -> None:
         add_import_date=False,
         add_snapshot_id=False,
     )
-    load_dictionnaire = create_action_from_multi_input_files_etl_task(
-        task_id="load_dictionnaire",
+    load_dictionnaire = create_task(
+        task_config=TaskConfig(task_id="load_dictionnaire"),
+        output_selecteur="load_dictionnaire",
         input_selecteurs=["process_dictionnaire"],
-        action_func=actions.load_dictionnaire,
+        steps=[
+            ETLStep(
+                fn=actions.load_dictionnaire,
+            )
+        ],
+        export_output=False,
     )
 
     chain(

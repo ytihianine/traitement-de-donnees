@@ -307,57 +307,6 @@ def create_action_etl_task(
     return _task
 
 
-def create_action_from_multi_input_files_etl_task(
-    task_id: str,
-    input_selecteurs: list[str],
-    action_func: Callable[..., None],
-    action_kwargs: Optional[dict[str, Any]] = None,
-) -> Callable[..., XComArg]:
-    """
-    Create an ETL task that:
-      1. Reads multiple input datasets (from S3 or configured sources)
-      2. Perform an action based on those files
-
-    Input files must be parquet.
-
-    Args:
-        task_id: to_define
-        input_selecteurs: List of selector keys for the input datasets
-        action_func: A function that merges/processes (*dfs) -> DataFrame
-        action_args: to_define
-        action_kwargs: to_define
-
-    Returns:
-        Callable: Airflow task function
-    """
-
-    if action_kwargs is None:
-        action_kwargs = {}
-
-    @task(task_id=task_id)
-    def _task(**context) -> None:
-        # Get project name from context
-        nom_projet = get_project_name(context=context)
-
-        # Initialize handler
-        s3_handler = create_default_s3_handler()
-
-        # Load all input datasets
-        dfs: list[pd.DataFrame] = []
-        for sel in input_selecteurs:
-            cfg = get_selecteur_config(nom_projet=nom_projet, selecteur=sel)
-            df = read_dataframe(
-                file_handler=s3_handler,
-                file_path=cfg.filepath_tmp_s3,
-            )
-            df_info(df=df, df_name=f"{sel} - Source normalisée")
-            dfs.append(df)
-
-        action_func(*dfs, **action_kwargs)
-
-    return _task
-
-
 def _execute_step(
     *,
     step: ETLStep,

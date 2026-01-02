@@ -4,7 +4,6 @@ from airflow.models.baseoperator import chain
 from utils.tasks.validation import create_validate_params_task
 from utils.config.types import ALL_PARAM_PATHS, ETLStep, TaskConfig
 from utils.tasks.etl import (
-    create_action_from_multi_input_files_etl_task,
     create_task,
     create_file_etl_task,
     create_multi_files_input_etl_task,
@@ -81,15 +80,21 @@ def source_files() -> None:
     )
 
 
-add_new_sp = create_action_from_multi_input_files_etl_task(
-    task_id="add_new_sp",
+add_new_sp = create_task(
+    task_config=TaskConfig(task_id="add_new_sp"),
+    output_selecteur="add_new_sp",
     input_selecteurs=[
         "demande_achat",
         "engagement_juridique",
         "demande_paiement_journal_pieces",
         "delai_global_paiement",
     ],
-    action_func=actions.load_new_sp,
+    steps=[
+        ETLStep(
+            fn=actions.load_new_sp,
+        )
+    ],
+    export_output=False,
 )
 
 get_sp = create_task(
