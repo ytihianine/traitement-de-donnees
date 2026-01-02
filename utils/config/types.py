@@ -1,8 +1,11 @@
 """Type definitions and Enums for configuration data structures."""
 
 from enum import Enum, auto
+from datetime import timedelta
 from dataclasses import dataclass
 from typing import Optional, TypedDict, List, ParamSpec, TypeVar
+
+from airflow.models.abstractoperator import TaskStateChangeCallback
 
 
 # ==================
@@ -84,6 +87,30 @@ class SelecteurConfig:
     nom_source: Optional[str] = None
     tbl_name: Optional[str] = None
     tbl_order: Optional[int] = None
+
+
+@dataclass
+class TaskConfig:
+    task_id: str
+    retries: int = 0
+    retry_delay: timedelta | float = 0
+    retry_exponential_backoff: bool = False
+    max_retry_delay: timedelta | float | None = None
+    on_execute_callback: (
+        None | TaskStateChangeCallback | list[TaskStateChangeCallback]
+    ) = None
+    on_failure_callback: (
+        None | TaskStateChangeCallback | list[TaskStateChangeCallback]
+    ) = None
+    on_success_callback: (
+        None | TaskStateChangeCallback | list[TaskStateChangeCallback]
+    ) = None
+    on_retry_callback: (
+        None | TaskStateChangeCallback | list[TaskStateChangeCallback]
+    ) = None
+    on_skipped_callback: (
+        None | TaskStateChangeCallback | list[TaskStateChangeCallback]
+    ) = None
 
 
 class DBParams(TypedDict):
