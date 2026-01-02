@@ -113,12 +113,13 @@ class TaskConfig:
     ) = None
 
 
-class ETLStep(TypedDict):
+@dataclass
+class ETLStep:
     fn: Callable[..., Any]
-    fn_kwargs: dict[str, Any]
-    fn_use_context: bool
-    read_data: bool
-    use_previous_output: bool
+    kwargs: Optional[dict[str, Any]] = None
+    use_context: bool = False
+    read_data: bool = False
+    use_previous_output: bool = False
 
 
 class DBParams(TypedDict):
