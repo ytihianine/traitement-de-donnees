@@ -362,11 +362,6 @@ def create_task(
         # Initialize handler
         s3_handler = create_default_s3_handler()
 
-        # Resolve configs
-        output_config = get_selecteur_config(
-            nom_projet=nom_projet, selecteur=output_selecteur
-        )
-
         # Execute steps
         result: Any = None
         for idx, step in enumerate(steps):
@@ -393,6 +388,11 @@ def create_task(
             raise ValueError(
                 "Final output must be a pandas DataFrame when export_output=True"
             )
+
+        # Resolve configs
+        output_config = get_selecteur_config(
+            nom_projet=nom_projet, selecteur=output_selecteur
+        )
 
         if add_import_date:
             result = _add_import_metadata(df=result, context=context)
