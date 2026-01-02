@@ -3,7 +3,7 @@
 from enum import Enum, auto
 from datetime import timedelta
 from dataclasses import dataclass
-from typing import Optional, TypedDict, List, ParamSpec, TypeVar
+from typing import Optional, TypedDict, List, ParamSpec, TypeVar, Callable, Any
 
 from airflow.models.abstractoperator import TaskStateChangeCallback
 
@@ -111,6 +111,14 @@ class TaskConfig:
     on_skipped_callback: (
         None | TaskStateChangeCallback | list[TaskStateChangeCallback]
     ) = None
+
+
+class ETLStep(TypedDict):
+    fn: Callable[..., Any]
+    fn_kwargs: dict[str, Any]
+    fn_use_context: bool
+    read_data: bool
+    use_previous_output: bool
 
 
 class DBParams(TypedDict):
