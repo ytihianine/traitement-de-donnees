@@ -2,10 +2,10 @@ from airflow.decorators import task_group
 from airflow.models.baseoperator import chain
 
 from utils.tasks.validation import create_validate_params_task
-from utils.config.types import ALL_PARAM_PATHS
+from utils.config.types import ALL_PARAM_PATHS, ETLStep, TaskConfig
 from utils.tasks.etl import (
     create_action_from_multi_input_files_etl_task,
-    create_action_to_file_etl_task,
+    create_task,
     create_file_etl_task,
     create_multi_files_input_etl_task,
 )
@@ -92,10 +92,14 @@ add_new_sp = create_action_from_multi_input_files_etl_task(
     action_func=actions.load_new_sp,
 )
 
-get_sp = create_action_to_file_etl_task(
+get_sp = create_task(
+    task_config=TaskConfig(task_id="get_service_prescripteur"),
     output_selecteur="service_prescripteur",
-    task_id="get_service_prescripteur",
-    action_func=actions.get_sp,
+    steps=[
+        ETLStep(
+            fn=actions.get_sp,
+        )
+    ],
     add_import_date=False,
     add_snapshot_id=False,
 )
