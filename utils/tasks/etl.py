@@ -254,7 +254,27 @@ def create_task(
     add_snapshot_id: bool = True,
     export_output: bool = True,
 ) -> Task[..., None]:
-    """Create a generic Airflow task based on the provided TaskConfig."""
+    """
+    Create a generic Airflow task based on the provided TaskConfig.
+
+    Args:
+        task_config: Configuration for the task
+        output_selecteur: Selector for the output configuration
+        steps: List of ETL steps to execute
+        input_selecteurs: (Optional) list of selectors for input data
+        add_import_date: Whether to add import date metadata to the output
+        add_snapshot_id: Whether to add snapshot ID metadata to the output
+        export_output: Whether to export the final output to S3
+
+    Returns:
+        An Airflow task that performs the defined ETL steps
+
+    Note:
+        input_selecteurs:
+            - must be provided if any step requires reading data
+            - if there is a single input selector, the DataFrame will be passed as "df".
+            - if multiple input selectors, DataFrames will be passed as "df_{selecteur}"
+    """
 
     @task(**task_config.__dict__)
     def _task(**context) -> None:
