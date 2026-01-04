@@ -205,27 +205,6 @@ def create_file_etl_task(
     return _task
 
 
-def create_action_etl_task(
-    task_id: str,
-    action_func: Callable[..., R],
-    action_args: Optional[tuple] = None,
-    action_kwargs: Optional[dict[str, Any]] = None,
-) -> Task[..., None]:
-    """Create an ETL task that executes a given action function with parameters."""
-
-    if action_args is None:
-        action_args = ()
-    if action_kwargs is None:
-        action_kwargs = {}
-
-    @task(task_id=task_id)
-    def _task(**context) -> None:
-        merged_kwargs = {**action_kwargs}
-        action_func(*action_args, **merged_kwargs)
-
-    return _task
-
-
 def _execute_step(
     *,
     step: ETLStep,

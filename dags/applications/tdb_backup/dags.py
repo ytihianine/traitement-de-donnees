@@ -1,0 +1,64 @@
+# from datetime import datetime, timedelta
+
+# from airflow.decorators import dag
+# from airflow.models.baseoperator import chain
+# from airflow.utils.dates import days_ago
+
+# from infra.mails.default_smtp import create_airflow_callback, MailStatus
+
+# from dags.applications.tdb_backup.tasks import (
+#     validate_params,
+#     tdb_backup_task_group,
+# )
+
+
+# LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/transverse/sauvegarde?ref_type=heads"  # noqa
+
+
+# default_args = {
+#     "owner": "airflow",
+#     "depends_on_past": False,
+#     "start_date": days_ago(1),
+#     "email_on_failure": False,
+#     "email_on_retry": False,
+#     "retries": 0,
+#     "retry_delay": timedelta(minutes=1),
+# }
+
+
+# # Définition du DAG
+# @dag(
+#     "sauvegarde-tdb",
+#     schedule="@daily",
+#     max_active_runs=1,
+#     start_date=datetime(2021, 12, 1),
+#     catchup=False,
+#     tags=["SG", "DSCI", "PRODUCTION", "SAUVEGARDE", "CHARTSGOUV"],
+#     description="Pipeline de des tableaux de bord Chartsgouv.",
+#     params={
+#         "nom_projet": "Sauvegarde tableaux de bords",
+#         "mail": {
+#             "enable": False,
+#             "to": ["yanis.tihianine@finances.gouv.fr"],
+#             "cc": ["labo-data@finances.gouv.fr"],
+#         },
+#         "docs": {"lien_pipeline": LINK_DOC_PIPELINE},
+#     },
+#     on_failure_callback=create_airflow_callback(
+#         mail_status=MailStatus.ERROR,
+#     ),
+#     on_success_callback=create_airflow_callback(mail_status=MailStatus.SUCCESS),
+#     default_args=default_args,
+# )
+# def sauvegarde_pipeline():
+#     # Ordre des tâches
+#     chain(
+#         validate_params(),
+#         tdb_backup_task_group(),
+#         # export_user_roles(
+#         #     s3_file_handler=MINIO_FILE_HANDLER
+#         # )
+#     )
+
+
+# sauvegarde_pipeline()
