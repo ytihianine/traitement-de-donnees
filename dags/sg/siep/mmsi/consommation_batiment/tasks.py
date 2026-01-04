@@ -2,9 +2,9 @@ from airflow.decorators import task_group
 from airflow.models.baseoperator import chain
 
 from utils.tasks.validation import create_validate_params_task
-from utils.config.types import ALL_PARAM_PATHS
+from utils.config.types import ALL_PARAM_PATHS, ETLStep, TaskConfig
 from utils.tasks.file import create_parquet_converter_task
-from utils.tasks.etl import create_file_etl_task, create_multi_files_input_etl_task
+from utils.tasks.etl import create_file_etl_task, create_task
 
 from dags.sg.siep.mmsi.consommation_batiment import process
 
@@ -30,70 +30,150 @@ def source_files():
         process_func=process.process_source_bien_info_comp,
         read_options={"sheet_name": 0},
     )
-    conso_mensuelles = create_multi_files_input_etl_task(
+    conso_mensuelles = create_task(
+        task_config=TaskConfig(task_id="conso_mens"),
         output_selecteur="conso_mens",
         input_selecteurs=["conso_mens_source"],
-        process_func=process.process_conso_mensuelles,
+        steps=[
+            ETLStep(
+                fn=process.process_conso_mensuelles,
+            )
+        ],
     )
     chain([informations_batiments(), conso_mensuelles()])
 
 
 @task_group(group_id="additionnal_files")
 def additionnal_files():
-    unpivot_conso_mens_corrigee = create_multi_files_input_etl_task(
+    unpivot_conso_mens_corrigee = create_task(
+        task_config=TaskConfig(task_id="conso_mens_corr_unpivot"),
         output_selecteur="conso_mens_corr_unpivot",
         input_selecteurs=["conso_mens"],
-        process_func=process.process_unpivot_conso_mens_corrigee,
+        steps=[
+            ETLStep(
+                fn=process.process_unpivot_conso_mens_corrigee,
+            )
+        ],
     )
-    unpivot_conso_mens_brute = create_multi_files_input_etl_task(
+    unpivot_conso_mens_brute = create_task(
+        task_config=TaskConfig(task_id="conso_mens_brute_unpivot"),
         output_selecteur="conso_mens_brute_unpivot",
         input_selecteurs=["conso_mens"],
-        process_func=process.process_unpivot_conso_mens_brute,
+        steps=[
+            ETLStep(
+                fn=process.process_unpivot_conso_mens_brute,
+            )
+        ],
     )
-    conso_annuelle = create_multi_files_input_etl_task(
+    conso_annuelle = create_task(
+        task_config=TaskConfig(task_id="conso_annuelle"),
         output_selecteur="conso_annuelle",
         input_selecteurs=["conso_mens"],
-        process_func=process.process_conso_annuelle,
+        steps=[
+            ETLStep(
+                fn=process.process_conso_annuelle,
+            )
+        ],
     )
-    conso_annuelle_unpivot = create_multi_files_input_etl_task(
+    conso_annuelle_unpivot = create_task(
+        task_config=TaskConfig(task_id="conso_annuelle_unpivot"),
         output_selecteur="conso_annuelle_unpivot",
         input_selecteurs=["conso_mens"],
-        process_func=process.process_conso_annuelle_unpivot,
+        steps=[
+            ETLStep(
+                fn=process.process_conso_annuelle_unpivot,
+            )
+        ],
     )
-    conso_annuelle_unpivot_comparaison = create_multi_files_input_etl_task(
+    conso_annuelle_unpivot_comparaison = create_task(
+        task_config=TaskConfig(task_id="conso_annuelle_unpivot_comparaison"),
         output_selecteur="conso_annuelle_unpivot_comparaison",
         input_selecteurs=["conso_annuelle_unpivot"],
-        process_func=process.process_conso_annuelle_unpivot_comparaison,
+        steps=[
+            ETLStep(
+                fn=process.process_conso_annuelle_unpivot_comparaison,
+            )
+        ],
     )
-    facture_annuelle_unpivot = create_multi_files_input_etl_task(
+    facture_annuelle_unpivot = create_task(
+        task_config=TaskConfig(task_id="facture_annuelle_unpivot"),
         output_selecteur="facture_annuelle_unpivot",
         input_selecteurs=["conso_annuelle"],
-        process_func=process.process_facture_annuelle_unpivot,
+        steps=[
+            ETLStep(
+                fn=process.process_facture_annuelle_unpivot,
+            )
+        ],
     )
-    facture_annuelle_unpivot_comparaison = create_multi_files_input_etl_task(
+    facture_annuelle_unpivot_comparaison = create_task(
+        task_config=TaskConfig(task_id="facture_annuelle_unpivot_comparaison"),
         output_selecteur="facture_annuelle_unpivot_comparaison",
         input_selecteurs=["facture_annuelle_unpivot"],
-        process_func=process.process_facture_annuelle_unpivot_comparaison,
+        steps=[
+            ETLStep(
+                fn=process.process_facture_annuelle_unpivot_comparaison,
+            )
+        ],
     )
-    conso_statut_par_fluide = create_multi_files_input_etl_task(
+    facture_annuelle_unpivot = create_task(
+        task_config=TaskConfig(task_id="facture_annuelle_unpivot"),
+        output_selecteur="facture_annuelle_unpivot",
+        input_selecteurs=["conso_annuelle"],
+        steps=[
+            ETLStep(
+                fn=process.process_facture_annuelle_unpivot,
+            )
+        ],
+    )
+    facture_annuelle_unpivot_comparaison = create_task(
+        task_config=TaskConfig(task_id="facture_annuelle_unpivot_comparaison"),
+        output_selecteur="facture_annuelle_unpivot_comparaison",
+        input_selecteurs=["facture_annuelle_unpivot"],
+        steps=[
+            ETLStep(
+                fn=process.process_facture_annuelle_unpivot_comparaison,
+            )
+        ],
+    )
+    conso_statut_par_fluide = create_task(
+        task_config=TaskConfig(task_id="conso_statut_par_fluide"),
         output_selecteur="conso_statut_par_fluide",
         input_selecteurs=["conso_annuelle"],
-        process_func=process.process_conso_statut_par_fluide,
+        steps=[
+            ETLStep(
+                fn=process.process_conso_statut_par_fluide,
+            )
+        ],
     )
-    conso_avant_2019 = create_multi_files_input_etl_task(
+    conso_avant_2019 = create_task(
+        task_config=TaskConfig(task_id="conso_avant_2019"),
         output_selecteur="conso_avant_2019",
         input_selecteurs=["conso_annuelle"],
-        process_func=process.process_conso_avant_2019,
+        steps=[
+            ETLStep(
+                fn=process.process_conso_avant_2019,
+            )
+        ],
     )
-    conso_statut_fluide_global = create_multi_files_input_etl_task(
+    conso_statut_fluide_global = create_task(
+        task_config=TaskConfig(task_id="conso_statut_fluide_global"),
         output_selecteur="conso_statut_fluide_global",
         input_selecteurs=["conso_statut_par_fluide"],
-        process_func=process.process_conso_statut_fluide_global,
+        steps=[
+            ETLStep(
+                fn=process.process_conso_statut_fluide_global,
+            )
+        ],
     )
-    conso_statut_batiment = create_multi_files_input_etl_task(
+    conso_statut_batiment = create_task(
+        task_config=TaskConfig(task_id="conso_statut_batiment"),
         output_selecteur="conso_statut_batiment",
         input_selecteurs=["conso_statut_fluide_global", "conso_avant_2019"],
-        process_func=process.process_conso_statut_batiment,
+        steps=[
+            ETLStep(
+                fn=process.process_conso_statut_batiment,
+            )
+        ],
     )
 
     chain(

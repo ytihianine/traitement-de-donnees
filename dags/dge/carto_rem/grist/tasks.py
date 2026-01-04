@@ -6,7 +6,6 @@ from utils.config.types import ALL_PARAM_PATHS, ETLStep, TaskConfig
 from utils.tasks.etl import (
     create_task,
     create_grist_etl_task,
-    create_multi_files_input_etl_task,
 )
 from utils.control.structures import normalize_grist_dataframe
 
@@ -143,13 +142,18 @@ def get_db_data() -> None:
 
 @task_group(group_id="dataset_additionnel")
 def datasets_additionnels() -> None:
-    agent_contrat_complet = create_multi_files_input_etl_task(
+    agent_contrat_complet = create_task(
+        task_config=TaskConfig(task_id="agent_contrat_complet"),
         output_selecteur="agent_contrat_complet",
         input_selecteurs=[
             "agent_contrat",
             "agent_contrat_db",
         ],
-        process_func=process.process_agent_contrat_complet,
+        steps=[
+            ETLStep(
+                fn=process.process_agent_contrat_complet,
+            )
+        ],
         add_import_date=False,
         add_snapshot_id=False,
     )

@@ -61,12 +61,18 @@ def compare_catalogue(df_db: pd.DataFrame, df_grist) -> pd.DataFrame:
     return df
 
 
-def compare_dictionnaire(df_db: pd.DataFrame, df_grist) -> pd.DataFrame:
+def compare_dictionnaire(
+    df_pg_info_extract_dictionnaire: pd.DataFrame, df_get_dictionnaire
+) -> pd.DataFrame:
     cols_to_keep = ["schema_name", "table_name", "variable"]
-    df_grist = df_grist.loc[:, cols_to_keep]
+    df_get_dictionnaire = df_get_dictionnaire.loc[:, cols_to_keep]
 
     df = pd.merge(
-        left=df_grist, right=df_db, on=cols_to_keep, how="outer", indicator=True
+        left=df_get_dictionnaire,
+        right=df_pg_info_extract_dictionnaire,
+        on=cols_to_keep,
+        how="outer",
+        indicator=True,
     )
 
     # Filter

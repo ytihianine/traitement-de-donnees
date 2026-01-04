@@ -1,7 +1,6 @@
 from utils.config.types import ETLStep, TaskConfig
 from utils.tasks.etl import (
     create_task,
-    create_multi_files_input_etl_task,
 )
 
 from dags.sg.siep.mmsi.eligibilite_fcu import actions
@@ -21,8 +20,13 @@ get_eligibilite_fcu = create_task(
     add_import_date=False,
 )
 
-process_fcu_result = create_multi_files_input_etl_task(
+process_fcu_result = create_task(
+    task_config=TaskConfig(task_id="fcu_result"),
     input_selecteurs=["fcu"],
     output_selecteur="fcu_result",
-    process_func=process.process_result,
+    steps=[
+        ETLStep(
+            fn=process.process_result,
+        )
+    ],
 )

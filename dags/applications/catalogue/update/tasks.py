@@ -4,7 +4,6 @@ from airflow.models.baseoperator import chain
 from utils.config.types import ALL_PARAM_PATHS, ETLStep, TaskConfig
 from utils.tasks.etl import (
     create_task,
-    create_multi_files_input_etl_task,
 )
 
 from dags.applications.catalogue.update import actions, process
@@ -31,17 +30,27 @@ def source_database() -> None:
         add_import_date=False,
         add_snapshot_id=False,
     )
-    pg_info_extract_catalogue = create_multi_files_input_etl_task(
-        input_selecteurs=["pg_info_scan"],
+    pg_info_extract_catalogue = create_task(
+        task_config=TaskConfig(task_id="pg_info_extract_catalogue"),
         output_selecteur="pg_info_extract_catalogue",
-        process_func=process.pg_info_extract_catalogue,
+        input_selecteurs=["pg_info_scan"],
+        steps=[
+            ETLStep(
+                fn=process.pg_info_extract_catalogue,
+            )
+        ],
         add_import_date=False,
         add_snapshot_id=False,
     )
-    pg_info_extract_dictionnaire = create_multi_files_input_etl_task(
-        input_selecteurs=["pg_info_scan"],
+    pg_info_extract_dictionnaire = create_task(
+        task_config=TaskConfig(task_id="pg_info_extract_dictionnaire"),
         output_selecteur="pg_info_extract_dictionnaire",
-        process_func=process.pg_info_extract_dictionnaire,
+        input_selecteurs=["pg_info_scan"],
+        steps=[
+            ETLStep(
+                fn=process.pg_info_extract_dictionnaire,
+            )
+        ],
         add_import_date=False,
         add_snapshot_id=False,
     )
@@ -70,17 +79,27 @@ def update_grist_catalogue() -> None:
         add_import_date=False,
         add_snapshot_id=False,
     )
-    compare_catalogue = create_multi_files_input_etl_task(
-        input_selecteurs=["pg_info_extract_catalogue", "get_catalogue"],
+    compare_catalogue = create_task(
+        task_config=TaskConfig(task_id="compare_catalogue"),
         output_selecteur="compare_catalogue",
-        process_func=process.compare_catalogue,
+        input_selecteurs=["pg_info_extract_catalogue", "get_catalogue"],
+        steps=[
+            ETLStep(
+                fn=process.compare_catalogue,
+            )
+        ],
         add_import_date=False,
         add_snapshot_id=False,
     )
-    process_catalogue = create_multi_files_input_etl_task(
+    process_catalogue = create_task(
+        task_config=TaskConfig(task_id="process_catalogue"),
         output_selecteur="process_catalogue",
         input_selecteurs=["compare_catalogue"],
-        process_func=process.process_catalogue,
+        steps=[
+            ETLStep(
+                fn=process.process_catalogue,
+            )
+        ],
         add_import_date=False,
         add_snapshot_id=False,
     )
@@ -108,17 +127,27 @@ def update_grist_catalogue() -> None:
         add_import_date=False,
         add_snapshot_id=False,
     )
-    compare_dictionnaire = create_multi_files_input_etl_task(
-        input_selecteurs=["pg_info_extract_dictionnaire", "get_dictionnaire"],
+    compare_dictionnaire = create_task(
+        task_config=TaskConfig(task_id="compare_dictionnaire"),
         output_selecteur="compare_dictionnaire",
-        process_func=process.compare_dictionnaire,
+        input_selecteurs=["pg_info_extract_dictionnaire", "get_dictionnaire"],
+        steps=[
+            ETLStep(
+                fn=process.compare_dictionnaire,
+            )
+        ],
         add_import_date=False,
         add_snapshot_id=False,
     )
-    process_dictionnaire = create_multi_files_input_etl_task(
+    process_dictionnaire = create_task(
+        task_config=TaskConfig(task_id="process_dictionnaire"),
         output_selecteur="process_dictionnaire",
         input_selecteurs=["compare_dictionnaire"],
-        process_func=process.process_dictionnaire,
+        steps=[
+            ETLStep(
+                fn=process.process_dictionnaire,
+            )
+        ],
         add_import_date=False,
         add_snapshot_id=False,
     )

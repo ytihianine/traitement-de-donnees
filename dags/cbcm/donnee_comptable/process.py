@@ -340,37 +340,37 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_demande_paiement_complet_sp(
-    df_dp: pd.DataFrame,
-    df_dp_carte_achat: pd.DataFrame,
-    df_dp_flux: pd.DataFrame,
-    df_dp_journal_pieces: pd.DataFrame,
-    df_dp_sfp: pd.DataFrame,
+    df_demande_paiement: pd.DataFrame,
+    df_demande_paiement_carte_achat: pd.DataFrame,
+    df_demande_paiement_flux: pd.DataFrame,
+    df_demande_paiement_journal_pieces: pd.DataFrame,
+    df_demande_paiement_sfp: pd.DataFrame,
 ) -> pd.DataFrame:
     # Fusionner les datasets
     df = pd.merge(
-        left=df_dp,
-        right=df_dp_journal_pieces,
+        left=df_demande_paiement,
+        right=df_demande_paiement_journal_pieces,
         how="left",
         on=["id_dp", "societe", "annee_exercice"],
         suffixes=(None, "_a"),
     )
     df = pd.merge(
         left=df,
-        right=df_dp_carte_achat,
+        right=df_demande_paiement_carte_achat,
         how="left",
         on=["id_dp", "annee_exercice"],
         suffixes=(None, "_b"),
     )
     df = pd.merge(
         left=df,
-        right=df_dp_flux,
+        right=df_demande_paiement_flux,
         how="left",
         on=["id_dp", "annee_exercice"],
         suffixes=(None, "_c"),
     )
     df = pd.merge(
         left=df,
-        right=df_dp_sfp,
+        right=df_demande_paiement_sfp,
         how="left",
         on=["id_dp", "annee_exercice"],
         suffixes=(None, "_d"),
@@ -433,10 +433,12 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
 # ======================================================
 # Ajout des services prescipteurs
 # ======================================================
-def add_service_prescripteurs(df: pd.DataFrame, df_sp: pd.DataFrame) -> pd.DataFrame:
+def add_service_prescripteurs(
+    df_demande_achat: pd.DataFrame, df_service_prescripteur: pd.DataFrame
+) -> pd.DataFrame:
     df = pd.merge(
-        left=df,
-        right=df_sp,
+        left=df_demande_achat,
+        right=df_service_prescripteur,
         how="left",
         on=["cf_cc"],
     )
