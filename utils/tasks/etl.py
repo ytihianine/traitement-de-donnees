@@ -217,20 +217,25 @@ def _execute_step(
     fn = step.fn
     kwargs = dict(step.kwargs or {})
 
+    if step.read_data and input_selecteurs is None:
+        raise ValueError("input_selecteurs must be provided if step.read_data is True")
+
     # Inject context if required
     if step.use_context:
         kwargs["context"] = context
 
     # Read data if required
-    if step.read_data:
-        for sel in input_selecteurs or []:
+    if step.read_data and input_selecteurs:
+        for sel in input_selecteurs:
             cfg = get_selecteur_config(nom_projet=nom_projet, selecteur=sel)
             df = read_dataframe(
                 file_handler=s3_handler,
                 file_path=cfg.filepath_tmp_s3,
             )
             df_info(df=df, df_name=f"{sel} - Input dataframe")
-            kwargs[f"df_{sel}"] = df
+            # Use "df" as key if only one input, otherwise "df_{selecteur}"
+            key = "df" if len(input_selecteurs) == 1 else f"df_{sel}"
+            kwargs[key] = df
 
     # Execute function
     print(f"Executing function: {fn.__name__} with kwargs: {kwargs.keys()}")
