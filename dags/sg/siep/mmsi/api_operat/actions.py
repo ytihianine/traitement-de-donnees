@@ -4,6 +4,7 @@ from airflow.models import Variable
 from infra.file_handling.factory import create_file_handler
 from infra.file_handling.dataframe import read_dataframe
 from infra.http_client.adapters import HttpxClient, ClientConfig
+from utils.config.dag_params import get_project_name
 from utils.config.types import FileHandlerType
 from utils.config.vars import AGENT, PROXY, DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
 from utils.config.tasks import get_selecteur_config
@@ -63,7 +64,8 @@ def get_liste_declarations(api_client: HttpxClient, url: str, token: str) -> dic
     return result.json()
 
 
-def liste_declaration(nom_projet: str) -> None:
+def liste_declaration(context: dict) -> None:
+    nom_projet = get_project_name(context=context)
     # Hooks
     s3_handler = create_file_handler(
         handler_type=FileHandlerType.S3,
@@ -116,7 +118,8 @@ def get_consommation_by_id(
     return result.json()
 
 
-def consommation_by_id(nom_projet: str) -> None:
+def consommation_by_id(context: dict) -> None:
+    nom_projet = get_project_name(context=context)
     # Hooks
     s3_handler = create_file_handler(
         handler_type=FileHandlerType.S3,

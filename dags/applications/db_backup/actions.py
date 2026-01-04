@@ -5,16 +5,18 @@ from airflow.models import Variable
 
 from infra.database.factory import create_db_handler
 from infra.file_handling.factory import create_file_handler
+from utils.config.dag_params import get_project_name
 from utils.config.tasks import get_projet_config
 from utils.config.types import FileHandlerType
 from utils.config.vars import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
 
 
-def create_dump_files(nom_projet: str) -> None:
+def create_dump_files(context: dict) -> None:
     """
     Perform a PostgreSQL pg_dumpall command and store the result in a local file.
     """
     # config
+    nom_projet = get_project_name(context=context)
     projet_config = get_projet_config(nom_projet=nom_projet)
 
     # Variables

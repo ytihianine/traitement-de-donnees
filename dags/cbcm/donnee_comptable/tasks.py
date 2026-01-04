@@ -2,12 +2,10 @@ from airflow.decorators import task_group
 from airflow.models.baseoperator import chain
 
 from utils.tasks.validation import create_validate_params_task
-from utils.config.types import ALL_PARAM_PATHS
+from utils.config.types import ALL_PARAM_PATHS, ETLStep, TaskConfig
 from utils.tasks.etl import (
-    create_action_from_multi_input_files_etl_task,
-    create_action_to_file_etl_task,
+    create_task,
     create_file_etl_task,
-    create_multi_files_input_etl_task,
 )
 
 from dags.cbcm.donnee_comptable import process
@@ -81,21 +79,31 @@ def source_files() -> None:
     )
 
 
-add_new_sp = create_action_from_multi_input_files_etl_task(
-    task_id="add_new_sp",
+add_new_sp = create_task(
+    task_config=TaskConfig(task_id="add_new_sp"),
+    output_selecteur="add_new_sp",
     input_selecteurs=[
         "demande_achat",
         "engagement_juridique",
         "demande_paiement_journal_pieces",
         "delai_global_paiement",
     ],
-    action_func=actions.load_new_sp,
+    steps=[
+        ETLStep(
+            fn=actions.load_new_sp,
+        )
+    ],
+    export_output=False,
 )
 
-get_sp = create_action_to_file_etl_task(
+get_sp = create_task(
+    task_config=TaskConfig(task_id="get_service_prescripteur"),
     output_selecteur="service_prescripteur",
-    task_id="get_service_prescripteur",
-    action_func=actions.get_sp,
+    steps=[
+        ETLStep(
+            fn=actions.get_sp,
+        )
+    ],
     add_import_date=False,
     add_snapshot_id=False,
 )
@@ -103,25 +111,45 @@ get_sp = create_action_to_file_etl_task(
 
 @task_group(group_id="ajout_sp")
 def ajout_sp() -> None:
-    demande_achat_sp = create_multi_files_input_etl_task(
+    demande_achat_sp = create_task(
+        task_config=TaskConfig(task_id="demande_achat_sp"),
         output_selecteur="demande_achat_sp",
         input_selecteurs=["demande_achat", "service_prescripteur"],
-        process_func=process.add_service_prescripteurs,
+        steps=[
+            ETLStep(
+                fn=process.add_service_prescripteurs_to_demande_achat,
+            )
+        ],
     )
-    engagement_juridique_sp = create_multi_files_input_etl_task(
+    engagement_juridique_sp = create_task(
+        task_config=TaskConfig(task_id="engagement_juridique_sp"),
         output_selecteur="engagement_juridique_sp",
         input_selecteurs=["engagement_juridique", "service_prescripteur"],
-        process_func=process.add_service_prescripteurs,
+        steps=[
+            ETLStep(
+                fn=process.add_service_prescripteurs_to_engagement_juridique,
+            )
+        ],
     )
-    demande_paiement_journal_pieces_sp = create_multi_files_input_etl_task(
+    demande_paiement_journal_pieces_sp = create_task(
+        task_config=TaskConfig(task_id="demande_paiement_journal_pieces_sp"),
         output_selecteur="demande_paiement_journal_pieces_sp",
         input_selecteurs=["demande_paiement_journal_pieces", "service_prescripteur"],
-        process_func=process.add_service_prescripteurs,
+        steps=[
+            ETLStep(
+                fn=process.add_service_prescripteurs_to_demande_paiement_journal_pieces,
+            )
+        ],
     )
-    delai_global_paiement_sp = create_multi_files_input_etl_task(
+    delai_global_paiement_sp = create_task(
+        task_config=TaskConfig(task_id="delai_global_paiement_sp"),
         output_selecteur="delai_global_paiement_sp",
         input_selecteurs=["delai_global_paiement", "service_prescripteur"],
-        process_func=process.add_service_prescripteurs,
+        steps=[
+            ETLStep(
+                fn=process.add_service_prescripteurs_to_delai_global_paiement,
+            )
+        ],
     )
 
     chain(
@@ -136,7 +164,8 @@ def ajout_sp() -> None:
 
 @task_group(group_id="dataset_additionnel")
 def datasets_additionnels() -> None:
-    demande_paiement_complet_sp = create_multi_files_input_etl_task(
+    demande_paiement_complet_sp = create_task(
+        task_config=TaskConfig(task_id="demande_paiement_complet_sp"),
         output_selecteur="demande_paiement_complet_sp",
         input_selecteurs=[
             "demande_paiement",
@@ -145,7 +174,11 @@ def datasets_additionnels() -> None:
             "demande_paiement_journal_pieces",
             "demande_paiement_sfp",
         ],
-        process_func=process.process_demande_paiement_complet_sp,
+        steps=[
+            ETLStep(
+                fn=process.process_demande_paiement_complet_sp,
+            )
+        ],
     )
 
     chain(demande_paiement_complet_sp())

@@ -1,7 +1,7 @@
 from airflow.decorators import task_group
 from airflow.models.baseoperator import chain
 
-from utils.tasks.etl import create_file_etl_task, create_multi_files_input_etl_task
+from utils.tasks.etl import create_file_etl_task
 
 from dags.cgefi.barometre import process
 

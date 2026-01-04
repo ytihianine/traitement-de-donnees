@@ -1,22 +1,35 @@
 from airflow.decorators import task_group
 from airflow.models.baseoperator import chain
 
-from utils.tasks.etl import create_action_etl_task
+from utils.config.types import ETLStep, TaskConfig
+from utils.tasks.etl import create_task
 
-from dags.sg.siep.mmsi.api_operat.actions import liste_declaration, consommation_by_id
+from dags.sg.siep.mmsi.api_operat import actions
 
 
 @task_group
 def taches():
-    declarations = create_action_etl_task(
-        action_func=liste_declaration,
-        task_id="liste_declaration",
-        action_kwargs={"nom_projet": "API Opera"},
+    declarations = create_task(
+        task_config=TaskConfig(task_id="liste_declaration"),
+        output_selecteur="declarations",
+        steps=[
+            ETLStep(
+                fn=actions.liste_declaration,
+                use_context=True,
+            ),
+        ],
+        export_output=False,
     )
-    consommations = create_action_etl_task(
-        action_func=consommation_by_id,
-        task_id="consommation_by_id",
-        action_kwargs={"nom_projet": "API Opera"},
+    consommations = create_task(
+        task_config=TaskConfig(task_id="consommation_by_id"),
+        output_selecteur="consommations",
+        steps=[
+            ETLStep(
+                fn=actions.consommation_by_id,
+                use_context=True,
+            ),
+        ],
+        export_output=False,
     )
 
     chain(

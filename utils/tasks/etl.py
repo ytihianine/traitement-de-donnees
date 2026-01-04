@@ -19,7 +19,7 @@ from utils.config.tasks import (
     get_required_cols,
 )
 from utils.config.dag_params import get_execution_date, get_project_name
-from utils.config.types import R, DatabaseType
+from utils.config.types import R, DatabaseType, ETLStep, TaskConfig
 
 
 def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
@@ -205,220 +205,129 @@ def create_file_etl_task(
     return _task
 
 
-def create_multi_files_input_etl_task(
-    output_selecteur: str,
-    input_selecteurs: list[str],
-    process_func: Callable[..., pd.DataFrame],
-    read_options: dict[str, Any] | None = None,
-    use_required_cols: bool = False,
-    add_import_date: bool = True,
-    add_snapshot_id: bool = True,
-) -> Callable[..., XComArg]:
-    """
-    Create an ETL task that:
-      1. Reads multiple input datasets (from S3 or configured sources)
-      2. Processes them with a custom process_func
-      3. Writes the result to the output_selecteur location in S3
+def _execute_step(
+    *,
+    step: ETLStep,
+    previous_output: Any,
+    context: dict,
+    s3_handler,
+    nom_projet: str,
+    input_selecteurs: list[str] | None,
+) -> Any:
+    fn = step.fn
+    kwargs = dict(step.kwargs or {})
 
-    There must be a unique DataFrame returned by process_func.
+    if step.read_data and input_selecteurs is None:
+        raise ValueError("input_selecteurs must be provided if step.read_data is True")
 
-    Args:
-        output_selecteur: The config selector key for the merged dataset
-        input_selecteurs: List of selector keys for the input datasets
-        process_func: A function that merges/processes (*dfs) -> DataFrame
-        read_options: Optional file read options (csv, excel, parquet, etc.)
+    # Inject context if required
+    if step.use_context:
+        kwargs["context"] = context
 
-    Returns:
-        Callable: Airflow task function
-    """
-    if read_options is None:
-        read_options = {}
-
-    @task(task_id=output_selecteur)
-    def _task(**context) -> None:
-        # Get project name from context
-        nom_projet = get_project_name(context=context)
-
-        # Initialize handler
-        s3_handler = create_default_s3_handler()
-
-        # Resolve configs
-        output_config = get_selecteur_config(
-            nom_projet=nom_projet, selecteur=output_selecteur
-        )
-
-        # Load all input datasets
-        dfs: list[pd.DataFrame] = []
-        if use_required_cols:
-            required_cols = get_required_cols(
-                nom_projet=nom_projet, selecteur=output_selecteur
-            )
-            print(required_cols)
-            if not required_cols.empty:
-                read_options["columns"] = required_cols["colname_dest"].to_list()
-        for sel in input_selecteurs:
-            cfg = get_selecteur_config(nom_projet=nom_projet, selecteur=sel)
-            df = read_dataframe(
-                file_handler=s3_handler,
-                file_path=cfg.filepath_tmp_s3,
-                read_options=read_options,
-            )
-            df_info(df=df, df_name=f"{sel} - Source normalisée")
-            dfs.append(df)
-
-        # Process all datasets
-        merged_df = process_func(*dfs)
-
-        if add_import_date:
-            merged_df = _add_import_metadata(df=merged_df, context=context)
-
-        if add_snapshot_id:
-            merged_df = _add_snapshot_id_metadata(df=merged_df, context=context)
-
-        df_info(df=merged_df, df_name=f"{output_selecteur} - After processing")
-
-        # Export merged result
-        s3_handler.write(
-            file_path=str(output_config.filepath_tmp_s3),
-            content=merged_df.to_parquet(path=None, index=False),
-        )
-
-    return _task
-
-
-def create_action_etl_task(
-    task_id: str,
-    action_func: Callable[..., R],
-    action_args: Optional[tuple] = None,
-    action_kwargs: Optional[dict[str, Any]] = None,
-) -> Task[..., None]:
-    """Create an ETL task that executes a given action function with parameters."""
-
-    if action_args is None:
-        action_args = ()
-    if action_kwargs is None:
-        action_kwargs = {}
-
-    @task(task_id=task_id)
-    def _task(**context) -> None:
-        merged_kwargs = {**action_kwargs}
-        action_func(*action_args, **merged_kwargs)
-
-    return _task
-
-
-def create_action_to_file_etl_task(
-    output_selecteur: str,
-    task_id: str,
-    action_func: Callable[..., pd.DataFrame],
-    action_args: Optional[tuple] = None,
-    action_kwargs: Optional[dict[str, Any]] = None,
-    use_context: bool = False,
-    add_import_date: bool = True,
-    add_snapshot_id: bool = True,
-) -> Task[..., None]:
-    """
-    Create an ETL task that executes a given action function with parameters. The action
-    function must return a DataFrame that will be saved to a file in S3 according
-    to the output_selecteur configuration.
-
-    Args:
-        output_selecteur: The config selector key for the output dataset
-        task_id: The identifier for this ETL task
-        action_func: A function that returns a DataFrame
-        action_args: Optional positional arguments for the action function
-        action_kwargs: Optional keyword arguments for the action function
-    Returns:
-        An Airflow task that performs the action and saves the result to S3
-    """
-
-    if action_args is None:
-        action_args = ()
-    if action_kwargs is None:
-        action_kwargs = {}
-
-    @task(task_id=task_id)
-    def _task(**context) -> None:
-        # Get project name from context
-        nom_projet = get_project_name(context=context)
-
-        # Initialize handler
-        s3_handler = create_default_s3_handler()
-
-        # Resolve configs
-        output_config = get_selecteur_config(
-            nom_projet=nom_projet, selecteur=output_selecteur
-        )
-
-        # Execute action
-        if use_context:
-            df = action_func(*action_args, **action_kwargs, context=context)
-        else:
-            df = action_func(*action_args, **action_kwargs)
-
-        if add_import_date:
-            df = _add_import_metadata(df=df, context=context)
-
-        if add_snapshot_id:
-            df = _add_snapshot_id_metadata(df=df, context=context)
-
-        df_info(df=df, df_name=f"{output_selecteur} - df to export")
-
-        # Export
-        s3_handler.write(
-            file_path=str(output_config.filepath_tmp_s3),
-            content=df.to_parquet(path=None, index=False),
-        )
-
-    return _task
-
-
-def create_action_from_multi_input_files_etl_task(
-    task_id: str,
-    input_selecteurs: list[str],
-    action_func: Callable[..., None],
-    action_kwargs: Optional[dict[str, Any]] = None,
-) -> Callable[..., XComArg]:
-    """
-    Create an ETL task that:
-      1. Reads multiple input datasets (from S3 or configured sources)
-      2. Perform an action based on those files
-
-    Input files must be parquet.
-
-    Args:
-        task_id: to_define
-        input_selecteurs: List of selector keys for the input datasets
-        action_func: A function that merges/processes (*dfs) -> DataFrame
-        action_args: to_define
-        action_kwargs: to_define
-
-    Returns:
-        Callable: Airflow task function
-    """
-
-    if action_kwargs is None:
-        action_kwargs = {}
-
-    @task(task_id=task_id)
-    def _task(**context) -> None:
-        # Get project name from context
-        nom_projet = get_project_name(context=context)
-
-        # Initialize handler
-        s3_handler = create_default_s3_handler()
-
-        # Load all input datasets
-        dfs: list[pd.DataFrame] = []
+    # Read data if required
+    if step.read_data and input_selecteurs:
         for sel in input_selecteurs:
             cfg = get_selecteur_config(nom_projet=nom_projet, selecteur=sel)
             df = read_dataframe(
                 file_handler=s3_handler,
                 file_path=cfg.filepath_tmp_s3,
             )
-            df_info(df=df, df_name=f"{sel} - Source normalisée")
-            dfs.append(df)
+            df_info(df=df, df_name=f"{sel} - Input dataframe")
+            # Use "df" as key if only one input, otherwise "df_{selecteur}"
+            key = "df" if len(input_selecteurs) == 1 else f"df_{sel}"
+            kwargs[key] = df
 
-        action_func(*dfs, **action_kwargs)
+    # Execute function
+    print(f"Executing function: {fn.__name__} with kwargs: {kwargs.keys()}")
+    if step.use_previous_output:
+        return fn(previous_output, **kwargs)
+
+    return fn(**kwargs)
+
+
+def create_task(
+    task_config: TaskConfig,
+    output_selecteur: str,
+    steps: list[ETLStep],
+    input_selecteurs: Optional[list[str]] = None,
+    add_import_date: bool = True,
+    add_snapshot_id: bool = True,
+    export_output: bool = True,
+) -> Task[..., None]:
+    """
+    Create a generic Airflow task based on the provided TaskConfig.
+
+    Args:
+        task_config: Configuration for the task
+        output_selecteur: Selector for the output configuration
+        steps: List of ETL steps to execute
+        input_selecteurs: (Optional) list of selectors for input data
+        add_import_date: Whether to add import date metadata to the output
+        add_snapshot_id: Whether to add snapshot ID metadata to the output
+        export_output: Whether to export the final output to S3
+
+    Returns:
+        An Airflow task that performs the defined ETL steps
+
+    Note:
+        input_selecteurs:
+            - must be provided if any step requires reading data
+            - if there is a single input selector, the DataFrame will be passed as "df".
+            - if multiple input selectors, DataFrames will be passed as "df_{selecteur}"
+    """
+
+    @task(**task_config.__dict__)
+    def _task(**context) -> None:
+        """The actual generic task function."""
+        # Get project name from context
+        nom_projet = get_project_name(context=context)
+
+        # Initialize handler
+        s3_handler = create_default_s3_handler()
+
+        # Execute steps
+        result: Any = None
+        for idx, step in enumerate(steps):
+            print(f"▶ Executing step: step_{idx}")
+            print(f"Step information: {step}")
+
+            result = _execute_step(
+                step=step,
+                previous_output=result,
+                context=context,
+                s3_handler=s3_handler,
+                nom_projet=nom_projet,
+                input_selecteurs=input_selecteurs,
+            )
+
+            if isinstance(result, pd.DataFrame):
+                df_info(df=result, df_name=f"step_{idx} - output")
+
+        # Export final result - always a DataFrame and the last step output
+        if not export_output:
+            return
+
+        if not isinstance(result, pd.DataFrame):
+            raise ValueError(
+                "Final output must be a pandas DataFrame when export_output=True"
+            )
+
+        # Resolve configs
+        output_config = get_selecteur_config(
+            nom_projet=nom_projet, selecteur=output_selecteur
+        )
+
+        if add_import_date:
+            result = _add_import_metadata(df=result, context=context)
+
+        if add_snapshot_id:
+            result = _add_snapshot_id_metadata(df=result, context=context)
+
+        df_info(df=result, df_name=f"{output_selecteur} - df to export")
+
+        s3_handler.write(
+            file_path=str(output_config.filepath_tmp_s3),
+            content=result.to_parquet(path=None, index=False),
+        )
 
     return _task

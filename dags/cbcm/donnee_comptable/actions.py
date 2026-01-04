@@ -11,7 +11,7 @@ from utils.config.vars import AGENT, DEFAULT_GRIST_HOST, DEFAULT_PG_DATA_CONN_ID
 def load_new_sp(
     df_demande_achat: pd.DataFrame,
     df_engagement_juridique: pd.DataFrame,
-    df_demande_paiement_justificatif_piece: pd.DataFrame,
+    df_demande_paiement_journal_pieces: pd.DataFrame,
     df_delai_global_paiement: pd.DataFrame,
 ) -> None:
     # Concaténer tous les CF et CC
@@ -20,7 +20,7 @@ def load_new_sp(
         objs=[
             df_demande_achat,
             df_engagement_juridique,
-            df_demande_paiement_justificatif_piece,
+            df_demande_paiement_journal_pieces,
             df_delai_global_paiement,
         ]
     )

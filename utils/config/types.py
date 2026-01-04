@@ -1,8 +1,11 @@
 """Type definitions and Enums for configuration data structures."""
 
 from enum import Enum, auto
+from datetime import timedelta
 from dataclasses import dataclass
-from typing import Optional, TypedDict, List, ParamSpec, TypeVar
+from typing import Optional, TypedDict, List, ParamSpec, TypeVar, Callable, Any
+
+from airflow.models.abstractoperator import TaskStateChangeCallback
 
 
 # ==================
@@ -84,6 +87,39 @@ class SelecteurConfig:
     nom_source: Optional[str] = None
     tbl_name: Optional[str] = None
     tbl_order: Optional[int] = None
+
+
+@dataclass
+class TaskConfig:
+    task_id: str
+    retries: int = 0
+    retry_delay: timedelta | float = 0
+    retry_exponential_backoff: bool = False
+    max_retry_delay: timedelta | float | None = None
+    on_execute_callback: (
+        None | TaskStateChangeCallback | list[TaskStateChangeCallback]
+    ) = None
+    on_failure_callback: (
+        None | TaskStateChangeCallback | list[TaskStateChangeCallback]
+    ) = None
+    on_success_callback: (
+        None | TaskStateChangeCallback | list[TaskStateChangeCallback]
+    ) = None
+    on_retry_callback: (
+        None | TaskStateChangeCallback | list[TaskStateChangeCallback]
+    ) = None
+    on_skipped_callback: (
+        None | TaskStateChangeCallback | list[TaskStateChangeCallback]
+    ) = None
+
+
+@dataclass
+class ETLStep:
+    fn: Callable[..., Any]
+    kwargs: Optional[dict[str, Any]] = None
+    use_context: bool = False
+    read_data: bool = False
+    use_previous_output: bool = False
 
 
 class DBParams(TypedDict):

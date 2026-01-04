@@ -1,9 +1,9 @@
 from airflow.decorators import task_group
 from airflow.models.baseoperator import chain
 
+from utils.config.types import ETLStep, TaskConfig
 from utils.tasks.etl import (
-    create_action_from_multi_input_files_etl_task,
-    create_action_to_file_etl_task,
+    create_task,
 )
 
 from dags.sg.siep.mmsi.georisques import actions
@@ -13,19 +13,28 @@ from dags.sg.siep.mmsi.georisques import actions
 def georisques_group() -> None:
     """Task group for the Georisques pipeline."""
 
-    bien_db = create_action_to_file_etl_task(
+    bien_db = create_task(
+        task_config=TaskConfig(task_id="bien_db"),
         output_selecteur="bien_db",
-        task_id="bien_db",
-        action_func=actions.get_bien_from_db,
-        use_context=True,
+        steps=[
+            ETLStep(
+                fn=actions.get_bien_from_db,
+                use_context=True,
+            )
+        ],
         add_snapshot_id=False,
         add_import_date=False,
     )
 
-    georisques = create_action_from_multi_input_files_etl_task(
-        task_id="georisques",
+    georisques = create_task(
+        task_config=TaskConfig(task_id="georisques"),
+        output_selecteur="georisques",
         input_selecteurs=["bien_db"],
-        action_func=actions.get_georisques,
+        steps=[
+            ETLStep(
+                fn=actions.get_georisques,
+            )
+        ],
     )
 
     chain(
