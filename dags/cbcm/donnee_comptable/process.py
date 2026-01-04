@@ -434,13 +434,51 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
 # Ajout des services prescipteurs
 # ======================================================
 def add_service_prescripteurs(
-    df_demande_achat: pd.DataFrame, df_service_prescripteur: pd.DataFrame
+    df: pd.DataFrame, df_service_prescripteur: pd.DataFrame
 ) -> pd.DataFrame:
     df = pd.merge(
-        left=df_demande_achat,
+        left=df,
         right=df_service_prescripteur,
         how="left",
         on=["cf_cc"],
     )
 
     return df
+
+
+def add_service_prescripteurs_to_demande_achat(
+    df_demande_achat: pd.DataFrame, df_service_prescripteur: pd.DataFrame
+) -> pd.DataFrame:
+    return add_service_prescripteurs(
+        df=df_demande_achat,
+        df_service_prescripteur=df_service_prescripteur,
+    )
+
+
+def add_service_prescripteurs_to_engagement_juridique(
+    df_engagement_juridique: pd.DataFrame, df_service_prescripteur: pd.DataFrame
+) -> pd.DataFrame:
+    return add_service_prescripteurs(
+        df=df_engagement_juridique,
+        df_service_prescripteur=df_service_prescripteur,
+    )
+
+
+def add_service_prescripteurs_to_demande_paiement_journal_pieces(
+    df_demande_paiement_journal_pieces: pd.DataFrame,
+    df_service_prescripteur: pd.DataFrame,
+) -> pd.DataFrame:
+    return add_service_prescripteurs(
+        df=df_demande_paiement_journal_pieces,
+        df_service_prescripteur=df_service_prescripteur,
+    )
+
+
+def add_service_prescripteurs_to_delai_global_paiement(
+    df_delai_global_paiement: pd.DataFrame,
+    df_service_prescripteur: pd.DataFrame,
+) -> pd.DataFrame:
+    return add_service_prescripteurs(
+        df=df_delai_global_paiement,
+        df_service_prescripteur=df_service_prescripteur,
+    )

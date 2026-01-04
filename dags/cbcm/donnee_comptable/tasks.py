@@ -117,7 +117,7 @@ def ajout_sp() -> None:
         input_selecteurs=["demande_achat", "service_prescripteur"],
         steps=[
             ETLStep(
-                fn=process.add_service_prescripteurs,
+                fn=process.add_service_prescripteurs_to_demande_achat,
             )
         ],
     )
@@ -127,7 +127,7 @@ def ajout_sp() -> None:
         input_selecteurs=["engagement_juridique", "service_prescripteur"],
         steps=[
             ETLStep(
-                fn=process.add_service_prescripteurs,
+                fn=process.add_service_prescripteurs_to_engagement_juridique,
             )
         ],
     )
@@ -137,7 +137,7 @@ def ajout_sp() -> None:
         input_selecteurs=["demande_paiement_journal_pieces", "service_prescripteur"],
         steps=[
             ETLStep(
-                fn=process.add_service_prescripteurs,
+                fn=process.add_service_prescripteurs_to_demande_paiement_journal_pieces,
             )
         ],
     )
@@ -147,7 +147,7 @@ def ajout_sp() -> None:
         input_selecteurs=["delai_global_paiement", "service_prescripteur"],
         steps=[
             ETLStep(
-                fn=process.add_service_prescripteurs,
+                fn=process.add_service_prescripteurs_to_delai_global_paiement,
             )
         ],
     )
