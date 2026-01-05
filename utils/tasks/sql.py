@@ -546,9 +546,9 @@ def import_file_to_db(
 ) -> None:
     selecteur = selecteur_config.selecteur
     db_info = get_db_info(context=context)
+    dag_status = get_dag_status(context=context)
     context = get_current_context()
     context["import_task_name"] = selecteur  # type: ignore
-    dag_status = get_dag_status(context=context)
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
