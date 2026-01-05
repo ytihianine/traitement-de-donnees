@@ -12,8 +12,10 @@ Ce script permet de créer automatiquement des webhooks dans un document Grist.
 
 Pour récupérer l'url du webhook n8n, il faut, depuis la pipeline:
 - Cliquer sur le node webhook
+
 ![n8n webhook node](../../../docs/images/webhooks/n8n_webhook_node.png)
 - Compléter les informations
+
 ![interface n8n url du webhook](../../../docs/images/webhooks/n8n_url.png)
 
 ## Script
