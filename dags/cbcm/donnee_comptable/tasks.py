@@ -117,7 +117,7 @@ def ajout_sp() -> None:
         input_selecteurs=["demande_achat", "service_prescripteur"],
         steps=[
             ETLStep(
-                fn=process.add_service_prescripteurs_to_demande_achat,
+                fn=process.add_service_prescripteurs_to_demande_achat, read_data=True
             )
         ],
     )
@@ -128,6 +128,7 @@ def ajout_sp() -> None:
         steps=[
             ETLStep(
                 fn=process.add_service_prescripteurs_to_engagement_juridique,
+                read_data=True,
             )
         ],
     )
@@ -138,6 +139,7 @@ def ajout_sp() -> None:
         steps=[
             ETLStep(
                 fn=process.add_service_prescripteurs_to_demande_paiement_journal_pieces,
+                read_data=True,
             )
         ],
     )
@@ -148,6 +150,7 @@ def ajout_sp() -> None:
         steps=[
             ETLStep(
                 fn=process.add_service_prescripteurs_to_delai_global_paiement,
+                read_data=True,
             )
         ],
     )
@@ -174,11 +177,7 @@ def datasets_additionnels() -> None:
             "demande_paiement_journal_pieces",
             "demande_paiement_sfp",
         ],
-        steps=[
-            ETLStep(
-                fn=process.process_demande_paiement_complet_sp,
-            )
-        ],
+        steps=[ETLStep(fn=process.process_demande_paiement_complet_sp, read_data=True)],
     )
 
     chain(demande_paiement_complet_sp())
