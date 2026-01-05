@@ -3,10 +3,27 @@
 ## Table des matières
 - [Convention de nommage](#convention-de-nommage)
   - [Table des matières](#table-des-matières)
+  - [Dags](#dags)
   - [S3](#s3)
   - [SQL](#sql)
   - [Grist](#grist)
 
+
+## Dags
+
+Tous les dags doivent êtres organisés de la façon suivante:
+```
+.
+├── dags
+│   ├── projet_X
+│   │   ├── grist
+│   │   │   ├── dags.py   # Définition du dag
+│   │   │   ├── process.py  # Contient toutes les fonctions de processing
+│   │   │   ├── README.md   # Documentation du dag
+│   │   │   ├── sql   # Contient les scripts sql
+│   │   │   │   └── projet_X.sql
+│   │   │   └── tasks.py  # Contient les tâches spécifiques au dag
+```
 
 ## S3
 Tous les fichiers stockés doivent respecter le format suivant:

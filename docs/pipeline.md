@@ -22,6 +22,8 @@ Le framework propose une architecture en couches :
 - **Utilitaires (`utils/`)** : Tâches réutilisables et configuration
 - **DAGs** : Orchestration des traitements métiers
 
+Les dags doivent respecter [cette organisation](./convention.md#dags)
+
 ### Workflow Standard
 
 Il existe deux worflows principaux génériques qui nécessitent d'être adapté à chaque pipeline.
