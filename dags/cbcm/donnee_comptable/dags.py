@@ -84,9 +84,9 @@ def chorus_donnees_comptables() -> None:
         # create_projet_snapshot(nom_projet=nom_projet),
         # get_projet_snapshot(nom_projet=nom_projet),
         source_files(),
-        add_new_sp(),
+        # add_new_sp(),
         get_sp(),
-        # ajout_sp(),
+        ajout_sp(),
         datasets_additionnels(),
         # create_tmp_tables(reset_id_seq=False),
         # import_file_to_db.expand(
