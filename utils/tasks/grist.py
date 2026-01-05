@@ -19,7 +19,12 @@ from utils.config.vars import (
 )
 
 
-@task(task_id="download_grist_doc_to_s3", retries=1, retry_delay=timedelta(seconds=20))
+@task(
+    task_id="download_grist_doc_to_s3",
+    retries=5,
+    retry_delay=timedelta(minutes=1),
+    retry_exponential_backoff=True,
+)
 def download_grist_doc_to_s3(
     selecteur: str,
     workspace_id: str,
