@@ -1,7 +1,6 @@
 """MinIO/S3 task utilities using infrastructure handlers."""
 
 import logging
-from datetime import datetime
 from typing import Any, Dict, List, Optional
 import pytz
 
@@ -9,9 +8,9 @@ from airflow.decorators import task
 
 from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
 from infra.file_handling.factory import create_file_handler
-from utils.config.dag_params import get_execution_date, get_project_name
+from utils.config.dag_params import get_dag_status, get_execution_date, get_project_name
 from utils.config.tasks import get_projet_config
-from utils.config.types import FileHandlerType
+from utils.config.types import DagStatus, FileHandlerType
 from utils.config.vars import (
     DEFAULT_S3_CONN_ID,
 )
@@ -35,6 +34,12 @@ def copy_s3_files(
         FileHandlerError: If file operations fail
     """
     nom_projet = get_project_name(context=context)
+    dag_status = get_dag_status(context=context)
+
+    if dag_status == DagStatus.DEV:
+        print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
+
     s3_handler = create_file_handler(
         handler_type=FileHandlerType.S3, connection_id=connection_id, bucket=bucket
     )
@@ -101,6 +106,12 @@ def del_s3_files(
         ValueError: If project name not provided in params
         FileHandlerError: If file operations fail
     """
+    dag_status = get_dag_status(context=context)
+
+    if dag_status == DagStatus.DEV:
+        print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
+
     tmp_keys: List[str] = []
     source_keys: List[str] = []
 

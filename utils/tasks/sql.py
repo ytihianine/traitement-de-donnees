@@ -12,14 +12,22 @@ from airflow.operators.python import get_current_context
 from infra.database.base import BaseDBHandler
 from infra.database.factory import create_db_handler
 
-from infra.file_handling.base import BaseFileHandler
-from infra.file_handling.base import BaseFileHandler
 from infra.file_handling.dataframe import read_dataframe
 from infra.file_handling.factory import create_default_s3_handler, create_local_handler
 
-from utils.config.dag_params import get_db_info, get_execution_date, get_project_name
-from utils.config.tasks import get_projet_config, get_tbl_names
-from utils.config.types import SelecteurConfig, LoadStrategy, PartitionTimePeriod
+from utils.config.dag_params import (
+    get_dag_status,
+    get_db_info,
+    get_execution_date,
+    get_project_name,
+)
+from utils.config.tasks import get_tbl_names
+from utils.config.types import (
+    DagStatus,
+    SelecteurConfig,
+    LoadStrategy,
+    PartitionTimePeriod,
+)
 from utils.control.structures import are_lists_egal
 from utils.config.vars import (
     DEFAULT_TMP_SCHEMA,
@@ -166,6 +174,11 @@ def create_projet_snapshot(
     """ """
     nom_projet = get_project_name(context=context)
     execution_date = get_execution_date(context=context)
+    dag_status = get_dag_status(context=context)
+
+    if dag_status == DagStatus.DEV:
+        print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
 
     # Hook
     db_handler = create_db_handler(connection_id=pg_conn_id)
@@ -222,6 +235,11 @@ def ensure_partition(
         Le nom de la partition (créée ou existante)
     """
     nom_projet = get_project_name(context=context)
+    dag_status = get_dag_status(context=context)
+
+    if dag_status == DagStatus.DEV:
+        print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
 
     db_info = get_db_info(context=context)
     prod_schema = db_info.get("prod_schema")
@@ -271,6 +289,11 @@ def create_tmp_tables(
     Used to create temporary tables in the database.
     """
     nom_projet = get_project_name(context=context)
+    dag_status = get_dag_status(context=context)
+
+    if dag_status == DagStatus.DEV:
+        print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
 
     db_info = get_db_info(context=context)
     prod_schema = db_info.get("prod_schema", None)
@@ -352,6 +375,11 @@ def copy_tmp_table_to_real_table(
         INCREMENTAL    -> UPSERT + delete missing rows based on primary key
     """
     nom_projet = get_project_name(context=context)
+    dag_status = get_dag_status(context=context)
+
+    if dag_status == DagStatus.DEV:
+        print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
 
     db_info = get_db_info(context=context)
     prod_schema = db_info.get("prod_schema", None)
@@ -520,6 +548,11 @@ def import_file_to_db(
     db_info = get_db_info(context=context)
     context = get_current_context()
     context["import_task_name"] = selecteur  # type: ignore
+    dag_status = get_dag_status(context=context)
+
+    if dag_status == DagStatus.DEV:
+        print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
 
     if use_prod_schema:
         schema = db_info["prod_schema"]
@@ -625,10 +658,15 @@ def set_dataset_last_update_date(
 @task
 def refresh_views(pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context) -> None:
     """Tâche pour actualiser les vues matérialisées"""
-    db = create_db_handler(connection_id=pg_conn_id)
-
+    dag_status = get_dag_status(context=context)
     db_info = get_db_info(context=context)
     prod_schema = db_info.get("prod_schema", None)
+
+    if dag_status == DagStatus.DEV:
+        print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
+
+    db = create_db_handler(connection_id=pg_conn_id)
 
     get_mview_query = """
         SELECT matviewname
