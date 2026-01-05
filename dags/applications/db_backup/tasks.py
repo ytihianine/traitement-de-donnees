@@ -6,8 +6,10 @@ from utils.config.types import (
     KEY_MAIL_CC,
     KEY_DOCS,
     KEY_DOCS_LIEN_PIPELINE,
+    ETLStep,
+    TaskConfig,
 )
-from utils.tasks.etl import create_action_etl_task
+from utils.tasks.etl import create_task
 from utils.tasks.validation import create_validate_params_task
 
 from dags.applications.db_backup import actions
@@ -28,8 +30,14 @@ validate_params = create_validate_params_task(
 )
 
 
-dump_databases = create_action_etl_task(
-    task_id="db_backup",
-    action_func=actions.create_dump_files,
-    action_kwargs={"nom_projet": "Sauvegarde databases"},
+dump_databases = create_task(
+    task_config=TaskConfig(task_id="db_backup"),
+    output_selecteur="db_backup",
+    steps=[
+        ETLStep(
+            fn=actions.create_dump_files,
+            use_context=True,
+        ),
+    ],
+    export_output=False,
 )

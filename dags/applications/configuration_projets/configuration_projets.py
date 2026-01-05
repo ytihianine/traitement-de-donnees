@@ -3,9 +3,10 @@ from airflow.models.baseoperator import chain
 from airflow.utils.dates import days_ago
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
+from utils.config.tasks import get_projet_config
 from utils.tasks.sql import (
     create_tmp_tables,
-    import_files_to_db,
+    import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     LoadStrategy,
@@ -70,7 +71,9 @@ def configuration_projets():
         ),
         process_data(),
         create_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, reset_id_seq=False),
-        import_files_to_db(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, keep_file_id_col=True),
+        import_file_to_db.partial(
+            pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, keep_file_id_col=True
+        ).expand(selecteur_config=get_projet_config(nom_projet=nom_projet)),
         copy_tmp_table_to_real_table(
             load_strategy=LoadStrategy.FULL_LOAD, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
         ),

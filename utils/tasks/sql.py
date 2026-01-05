@@ -9,8 +9,11 @@ import psycopg2
 from airflow.decorators import task
 from airflow.operators.python import get_current_context
 
+from infra.database.base import BaseDBHandler
 from infra.database.factory import create_db_handler
 
+from infra.file_handling.base import BaseFileHandler
+from infra.file_handling.base import BaseFileHandler
 from infra.file_handling.dataframe import read_dataframe
 from infra.file_handling.factory import create_default_s3_handler, create_local_handler
 
@@ -25,12 +28,13 @@ from utils.config.vars import (
     DEFAULT_S3_CONN_ID,
 )
 
+# ------------------------------------------------------------------------------
+# Internal functions
+# ------------------------------------------------------------------------------
 
-def get_primary_keys(
-    schema: str, table: str, pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID
-) -> list[str]:
+
+def _get_primary_keys(schema: str, table: str, db_handler: BaseDBHandler) -> list[str]:
     """Get primary key columns of a table."""
-    db = create_db_handler(connection_id=pg_conn_id)
     query = """
         SELECT kcu.column_name
         FROM information_schema.table_constraints tc
@@ -42,19 +46,12 @@ def get_primary_keys(
             AND tc.constraint_type = 'PRIMARY KEY'
         ORDER BY kcu.ordinal_position;
     """
-    df = db.fetch_df(query, parameters=(schema, table))
+    df = db_handler.fetch_df(query, parameters=(schema, table))
     return df.loc[:, "column_name"].tolist()
 
 
-@task(task_id="get_tbl_names_from_postgresql")
-def get_tbl_names_from_postgresql(**context) -> list[str]:
-    nom_projet = get_project_name(context=context)
-    tbl_names = get_tbl_names(nom_projet=nom_projet)
-    return tbl_names
-
-
-def create_snapshot_id(
-    nom_projet: str, execution_date: datetime, pg_conn_id: str
+def _create_snapshot_id(
+    nom_projet: str, execution_date: datetime, db_handler: BaseDBHandler
 ) -> None:
 
     snapshot_id = execution_date.strftime(format="%Y%m%d_%H:%M:%S")
@@ -77,11 +74,10 @@ def create_snapshot_id(
     }
 
     # Exécution de la requête
-    db = create_db_handler(connection_id=pg_conn_id)
-    db.execute(query, parameters=params)
+    db_handler.execute(query, parameters=params)
 
 
-def get_snapshot_id(nom_projet: str, pg_conn_id: str) -> str:
+def _get_snapshot_id(nom_projet: str, db_handler: BaseDBHandler) -> str:
     query = """
         WITH cte_id_projet AS (
             SELECT id as id_projet
@@ -103,8 +99,7 @@ def get_snapshot_id(nom_projet: str, pg_conn_id: str) -> str:
     params = {"nom_projet": nom_projet}
 
     # Exécution de la requête
-    db = create_db_handler(connection_id=pg_conn_id)
-    db_result = db.fetch_one(query, parameters=params)
+    db_result = db_handler.fetch_one(query, parameters=params)
 
     if db_result is None:
         raise ValueError(f"No db_result found for project {nom_projet}")
@@ -115,45 +110,6 @@ def get_snapshot_id(nom_projet: str, pg_conn_id: str) -> str:
         raise ValueError(f"No snapshot_id found for project {nom_projet}")
 
     return snapshot_id
-
-
-@task
-def create_projet_snapshot(
-    pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID, **context
-) -> None:
-    """ """
-    nom_projet = get_project_name(context=context)
-    execution_date = get_execution_date(context=context)
-
-    create_snapshot_id(
-        nom_projet=nom_projet, execution_date=execution_date, pg_conn_id=pg_conn_id
-    )
-
-
-@task
-def get_projet_snapshot(
-    nom_projet: Optional[str] = None,
-    pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID,
-    **context,
-) -> None:
-    """
-    Récupérer le dernier snapshot_id d'un projet.
-
-    Args:
-        nom_projet (optionnel): Le nom du projet. A spécifier lorsque le nom du projet
-            dans le DAG est différent de celui qui génère le snapshot_id,
-        pg_conn_id: Connexion Postgres. Valeur par défaut
-
-    Returns:
-        None. Ajoute le snapshot_id dans le context du DAG
-    """
-    if nom_projet is None:
-        nom_projet = get_project_name(context=context)
-
-    snapshot_id = get_snapshot_id(nom_projet=nom_projet, pg_conn_id=pg_conn_id)
-    print(f"Adding snapshot_id {snapshot_id} to context")
-    context["ti"].xcom_push(key="snapshot_id", value=snapshot_id)
-    print("Snapshot_id added to context.")
 
 
 def determine_partition_period(
@@ -189,6 +145,63 @@ def determine_partition_period(
     else:
         raise ValueError(f"Unsupported time period: {time_period}")
     return (from_date_period, to_date_period)
+
+
+# ------------------------------------------------------------------------------
+# SQL tasks
+# ------------------------------------------------------------------------------
+
+
+@task(task_id="get_tbl_names_from_postgresql")
+def get_tbl_names_from_postgresql(**context) -> list[str]:
+    nom_projet = get_project_name(context=context)
+    tbl_names = get_tbl_names(nom_projet=nom_projet)
+    return tbl_names
+
+
+@task
+def create_projet_snapshot(
+    pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID, **context
+) -> None:
+    """ """
+    nom_projet = get_project_name(context=context)
+    execution_date = get_execution_date(context=context)
+
+    # Hook
+    db_handler = create_db_handler(connection_id=pg_conn_id)
+
+    _create_snapshot_id(
+        nom_projet=nom_projet, execution_date=execution_date, db_handler=db_handler
+    )
+
+
+@task
+def get_projet_snapshot(
+    nom_projet: Optional[str] = None,
+    pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID,
+    **context,
+) -> None:
+    """
+    Récupérer le dernier snapshot_id d'un projet.
+
+    Args:
+        nom_projet (optionnel): Le nom du projet. A spécifier lorsque le nom du projet
+            dans le DAG est différent de celui qui génère le snapshot_id,
+        pg_conn_id: Connexion Postgres. Valeur par défaut
+
+    Returns:
+        None. Ajoute le snapshot_id dans le context du DAG
+    """
+    if nom_projet is None:
+        nom_projet = get_project_name(context=context)
+
+    # Hook
+    db_handler = create_db_handler(connection_id=pg_conn_id)
+
+    snapshot_id = _get_snapshot_id(nom_projet=nom_projet, db_handler=db_handler)
+    print(f"Adding snapshot_id {snapshot_id} to context")
+    context["ti"].xcom_push(key="snapshot_id", value=snapshot_id)
+    print("Snapshot_id added to context.")
 
 
 @task
@@ -345,7 +358,7 @@ def copy_tmp_table_to_real_table(
     tmp_schema = db_info.get("tmp_schema", None)
 
     # Hook
-    db = create_db_handler(pg_conn_id)
+    db_handler = create_db_handler(pg_conn_id)
 
     tbl_names = get_tbl_names(nom_projet=nom_projet, order_tbl=True)
     print(f"Tables to copy: {', '.join(tbl_names)}")
@@ -372,8 +385,8 @@ def copy_tmp_table_to_real_table(
             prod_table = f"{prod_schema}.{table}"
             tmp_table = f"{tmp_schema}.tmp_{table}"
 
-            pk_cols = get_primary_keys(
-                schema=prod_schema, table=table, pg_conn_id=pg_conn_id
+            pk_cols = _get_primary_keys(
+                schema=prod_schema, table=table, db_handler=db_handler
             )
             col_list = sort_db_colnames(tbl_name=table, pg_conn_id=pg_conn_id)
 
@@ -418,7 +431,7 @@ def copy_tmp_table_to_real_table(
 
     if queries:
         for q in queries:
-            db.execute(query=q)
+            db_handler.execute(query=q)
     else:
         print("No query to execute")
 
@@ -465,7 +478,7 @@ def bulk_load_local_tsv_file_to_db(
     local_filepath: str,
     tbl_name: str,
     column_names: list[str],
-    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    db_handler: BaseDBHandler,
     schema: str = DEFAULT_TMP_SCHEMA,
 ) -> None:
     """Bulk load TSV file into database using COPY.
@@ -476,7 +489,6 @@ def bulk_load_local_tsv_file_to_db(
         column_names: List of column names in order
         schema: Target schema
     """
-    db = create_db_handler(pg_conn_id)
     logging.info(f"Bulk importing {local_filepath} to {schema}.tmp_{tbl_name}")
 
     copy_sql = f"""
@@ -489,105 +501,10 @@ def bulk_load_local_tsv_file_to_db(
         )
     """
 
-    db.copy_expert(sql=copy_sql, filepath=local_filepath)
+    db_handler.copy_expert(sql=copy_sql, filepath=local_filepath)
     logging.info(
         msg=f"Successfully loaded {local_filepath} into {schema}.tmp_{tbl_name}"
     )
-
-
-def _process_and_import_file(
-    s3_filepath: str,
-    local_filepath: str,
-    tbl_name: str,
-    pg_conn_id: str,
-    db_schema: str,
-    s3_conn_id: str = DEFAULT_S3_CONN_ID,
-    keep_file_id_col: bool = False,
-) -> None:
-    """
-    warning: la fonction bulk_load fonctionne uniquement si les colonnes entre la source
-    et la table de destination sont dans le même ordre !
-    """
-    # Define hooks
-    s3_handler = create_default_s3_handler(connection_id=s3_conn_id)
-    local_handler = create_local_handler(base_path=None)
-
-    # Check if old file already exists in local system
-    local_handler.delete(file_path=local_filepath)
-
-    print(f"Reading file from remote < {s3_filepath} >")
-    df = read_dataframe(file_handler=s3_handler, file_path=s3_filepath)
-
-    df_cols = df.columns
-    sorted_df_cols = sorted(df_cols)
-    df = df.reindex(labels=sorted_df_cols, axis=1).convert_dtypes()
-    print(f"DF : {sorted_df_cols}")
-    print(f"Saving file to local < {local_filepath} >")
-    local_handler.write(
-        file_path=local_filepath,
-        content=df.to_csv(index=False, sep="\t", na_rep="NULL"),
-    )
-
-    sorted_db_colnames = sort_db_colnames(
-        tbl_name=tbl_name,
-        keep_file_id_col=keep_file_id_col,
-        pg_conn_id=pg_conn_id,
-        schema=db_schema,
-    )
-    # Loading file to db
-    if are_lists_egal(list_A=sorted_df_cols, list_B=sorted_db_colnames):
-        bulk_load_local_tsv_file_to_db(
-            local_filepath=local_filepath,
-            tbl_name=tbl_name,
-            column_names=sorted_db_colnames,
-            pg_conn_id=pg_conn_id,
-        )
-    else:
-        raise ValueError(
-            textwrap.dedent(
-                text="""
-            Il y a des différences entre les colonnes du DataFrame et de la Table.
-            Impossible d'importer les données.
-        """
-            )
-        )
-
-    # Deleting file from local system
-    local_handler.delete(file_path=local_filepath)
-
-
-@task(task_id="import_files_to_db")
-def import_files_to_db(
-    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
-    s3_conn_id: str = DEFAULT_S3_CONN_ID,
-    keep_file_id_col: bool = False,
-    **context,
-) -> None:
-    nom_projet = get_project_name(context=context)
-    schema = get_db_info(context=context)["prod_schema"]
-
-    projet_config = get_projet_config(nom_projet=nom_projet)
-
-    for config in projet_config:
-        selecteur = config.selecteur
-        local_filepath = config.filepath_local
-        s3_filepath = config.filepath_tmp_s3
-        tbl_name = config.tbl_name
-
-        if tbl_name is None or tbl_name == "":
-            print(
-                f"Sélecteur {selecteur}: La table n'est pas définie. Skipping insertion !"
-            )
-        else:
-            _process_and_import_file(
-                s3_filepath=s3_filepath,
-                local_filepath=local_filepath,
-                tbl_name=tbl_name,
-                pg_conn_id=pg_conn_id,
-                db_schema=schema,
-                s3_conn_id=s3_conn_id,
-                keep_file_id_col=keep_file_id_col,
-            )
 
 
 @task(map_index_template="{{ import_task_name }}")
@@ -596,12 +513,18 @@ def import_file_to_db(
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     s3_conn_id: str = DEFAULT_S3_CONN_ID,
     keep_file_id_col: bool = False,
+    use_prod_schema: bool = True,
     **context,
 ) -> None:
     selecteur = selecteur_config.selecteur
-    schema = get_db_info(context=context)["prod_schema"]
+    db_info = get_db_info(context=context)
     context = get_current_context()
     context["import_task_name"] = selecteur  # type: ignore
+
+    if use_prod_schema:
+        schema = db_info["prod_schema"]
+    else:
+        schema = db_info["tmp_schema"]
 
     # Variables
     local_filepath = selecteur_config.filepath_local
@@ -611,15 +534,54 @@ def import_file_to_db(
     if tbl_name is None or tbl_name == "":
         print(f"tbl_name is None for selecteur <{selecteur}>. Nothing to import to db")
     else:
-        _process_and_import_file(
-            s3_filepath=s3_filepath,
+        # Hooks
+        db_handler = create_db_handler(connection_id=pg_conn_id)
+        s3_handler = create_default_s3_handler(connection_id=s3_conn_id)
+        local_handler = create_local_handler(base_path=None)
+
+        # Check if old file exists
+        local_handler.delete(file_path=local_filepath)
+
+        # Read data from s3, sort its columns and save it locally
+        print(f"Reading file from remote < {s3_filepath} >")
+        df = read_dataframe(file_handler=s3_handler, file_path=s3_filepath)
+
+        sorted_df_cols = sorted(df.columns)
+        df = df.reindex(labels=sorted_df_cols, axis=1).convert_dtypes()
+        print(f"DF : {sorted_df_cols}")
+        print(f"Saving file to local < {local_filepath} >")
+        local_handler.write(
+            file_path=local_filepath,
+            content=df.to_csv(index=False, sep="\t", na_rep="NULL"),
+        )
+
+        # Check if columns are the same between df and db table
+        sorted_db_colnames = sort_db_colnames(
+            tbl_name=tbl_name,
+            keep_file_id_col=keep_file_id_col,
+            pg_conn_id=pg_conn_id,
+            schema=schema,
+        )
+        if not are_lists_egal(list_A=sorted_df_cols, list_B=sorted_db_colnames):
+            raise ValueError(
+                textwrap.dedent(
+                    text="""
+                Il y a des différences entre les colonnes du DataFrame et de la Table.
+                Impossible d'importer les données.
+            """
+                )
+            )
+
+        # Bulk load file to db
+        bulk_load_local_tsv_file_to_db(
             local_filepath=local_filepath,
             tbl_name=tbl_name,
-            pg_conn_id=pg_conn_id,
-            db_schema=schema,
-            s3_conn_id=s3_conn_id,
-            keep_file_id_col=keep_file_id_col,
+            column_names=sorted_db_colnames,
+            db_handler=db_handler,
         )
+
+        # Clean up local file
+        local_handler.delete(file_path=local_filepath)
 
 
 @task(task_id="set_dataset_last_update")

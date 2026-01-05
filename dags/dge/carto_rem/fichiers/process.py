@@ -70,7 +70,7 @@ def process_agent_contrat(df: pd.DataFrame) -> pd.DataFrame:
 """
 
 
-def process_agent(df_info_car: pd.DataFrame) -> pd.DataFrame:
+def process_agent(df_agent_info_carriere: pd.DataFrame) -> pd.DataFrame:
     # Keep only needed columns
     cols_to_keep = [
         "matricule_agent",
@@ -79,12 +79,12 @@ def process_agent(df_info_car: pd.DataFrame) -> pd.DataFrame:
         "genre",
         "age",
     ]
-    df = df_info_car.loc[:, cols_to_keep]
+    df = df_agent_info_carriere.loc[:, cols_to_keep]
 
     return df
 
 
-def process_agent_carriere(df_info_car: pd.DataFrame) -> pd.DataFrame:
+def process_agent_carriere(df_agent_info_carriere: pd.DataFrame) -> pd.DataFrame:
     # Keep only needed columns
     cols_to_keep = [
         "matricule_agent",
@@ -95,7 +95,7 @@ def process_agent_carriere(df_info_car: pd.DataFrame) -> pd.DataFrame:
         "echelon",
         "indice_majore",
     ]
-    df = df_info_car.loc[:, cols_to_keep]
+    df = df_agent_info_carriere.loc[:, cols_to_keep]
 
     # Convert column
     df["echelon"] = pd.to_numeric(arg=df["echelon"])

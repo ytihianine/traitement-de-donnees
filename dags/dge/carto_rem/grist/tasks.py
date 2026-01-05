@@ -2,11 +2,10 @@ from airflow.decorators import task_group
 from airflow.models.baseoperator import chain
 
 from utils.tasks.validation import create_validate_params_task
-from utils.config.types import ALL_PARAM_PATHS
+from utils.config.types import ALL_PARAM_PATHS, ETLStep, TaskConfig
 from utils.tasks.etl import (
-    create_action_to_file_etl_task,
+    create_task,
     create_grist_etl_task,
-    create_multi_files_input_etl_task,
 )
 from utils.control.structures import normalize_grist_dataframe
 
@@ -125,11 +124,15 @@ def source_grist() -> None:
 
 @task_group(group_id="get_db_data")
 def get_db_data() -> None:
-    agent_contrat_db = create_action_to_file_etl_task(
-        task_id="agent_contrat_db",
+    agent_contrat_db = create_task(
+        task_config=TaskConfig(task_id="agent_contrat_db"),
         output_selecteur="agent_contrat_db",
-        action_func=actions.get_agent_contrat,
-        use_context=True,
+        steps=[
+            ETLStep(
+                fn=actions.get_agent_contrat,
+                use_context=True,
+            )
+        ],
         add_import_date=False,
         add_snapshot_id=False,
     )
@@ -139,13 +142,18 @@ def get_db_data() -> None:
 
 @task_group(group_id="dataset_additionnel")
 def datasets_additionnels() -> None:
-    agent_contrat_complet = create_multi_files_input_etl_task(
+    agent_contrat_complet = create_task(
+        task_config=TaskConfig(task_id="agent_contrat_complet"),
         output_selecteur="agent_contrat_complet",
         input_selecteurs=[
             "agent_contrat",
             "agent_contrat_db",
         ],
-        process_func=process.process_agent_contrat_complet,
+        steps=[
+            ETLStep(
+                fn=process.process_agent_contrat_complet,
+            )
+        ],
         add_import_date=False,
         add_snapshot_id=False,
     )
