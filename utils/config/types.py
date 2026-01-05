@@ -11,6 +11,13 @@ from airflow.models.abstractoperator import TaskStateChangeCallback
 # ==================
 # Enums
 # ==================
+class DagStatus(Enum):
+    """DAG status"""
+
+    RUN = auto()
+    DEV = auto()
+
+
 class DatabaseType(Enum):
     """Database types enumeration."""
 
@@ -141,6 +148,7 @@ class DocsParams(TypedDict):
 
 class DagParams(TypedDict):
     nom_projet: str
+    dag_status: DagStatus
     db: DBParams
     mail: MailParams
     docs: DocsParams
@@ -148,6 +156,7 @@ class DagParams(TypedDict):
 
 # Top level keys
 KEY_NOM_PROJET = "nom_projet"
+KEY_DB_STATUS = "dag_status"
 KEY_DB = "db"
 KEY_MAIL = "mail"
 KEY_MAIL_ENABLE = f"{KEY_MAIL}.enable"

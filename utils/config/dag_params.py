@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from airflow.utils.dates import days_ago
 from typing import Optional
 
-from utils.config.types import DBParams, MailParams, DocsParams
+from utils.config.types import DBParams, DagParams, DagStatus, MailParams, DocsParams
 
 DEFAULT_OWNER = "airflow"
 DEFAULT_EMAIL_TO = ["yanis.tihianine@finances.gouv.fr"]
@@ -16,6 +16,14 @@ def get_project_name(context: dict) -> str:
     if not nom_projet:
         raise ValueError("nom_projet must be defined in DAG parameters")
     return nom_projet
+
+
+def get_dag_status(context: dict) -> str:
+    """Extract and validate project name from context."""
+    dag_status = context.get("params", {}).get("dag_status")
+    if not dag_status:
+        raise ValueError("dag_status must be defined in DAG parameters")
+    return dag_status
 
 
 def get_execution_date(context: dict) -> datetime:
@@ -100,6 +108,7 @@ def create_default_args(
 
 def create_dag_params(
     nom_projet: str,
+    dag_status: DagStatus,
     prod_schema: str,
     lien_pipeline: str = "Non renseigné",
     lien_donnees: str = "Non renseigné",
@@ -107,7 +116,8 @@ def create_dag_params(
     mail_enable: bool = True,
     mail_to: Optional[list[str]] = None,
     mail_cc: Optional[list[str]] = None,
-) -> dict:
+    mail_bcc: Optional[list[str]] = None,
+) -> DagParams:
     """Create standard params for DAGs."""
     if mail_to is None:
         mail_to = DEFAULT_EMAIL_TO
@@ -119,15 +129,12 @@ def create_dag_params(
 
     return {
         "nom_projet": nom_projet,
+        "dag_status": dag_status,
         "db": {
             "prod_schema": prod_schema,
             "tmp_schema": tmp_schema,
         },
-        "mail": {
-            "enable": mail_enable,
-            "to": mail_to,
-            "cc": mail_cc,
-        },
+        "mail": {"enable": mail_enable, "to": mail_to, "cc": mail_cc, "bcc": mail_bcc},
         "docs": {
             "lien_pipeline": lien_pipeline,
             "lien_donnees": lien_donnees,
