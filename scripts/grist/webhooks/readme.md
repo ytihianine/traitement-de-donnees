@@ -20,7 +20,7 @@ Pour récupérer l'url du webhook n8n, il faut, depuis la pipeline:
 
 ## Script
 
-1. Configurer les variables![alt text](image.png)
+1. Configurer les variables
 
 Dupliquer le fichier `vars.cfg.example` et renommer le en `vars.cfg`.
 Vous pouvez définir des préfix de tables sur lesquels vous ne souhaitez pas de webhooks.
