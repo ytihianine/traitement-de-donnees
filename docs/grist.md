@@ -10,32 +10,7 @@ Cette documentation décrit le processus d'un projet Grist, de la phase de cadra
 
 ## Convention de nommage
 
-Ces conventions visent à faciliter le traitement des données issues de Grist.
-- Les tables de documentations
-
-Ajouter le préfix `doc_` => `doc_nom_de_la_table`
-
-- Les tables métiers
-
-Aucun préfix ou suffix nécessaire. Il faut néanmoins qu'elles possèdent un nom clair et concis qui découlent de la structuration des données définies dans le projet.
-
-- Les tables de référence
-
-Ajouter le préfix `ref_` => `ref_direction`
-
-- Les tables d'onglets
-
-Ajouter le préfix `onglet_` => `onglet_global_dsci`
-Les onglets permettent de hiérarchiser visuellement les tables sur le bandeau latéral gauche. Elles ne contiennent pas de données mais peuvent être utilisées pour de la documentation.
-
-- Les colonnes intermédiaires
-
-Toutes les colonnes qui n'ont pas de significations métiers mais qui servent pour mettre en place certaines fonctionnalités
-Si c'est une colonne qui servira pour un questionnaire => `quest_nom_colonne`
-Si c'est une colonne de traitement intermédiaire => `int_nom_colonne`
-
-> Cette convention de nommage n'empêche pas l'utilisation de label plus explicite pour les utilisateurs finaux.
-
+Voir la section Grist de la documentation [convention.md](./convention.md#grist)
 
 ## Mener un projet Grist
 
