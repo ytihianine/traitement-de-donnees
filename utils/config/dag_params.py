@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
-from airflow.utils.dates import days_ago
 from typing import Optional
 
+import pendulum
 from utils.config.types import DBParams, DagParams, DagStatus, MailParams, DocsParams
 
 DEFAULT_OWNER = "airflow"
@@ -95,7 +95,7 @@ def create_default_args(
     args = {
         "owner": DEFAULT_OWNER,
         "depends_on_past": False,
-        "start_date": days_ago(1),
+        "start_date": pendulum.today(tz="UTC").add(days=-1),
         "email_on_failure": False,
         "email_on_retry": False,
         "retries": retries,

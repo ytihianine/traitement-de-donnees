@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
+
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
@@ -24,7 +24,6 @@ LINK_DOC_DONNEES = "https://catalogue-des-donnees.lab.incubateur.finances.rie.go
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": days_ago(1),
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 0,

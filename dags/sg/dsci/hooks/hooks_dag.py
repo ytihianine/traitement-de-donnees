@@ -1,6 +1,5 @@
 from airflow.decorators import dag, task
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
 from airflow.models import Variable
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
@@ -15,7 +14,6 @@ cc = []
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": days_ago(1),
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 0,
