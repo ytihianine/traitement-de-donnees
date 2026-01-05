@@ -8,9 +8,9 @@ Le dossier `infra` contient les abstractions et wrappers pour toutes les interac
 
 ```
 infra/
-├── database/           # Handlers pour bases de données
-├── file_handling/      # Gestion des fichiers (local, S3)
-├── http_client/        # Clients HTTP génériques
+├── database/           # Intéragir avec les bases de données
+├── file_handling/      # Intéragir avec les gestionnaires de fichiers (local, S3, ...)
+├── http_client/        # Intéragir avec les serveurs webs (HTTP, API, ...)
 ├── grist/             # Client spécialisé pour Grist
 └── mails/             # Système d'envoi d'emails
 ```
@@ -18,7 +18,10 @@ infra/
 ## 1. Module Database (`infra/database/`)
 
 ### Description
-Fournit une interface unifiée pour les opérations de base de données, avec support pour PostgreSQL et SQLite.
+Fournit une interface unifiée pour les opérations de base de données.
+Base de données supportées
+-   SQLite
+-   PostgreSQL
 
 ### Classes principales
 
@@ -40,12 +43,13 @@ Implémentation pour SQLite (utile pour les tests et imports Grist).
 
 ```python
 from infra.database.factory import create_db_handler
+from utils.config.types import DatabaseType
 
 # PostgreSQL (par défaut)
-db = create_db_handler("my_postgres_conn_id")
+db = create_db_handler(connection_id="my_postgres_conn_id", db_type=DatabaseType.POSTGRES)
 
 # SQLite
-db = create_db_handler("/path/to/database.db", db_type="sqlite")
+db = create_db_handler(connection_id="/path/to/database.db", db_type=DatabaseType.SQLITE)
 
 # Utilisation
 results = db.fetch_all("SELECT * FROM my_table WHERE id = %s", (123,))
@@ -80,24 +84,27 @@ Gestion des fichiers sur S3/MinIO utilisant Airflow S3Hook.
 ### Initialisation
 
 ```python
-from infra.file_handling.factory import FileHandlerFactory
+from infra.file_handling.factory import create_file_handler
+from utils.config.types import FileHandlerType
 
 # Fichiers locaux
-local_handler = FileHandlerFactory.create_handler("local", base_path="/tmp")
+local_handler = create_file_handler(handler_type=FileHandlerType.LOCAL, base_path="/tmp")
 
 # S3/MinIO
-s3_handler = FileHandlerFactory.create_handler(
-    "s3",
+s3_handler = create_file_handler(
+    handler_type=FileHandlerType.S3,
     connection_id="minio_conn",
     bucket="my-bucket"
 )
 
 # Utilisation
 content = local_handler.read("path/to/file.txt")
-s3_handler.write("remote/file.txt", "Hello World")
+s3_handler.write("remote/key/file.txt", "Hello World")
 ```
 
 ### Utilitaires DataFrame
+
+Une fonction utilitaire est définie pour obtenir un dataframe directement.
 
 ```python
 from infra.file_handling.dataframe import read_dataframe, write_dataframe
@@ -107,14 +114,6 @@ df = read_dataframe(
     file_handler=s3_handler,
     file_path="data.csv",
     read_options={"sep": ";", "encoding": "utf-8"}
-)
-
-# Écriture d'un DataFrame
-write_dataframe(
-    df=my_dataframe,
-    file_handler=s3_handler,
-    file_path="output.parquet",
-    format="parquet"
 )
 ```
 
@@ -148,17 +147,21 @@ Wrapper pour les réponses HTTP avec méthodes pratiques :
 ```python
 from infra.http_client.factory import create_http_client
 from infra.http_client.config import ClientConfig
+from utils.config.types import HttpHandlerType
 
 config = ClientConfig(
-    base_url="https://api.example.com",
     timeout=30,
     headers={"Authorization": "Bearer token"}
 )
 
-client = create_http_client("requests", config)
+# Requests package - recommandé
+client = create_http_client(client_type=HttpHandlerType.REQUEST, config=config)
+
+# HTTPx package
+client = create_http_client(client_type=HttpHandlerType.HTTPX, config=config)
 
 # Utilisation
-response = client.get("/users")
+response = client.get("https://api.example.com/users")
 if response.ok:
     users = response.json
 ```
@@ -230,7 +233,7 @@ Structure d'un message email :
 ### Initialisation
 
 ```python
-from infra.mails.sender import MailSender
+from infra.mails.default_smtp import MailSender
 from infra.mails.config import MailConfig, MailMessage
 
 config = MailConfig(
@@ -261,7 +264,7 @@ sender.send(message)
 ### Fonctions utilitaires
 
 ```python
-from infra.mails.sender import create_airflow_callback
+from infra.mails.default_smtp import create_airflow_callback
 from infra.mails.config import MailStatus
 
 # Création de callbacks Airflow pour notifications automatiques
@@ -279,8 +282,8 @@ def my_dag():
 
 ## Bonnes pratiques
 
-### 1. Utilisation des fabriques
-Toujours utiliser les fabriques (`create_db_handler`, `FileHandlerFactory.create_handler`) pour créer les instances.
+### 1. Utilisation des factory fonctions
+Toujours utiliser les factory fonctions (`create_db_handler`, `create_file_handler`) pour créer les instances.
 
 ### 2. Gestion des erreurs
 Capturer les exceptions spécifiques à chaque module plutôt que les exceptions génériques.
