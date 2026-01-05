@@ -1,5 +1,4 @@
 import os
-from enum import Enum
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 from jinja2 import Environment, FileSystemLoader
@@ -12,32 +11,13 @@ from utils.config.dag_params import (
     get_mail_info,
     get_doc_info,
 )
-from utils.config.types import DagStatus
+from utils.config.types import DagStatus, MailPriority, MailStatus
 from utils.config.vars import (
     get_root_folder,
     DEFAULT_SMTP_CONN_ID,
     DEFAULT_MAIL_CC,
     paris_tz,
 )
-
-
-class MailStatus(Enum):
-    """Mail notification status types."""
-
-    START = "Début"
-    SUCCESS = "Succès"
-    ERROR = "Erreur"
-    SKIP = "Skip"
-    WARNING = "Warning"
-    INFO = "Information"
-
-
-class MailPriority(Enum):
-    """Mail priority levels."""
-
-    NORMAL = 0
-    LOW = 1
-    HIGH = 2
 
 
 default_mail_config = {
