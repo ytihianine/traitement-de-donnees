@@ -4,6 +4,7 @@ from airflow.models.baseoperator import chain
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_projet_config
+from utils.config.types import DagStatus
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.tasks.sql import (
     create_tmp_tables,
@@ -37,6 +38,7 @@ LINK_DOC_DATA = "Non-défini"  # noqa
     default_args=create_default_args(),
     params=create_dag_params(
         nom_projet=nom_projet,
+        dag_status=DagStatus.DEV,
         prod_schema="documentation",
         mail_enable=False,
         mail_to=["yanis.tihianine@finances.gouv.fr"],
