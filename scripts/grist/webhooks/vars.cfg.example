@@ -1,0 +1,10 @@
+# Toutes les variables sont traitées comme des str par défaut. Pas besoin de quote
+[HTTP]
+PROXY =
+AGENT =
+
+[GRIST]
+TOKEN =
+DOC_ID =
+N8N_PIPELINE_URL =
+GRIST_HOST =
