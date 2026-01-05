@@ -1,6 +1,5 @@
 """Module for ETL task creation and execution."""
 
-from airflow.decorators.base import Task
 from typing import Callable, Optional, Any
 from airflow import XComArg
 import pandas as pd
@@ -252,7 +251,7 @@ def create_task(
     add_import_date: bool = True,
     add_snapshot_id: bool = True,
     export_output: bool = True,
-) -> Task[..., None]:
+) -> Callable[..., None]:
     """
     Create a generic Airflow task based on the provided TaskConfig.
 
