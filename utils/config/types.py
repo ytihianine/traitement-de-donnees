@@ -31,34 +31,13 @@ class MailPriority(Enum):
 
 
 # ==================
-# Enums
+# Database
 # ==================
-class DagStatus(Enum):
-    """DAG status"""
-
-    RUN = auto()
-    DEV = auto()
-
-
 class DatabaseType(Enum):
     """Database types enumeration."""
 
     POSTGRES = auto()
     SQLITE = auto()
-
-
-class FileHandlerType(Enum):
-    """File handler types enumeration."""
-
-    S3 = auto()
-    LOCAL = auto()
-
-
-class HttpHandlerType(Enum):
-    """Http handler types enumeration."""
-
-    REQUEST = auto()
-    HTTPX = auto()
 
 
 class PartitionTimePeriod(str, Enum):
@@ -76,6 +55,16 @@ class LoadStrategy(Enum):
     APPEND = auto()
 
 
+# ==================
+# File system
+# ==================
+class FileHandlerType(Enum):
+    """File handler types enumeration."""
+
+    S3 = auto()
+    LOCAL = auto()
+
+
 class FileFormat(str, Enum):
     """Supported file formats for ETL operations."""
 
@@ -86,10 +75,28 @@ class FileFormat(str, Enum):
 
 
 # ==================
-# Data Classes
+# HTTP Client
 # ==================
+class HttpHandlerType(Enum):
+    """Http handler types enumeration."""
+
+    REQUEST = auto()
+    HTTPX = auto()
 
 
+# ==================
+# Dags
+# ==================
+class DagStatus(Enum):
+    """DAG status"""
+
+    RUN = auto()
+    DEV = auto()
+
+
+# ==================
+# Dags
+# ==================
 P = ParamSpec("P")
 R = TypeVar("R")
 
