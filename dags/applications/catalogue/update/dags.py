@@ -13,6 +13,7 @@ from dags.applications.catalogue.update.tasks import (
     # update_catalogue,
     # update_dictionnaire,
 )
+from utils.config.types import DagStatus
 
 
 nom_projet = "Catalogue - Update"
@@ -32,6 +33,7 @@ LINK_DOC_DATA = "Non-défini"  # noqa
     default_args=create_default_args(),
     params=create_dag_params(
         nom_projet=nom_projet,
+        dag_status=DagStatus.DEV,
         prod_schema="documentation",
         mail_enable=False,
         mail_to=["yanis.tihianine@finances.gouv.fr"],

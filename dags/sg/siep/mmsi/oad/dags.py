@@ -1,7 +1,6 @@
 from datetime import timedelta
 from airflow.decorators import dag, task_group
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
 
 from airflow.operators.empty import EmptyOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
@@ -9,6 +8,7 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from infra.mails.default_smtp import MailStatus, create_airflow_callback
 from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_s3_keys_source, get_projet_config
+from utils.config.types import DagStatus
 from utils.tasks.sql import (
     LoadStrategy,
     create_tmp_tables,
@@ -44,19 +44,9 @@ LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow
 LINK_DOC_DATA = "Non-défini"  # noqa
 
 
-default_args = {
-    "owner": "airflow",
-    "depends_on_past": False,
-    "start_date": days_ago(1),
-    "email_on_failure": False,
-    "email_on_retry": False,
-    "retries": 0,
-}
-
-
 # Définition du DAG
 @dag(
-    "outil_aide_diagnostic",
+    dag_id="outil_aide_diagnostic",
     schedule_interval="*/15 6-22 * * 1-5",
     max_active_runs=1,
     max_consecutive_failed_dag_runs=1,
@@ -66,6 +56,7 @@ default_args = {
     default_args=create_default_args(retries=0),
     params=create_dag_params(
         nom_projet=nom_projet,
+        dag_status=DagStatus.RUN,
         prod_schema="siep",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,
@@ -100,10 +91,10 @@ def oad() -> None:
             ]
         )
 
-    # end_task = EmptyOperator(
-    #     task_id="end_task",
-    #     on_success_callback=create_airflow_callback(mail_status=MailStatus.SUCCESS),
-    # )
+    end_task = EmptyOperator(
+        task_id="end_task",
+        on_success_callback=create_airflow_callback(mail_status=MailStatus.SUCCESS),
+    )
 
     # Ordre des tâches
     chain(
@@ -126,7 +117,7 @@ def oad() -> None:
         copy_s3_files(bucket="dsci"),
         del_s3_files(bucket="dsci"),
         delete_tmp_tables(),
-        # end_task,
+        end_task,
     )
 
 

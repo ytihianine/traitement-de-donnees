@@ -1,20 +1,15 @@
-from datetime import timedelta
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
+from utils.config.dag_params import create_dag_params, create_default_args
 
 from dags.applications.clean_logs_and_tasks.task import (
     clean_s3,
     clean_old_logs,
     clean_skipped_logs,
 )
-
-
-# Mails
-To = ["yanis.tihianine@finances.gouv.fr"]
-CC = ["labo-data@finances.gouv.fr"]
+from utils.config.types import DagStatus
 
 # Liens
 LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/sg/dsci/catalogue?ref_type=heads"  # noqa
@@ -23,44 +18,31 @@ LINK_DOC_DATA = (
 )
 
 
-default_args = {
-    "owner": "airflow",
-    "depends_on_past": False,
-    "start_date": days_ago(1),
-    "email_on_failure": False,
-    "email_on_retry": False,
-    "retries": 1,
-    "retry_delay": timedelta(minutes=1),
-}
-
-
 # Définition du DAG
 @dag(
-    "clean_logs_tasks",
+    dag_id="clean_logs_tasks",
     schedule_interval="@weekly",
     max_active_runs=1,
     catchup=False,
     tags=["SG", "DSCI", "PRODUCTION", "LOGS"],
     description="Pipeline qui nettoie la base de données et S3",
-    default_args=default_args,
-    params={
-        "nom_projet": "Clean tasks, logs and S3",
-        "mail": {
-            "enable": False,
-            "To": To,
-            "CC": CC,
-        },
-        "docs": {
-            "lien_pipeline": LINK_DOC_PIPELINE,
-            "lien_donnees": LINK_DOC_DATA,
-        },
-    },
+    default_args=create_default_args(),
+    params=create_dag_params(
+        nom_projet="Clean tasks, logs and S3",
+        dag_status=DagStatus.DEV,
+        prod_schema="null",
+        mail_enable=False,
+        mail_to=["yanis.tihianine@finances.gouv.fr"],
+        mail_cc=["labo-data@finances.gouv.fr"],
+        lien_pipeline=LINK_DOC_PIPELINE,
+        lien_donnees=LINK_DOC_DATA,
+    ),
     on_failure_callback=create_airflow_callback(
         mail_status=MailStatus.ERROR,
     ),
     on_success_callback=create_airflow_callback(mail_status=MailStatus.SUCCESS),
 )
-def clean_logs_tasks():
+def clean_logs_tasks() -> None:
     # nom_projet = "Clean tasks and logs"
 
     """Task definitions"""

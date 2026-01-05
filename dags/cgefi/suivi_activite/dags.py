@@ -1,9 +1,9 @@
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
 from datetime import timedelta
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
+from utils.config.types import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -32,7 +32,7 @@ LINK_DOC_DATA = (
 
 # Définition du DAG
 @dag(
-    "cgefi_suivi_activite",
+    dag_id="cgefi_suivi_activite",
     schedule_interval="*/5 * * * 1-5",
     max_active_runs=1,
     catchup=False,
@@ -43,6 +43,7 @@ LINK_DOC_DATA = (
     default_args=create_default_args(retries=1, retry_delay=timedelta(seconds=30)),
     params=create_dag_params(
         nom_projet=nom_projet,
+        dag_status=DagStatus.DEV,
         prod_schema="cgefi_poc",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,

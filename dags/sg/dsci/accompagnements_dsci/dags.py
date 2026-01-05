@@ -2,6 +2,7 @@ from airflow.decorators import dag
 from airflow.models.baseoperator import chain
 
 from infra.mails.default_smtp import MailStatus, create_airflow_callback
+from utils.config.types import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -37,6 +38,7 @@ LINK_DOC_DATA = (
     catchup=False,
     params=create_dag_params(
         nom_projet=nom_projet,
+        dag_status=DagStatus.RUN,
         prod_schema="activite_dsci",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,

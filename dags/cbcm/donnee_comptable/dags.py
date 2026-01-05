@@ -6,6 +6,7 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 
+from utils.config.types import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -53,6 +54,7 @@ LINK_DOC_DATA = "Non-défini"  # noqa
     default_args=create_default_args(),
     params=create_dag_params(
         nom_projet=nom_projet,
+        dag_status=DagStatus.DEV,
         prod_schema="donnee_comptable",
         mail_enable=False,
         lien_pipeline=LINK_DOC_PIPELINE,
@@ -81,28 +83,28 @@ def chorus_donnees_comptables() -> None:
     chain(
         validate_params(),
         looking_for_files,
-        # create_projet_snapshot(nom_projet=nom_projet),
-        # get_projet_snapshot(nom_projet=nom_projet),
+        create_projet_snapshot(nom_projet=nom_projet),
+        get_projet_snapshot(nom_projet=nom_projet),
         source_files(),
-        # add_new_sp(),
+        add_new_sp(),
         get_sp(),
         ajout_sp(),
         datasets_additionnels(),
-        # create_tmp_tables(reset_id_seq=False),
-        # import_file_to_db.expand(
-        #     selecteur_config=get_projet_config(nom_projet=nom_projet)
+        create_tmp_tables(reset_id_seq=False),
+        import_file_to_db.expand(
+            selecteur_config=get_projet_config(nom_projet=nom_projet)
+        ),
+        ensure_partition(),
+        copy_tmp_table_to_real_table(
+            load_strategy=LoadStrategy.APPEND,
+        ),
+        refresh_views(),
+        copy_s3_files(bucket="dsci"),
+        del_s3_files(bucket="dsci"),
+        delete_tmp_tables(),
+        # set_dataset_last_update_date(
+        #     dataset_ids=[49, 50, 51, 52, 53, 54],
         # ),
-        # # ensure_partition(),
-        # copy_tmp_table_to_real_table(
-        #     load_strategy=LoadStrategy.APPEND,
-        # ),
-        # refresh_views(),
-        # copy_s3_files(bucket="dsci"),
-        # del_s3_files(bucket="dsci"),
-        # delete_tmp_tables(),
-        # # set_dataset_last_update_date(
-        # #     dataset_ids=[49, 50, 51, 52, 53, 54],
-        # # ),
     )
 
 

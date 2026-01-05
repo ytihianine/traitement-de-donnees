@@ -1,12 +1,11 @@
-from datetime import timedelta
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 
 from utils.config.dag_params import create_default_args, create_dag_params
 from utils.config.tasks import get_projet_config
+from utils.config.types import DagStatus
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.tasks.sql import (
     create_tmp_tables,
@@ -14,7 +13,6 @@ from utils.tasks.sql import (
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     LoadStrategy,
-    get_projet_snapshot,
     refresh_views,
     # set_dataset_last_update_date,
 )
@@ -44,6 +42,7 @@ LINK_DOC_DATA = "Non-défini"  # noqa
     default_args=create_default_args(),
     params=create_dag_params(
         nom_projet=nom_projet,
+        dag_status=DagStatus.RUN,
         prod_schema="donnee_comptable",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,
@@ -59,7 +58,6 @@ def chorus_service_prescripteur() -> None:
     # Ordre des tâches
     chain(
         validate_params(),
-        # get_projet_snapshot(nom_projet=nom_projet),
         download_grist_doc_to_s3(
             selecteur="grist_doc", workspace_id="dsci", doc_id_key="grist_doc_id_cbcm"
         ),

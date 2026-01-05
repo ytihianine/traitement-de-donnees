@@ -1,11 +1,11 @@
 from airflow.decorators import dag
 from datetime import timedelta
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_projet_config
+from utils.config.types import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
@@ -34,7 +34,7 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
 
 # Définition du DAG
 @dag(
-    "api_operat_ademe",
+    dag_id="api_operat_ademe",
     schedule_interval="@daily",
     max_active_runs=1,
     catchup=False,
@@ -44,6 +44,7 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
     default_args=create_default_args(retries=1, retry_delay=timedelta(minutes=1)),
     params=create_dag_params(
         nom_projet=nom_projet,
+        dag_status=DagStatus.DEV,
         prod_schema="siep",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,
@@ -54,7 +55,7 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
     ),
     on_success_callback=create_airflow_callback(mail_status=MailStatus.SUCCESS),
 )
-def api_operat_ademe():
+def api_operat_ademe() -> None:
 
     # Ordre des tâches
     chain(

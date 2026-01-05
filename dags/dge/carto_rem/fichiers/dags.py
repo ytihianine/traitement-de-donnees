@@ -5,6 +5,7 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
+from utils.config.types import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
@@ -45,6 +46,7 @@ LINK_DOC_DATA = "To define"  # noqa
     default_args=create_default_args(retries=0),
     params=create_dag_params(
         nom_projet=nom_projet,
+        dag_status=DagStatus.DEV,
         prod_schema="cartographie_remuneration",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,

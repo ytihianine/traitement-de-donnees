@@ -1,8 +1,7 @@
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
-from datetime import timedelta
 
+from utils.config.types import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -30,19 +29,20 @@ LINK_DOC_DATA = (
 
 @dag(
     dag_id="carte_identite_mef",
-    default_args=create_default_args(retries=1, retry_delay=timedelta(seconds=20)),
+    default_args=create_default_args(),
     schedule_interval="*/8 8-13,14-19 * * 1-5",
     catchup=False,
     max_consecutive_failed_dag_runs=1,
     params=create_dag_params(
         nom_projet=nom_projet,
+        dag_status=DagStatus.RUN,
         prod_schema="dsci",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,
         mail_enable=False,
     ),
 )
-def carte_identite_mef_dag():
+def carte_identite_mef_dag() -> None:
     """Tasks order"""
     chain(
         validate_params(),
