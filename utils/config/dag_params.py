@@ -18,7 +18,7 @@ def get_project_name(context: dict) -> str:
     return nom_projet
 
 
-def get_dag_status(context: dict) -> str:
+def get_dag_status(context: dict) -> DagStatus:
     """Extract and validate project name from context."""
     dag_status = context.get("params", {}).get("dag_status")
     if not dag_status:
