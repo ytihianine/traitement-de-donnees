@@ -17,5 +17,6 @@ def create_http_client(
         return HttpxClient(config)
 
     raise ValueError(
-        f"Unsupported handler type: '{client_type}'. " f"Supported types: 'local', 's3'"
+        f"Unsupported handler type: '{client_type}'. "
+        f"Supported types: 'REQUESTS', 'HTTPX'"
     )

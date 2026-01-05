@@ -1,10 +1,10 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 
 class HTTPResponse:
     """Wrapper around the raw HTTP response to provide a unified interface."""
 
-    def __init__(self, raw: Any):
+    def __init__(self, raw: Any) -> None:
         self._raw = raw
 
     def json(self) -> Dict[str, Any]:
@@ -22,7 +22,7 @@ class HTTPResponse:
     @property
     def content(self) -> bytes:
         """Return response body as raw bytes."""
-        return getattr(self._raw, "content", str(self._raw).encode("utf-8"))
+        return getattr(self._raw, "content", str(self._raw).encode(encoding="utf-8"))
 
     @property
     def status_code(self) -> int:

@@ -1,7 +1,7 @@
 """Configuration for HTTP client."""
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Union
+from typing import Dict, Optional
 from urllib.parse import urlparse
 
 
@@ -34,11 +34,11 @@ class ClientConfig:
     # Rate limiting
     rate_limit: Optional[int] = None  # requests per second
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate and process the configuration after initialization."""
         # Process base URL
         if self.base_url:
-            parsed = urlparse(self.base_url)
+            parsed = urlparse(url=self.base_url)
             if not parsed.scheme or not parsed.netloc:
                 raise ValueError("base_url must be a valid URL with scheme and domain")
 
