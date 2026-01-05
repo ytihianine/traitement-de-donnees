@@ -117,7 +117,7 @@ def create_dag_params(
     mail_to: Optional[list[str]] = None,
     mail_cc: Optional[list[str]] = None,
     mail_bcc: Optional[list[str]] = None,
-) -> DagParams:
+) -> dict:
     """Create standard params for DAGs."""
     if mail_to is None:
         mail_to = DEFAULT_EMAIL_TO
@@ -127,16 +127,19 @@ def create_dag_params(
     if mail_cc is None:
         mail_cc = DEFAULT_EMAIL_CC
 
-    return {
-        "nom_projet": nom_projet,
-        "dag_status": dag_status,
-        "db": {
+    # Using DagParams for type checking
+    dag_params = DagParams(
+        nom_projet=nom_projet,
+        dag_status=dag_status,
+        db={
             "prod_schema": prod_schema,
             "tmp_schema": tmp_schema,
         },
-        "mail": {"enable": mail_enable, "to": mail_to, "cc": mail_cc, "bcc": mail_bcc},
-        "docs": {
+        mail={"enable": mail_enable, "to": mail_to, "cc": mail_cc, "bcc": mail_bcc},
+        docs={
             "lien_pipeline": lien_pipeline,
             "lien_donnees": lien_donnees,
         },
-    }
+    )
+
+    return dict(dag_params)
