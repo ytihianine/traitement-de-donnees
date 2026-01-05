@@ -32,6 +32,13 @@ class FileHandlerType(Enum):
     LOCAL = auto()
 
 
+class HttpHandlerType(Enum):
+    """Http handler types enumeration."""
+
+    REQUEST = auto()
+    HTTPX = auto()
+
+
 class PartitionTimePeriod(str, Enum):
     DAY = auto()
     WEEK = auto()
