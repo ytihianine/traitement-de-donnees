@@ -251,7 +251,7 @@ def create_task(
     add_import_date: bool = True,
     add_snapshot_id: bool = True,
     export_output: bool = True,
-) -> Callable[..., None]:
+) -> Callable[..., XComArg]:
     """
     Create a generic Airflow task based on the provided TaskConfig.
 
@@ -274,7 +274,18 @@ def create_task(
             - if multiple input selectors, DataFrames will be passed as "df_{selecteur}"
     """
 
-    @task(**task_config.__dict__)
+    @task(
+        task_id=task_config.task_id,
+        retries=task_config.retries,
+        retry_delay=task_config.retry_delay,
+        retry_exponential_backoff=task_config.retry_exponential_backoff,
+        max_retry_delay=task_config.max_retry_delay,
+        on_execute_callback=task_config.on_execute_callback,
+        on_failure_callback=task_config.on_failure_callback,
+        on_success_callback=task_config.on_success_callback,
+        on_retry_callback=task_config.on_retry_callback,
+        on_skipped_callback=task_config.on_skipped_callback,
+    )
     def _task(**context) -> None:
         """The actual generic task function."""
         # Get project name from context
