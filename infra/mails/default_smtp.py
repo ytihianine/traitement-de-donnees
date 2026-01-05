@@ -1,13 +1,18 @@
 import os
 from enum import Enum
-import textwrap
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 from jinja2 import Environment, FileSystemLoader
 
 from airflow.utils.email import send_email_smtp
 
-from utils.config.dag_params import get_execution_date, get_mail_info, get_doc_info
+from utils.config.dag_params import (
+    get_dag_status,
+    get_execution_date,
+    get_mail_info,
+    get_doc_info,
+)
+from utils.config.types import DagStatus
 from utils.config.vars import (
     get_root_folder,
     DEFAULT_SMTP_CONN_ID,
@@ -155,6 +160,11 @@ def create_airflow_callback(mail_status: MailStatus) -> Callable:
     def _callback(context: dict[str, Any]) -> None:
         # If debug mode is ON, we don't want to send any mail
         mail_info = get_mail_info(context=context)
+        dag_status = get_dag_status(context=context)
+
+        if dag_status == DagStatus.DEV:
+            print("Dag status parameter is set to DEV -> skipping this task ...")
+            return
 
         if not mail_info["enable"]:
             print("Skipping! Mails are disabled for this dag ...")
@@ -185,16 +195,6 @@ def create_airflow_callback(mail_status: MailStatus) -> Callable:
             },
         )
 
-        if mail_info["enable"]:
-            send_mail(mail_message=mail_message)
-        else:
-            print(
-                textwrap.dedent(
-                    text="""
-            mail are not enabled for this dag !
-            To enable it, update mail.enable: True in dag parameters definition
-            """
-                )
-            )
+        send_mail(mail_message=mail_message)
 
     return _callback
