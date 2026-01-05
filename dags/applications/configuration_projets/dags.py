@@ -1,9 +1,10 @@
 from airflow.decorators import dag
 from airflow.models.baseoperator import chain
-from airflow.utils.dates import days_ago
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
+from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_projet_config
+from utils.config.types import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -24,43 +25,28 @@ nom_projet = "Configuration des projets"
 LINK_DOC_PIPELINE = "Non-défini"
 LINK_DOC_DONNEE = "Non-défini"
 
-default_args = {
-    "owner": "airflow",
-    "depends_on_past": False,
-    "start_date": days_ago(1),
-    "email_on_failure": False,
-    "email_on_retry": False,
-    "retries": 0,
-}
-
 
 @dag(
     dag_id="configuration_projets",
     schedule_interval="*/15 * * * 1-5",
     max_consecutive_failed_dag_runs=1,
-    default_args=default_args,
+    default_args=create_default_args(),
     catchup=False,
-    params={
-        "nom_projet": nom_projet,
-        "db": {
-            "prod_schema": "conf_projets",
-            "tmp_schema": "temporaire",
-        },
-        "mail": {
-            "enable": True,
-            "to": ["yanis.tihianine@finances.gouv.fr"],
-            "cc": ["labo-data@finances.gouv.fr"],
-        },
-        "docs": {
-            "lien_pipeline": LINK_DOC_PIPELINE,
-            "lien_donnees": LINK_DOC_DONNEE,
-        },
-    },
+    params=create_dag_params(
+        nom_projet=nom_projet,
+        dag_status=DagStatus.RUN,
+        prod_schema="conf_projets",
+        mail_enable=True,
+        mail_to=["yanis.tihianine@finances.gouv.fr"],
+        mail_cc=["labo-data@finances.gouv.fr"],
+        lien_pipeline=LINK_DOC_PIPELINE,
+        lien_donnees=LINK_DOC_DONNEE,
+    ),
     on_failure_callback=create_airflow_callback(
         mail_status=MailStatus.ERROR,
     ),
 )
-def configuration_projets():
+def configuration_projets() -> None:
     """Tasks order"""
     chain(
         validate_params(),
