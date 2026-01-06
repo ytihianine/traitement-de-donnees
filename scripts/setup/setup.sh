@@ -4,10 +4,23 @@ PYTHON_VERSION="3.12"
 AIRFLOW_VERSION="3.1.5"
 
 # Pour régler certains problèmes d'installation des packages
-echo Updating system ...
-sudo apt update
-sudo apt install -y libxml2-dev libxmlsec1-dev pkg-config
-echo System updated !
+
+echo "Ce script va mettre à jour votre système et installer les packages nécessaires."
+echo "Packages à installer: libxml2-dev libxmlsec1-dev pkg-config"
+echo ""
+read -p "Voulez-vous continuer? (o/n): " -n 1 -r
+echo ""
+
+if [[ $REPLY =~ ^[OoYy]$ ]]; then
+    echo "Mise à jour du système en cours..."
+    sudo apt update
+    sudo apt install -y libxml2-dev libxmlsec1-dev pkg-config
+    echo "Système mis à jour avec succès!"
+else
+    echo "Mise à jour du système annulée."
+fi
+
+echo "Installation des packages ..."
 
 # Installation des packages
 # Pour travailler avec le projet en mode package
