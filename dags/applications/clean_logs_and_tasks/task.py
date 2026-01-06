@@ -1,11 +1,14 @@
 from airflow.sdk import task
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+
+from utils.config.vars import DEFAULT_S3_CONN_ID
 
 
 @task(task_id="clean_s3")
 def clean_s3() -> None:
     from datetime import datetime, timedelta
 
-    s3_handler = MinioFileHandler(connection_id="minio_bucket_dsci", bucket="dsci")
+    s3_handler = S3Hook(aws_conn_id=DEFAULT_S3_CONN_ID, bucket="dsci")
     days_to_keep = 60
 
     date_to_clean_before = datetime.now() - timedelta(days=days_to_keep)

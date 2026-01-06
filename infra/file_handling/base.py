@@ -7,11 +7,8 @@ import hashlib
 from datetime import datetime
 
 from .exceptions import (
-    FileHandlerError,
     FileValidationError,
     FileNotFoundError,
-    FilePermissionError,
-    FileTypeError,
 )
 
 
@@ -37,43 +34,11 @@ class FileMetadata:
         self.extra = extra or {}
 
 
-class FileValidator:
-    """Handles file validation operations."""
-
-    @staticmethod
-    def validate_mime_type(
-        file_path: Union[str, Path], allowed_types: List[str]
-    ) -> bool:
-        """Validate file mime type."""
-        import magic
-
-        mime = magic.Magic(mime=True)
-        file_type = mime.from_file(str(file_path))
-        return file_type in allowed_types
-
-    @staticmethod
-    def calculate_checksum(
-        file_path: Union[str, Path], algorithm: str = "sha256"
-    ) -> str:
-        """Calculate file checksum."""
-        hash_func = getattr(hashlib, algorithm)()
-        with open(file_path, "rb") as f:
-            for chunk in iter(lambda: f.read(4096), b""):
-                hash_func.update(chunk)
-        return hash_func.hexdigest()
-
-    @staticmethod
-    def validate_size(file_path: Union[str, Path], max_size: int) -> bool:
-        """Validate file size."""
-        return Path(file_path).stat().st_size <= max_size
-
-
 class BaseFileHandler(ABC):
     """Abstract base class for file handling operations."""
 
     def __init__(self, base_path: Optional[Union[str, Path]] = None):
         self.base_path = Path(base_path) if base_path else None
-        self.validator = FileValidator()
 
     @abstractmethod
     def read(self, file_path: Union[str, Path], validate: bool = True) -> BinaryIO:

@@ -22,7 +22,7 @@ def convert_to_numeric(
 def is_lower(
     df: pd.DataFrame,
     cols_to_check: list[str],
-    seuil: float | int = None,
+    seuil: float | int,
     inclusive=True,
 ) -> bool:
     """

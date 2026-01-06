@@ -86,7 +86,7 @@ class SQLiteDBHandler(BaseDBHandler):
         """Fetch results as a pandas DataFrame."""
         try:
             start_time = time.time()
-            df = pd.read_sql_query(query, self.conn, params=parameters)
+            df = pd.read_sql_query(sql=query, con=self.conn, params=parameters)  # type: ignore
             logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
             return df
         except Exception as e:

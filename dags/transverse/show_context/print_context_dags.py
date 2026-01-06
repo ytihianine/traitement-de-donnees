@@ -21,7 +21,7 @@ link_documentation_donnees = "Non-défini"
 
 # Définition du DAG
 @dag(
-    "liste-des-variables-contexte",
+    dag_id="liste-des-variables-contexte",
     schedule="@once",
     max_active_runs=1,
     catchup=False,
@@ -42,14 +42,13 @@ link_documentation_donnees = "Non-défini"
     },
     on_success_callback=create_airflow_callback(mail_status=MailStatus.SUCCESS),
 )
-def liste_contexte_var():
+def liste_contexte_var() -> None:
     @task
-    def print_context(**context):
-        pprint(context)
-        pprint(context.dag)
+    def print_context(**context) -> None:
+        pprint(object=context)
 
     @task
-    def my_task(**context):
+    def my_task(**context) -> None:
         execution_date = context["dag_run"].execution_date
         print(execution_date)
         print("avant timezone", execution_date.strftime("%Y-%m-%d %H:%M:%S"))
@@ -64,26 +63,26 @@ def liste_contexte_var():
         print("apres timezone", formatted_time)
 
     @task
-    def print_conf_var(**context):
-        send_mail = context.get("params").get("send_mail")
+    def print_conf_var(**context) -> None:
+        send_mail = context.get("params", {}).get("send_mail")
         print(f"send_mail value: {send_mail}")
 
     @task
-    def mail_success(**context):
+    def mail_success(**context) -> None:
         mail_func_success = create_airflow_callback(
             mail_status=MailStatus.SUCCESS,
         )
         mail_func_success(context=context)
 
     @task
-    def mail_start(**context):
+    def mail_start(**context) -> None:
         mail_func_start = create_airflow_callback(
             mail_status=MailStatus.START,
         )
         mail_func_start(context=context)
 
     @task
-    def mail_error(**context):
+    def mail_error(**context) -> None:
         mail_func_error = create_airflow_callback(
             mail_status=MailStatus.ERROR,
         )

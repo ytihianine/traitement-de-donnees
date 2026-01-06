@@ -24,7 +24,7 @@ def list_keys(selecteur: str) -> None:
     list_objects = s3_handler.list_files(directory="")
 
     # Convert to DataFrame
-    df = pd.DataFrame(list_objects, columns=["s3_keys"])
+    df = pd.DataFrame(list_objects, columns=["s3_keys"])  # type: ignore
 
     # Export to file
     s3_handler.write(
@@ -61,7 +61,7 @@ def process_keys(input_selecteur: str, output_selecteur: str) -> None:
 
     # Step 2: Get the latest date per year-month
     max_dates = (
-        df_filtered.dropna(subset=["date"])
+        df_filtered.dropna(subset=["date"])  # type: ignore
         .groupby(["year", "month"], as_index=False)["date"]
         .max()
         .rename(columns={"date": "max_month_date"})
@@ -95,7 +95,7 @@ def delete_old_keys(input_selecteur: str) -> None:
     # Read file
     df = read_dataframe(file_handler=s3_handler, file_path=config_input.filepath_tmp_s3)
     print(f"Total of keys: {len(df)}")
-    df = df.loc[df["is_latest_in_month"] == False]
+    df = df.loc[~df["is_latest_in_month"]]
     keys_to_delete = df["s3_keys"].to_list()
     print(f"Total of keys to delete: {len(keys_to_delete)}")
     if len(keys_to_delete) > 0:

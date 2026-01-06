@@ -111,7 +111,7 @@ class GristAPI:
             raise ValueError("No data was provided. records['records'] is empty.")
 
         colonnes = [key for key, value in results[0].items()]
-        df = pd.DataFrame(results, columns=colonnes)
+        df = pd.DataFrame(data=results, columns=colonnes)
         return df
 
     def get_records(
@@ -228,6 +228,9 @@ class GristAPI:
             tbl_name (str, optional): _description_. Defaults to None.
             api_token (str, optional): _description_. Defaults to None.
         """
+        json = json or {}
+        data = data or {}
+
         url = self._build_url_records(
             base_url=base_url, doc_id=doc_id, tbl_name=tbl_name
         )

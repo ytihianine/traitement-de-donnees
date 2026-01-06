@@ -21,6 +21,7 @@ from utils.config.vars import (
 http_client_config = ClientConfig(
     timeout=30, verify_ssl=False, user_agent=AGENT, proxy=PROXY
 )
+CA_PATH = ""
 
 
 def get_bearer_token() -> str:
