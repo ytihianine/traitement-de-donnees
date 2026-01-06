@@ -36,7 +36,7 @@ def copy_s3_files(
     nom_projet = get_project_name(context=context)
     dag_status = get_dag_status(context=context)
 
-    if dag_status == DagStatus.DEV.value:
+    if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 
@@ -108,7 +108,7 @@ def del_s3_files(
     """
     dag_status = get_dag_status(context=context)
 
-    if dag_status == DagStatus.DEV.value:
+    if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 

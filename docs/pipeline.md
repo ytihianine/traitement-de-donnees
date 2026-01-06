@@ -64,7 +64,7 @@ from utils.config.types import DagParams, DagStatus
     default_args=create_default_args(),
     params=create_dag_params(
         nom_projet="Mon Projet",
-        dag_status=DagStatus.DEV.value,
+        dag_status=DagStatus.DEV,
         prod_schema="production",
         mail_enable=False,
         mail_to=None,

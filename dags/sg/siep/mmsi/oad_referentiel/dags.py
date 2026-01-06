@@ -45,7 +45,7 @@ LINK_DOC_DATA = ""  # noqa
     default_args=create_default_args(retries=0),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.RUN.value,
+        dag_status=DagStatus.RUN,
         prod_schema="siep",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,

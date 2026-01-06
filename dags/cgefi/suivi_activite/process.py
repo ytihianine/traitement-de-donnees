@@ -4,13 +4,6 @@ from utils.control.structures import convert_str_of_list_to_list
 from utils.config.vars import NO_PROCESS_MSG
 
 
-def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    print("Normalizing dataframe")
-    df.columns = map(str.lower, df.columns)
-    df = df.drop(df.filter(regex="^(grist|manual)").columns, axis=1)
-    return df
-
-
 """
     Fonction de processing des référentiels
 """
@@ -95,7 +88,7 @@ def process_organisme_type(df: pd.DataFrame) -> pd.DataFrame:
     df["id_type_organisme"] = convert_str_of_list_to_list(
         df=df, col_to_convert="id_type_organisme"
     )
-    df["id_type_organisme"] = df["id_type_organisme"].explode(ignore_index=True)
+    df["id_type_organisme"] = df["id_type_organisme"].explode(ignore_index=True)  # type: ignore
     df["id"] = df.index
     return df
 
@@ -265,7 +258,7 @@ def process_process_atpro_a01(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(
         columns={
             "region": "id_region",
-            "montant_net_des_frais_engages_avec_prise_en_compte_des_annulations_probables": "montant_net_des_frais_engages_avec_annulations_probables",
+            "montant_net_des_frais_engages_avec_prise_en_compte_des_annulations_probables": "montant_net_des_frais_engages_avec_annulations_probables",  # noqa
         }
     )
     return df
