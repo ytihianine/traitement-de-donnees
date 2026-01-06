@@ -21,7 +21,7 @@ LINK_DOC_DATA = (
 # Définition du DAG
 @dag(
     dag_id="clean_logs_tasks",
-    schedule_interval="@weekly",
+    schedule="@weekly",
     max_active_runs=1,
     catchup=False,
     tags=["SG", "DSCI", "PRODUCTION", "LOGS"],

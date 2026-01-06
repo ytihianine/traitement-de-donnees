@@ -45,7 +45,7 @@ LINK_DOC_DATA = "Non-défini"  # noqa
 # Définition du DAG
 @dag(
     dag_id="chorus_donnees_comptables",
-    schedule_interval="*/15 8-19 * * 1-5",
+    schedule="*/15 8-19 * * 1-5",
     max_active_runs=1,
     max_consecutive_failed_dag_runs=1,
     catchup=False,

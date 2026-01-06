@@ -24,7 +24,7 @@ LINK_DOC_DATA = "Indéfini"  # noqa
 # Définition du DAG
 @dag(
     dag_id="informations_geographiques",
-    schedule_interval="00 00 7 * *",
+    schedule="00 00 7 * *",
     max_active_runs=1,
     catchup=False,
     tags=["DEV", "COMMUN", "DSCI"],

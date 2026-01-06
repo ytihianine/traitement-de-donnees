@@ -21,7 +21,7 @@ LINK_DOC_DATA = "Aucune"
 # Définition du DAG
 @dag(
     dag_id="sauvegarde_database",
-    schedule_interval=timedelta(hours=12),
+    schedule=timedelta(hours=12),
     max_active_runs=1,
     catchup=False,
     tags=["SG", "DSCI", "RECETTE", "SAUVEGARDE", "DATABASE"],

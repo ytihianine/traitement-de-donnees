@@ -29,7 +29,7 @@ LINK_DOC_DATA = "Non-défini"  # noqa
 # Définition du DAG
 @dag(
     dag_id="catalogue",
-    schedule_interval="*/15 * * * *",
+    schedule="*/15 * * * *",
     max_active_runs=1,
     max_consecutive_failed_dag_runs=1,
     catchup=False,

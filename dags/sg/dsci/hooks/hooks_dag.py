@@ -22,7 +22,7 @@ default_args = {
 
 @dag(
     dag_id="hooks_check",
-    schedule_interval="@daily",
+    schedule="@daily",
     default_args=default_args,
     catchup=False,
     params={

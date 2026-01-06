@@ -29,7 +29,7 @@
 # # Définition du DAG
 # @dag(
 #     "clean_s3",
-#     schedule_interval="@daily",
+#     schedule="@daily",
 #     max_active_runs=1,
 #     catchup=False,
 #     tags=["SG", "DSCI", "PRODUCTION", "OLD", "S3"],

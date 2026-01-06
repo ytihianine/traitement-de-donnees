@@ -33,7 +33,7 @@ default_args: dict[str, Any] = {
 # Définition du DAG
 @dag(
     dag_id="dag_verification",
-    schedule_interval=None,
+    schedule=None,
     max_active_runs=1,
     max_consecutive_failed_dag_runs=1,
     catchup=False,

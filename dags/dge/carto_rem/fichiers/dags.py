@@ -37,7 +37,7 @@ LINK_DOC_DATA = "To define"  # noqa
 # Définition du DAG
 @dag(
     dag_id="cartographie_remuneration",
-    schedule_interval="*/15 8-20 * * 1-5",
+    schedule="*/15 8-20 * * 1-5",
     max_active_runs=1,
     max_consecutive_failed_dag_runs=1,
     catchup=False,

@@ -47,7 +47,7 @@ LINK_DOC_DATA = "Non-défini"  # noqa
 # Définition du DAG
 @dag(
     dag_id="outil_aide_diagnostic",
-    schedule_interval="*/15 6-22 * * 1-5",
+    schedule="*/15 6-22 * * 1-5",
     max_active_runs=1,
     max_consecutive_failed_dag_runs=1,
     catchup=False,

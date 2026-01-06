@@ -42,7 +42,7 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
 # Définition du DAG
 @dag(
     dag_id="consommation_des_batiments",
-    schedule_interval="*/15 8-19 * * 1-5",
+    schedule="*/15 8-19 * * 1-5",
     max_active_runs=1,
     max_consecutive_failed_dag_runs=1,
     catchup=False,

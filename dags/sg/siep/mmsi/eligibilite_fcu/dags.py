@@ -33,7 +33,7 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
 # Définition du DAG
 @dag(
     dag_id="eligibilite_fcu",
-    schedule_interval=None,
+    schedule=None,
     max_active_runs=1,
     catchup=False,
     tags=["SG", "SIEP", "PRODUCTION", "BATIMENT", "FCU"],

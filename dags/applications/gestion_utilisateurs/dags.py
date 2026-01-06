@@ -41,7 +41,7 @@
 
 # @dag(
 #     default_args=default_args,
-#     schedule_interval="*/15 9-19 * * 1-5",
+#     schedule="*/15 9-19 * * 1-5",
 #     catchup=False,
 #     dag_id="gestion_utilisateurs",
 #     description="Permet de créer automatiquement des utilisateurs à partir de la liste définie dans Grist",

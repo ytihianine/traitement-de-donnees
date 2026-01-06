@@ -30,7 +30,7 @@ LINK_DOC_DATA = (
 @dag(
     dag_id="carte_identite_mef",
     default_args=create_default_args(),
-    schedule_interval="*/8 8-13,14-19 * * 1-5",
+    schedule="*/8 8-13,14-19 * * 1-5",
     catchup=False,
     max_consecutive_failed_dag_runs=1,
     params=create_dag_params(

@@ -36,7 +36,7 @@ LINK_DOC_DATA = ""  # noqa
 # Définition du DAG
 @dag(
     dag_id="outil_aide_diagnostic_referentiel",
-    schedule_interval=None,  # timedelta(seconds=30),
+    schedule=None,  # timedelta(seconds=30),
     max_active_runs=1,
     catchup=False,
     tags=["DEV", "SG", "SIEP", "MMSI", "OAD"],

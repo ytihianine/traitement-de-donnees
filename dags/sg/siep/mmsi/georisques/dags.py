@@ -28,7 +28,7 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
 # Définition du DAG
 @dag(
     dag_id="georisques_batiments",
-    schedule_interval=None,
+    schedule=None,
     max_active_runs=1,
     catchup=False,
     tags=["SG", "SIEP", "PRODUCTION", "BATIMENT", "GEORISQUES"],

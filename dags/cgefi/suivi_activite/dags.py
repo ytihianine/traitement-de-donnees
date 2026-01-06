@@ -33,7 +33,7 @@ LINK_DOC_DATA = (
 # Définition du DAG
 @dag(
     dag_id="cgefi_suivi_activite",
-    schedule_interval="*/5 * * * 1-5",
+    schedule="*/5 * * * 1-5",
     max_active_runs=1,
     catchup=False,
     tags=["CGEFI", "ACTIVITE", "POC", "TABLEAU DE BORD"],

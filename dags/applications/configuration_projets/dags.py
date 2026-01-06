@@ -28,7 +28,7 @@ LINK_DOC_DONNEE = "Non-défini"
 
 @dag(
     dag_id="configuration_projets",
-    schedule_interval="*/15 * * * 1-5",
+    schedule="*/15 * * * 1-5",
     max_consecutive_failed_dag_runs=1,
     default_args=create_default_args(),
     catchup=False,

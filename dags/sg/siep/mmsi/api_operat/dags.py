@@ -35,7 +35,7 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
 # Définition du DAG
 @dag(
     dag_id="api_operat_ademe",
-    schedule_interval="@daily",
+    schedule="@daily",
     max_active_runs=1,
     catchup=False,
     tags=["SG", "SIEP", "PRODUCTION", "BATIMENT", "ADEME"],

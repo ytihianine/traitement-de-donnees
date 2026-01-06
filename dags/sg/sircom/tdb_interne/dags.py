@@ -33,7 +33,7 @@ LINK_DOC_DATA = (
 # Définition du DAG
 @dag(
     dag_id="tdb_sircom",
-    schedule_interval="*/8 8-13,14-19 * * 1-5",
+    schedule="*/8 8-13,14-19 * * 1-5",
     max_active_runs=1,
     catchup=False,
     tags=["SG", "SIRCOM", "PRODUCTION", "TABLEAU DE BORD"],

@@ -33,7 +33,7 @@ default_args = {
 # Définition du DAG
 @dag(
     "dag_standard",
-    schedule_interval=timedelta(seconds=30),
+    schedule=timedelta(seconds=30),
     max_active_runs=1,
     max_consecutive_failed_dag_runs=1,
     catchup=False,
