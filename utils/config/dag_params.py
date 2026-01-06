@@ -28,7 +28,7 @@ def get_dag_status(context: dict) -> DagStatus:
 
 def get_execution_date(context: dict) -> datetime:
     """Extract and validate execution date from context."""
-    execution_date = context.get("execution_date")
+    execution_date = context.get("data_interval_start")
 
     if not execution_date or not isinstance(execution_date, datetime):
         raise ValueError("Invalid execution date in Airflow context")
