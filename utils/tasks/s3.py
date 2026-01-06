@@ -65,7 +65,7 @@ def copy_s3_files(
 
         if filename is None or filename == "":
             logging.info(
-                f"Config filename is empty for project <{nom_projet}> and selecteur <{config.selecteur}>. \n Skipping s3 copy ..."
+                msg=f"Config filename is empty for project <{nom_projet}> and selecteur <{config.selecteur}>. \n Skipping s3 copy ..."  # noqa
             )
         else:
             # Build destination path
