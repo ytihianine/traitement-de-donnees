@@ -44,7 +44,7 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
     default_args=create_default_args(retries=1, retry_delay=timedelta(minutes=1)),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.DEV,
+        dag_status=DagStatus.DEV.value,
         prod_schema="siep",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,
