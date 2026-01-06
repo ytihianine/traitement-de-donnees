@@ -88,11 +88,7 @@ add_new_sp = create_task(
         "demande_paiement_journal_pieces",
         "delai_global_paiement",
     ],
-    steps=[
-        ETLStep(
-            fn=actions.load_new_sp,
-        )
-    ],
+    steps=[ETLStep(fn=actions.load_new_sp, read_data=True)],
     export_output=False,
 )
 
