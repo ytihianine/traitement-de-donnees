@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from airflow.decorators import dag
-from airflow.models.baseoperator import chain
+from airflow.sdk import dag
+from airflow.sdk.bases.operator import chain
 from airflow.operators.empty import EmptyOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 

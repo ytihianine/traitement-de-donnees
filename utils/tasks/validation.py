@@ -21,7 +21,7 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 import logging
 
 from airflow import XComArg
-from airflow.decorators import task
+from airflow.sdk import task
 
 from utils.exceptions import ConfigError
 

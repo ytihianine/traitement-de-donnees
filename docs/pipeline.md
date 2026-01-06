@@ -50,7 +50,7 @@ Les workflows peuvent être plus complexes et mélanger des étapes de chacun de
 Chaque DAG doit définir ses paramètres selon la structure TypedDict suivante :
 
 ```python
-from airflow.decorators import dag
+from airflow.sdk import dag
 from utils.config.types import DagParams, DagStatus
 
 @dag(

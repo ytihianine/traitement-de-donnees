@@ -3,8 +3,8 @@ from typing import Any
 
 from pprint import pprint
 
-from airflow.decorators import dag, task
-from airflow.models.baseoperator import chain
+from airflow.sdk import dag, task
+from airflow.sdk.bases.operator import chain
 
 # from infra.mails.default_smtp import create_airflow_callback, MailStatus
 from infra.mails.default_smtp import (

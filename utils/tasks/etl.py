@@ -4,7 +4,7 @@ from typing import Callable, Optional, Any
 from airflow import XComArg
 import pandas as pd
 
-from airflow.decorators import task
+from airflow.sdk import task
 
 from infra.file_handling.dataframe import read_dataframe
 from infra.file_handling.factory import create_default_s3_handler, create_local_handler

@@ -1,7 +1,7 @@
 # from datetime import timedelta
-# from airflow.decorators import dag, task_group
+# from airflow.sdk import dag, task_group
 # from airflow.providers.common.sql.hooks.sql import DbApiHook
-# from airflow.models.baseoperator import chain
+# from airflow.sdk.bases.operator import chain
 # from airflow.utils.dates import days_ago
 
 # from utils.api_client.base import AbstractApiClient

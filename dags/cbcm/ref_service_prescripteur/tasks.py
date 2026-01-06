@@ -1,5 +1,5 @@
-from airflow.decorators import task_group
-from airflow.models.baseoperator import chain
+from airflow.sdk import task_group
+from airflow.sdk.bases.operator import chain
 
 from utils.tasks.validation import create_validate_params_task
 from utils.config.types import ALL_PARAM_PATHS

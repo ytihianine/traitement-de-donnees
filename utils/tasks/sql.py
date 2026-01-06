@@ -6,8 +6,8 @@ from typing import Optional
 from datetime import datetime, timedelta
 
 import psycopg2
-from airflow.decorators import task
-from airflow.operators.python import get_current_context
+from airflow.sdk import task
+from airflow.sdk import get_current_context
 
 from infra.database.base import BaseDBHandler
 from infra.database.factory import create_db_handler

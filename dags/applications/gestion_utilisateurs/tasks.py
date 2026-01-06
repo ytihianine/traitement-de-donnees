@@ -1,5 +1,5 @@
 # from datetime import datetime
-# from airflow.decorators import task
+# from airflow.sdk import task
 
 # from utils.api_client.base import AbstractApiClient
 # from airflow.providers.common.sql.hooks.sql import DbApiHook

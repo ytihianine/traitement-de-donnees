@@ -1,5 +1,5 @@
 from datetime import timedelta
-from airflow.decorators import task
+from airflow.sdk import task
 from airflow.models import Variable
 
 from infra.file_handling.factory import create_file_handler

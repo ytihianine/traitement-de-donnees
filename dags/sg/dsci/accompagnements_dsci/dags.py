@@ -1,5 +1,5 @@
-from airflow.decorators import dag
-from airflow.models.baseoperator import chain
+from airflow.sdk import dag
+from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import MailStatus, create_airflow_callback
 from utils.config.types import DagStatus

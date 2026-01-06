@@ -1,5 +1,5 @@
-from airflow.decorators import dag, task
-from airflow.models.baseoperator import chain
+from airflow.sdk import dag, task
+from airflow.sdk.bases.operator import chain
 from datetime import timedelta
 from pprint import pprint
 import pytz

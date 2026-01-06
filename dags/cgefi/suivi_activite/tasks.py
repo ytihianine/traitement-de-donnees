@@ -1,5 +1,5 @@
-from airflow.decorators import task, task_group
-from airflow.models.baseoperator import chain
+from airflow.sdk import task, task_group
+from airflow.sdk.bases.operator import chain
 
 from utils.tasks.etl import create_grist_etl_task
 

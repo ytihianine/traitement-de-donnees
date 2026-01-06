@@ -2,15 +2,13 @@
 
 import io
 import mimetypes
-from datetime import datetime
 from pathlib import Path
-from typing import Any, BinaryIO, List, Optional, Union
+from typing import BinaryIO, List, Optional, Union
 
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
-from airflow.hooks.base import BaseHook
 
 from .base import BaseFileHandler, FileMetadata
-from .exceptions import FileHandlerError, FileNotFoundError, FilePermissionError
+from .exceptions import FileHandlerError, FileNotFoundError
 
 
 class S3FileHandler(BaseFileHandler):

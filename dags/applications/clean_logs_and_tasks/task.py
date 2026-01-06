@@ -1,4 +1,4 @@
-from airflow.decorators import task
+from airflow.sdk import task
 
 
 @task(task_id="clean_s3")

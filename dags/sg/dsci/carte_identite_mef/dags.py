@@ -1,5 +1,5 @@
-from airflow.decorators import dag
-from airflow.models.baseoperator import chain
+from airflow.sdk import dag
+from airflow.sdk.bases.operator import chain
 
 from utils.config.types import DagStatus
 from utils.tasks.sql import (

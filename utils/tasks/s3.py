@@ -4,7 +4,7 @@ import logging
 from typing import Any, Dict, List, Optional
 import pytz
 
-from airflow.decorators import task
+from airflow.sdk import task
 
 from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
 from infra.file_handling.factory import create_file_handler

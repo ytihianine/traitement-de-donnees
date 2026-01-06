@@ -1,5 +1,5 @@
-from airflow.decorators import task_group
-from airflow.models.baseoperator import chain
+from airflow.sdk import task_group
+from airflow.sdk.bases.operator import chain
 
 from utils.control.structures import normalize_grist_dataframe
 from utils.tasks.validation import create_validate_params_task

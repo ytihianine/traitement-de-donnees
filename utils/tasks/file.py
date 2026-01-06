@@ -3,7 +3,7 @@
 import logging
 from typing import Any, Callable, Dict, Optional
 
-from airflow.decorators import task
+from airflow.sdk import task
 import pandas as pd
 
 from infra.file_handling.factory import create_default_s3_handler
