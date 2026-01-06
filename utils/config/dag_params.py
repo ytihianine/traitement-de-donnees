@@ -130,7 +130,7 @@ def create_dag_params(
     # Using DagParams for type checking
     dag_params = DagParams(
         nom_projet=nom_projet,
-        dag_status=dag_status,
+        dag_status=dag_status.value,
         db={
             "prod_schema": prod_schema,
             "tmp_schema": tmp_schema,

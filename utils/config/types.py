@@ -184,7 +184,7 @@ class DocsParams(TypedDict):
 
 class DagParams(TypedDict):
     nom_projet: str
-    dag_status: DagStatus
+    dag_status: DagStatus | int
     db: DBParams
     mail: MailParams
     docs: DocsParams
