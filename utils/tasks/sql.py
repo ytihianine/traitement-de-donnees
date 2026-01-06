@@ -177,6 +177,7 @@ def create_projet_snapshot(
     dag_status = get_dag_status(context=context)
 
     if dag_status == DagStatus.DEV:
+        print(f"Pipeline start execution date: {execution_date}")
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 
