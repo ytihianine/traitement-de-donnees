@@ -107,7 +107,15 @@ s3_handler.write("remote/key/file.txt", "Hello World")
 Une fonction utilitaire est définie pour obtenir un dataframe directement.
 
 ```python
-from infra.file_handling.dataframe import read_dataframe, write_dataframe
+from infra.file_handling.factory import create_file_handler
+from infra.file_handling.dataframe import read_dataframe
+
+# S3/MinIO
+s3_handler = create_file_handler(
+    handler_type=FileHandlerType.S3,
+    connection_id="minio_conn",
+    bucket="my-bucket"
+)
 
 # Lecture d'un DataFrame depuis différents formats
 df = read_dataframe(

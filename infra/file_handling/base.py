@@ -3,11 +3,9 @@
 from abc import ABC, abstractmethod
 from typing import Any, BinaryIO, Dict, List, Optional, Union
 from pathlib import Path
-import hashlib
 from datetime import datetime
 
 from .exceptions import (
-    FileValidationError,
     FileNotFoundError,
 )
 
@@ -93,14 +91,6 @@ class BaseFileHandler(ABC):
         """Validate file against various criteria."""
         if not self.exists(file_path):
             raise FileNotFoundError(f"File not found: {file_path}")
-
-        if allowed_types and not self.validator.validate_mime_type(
-            file_path, allowed_types
-        ):
-            raise FileValidationError(f"Invalid file type for: {file_path}")
-
-        if max_size and not self.validator.validate_size(file_path, max_size):
-            raise FileValidationError(f"File size exceeds maximum allowed: {file_path}")
 
         return True
 

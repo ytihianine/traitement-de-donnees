@@ -111,7 +111,7 @@ class GristAPI:
             raise ValueError("No data was provided. records['records'] is empty.")
 
         colonnes = [key for key, value in results[0].items()]
-        df = pd.DataFrame(data=results, columns=colonnes)
+        df = pd.DataFrame(data=results, columns=colonnes)  # type: ignore
         return df
 
     def get_records(

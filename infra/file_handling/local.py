@@ -97,7 +97,7 @@ class LocalFileHandler(BaseFileHandler):
                 created_at=datetime.fromtimestamp(stat.st_ctime),
                 modified_at=datetime.fromtimestamp(stat.st_mtime),
                 mime_type=mime_type or "application/octet-stream",
-                checksum=self.validator.calculate_checksum(abs_path),
+                checksum="",  # self.validator.calculate_checksum(abs_path),
                 extra={
                     "permissions": oct(stat.st_mode)[-3:],
                     "owner": stat.st_uid,
