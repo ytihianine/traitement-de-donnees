@@ -23,7 +23,7 @@ def get_dag_status(context: dict) -> DagStatus:
     dag_status = context.get("params", {}).get("dag_status")
     if not dag_status:
         raise ValueError("dag_status must be defined in DAG parameters")
-    return dag_status
+    return DagStatus(value=dag_status)
 
 
 def get_execution_date(context: dict) -> datetime:
