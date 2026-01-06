@@ -58,17 +58,18 @@ for tbl in tbl_ordered:
     # Get tbl columns and order them
     fetch_query = f"SELECT * FROM {schema}.{tbl["tbl_name"]} LIMIT 0;"
     pg_cur.execute(query=fetch_query)
-    sorted_cols = sorted([col.name for col in pg_cur.description])
-    print(sorted_cols)
+    if pg_cur.description:
+        sorted_cols = sorted([col.name for col in pg_cur.description])
+        print(sorted_cols)
 
-    # load data to config db
-    insert_records = df.to_records(index=False).tolist()
-    insert_query = (
-        f"INSERT INTO {schema}.{tbl["tbl_name"]} ({", ".join(sorted_cols)}) VALUES %s"
-    )
-    print(insert_query)
-    execute_values(cur=pg_cur, sql=insert_query, argslist=insert_records)
-    print(f"End processing table <{tbl["tbl_name"]}>\n")
+        # load data to config db
+        insert_records = df.to_records(index=False).tolist()
+        insert_query = f"INSERT INTO {schema}.{tbl["tbl_name"]} ({", ".join(sorted_cols)}) VALUES %s"
+        print(insert_query)
+        execute_values(cur=pg_cur, sql=insert_query, argslist=insert_records)
+        print(f"End processing table <{tbl["tbl_name"]}>\n")
+    else:
+        print("No results retrieved ...")
 
 pg_conn.commit()
 pg_conn.close()
