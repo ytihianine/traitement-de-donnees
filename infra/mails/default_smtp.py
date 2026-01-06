@@ -142,7 +142,7 @@ def create_airflow_callback(mail_status: MailStatus) -> Callable:
         mail_info = get_mail_info(context=context)
         dag_status = get_dag_status(context=context)
 
-        if dag_status == DagStatus.DEV:
+        if dag_status == DagStatus.DEV.value:
             print("Dag status parameter is set to DEV -> skipping this task ...")
             return
 

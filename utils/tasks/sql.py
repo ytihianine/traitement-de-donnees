@@ -176,7 +176,7 @@ def create_projet_snapshot(
     execution_date = get_execution_date(context=context)
     dag_status = get_dag_status(context=context)
 
-    if dag_status == DagStatus.DEV:
+    if dag_status == DagStatus.DEV.value:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 
@@ -237,7 +237,7 @@ def ensure_partition(
     nom_projet = get_project_name(context=context)
     dag_status = get_dag_status(context=context)
 
-    if dag_status == DagStatus.DEV:
+    if dag_status == DagStatus.DEV.value:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 
@@ -291,7 +291,7 @@ def create_tmp_tables(
     nom_projet = get_project_name(context=context)
     dag_status = get_dag_status(context=context)
 
-    if dag_status == DagStatus.DEV:
+    if dag_status == DagStatus.DEV.value:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 
@@ -377,7 +377,7 @@ def copy_tmp_table_to_real_table(
     nom_projet = get_project_name(context=context)
     dag_status = get_dag_status(context=context)
 
-    if dag_status == DagStatus.DEV:
+    if dag_status == DagStatus.DEV.value:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 
@@ -550,7 +550,7 @@ def import_file_to_db(
     context = get_current_context()
     context["import_task_name"] = selecteur  # type: ignore
 
-    if dag_status == DagStatus.DEV:
+    if dag_status == DagStatus.DEV.value:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 
@@ -662,7 +662,7 @@ def refresh_views(pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context) -> None:
     db_info = get_db_info(context=context)
     prod_schema = db_info.get("prod_schema", None)
 
-    if dag_status == DagStatus.DEV:
+    if dag_status == DagStatus.DEV.value:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 
