@@ -160,7 +160,7 @@ def process_engagement_juridique(df: pd.DataFrame) -> pd.DataFrame:
 
     # Regroupement
     df_grouped = df.groupby(by=["id_ej"], as_index=False)["ej_cf_cc"].count()
-    df_grouped = df_grouped.rename(columns={"ej_cf_cc": "nb_poste_ej"})
+    df_grouped = df_grouped.rename(columns={"ej_cf_cc": "nb_poste_ej"})  # type: ignore
 
     # Catégoriser les données
     df_grouped["unique_multi"] = np.where(
@@ -324,7 +324,7 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
 
     # Regroupement
     df_grouped = df.groupby(by=["id_dp"], as_index=False)["id_dp_cf_cc"].count()
-    df_grouped = df_grouped.rename(columns={"id_dp_cf_cc": "nb_poste"})
+    df_grouped = df_grouped.rename(columns={"id_dp_cf_cc": "nb_poste"})  # type: ignore
 
     # Catégoriser les données
     df_grouped["unique_multi"] = np.where(
@@ -387,7 +387,7 @@ def process_demande_paiement_complet_sp(
     ]
     choices = ["DP automatisées", "DP non automatisées"]
     df["flux_3_automatisation_compta"] = np.select(
-        condlist=conditions, choicelist=choices, default=None
+        condlist=conditions, choicelist=choices
     )
 
     return df
