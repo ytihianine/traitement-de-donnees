@@ -1,5 +1,5 @@
 import pandas as pd
-from airflow.models import Variable
+from airflow.sdk import Variable
 
 from infra.file_handling.factory import create_file_handler
 from infra.file_handling.dataframe import read_dataframe

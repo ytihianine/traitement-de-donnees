@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from airflow.models import Variable
+from airflow.sdk import Variable
 
 from infra.database.factory import create_db_handler
 from infra.file_handling.factory import create_file_handler

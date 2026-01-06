@@ -1,6 +1,6 @@
 from datetime import timedelta
 from airflow.sdk import task
-from airflow.models import Variable
+from airflow.sdk import Variable
 
 from infra.file_handling.factory import create_file_handler
 from infra.http_client.adapters import RequestsClient

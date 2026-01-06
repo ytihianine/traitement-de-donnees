@@ -1,4 +1,4 @@
-from airflow.models import Variable
+from airflow.sdk import Variable
 from infra.http_client.adapters import RequestsClient
 from infra.http_client.config import ClientConfig
 import pandas as pd

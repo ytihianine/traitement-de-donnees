@@ -1,4 +1,4 @@
-# from airflow.models import Variable
+# from airflow.sdk import Variable
 # from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 # from utils.api_client.adapters import HttpxAPIClient

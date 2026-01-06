@@ -1,7 +1,7 @@
 from io import BytesIO
 from datetime import datetime
 from typing import Any
-from airflow.models import Variable
+from airflow.sdk import Variable
 
 from dags.applications.tdb_backup.process import convert_str_to_ascii_str
 from infra.file_handling.factory import create_file_handler
