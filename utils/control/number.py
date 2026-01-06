@@ -33,7 +33,7 @@ def is_lower(
     else:
         df_inf = df[cols_to_check].lt(seuil)
 
-    return df_inf.all(axis=None)
+    return df_inf.all(axis=None)  # type: ignore
 
 
 def is_upper(
@@ -47,7 +47,7 @@ def is_upper(
     else:
         df_sup = df[cols_to_check].gt(seuil)
 
-    return df_sup.all(axis=None)
+    return df_sup.all(axis=None)  # type: ignore
 
 
 def is_in_range(
