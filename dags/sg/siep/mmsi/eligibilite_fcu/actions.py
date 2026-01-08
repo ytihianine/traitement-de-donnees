@@ -1,13 +1,14 @@
 from typing import Any
 import pandas as pd
 
-from infra.http_client.adapters import HttpxClient, ClientConfig, RequestsClient
+from infra.http_client.adapters import ClientConfig
+from infra.http_client.factory import create_http_client
+from utils.config.types import HttpHandlerType
 from utils.config.vars import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
 from infra.database.factory import create_db_handler
 
 from dags.sg.siep.mmsi.eligibilite_fcu.process import (
     get_eligibilite_fcu,
-    process_result,
 )
 from utils.dataframe import df_info
 
@@ -15,7 +16,9 @@ from utils.dataframe import df_info
 def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
     # Http client
     client_config = ClientConfig(user_agent=AGENT, proxy=PROXY)
-    httpx_internet_client = RequestsClient(config=client_config)
+    http_internet_client = create_http_client(
+        client_type=HttpHandlerType.REQUEST, config=client_config
+    )
 
     # Hooks
     db_hook = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
@@ -47,7 +50,7 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
     for row in df_oad.itertuples():
         print(f"{row.Index}/{nb_rows}")
         api_result = get_eligibilite_fcu(
-            api_client=httpx_internet_client,
+            api_client=http_internet_client,
             url=url,
             latitude=row.latitude,
             longitude=row.longitude,
