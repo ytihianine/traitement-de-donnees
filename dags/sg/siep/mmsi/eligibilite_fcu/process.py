@@ -24,7 +24,7 @@ def can_perform_api_call(lat: float, lon: float) -> bool:
     return True
 
 
-def process_result(df_fcu: pd.DataFrame) -> pd.DataFrame:
+def process_result(df: pd.DataFrame) -> pd.DataFrame:
     cols_mapping = {
         "isEligible": "is_eligible",
         "distance": "distance",
@@ -38,7 +38,7 @@ def process_result(df_fcu: pd.DataFrame) -> pd.DataFrame:
         "rateCO2": "rate_co2",
     }
 
-    df = df_fcu.rename(columns=cols_mapping)
+    df = df.rename(columns=cols_mapping)
     txt_cols = ["name", "gestionnaire_fcu"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
