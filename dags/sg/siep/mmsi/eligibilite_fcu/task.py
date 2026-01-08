@@ -24,9 +24,5 @@ process_fcu_result = create_task(
     task_config=TaskConfig(task_id="fcu_result"),
     input_selecteurs=["fcu"],
     output_selecteur="fcu_result",
-    steps=[
-        ETLStep(
-            fn=process.process_result,
-        )
-    ],
+    steps=[ETLStep(fn=process.process_result, read_data=True)],
 )
