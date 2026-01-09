@@ -6,7 +6,7 @@ def merge_old_df_to_new_df(
     new_df: pd.DataFrame,
     old_df: pd.DataFrame,
     id_keys: list[str],
-    old_cols_to_keep: list[str] = None,
+    old_cols_to_keep: list[str] | None = None,
 ) -> pd.DataFrame:
     """
     Certaines données sont disponibles via d'autres chaines de traitement.
@@ -24,8 +24,7 @@ def merge_old_df_to_new_df(
 
 def process_oad_file(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[
-        (df["presence_mef_bat"] == "Avec MEF")
-        & (df["filtre_manuel_a_conserver"] == True)
+        (df["presence_mef_bat"] == "Avec MEF") & (df["filtre_manuel_a_conserver"])
     ]
     df = df.replace("NC", None)
     return df

@@ -4,11 +4,11 @@ import numpy as np
 from utils.control.text import normalize_whitespace_columns
 
 
-def filter_bien(df_oad_indic: pd.DataFrame, df_biens: pd.DataFrame) -> pd.DataFrame:
+def filter_bien(df: pd.DataFrame, df_bien: pd.DataFrame) -> pd.DataFrame:
     # Conserver uniquement les biens présents dans la table bien
     df = pd.merge(
-        left=df_biens["code_bat_ter"],
-        right=df_oad_indic,
+        left=df_bien["code_bat_ter"],
+        right=df,
         on="code_bat_ter",
         how="inner",
     )

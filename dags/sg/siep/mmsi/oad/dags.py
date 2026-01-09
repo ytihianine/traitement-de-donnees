@@ -2,7 +2,7 @@ from datetime import timedelta
 from airflow.sdk import dag, task_group
 from airflow.sdk.bases.operator import chain
 
-from airflow.operators.empty import EmptyOperator
+from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import MailStatus, create_airflow_callback
