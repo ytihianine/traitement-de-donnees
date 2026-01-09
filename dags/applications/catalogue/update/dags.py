@@ -13,7 +13,7 @@ from dags.applications.catalogue.update.tasks import (
     # update_catalogue,
     # update_dictionnaire,
 )
-from utils.config.types import DagStatus
+from enums.dags import DagStatus
 
 
 nom_projet = "Catalogue - Update"

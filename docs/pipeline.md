@@ -51,7 +51,7 @@ Chaque DAG doit définir ses paramètres selon la structure TypedDict suivante :
 
 ```python
 from airflow.sdk import dag
-from utils.config.types import DagParams, DagStatus
+from entities.dags import DagParams, DagStatus
 
 @dag(
     dag_id="id_unique_du_dag",
@@ -124,7 +124,7 @@ grist_etl = create_grist_etl_task(
 #### ETL Générique
 ```python
 from utils.tasks.etl import create_task
-from utils.config.types import TaskConfig, ETLStep
+from entities.dags import TaskConfig, ETLStep
 
 # ETL générique avec traitement personnalisé
 etl_task = create_task(

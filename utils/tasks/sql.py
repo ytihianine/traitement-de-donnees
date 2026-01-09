@@ -22,11 +22,13 @@ from utils.config.dag_params import (
     get_project_name,
 )
 from utils.config.tasks import get_tbl_names
-from utils.config.types import (
-    DagStatus,
-    SelecteurConfig,
+from enums.database import (
     LoadStrategy,
     PartitionTimePeriod,
+)
+from entities.dags import (
+    DagStatus,
+    SelecteurConfig,
 )
 from utils.control.structures import are_lists_egal
 from utils.config.vars import (

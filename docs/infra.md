@@ -43,7 +43,7 @@ Implémentation pour SQLite (utile pour les tests et imports Grist).
 
 ```python
 from infra.database.factory import create_db_handler
-from utils.config.types import DatabaseType
+from entities.dags import DatabaseType
 
 # PostgreSQL (par défaut)
 db = create_db_handler(connection_id="my_postgres_conn_id", db_type=DatabaseType.POSTGRES)
@@ -85,7 +85,7 @@ Gestion des fichiers sur S3/MinIO utilisant Airflow S3Hook.
 
 ```python
 from infra.file_handling.factory import create_file_handler
-from utils.config.types import FileHandlerType
+from enums.filesystem import FileHandlerType
 
 # Fichiers locaux
 local_handler = create_file_handler(handler_type=FileHandlerType.LOCAL, base_path="/tmp")
@@ -155,7 +155,7 @@ Wrapper pour les réponses HTTP avec méthodes pratiques :
 ```python
 from infra.http_client.factory import create_http_client
 from infra.http_client.config import ClientConfig
-from utils.config.types import HttpHandlerType
+from entities.dags import HttpHandlerType
 
 config = ClientConfig(
     timeout=30,

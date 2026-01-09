@@ -10,7 +10,8 @@ from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
 from infra.file_handling.factory import create_file_handler
 from utils.config.dag_params import get_dag_status, get_execution_date, get_project_name
 from utils.config.tasks import get_projet_config
-from utils.config.types import DagStatus, FileHandlerType
+from enums.dags import DagStatus
+from enums.filesystem import FileHandlerType
 from utils.config.vars import (
     DEFAULT_S3_CONN_ID,
 )

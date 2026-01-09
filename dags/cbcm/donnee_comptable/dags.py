@@ -6,7 +6,7 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 
-from utils.config.types import DagStatus
+from enums.dags import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,

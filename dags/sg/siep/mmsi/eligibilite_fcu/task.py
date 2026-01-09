@@ -1,4 +1,4 @@
-from utils.config.types import ETLStep, TaskConfig
+from entities.dags import ETLStep, TaskConfig
 from utils.tasks.etl import (
     create_task,
 )

@@ -6,7 +6,7 @@ from typing import Iterable, Sequence
 from infra.http_client.config import ClientConfig
 from infra.http_client.factory import create_http_client
 
-from utils.config.types import HttpHandlerType
+from enums.http import HttpHandlerType
 
 
 EVENT_TYPES = ["add", "update"]

@@ -9,7 +9,7 @@ from dags.applications.clean_logs_and_tasks.task import (
     clean_old_logs,
     clean_skipped_logs,
 )
-from utils.config.types import DagStatus
+from enums.dags import DagStatus
 
 # Liens
 LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/sg/dsci/catalogue?ref_type=heads"  # noqa

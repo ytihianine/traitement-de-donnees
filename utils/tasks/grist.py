@@ -9,7 +9,7 @@ from infra.grist.client import GristAPI
 from utils.config.dag_params import get_project_name
 from utils.config.tasks import get_selecteur_config
 
-from utils.config.types import FileHandlerType
+from enums.filesystem import FileHandlerType
 from utils.config.vars import (
     DEFAULT_GRIST_HOST,
     DEFAULT_S3_BUCKET,

@@ -27,7 +27,7 @@ def split_df_organisme(df_orga: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFram
     ]
     cols_df_orga = list(set(df_orga.columns) - set(cols_df_orga_merge))
 
-    return df_orga[cols_df_orga], df_orga[col_id + cols_df_orga_merge]
+    return df_orga[cols_df_orga], df_orga[col_id + cols_df_orga_merge]  # type: ignore
 
 
 def process_organisme_hors_corpus(

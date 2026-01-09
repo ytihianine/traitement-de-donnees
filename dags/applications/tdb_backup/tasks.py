@@ -1,7 +1,7 @@
 # from airflow.sdk import task_group
 # from airflow.sdk.bases.operator import chain
 
-# from utils.config.types import (
+# from entities.dags import (
 #     KEY_NOM_PROJET,
 #     KEY_MAIL,
 #     KEY_MAIL_ENABLE,

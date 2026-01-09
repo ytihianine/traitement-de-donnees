@@ -11,7 +11,8 @@ from utils.config.dag_params import (
     get_mail_info,
     get_doc_info,
 )
-from utils.config.types import DagStatus, MailPriority, MailStatus
+from entities.dags import DagStatus
+from enums.mail import MailPriority, MailStatus
 from utils.config.vars import (
     get_root_folder,
     DEFAULT_SMTP_CONN_ID,

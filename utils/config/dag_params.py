@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 import pendulum
-from utils.config.types import DBParams, DagParams, DagStatus, MailParams, DocsParams
+from entities.dags import DBParams, DagParams, DagStatus, MailParams, DocsParams
 
 DEFAULT_OWNER = "airflow"
 DEFAULT_EMAIL_TO = ["yanis.tihianine@finances.gouv.fr"]

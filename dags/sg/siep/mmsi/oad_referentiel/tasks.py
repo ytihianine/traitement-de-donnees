@@ -1,5 +1,5 @@
 from utils.tasks.validation import create_validate_params_task
-from utils.config.types import ALL_PARAM_PATHS
+from entities.dags import ALL_PARAM_PATHS
 from utils.tasks.etl import create_file_etl_task
 
 from dags.sg.siep.mmsi.oad_referentiel import process

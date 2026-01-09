@@ -4,7 +4,7 @@ from infra.database.base import BaseDBHandler
 from infra.database.postgres import PostgresDBHandler
 from infra.database.sqlite import SQLiteDBHandler
 
-from utils.config.types import DatabaseType
+from enums.database import DatabaseType
 
 
 def create_db_handler(

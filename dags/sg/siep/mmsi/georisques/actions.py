@@ -7,7 +7,7 @@ from infra.database.factory import create_db_handler
 from infra.http_client.factory import create_http_client
 from infra.http_client.config import ClientConfig
 from utils.config.dag_params import get_db_info
-from utils.config.types import HttpHandlerType
+from entities.dags import HttpHandlerType
 from utils.config.vars import AGENT, PROXY, DEFAULT_PG_DATA_CONN_ID
 
 from dags.sg.siep.mmsi.georisques.process import (

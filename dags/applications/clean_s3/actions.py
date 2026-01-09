@@ -5,7 +5,7 @@ from dags.applications.clean_s3.process import check_date_format, safe_parse_dat
 from infra.file_handling.dataframe import read_dataframe
 from infra.file_handling.factory import create_file_handler
 from utils.config.tasks import get_selecteur_config
-from utils.config.types import FileHandlerType
+from enums.filesystem import FileHandlerType
 from utils.config.vars import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
 from utils.dataframe import df_info
 

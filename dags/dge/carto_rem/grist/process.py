@@ -173,7 +173,7 @@ def process_agent_remuneration_autres_elements(df: pd.DataFrame) -> pd.DataFrame
 
     # Handle boolean columns
     df["present_cartographie"] = df["present_cartographie"].map(
-        {b"T": True, b"F": False, None: None}
+        {b"T": True, b"F": False, None: None}  # type: ignore
     )
 
     return df

@@ -1,7 +1,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from utils.config.types import ETLStep, TaskConfig
+from entities.dags import ETLStep, TaskConfig
 from utils.tasks.etl import (
     create_task,
 )

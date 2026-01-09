@@ -1,6 +1,6 @@
 """Factory for creating HTTP clients."""
 
-from utils.config.types import HttpHandlerType
+from enums.http import HttpHandlerType
 
 from .adapters import HttpxClient, RequestsClient
 from .base import AbstractHTTPClient

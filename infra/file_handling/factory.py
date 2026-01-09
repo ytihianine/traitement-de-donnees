@@ -3,7 +3,7 @@
 from typing import Optional, Union
 from pathlib import Path
 
-from utils.config.types import FileHandlerType
+from enums.filesystem import FileHandlerType
 
 from .base import BaseFileHandler
 from .local import LocalFileHandler

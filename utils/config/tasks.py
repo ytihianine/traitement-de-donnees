@@ -5,7 +5,7 @@ from typing import List, Optional
 import pandas as pd
 
 from utils.config.dag_params import get_project_name
-from utils.config.types import SelecteurConfig
+from entities.dags import SelecteurConfig
 from utils.exceptions import ConfigError
 from infra.database.factory import create_db_handler
 from utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID

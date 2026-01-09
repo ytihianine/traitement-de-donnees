@@ -8,7 +8,7 @@ from infra.file_handling.factory import create_file_handler
 from infra.http_client.config import ClientConfig
 from infra.http_client.adapters import RequestsClient
 from utils.config.tasks import get_selecteur_config
-from utils.config.types import FileHandlerType
+from enums.filesystem import FileHandlerType
 from utils.config.vars import (
     get_root_folder,
     AGENT,

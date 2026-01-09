@@ -4,7 +4,7 @@ from airflow.sdk.bases.operator import chain
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_projet_config
-from utils.config.types import DagStatus
+from enums.dags import DagStatus
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.tasks.sql import (
     create_tmp_tables,

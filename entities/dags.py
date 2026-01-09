@@ -1,104 +1,16 @@
-"""Type definitions and Enums for configuration data structures."""
-
-from enum import Enum, auto
 from datetime import timedelta
 from dataclasses import dataclass
-from typing import Optional, TypedDict, List, ParamSpec, TypeVar, Callable, Any
+from typing import TypedDict, List, ParamSpec, TypeVar, Callable, Any
 
 from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
 
-
-# ==================
-# SMTP
-# ==================
-class MailStatus(Enum):
-    """Mail notification status types."""
-
-    START = "Début"
-    SUCCESS = "Succès"
-    ERROR = "Erreur"
-    SKIP = "Skip"
-    WARNING = "Warning"
-    INFO = "Information"
-
-
-class MailPriority(Enum):
-    """Mail priority levels."""
-
-    NORMAL = 0
-    LOW = 1
-    HIGH = 2
-
-
-# ==================
-# Database
-# ==================
-class DatabaseType(Enum):
-    """Database types enumeration."""
-
-    POSTGRES = auto()
-    SQLITE = auto()
-
-
-class PartitionTimePeriod(str, Enum):
-    DAY = auto()
-    WEEK = auto()
-    MONTH = auto()
-    YEAR = auto()
-
-
-class LoadStrategy(Enum):
-    """Load strategies for data ingestion."""
-
-    FULL_LOAD = auto()
-    INCREMENTAL = auto()
-    APPEND = auto()
-
-
-# ==================
-# File system
-# ==================
-class FileHandlerType(Enum):
-    """File handler types enumeration."""
-
-    S3 = auto()
-    LOCAL = auto()
-
-
-class FileFormat(str, Enum):
-    """Supported file formats for ETL operations."""
-
-    CSV = "csv"
-    EXCEL = "excel"
-    PARQUET = "parquet"
-    JSON = "json"
-
-
-# ==================
-# HTTP Client
-# ==================
-class HttpHandlerType(Enum):
-    """Http handler types enumeration."""
-
-    REQUEST = auto()
-    HTTPX = auto()
-
+from enums.dags import DagStatus
 
 # ==================
 # Dags
 # ==================
-class DagStatus(Enum):
-    """DAG status"""
-
-    RUN = auto()
-    DEV = auto()
-
-
-# ==================
-# Dags
-# ==================
-P = ParamSpec("P")
-R = TypeVar("R")
+P = ParamSpec(name="P")
+R = TypeVar(name="R")
 
 
 @dataclass
@@ -127,9 +39,9 @@ class SelecteurConfig:
     filepath_local: str
     filepath_s3: str
     filepath_tmp_s3: str
-    nom_source: Optional[str] = None
-    tbl_name: Optional[str] = None
-    tbl_order: Optional[int] = None
+    nom_source: str | None = None
+    tbl_name: str | None = None
+    tbl_order: int | None = None
 
 
 @dataclass
@@ -159,7 +71,7 @@ class TaskConfig:
 @dataclass
 class ETLStep:
     fn: Callable[..., Any]
-    kwargs: Optional[dict[str, Any]] = None
+    kwargs: dict[str, Any] | None = None
     use_context: bool = False
     read_data: bool = False
     use_previous_output: bool = False
@@ -173,8 +85,8 @@ class DBParams(TypedDict):
 class MailParams(TypedDict):
     enable: bool
     to: List[str]
-    cc: Optional[List[str]]
-    bcc: Optional[List[str]]
+    cc: List[str]
+    bcc: List[str] | None
 
 
 class DocsParams(TypedDict):

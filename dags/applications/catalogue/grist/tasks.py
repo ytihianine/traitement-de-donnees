@@ -9,7 +9,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from utils.config.types import ALL_PARAM_PATHS
+from entities.dags import ALL_PARAM_PATHS
 from utils.tasks.etl import (
     create_grist_etl_task,
 )

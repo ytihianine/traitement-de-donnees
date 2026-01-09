@@ -17,7 +17,8 @@ from utils.config.tasks import (
     format_cols_mapping,
 )
 from utils.config.dag_params import get_execution_date, get_project_name
-from utils.config.types import DatabaseType, ETLStep, TaskConfig
+from entities.dags import ETLStep, TaskConfig
+from enums.database import DatabaseType
 
 
 def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:

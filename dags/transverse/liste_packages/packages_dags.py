@@ -3,7 +3,7 @@ from typing import Literal
 from airflow.sdk import dag, task
 
 from utils.config.dag_params import create_dag_params, create_default_args
-from utils.config.types import DagStatus
+from enums.dags import DagStatus
 
 
 # Définition du DAG
