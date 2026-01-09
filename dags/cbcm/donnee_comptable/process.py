@@ -14,7 +14,7 @@ corr_mois = {
     "août": "08-aout",
     "septembre": "09-sept",
     "octobre": "10-oct",
-    "novembre": "11-now",
+    "novembre": "11-nov",
     "décembre": "12-dec",
 }
 
