@@ -3,7 +3,7 @@ import pandas as pd
 
 from infra.http_client.adapters import ClientConfig
 from infra.http_client.factory import create_http_client
-from entities.dags import HttpHandlerType
+from enums.http import HttpHandlerType
 from utils.config.vars import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
 from infra.database.factory import create_db_handler
 
