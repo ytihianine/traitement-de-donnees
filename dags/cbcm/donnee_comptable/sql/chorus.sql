@@ -188,5 +188,6 @@ CREATE TABLE donnee_comptable.demande_paiement_complet_sp (
 	type_flux_sfp text,
 	flux_3_automatisation_compta text,
 	statut_sfp text,
+	service_prescripteur text,
 	snapshot_id text
 );

@@ -343,13 +343,13 @@ def process_demande_paiement_complet_sp(
     df_demande_paiement: pd.DataFrame,
     df_demande_paiement_carte_achat: pd.DataFrame,
     df_demande_paiement_flux: pd.DataFrame,
-    df_demande_paiement_journal_pieces: pd.DataFrame,
+    df_demande_paiement_journal_pieces_sp: pd.DataFrame,
     df_demande_paiement_sfp: pd.DataFrame,
 ) -> pd.DataFrame:
     # Fusionner les datasets
     df = pd.merge(
         left=df_demande_paiement,
-        right=df_demande_paiement_journal_pieces,
+        right=df_demande_paiement_journal_pieces_sp,
         how="left",
         on=["id_dp", "societe", "annee_exercice"],
         suffixes=(None, "_a"),
