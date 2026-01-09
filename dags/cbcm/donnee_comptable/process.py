@@ -187,7 +187,7 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
     df[["centre_financier"]] = df[["centre_financier"]].fillna("Ind")
 
     # Nettoyer les champs textuels
-    txt_cols = ["centre_financier", "societe", "statut_piece", "montant_dp"]
+    txt_cols = ["centre_financier", "societe", "statut_piece"]
     df = normalize_whitespace_columns(df, columns=txt_cols)
     df["montant_dp"] = (
         df["montant_dp"]
