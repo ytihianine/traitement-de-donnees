@@ -30,11 +30,7 @@ def georisques_group() -> None:
         task_config=TaskConfig(task_id="georisques"),
         output_selecteur="georisques",
         input_selecteurs=["bien_db"],
-        steps=[
-            ETLStep(
-                fn=actions.get_georisques,
-            )
-        ],
+        steps=[ETLStep(fn=actions.get_georisques, read_data=True)],
     )
 
     chain(

@@ -4,9 +4,10 @@ from infra.http_client.types import HTTPResponse
 import pandas as pd
 
 from infra.database.factory import create_db_handler
-from infra.http_client.adapters import AbstractHTTPClient, RequestsClient
+from infra.http_client.factory import create_http_client
 from infra.http_client.config import ClientConfig
 from utils.config.dag_params import get_db_info
+from utils.config.types import HttpHandlerType
 from utils.config.vars import AGENT, PROXY, DEFAULT_PG_DATA_CONN_ID
 
 from dags.sg.siep.mmsi.georisques.process import (
@@ -101,10 +102,12 @@ def get_risque(
     return None
 
 
-def get_georisques(df_bien_db: pd.DataFrame) -> pd.DataFrame:
+def get_georisques(df: pd.DataFrame) -> pd.DataFrame:
     # Http client
     http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
-    http_internet_client = RequestsClient(config=http_config)
+    http_internet_client = create_http_client(
+        client_type=HttpHandlerType.REQUEST, config=http_config
+    )
 
     # Get result from API
     api_host = "https://www.georisques.gouv.fr"
@@ -112,8 +115,8 @@ def get_georisques(df_bien_db: pd.DataFrame) -> pd.DataFrame:
     url = "/".join([api_host, api_endpoint])
 
     risques_results = []
-    nb_rows = len(df_bien)
-    for row in df_bien.itertuples():
+    nb_rows = len(df)
+    for row in df.itertuples():
         print(f"{row.Index + 1}/{nb_rows}")
         query_param = format_query_param(
             adresse=row.adresse_normalisee,
