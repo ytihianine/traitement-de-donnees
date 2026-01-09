@@ -189,13 +189,14 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
     # Nettoyer les champs textuels
     txt_cols = ["centre_financier", "societe", "statut_piece", "montant_dp"]
     df = normalize_whitespace_columns(df, columns=txt_cols)
-    df["montant_dp"] = pd.to_numeric(
-        arg=df["montant_dp"]
-        .str.split()
-        .str.join("")
-        .str.replace(",", ".", regex=False),
-        errors="raise",
+    df["montant_dp"] = (
+        df["montant_dp"]
+        .astype(str)  # Convertir en string pour éviter les erreurs sur NaN
+        .str.replace(" ", "", regex=False)  # Enlever tous les espaces
+        .str.replace(",", ".", regex=False)  # Remplacer virgule par point
     )
+
+    df["montant_dp"] = pd.to_numeric(arg=df["montant_dp"], errors="coerce")
 
     # Filtrer les lignes
     df = df.loc[df["statut_piece"] == "Comptabiliser"]
