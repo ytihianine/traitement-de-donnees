@@ -358,7 +358,13 @@ def process_demande_paiement_complet_sp(
     df = pd.merge(
         left=df,
         right=df_demande_paiement_carte_achat[
-            ["id_dp", "annee_exercice", "niveau_carte_achat"]
+            [
+                "id_dp",
+                "annee_exercice",
+                "niveau_carte_achat",
+                "num_piece_dp_carte_achat",
+                "statut_dp_carte_achat",
+            ]
         ],
         how="left",
         on=["id_dp", "annee_exercice"],
@@ -380,6 +386,8 @@ def process_demande_paiement_complet_sp(
                 "type_flux_sfp",
                 "statut_sfp",
                 "automatisation_wf_cpt",
+                "num_ej_sfp",
+                "num_piece_sfp",
             ]
         ],
         how="left",
