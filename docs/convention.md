@@ -40,16 +40,19 @@ avec la date et l'heure sont ajoutés lors de la copie des fichiers via les tâc
 
 ## SQL
 1. Les tables
+
 Application de ces [règles](https://www.postgresql.org/docs/7.0/syntax525.htm).
 Le nom des tables doit définis avec les agents métiers.
 
 2. Les vues
+
 Les vues suivent les même règles que les tables.
 En complément, le suffix `_vw` doit être rajouté pour faciliter la recherche.
 
 3. Les colonnes
+
 Les colonnes suivent les même règles que les tables.
-En complément, si une même information est présente dans plusieurs tables, il faut s'assurer de conserver le même nom de colonne pour conserver une cohérence.
+En complément, si une même information est présente dans plusieurs tables, il faut s'assurer de conserver le même nom de colonne par cohérence.
 
 ## Grist
 Ces conventions visent à faciliter le traitement des données issues de Grist.
