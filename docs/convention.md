@@ -21,9 +21,9 @@ Tous les dags doivent êtres organisés de la façon suivante:
 │   │   │   │   └── projet_X.sql
 │   │   │   ├── dags.py   # Définition du dag
 │   │   │   ├── process.py  # Contient toutes les fonctions de processing
-│   │   │   ├── actions.md   # Contient les actions à réaliser dans le dag
-│   │   │   ├── enums.md   # (Optionnel) Enums propres au dag
-│   │   │   ├── enums.md   # (Optionnel) Types propres au dag
+│   │   │   ├── actions.py   # Contient les actions à réaliser dans le dag
+│   │   │   ├── enums.py   # (Optionnel) Enums propres au dag
+│   │   │   ├── entities.py   # (Optionnel) Types propres au dag
 │   │   │   ├── readme.md   # Documentation du dag
 │   │   │   └── tasks.py  # Contient les tâches spécifiques au dag
 ```
