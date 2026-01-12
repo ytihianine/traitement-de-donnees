@@ -17,8 +17,10 @@ Voir la section Grist de la documentation [convention.md](./convention.md#grist)
 1) Cadrer le besoin métier
 
 Comme tout projet informatique, une première réunion de cadrage est nécessaire. Elle doit permettre de définir à minima:
-- Objectif attendu
-- Fonctionnalités attentdues pour définir les fonctionnalités attendues, le processus dans lequel le document Grist s'intègre. Cette première réunion doit aussi permettre de savoir d'où proviennent les données dans le processus actuel et qui sont les acteurs impliqués.
+- Les objectifs que le document Grist doit couvrir
+- Les fonctionnalités attendues et le processus dans lequel le document Grist s'intègre.
+
+Cette première réunion doit aussi permettre de savoir d'où proviennent les données dans le processus actuel et qui sont les acteurs impliqués.
 
 2) Lister l'ensemble des données nécessaires
 
