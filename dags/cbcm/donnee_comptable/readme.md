@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `chorus_dags.py`     |
+| Fichier source     | `dags.py`     |
 | Description | Analyse des données issues de Chorus |
 | Fréquence de mise à jour | Mensuelle |
 | Fonctionnement | Semi-automatisé |

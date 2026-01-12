@@ -3,7 +3,7 @@
 | Information | Valeur |
 | -------- | -------- |
 | Fichier source     | `dags.py`     |
-| Description | Référentiel des services prescripteurs |
+| Description | Récupérer le référentiel des services prescripteurs depuis Grist |
 | Fréquence de mise à jour | Toutes les 8 minutes |
 | Fonctionnement | Automatisé |
 | Propriétaires des données | MEF - CBCM - DCM |

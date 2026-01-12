@@ -18,9 +18,11 @@ Ce guide explique comment créer des pipelines Airflow (appelées DAGsdans Airfl
 
 Le framework propose une architecture en couches :
 
+- **DAGs (`dags/`)** : Orchestration des traitements métiers
 - **Infrastructure (`infra/`)** : Interaction avec les systèmes externes (base de données, S3, HTTP, mails)
+- **Enums (`enums/`)** : Enums transverses nécessaires dans les dags, tâches, fonctions ...
+- **Entities (`entities/`)** : Types transverses nécessaires dans les dags, tâches, fonctions ...
 - **Utilitaires (`utils/`)** : Tâches réutilisables et configuration
-- **DAGs** : Orchestration des traitements métiers
 
 Les dags doivent respecter [cette organisation](./convention.md#dags)
 
@@ -43,7 +45,6 @@ Le second workflow permet des actions qui ne nécessitent pas nécessairement de
 Les workflows peuvent être plus complexes et mélanger des étapes de chacun de ces workflows. Les étapes à absolument conserver sont
 - **Validation des paramètres**
 - **Notification**
-
 
 ## Structure des Paramètres
 

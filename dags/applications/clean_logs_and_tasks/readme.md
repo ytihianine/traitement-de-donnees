@@ -2,9 +2,9 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `sync_projets_dags.py`     |
-| Description | Ce traitement permet de garder une synchronisation entre Grist et la base de données |
-| Fréquence d'exécution | Toutes les 10 minutes du lundi au vendredi |
+| Fichier source     | `dags.py`     |
+| Description | Nettoie les logs du S3 et de la base de données qui datent de plus de X jours. |
+| Fréquence de mise à jour | Hebdomadaire |
 | Fonctionnement | Automatisé |
 | Propriétaires des données | MEF - SG - DSCI |
 | Mise en place de la pipeline | MEF - SG - DSCI - LdT |
@@ -12,17 +12,17 @@
 ### Données
 | Information | Valeur |
 | -------- | -------- |
-| Données sources | Grist |
-| Données de sorties | Base de donnnées |
+| Données sources | Base de donnnées, filesystem |
+| Données de sorties | Aucune |
 | Données sources archivées | Non |
-| Structure des données sources | Aucune |
-| Structure des données de sortie | Aucune |
+| Structure des données sources | X |
+| Structure des données de sortie | X |
 
 ### Configuration
 | Information | Valeur |
 | -------- | -------- |
-| Variables | grist_doc_id_gestion_interne |
-| Connexions | db_depose_fichier |
+| Variables | X |
+| Connexions | db_data_store |
 
 <br />
 

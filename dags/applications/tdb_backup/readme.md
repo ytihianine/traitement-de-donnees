@@ -2,8 +2,8 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `sauvegarde_dags.py`     |
-| Description | Cette pipeline sauvegarde la configuration des tableaux de bord de l'instance Chartsgouv. |
+| Fichier source     | `dags.py`     |
+| Description | Sauvegarde automatisée des tableaux de bord de l'instance Chartsgouv. |
 | Fréquence de mise à jour | Quotidienne |
 | Fonctionnement | Automatisé |
 | Propriétaires des données | MEF - SG - DSCI - LdT |

@@ -2,8 +2,8 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `db_backup_dag.py`     |
-| Description | Ce traitement permet de créer un backup de la base de données |
+| Fichier source     | `dags.py`     |
+| Description | Sauvegarde automatisée des bases de données |
 | Fréquence de mise à jour | Quotidien |
 | Fonctionnement | Automatisé |
 | Propriétaires des données | MEF - SG - DSCI |

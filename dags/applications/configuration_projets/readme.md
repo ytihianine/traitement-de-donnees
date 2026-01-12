@@ -2,9 +2,9 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `catalogue_dags.py`     |
-| Description | Ce traitement permet de maintenir à jour le catalogue de données |
-| Fréquence de mise à jour | Quotidien |
+| Fichier source     | `dags.py`     |
+| Description | Ce traitement permet de récupérer la configuration des projets depuis Grist. |
+| Fréquence d'exécution | Quotidienne |
 | Fonctionnement | Automatisé |
 | Propriétaires des données | MEF - SG - DSCI |
 | Mise en place de la pipeline | MEF - SG - DSCI - LdT |
@@ -12,17 +12,17 @@
 ### Données
 | Information | Valeur |
 | -------- | -------- |
-| Données sources | Base de donnnées |
-| Données de sorties | Grist |
+| Données sources | Grist |
+| Données de sorties | Base de donnnées |
 | Données sources archivées | Non |
-| Structure des données sources | [Non disponible]() |
-| Structure des données de sortie | [Voir dans Grist]() |
+| Structure des données sources | Aucune |
+| Structure des données de sortie | Aucune |
 
 ### Configuration
 | Information | Valeur |
 | -------- | -------- |
-| Variables | grist_secret_key |
-| Connexions | db_data_store |
+| Variables | grist_doc_id_gestion_interne |
+| Connexions | db_depose_fichier |
 
 <br />
 

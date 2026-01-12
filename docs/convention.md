@@ -17,11 +17,14 @@ Tous les dags doivent êtres organisés de la façon suivante:
 ├── dags
 │   ├── projet_X
 │   │   ├── grist
-│   │   │   ├── dags.py   # Définition du dag
-│   │   │   ├── process.py  # Contient toutes les fonctions de processing
-│   │   │   ├── README.md   # Documentation du dag
 │   │   │   ├── sql   # Contient les scripts sql
 │   │   │   │   └── projet_X.sql
+│   │   │   ├── dags.py   # Définition du dag
+│   │   │   ├── process.py  # Contient toutes les fonctions de processing
+│   │   │   ├── actions.md   # Contient les actions à réaliser dans le dag
+│   │   │   ├── enums.md   # (Optionnel) Enums propres au dag
+│   │   │   ├── enums.md   # (Optionnel) Types propres au dag
+│   │   │   ├── readme.md   # Documentation du dag
 │   │   │   └── tasks.py  # Contient les tâches spécifiques au dag
 ```
 

@@ -3,7 +3,7 @@
 | Information | Valeur |
 | -------- | -------- |
 | Fichier source     | `dags.py`     |
-| Description | Ce traitement permet de maintenir à jour le catalogue de données |
+| Description | Ce traitement permet de mettre à jour le catalogue de données |
 | Fréquence de mise à jour | Quotidien |
 | Fonctionnement | Automatisé |
 | Propriétaires des données | MEF - SG - DSCI |

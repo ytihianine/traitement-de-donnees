@@ -2,8 +2,8 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `old_logs_dags.py`     |
-| Description | Ce traitement permet de nettoyer les logs qui datent de plus de 60 jours |
+| Fichier source     | `dags.py`     |
+| Description | Synchronisation entre le catalogue disponible dans Grist et celui stocké en base |
 | Fréquence de mise à jour | Quotidien |
 | Fonctionnement | Automatisé |
 | Propriétaires des données | MEF - SG - DSCI |
@@ -12,16 +12,16 @@
 ### Données
 | Information | Valeur |
 | -------- | -------- |
-| Données sources | Base de donnnées, filesystem |
-| Données de sorties | Aucune |
+| Données sources | Base de donnnées |
+| Données de sorties | Grist |
 | Données sources archivées | Non |
-| Structure des données sources | X |
-| Structure des données de sortie | X |
+| Structure des données sources | [Non disponible]() |
+| Structure des données de sortie | [Voir dans Grist]() |
 
 ### Configuration
 | Information | Valeur |
 | -------- | -------- |
-| Variables | X |
+| Variables | grist_secret_key |
 | Connexions | db_data_store |
 
 <br />
