@@ -34,13 +34,13 @@ Cette étape est la plus importante et nécessite d'itérer avec l'agent métier
 
 4) Création du document Grist
 
-Les tables de référentiels doivent être regroupées dans un onglet `onglet_referentiel`.
-__ajouter_image__
+Les tables de référentiels doivent être regroupées dans un onglet `onglet_referentiel`.  
+__ajouter_image__  
 
-Toutes les tables métiers doivent être dans un format table par défaut dans un onglet `onglet_structure`. L'objectif est de pouvoir travailler et modifier facilement les tables sans avoir à travailler depuis des widgets/pages spécifiques.
+Toutes les tables métiers doivent être dans un format table par défaut dans un onglet `onglet_structure`. L'objectif est de pouvoir travailler et modifier facilement les tables sans avoir à travailler depuis des widgets/pages spécifiques.  
 
-__ajouter_image__
+__ajouter_image__  
 
-Une fois le document créé dans Grist. Les tables peuvent être générés au format dbml.
-L'outil suivant permet de réaliser cette transposition: [https://github.com/ytihianine/grist-doc-to-db-parser](https://github.com/ytihianine/grist-doc-to-db-parser)
+Une fois le document créé dans Grist. Les tables peuvent être générés au format dbml.  
+L'outil suivant permet de réaliser cette transposition: [https://github.com/ytihianine/grist-doc-to-db-parser](https://github.com/ytihianine/grist-doc-to-db-parser)  
 Une fois le fichier dbml généré, vous pouvez copier/coller le contenu sur le site [https://dbdiagram.io/](https://dbdiagram.io/) et exporter le résultat pour PosteSQL.
