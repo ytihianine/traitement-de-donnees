@@ -77,6 +77,8 @@ Pour conserver une structure similaire à l'ensemble des projets, l'organisation
 │   │   └── table_n
 ```
 
+Cette structuration est une base à adapter selon la complexité des cas d'usages.
+
 **Accueil**  
 
 Cette page contient une documentation qui décrit la finalité du document et permet de guider l'utilisateur à travers les différents onglets.
@@ -107,7 +109,7 @@ Documentation complémentaire. Elle peut servir de glossaire, préciser des moda
 
 **Zone administrateurs**  
 
-Cet onglet contient exclusivement la table d'habilitation pour gérer les utilisateurs qui ont des accès au document Grist.
+Cet onglet contient exclusivement la table d's pour gérer les utilisateurs qui ont accès au document Grist et leurs profils.
 
 **Structure des données**  
 
@@ -130,12 +132,26 @@ Ci-dessous un exemple
 
 ### Connecter le document Grist à l'outil de datavisualisation
 
-Une fois le document créé dans Grist. Les tables peuvent être générés au format dbml.  
-L'outil suivant permet de réaliser cette transposition: [https://github.com/ytihianine/grist-doc-to-db-parser](https://github.com/ytihianine/grist-doc-to-db-parser)  
-Une fois le fichier dbml généré, vous pouvez copier/coller le contenu sur le site [https://dbdiagram.io/](https://dbdiagram.io/) et exporter le résultat pour PosteSQL.
+Une fois le document créé dans Grist, il peut être connecté à l'outil de datavisualisation.
+
+### Générer les tables au format dbml
+
+Depuis Grist, exporter la structure des données (sans les données).
+![Exporter le document depuis Grist](./images/grist/exporter_document.png)
+
+Convertir le document Grist en fichier dbml. L'outil suivant permet de faire cette conversion: [https://github.com/ytihianine/grist-doc-to-db-parser](https://github.com/ytihianine/grist-doc-to-db-parser)
+
+### Générer les ERD associés au document
+
+Importer le fichier dbml dans [https://dbdiagram.io](https://dbdiagram.io).  
+L'ensemble des tables seront présentées sous forme de diagramme.
+
+### Générer le script SQL
+
+Depuis [https://dbdiagram.io](https://dbdiagram.io), exporter le résultat au pour PostgreSQL.
 
 
-### Créer automatiquement un document Grist
+## Créer automatiquement un document Grist
 
 _réflexion en cours_
 
