@@ -152,7 +152,7 @@ Depuis [https://dbdiagram.io](https://dbdiagram.io), exporter le résultat au po
 
 ### Créer le dag associé
 
-La dernière étape est de créer le dag qui ira récupérer les données depuis Grist. Voir la documentation [](./dags.md) pour le créer.
+La dernière étape est de créer le dag qui ira récupérer les données depuis Grist. Voir la documentation [dags.md](./dags.md) pour le créer.
 
 ## Créer automatiquement un document Grist
 
