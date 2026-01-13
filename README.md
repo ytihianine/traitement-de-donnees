@@ -24,14 +24,14 @@ L'ensemble de la documentation se trouve dans le dossier `docs/`.
 
 ```
 .
-├── docs # Contient toute la documentation du repo
-|    ├── configuration_projet.md # Gestion de la configuration des projets
-|    ├── contribuer.md # Mise en place de l'environnement de dev
-|    ├── convention.md # Description des différentes configurations
-|    ├── dags.md # Comment mettre en place un dags
-|    ├── grist.md # Mener un projet Grist
-|    ├── infra.md # Description pour interagir avec les services externes
-|    └── utilitaires.md # Description des éléments génériques disponibles
+├── docs
+|    ├── configuration_projet.md
+|    ├── contribuer.md
+|    ├── convention.md
+|    ├── dags.md
+|    ├── grist.md
+|    ├── infra.md
+|    └── utilitaires.md
 ```
 
 ## Mise en place de l'infrastructure
