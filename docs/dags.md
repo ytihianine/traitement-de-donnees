@@ -1,6 +1,6 @@
-# Guide de création des pipelines
+# Guide de création des pipelines (dags)
 
-Ce guide explique comment créer des pipelines Airflow (appelées DAGsdans Airflow) en utilisant les tâches pré-définies disponibles dans le dossier `utils/` et/ou en créant ses propres tâches.
+Ce guide explique comment créer des pipelines Airflow (appelées DAGs dans Airflow) en utilisant les tâches pré-définies disponibles dans le dossier `utils/` et/ou en créant ses propres tâches.
 
 ## Table des matières
 
