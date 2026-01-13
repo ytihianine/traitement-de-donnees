@@ -136,8 +136,8 @@ Une fois le document créé dans Grist, il peut être connecté à l'outil de da
 
 ### Générer les tables au format dbml
 
-Depuis Grist, exporter la structure des données (sans les données).
-![Exporter le document depuis Grist](./images/grist/exporter_document.png)
+Depuis Grist, exporter la structure des données (sans les données).  
+<img src="./images/grist/exporter_document.png" alt="Exporter le document depuis Grist" width="50%"/>  
 
 Convertir le document Grist en fichier dbml. L'outil suivant permet de faire cette conversion: [https://github.com/ytihianine/grist-doc-to-db-parser](https://github.com/ytihianine/grist-doc-to-db-parser)
 
