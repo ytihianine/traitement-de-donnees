@@ -150,6 +150,9 @@ L'ensemble des tables seront présentées sous forme de diagramme.
 
 Depuis [https://dbdiagram.io](https://dbdiagram.io), exporter le résultat au pour PostgreSQL.
 
+### Créer le dag associé
+
+La dernière étape est de créer le dag qui ira récupérer les données depuis Grist. Voir la documentation [](./dags.md) pour le créer.
 
 ## Créer automatiquement un document Grist
 
