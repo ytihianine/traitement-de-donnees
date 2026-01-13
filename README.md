@@ -8,6 +8,8 @@ Ce repo contient des scripts et dags permettant de traiter des données.
 .
 ├── dags: Contient l'ensemble des dags
 ├── docs: Contient toute la documentation du repo
+├── entities: types transverses
+├── enums: enums transverses
 ├── infra: Code pour interagir avec l'infrastructure / systèmes externes
 ├── scripts: Contient différents scripts utilitaires
 └── utils: Code réutilisable (variables globales, tâches, fonctions ...)
