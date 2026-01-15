@@ -317,37 +317,62 @@ def process_conso_annuelle_unpivot(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_conso_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFrame:
-    cols_to_drop = ["import_date", "import_timestamp", "snapshot_id"]
-    df = df.drop(columns=cols_to_drop)
+    # Filtrage initial des données
+    df_filtered = df[(df["annee"] >= 2019)].copy()
 
-    # Conserver les données qu'à partir de 2019
-    df = df.loc[df["annee"] >= 2019].copy()
-    df_comp = df.loc[df["annee"] >= 2019].copy()
+    # Agrégation des consommations par année
+    conso_par_annee = df_filtered.groupby(
+        ["code_bat_gestionnaire", "annee", "fluide", "type_conso"], as_index=False
+    )["conso"].sum()
 
-    # Renommer les colonnes
-    df_comp = df_comp.rename(
-        columns={
-            "annee": "annee_comparaison",
-            "conso": "conso_comparaison",
-        }
-    )
+    # Création du référentiel complet (toutes les combinaisons bâtiment/fluide/type_conso)
+    referentiel_complet = conso_par_annee[
+        ["code_bat_gestionnaire", "fluide", "type_conso"]
+    ].drop_duplicates()
 
-    # Fusionner les dataframes
-    df = pd.merge(
-        left=df,
-        right=df_comp,
-        on=["code_bat_gestionnaire", "fluide", "type_conso"],
+    # Liste de toutes les années disponibles
+    annees_disponibles = pd.DataFrame(data={"annee": conso_par_annee["annee"].unique()})
+
+    # Produit cartésien : chaque bâtiment × fluide × année
+    grille_complete = referentiel_complet.merge(right=annees_disponibles, how="cross")
+
+    # Jointure avec les données réelles (LEFT JOIN)
+    conso_complete = grille_complete.merge(
+        right=conso_par_annee,
+        on=["code_bat_gestionnaire", "fluide", "type_conso", "annee"],
         how="left",
     )
-    df = df.loc[df["annee_comparaison"] <= df["annee"]]
 
-    # Calculer les évolutions de facture
-    df["diff_vs_comparaison"] = df["conso"] - df["conso_comparaison"]
-    valid = df["conso_comparaison"].notna() & (df["conso_comparaison"] != 0)
-    df["diff_vs_comparaison_pct"] = np.nan
-    df.loc[valid, "diff_vs_comparaison_pct"] = (
-        df.loc[valid, "diff_vs_comparaison"] / df.loc[valid, "conso_comparaison"]
+    # Remplacement des valeurs manquantes par 0
+    conso_complete["conso"] = conso_complete["conso"].fillna(0)
+
+    # Auto-jointure pour comparer chaque année avec toutes les années précédentes
+    df = conso_complete.merge(
+        right=conso_complete,
+        on=["code_bat_gestionnaire", "fluide", "type_conso"],
+        suffixes=("", "_comparaison"),
     )
+
+    # Filtre : année actuelle >= année précédente
+    df = df.loc[df["annee"] >= df["annee_comparaison"]]
+
+    # Calcul de la différence
+    df["diff_vs_comparaison"] = df["conso"] - df["conso_comparaison"]
+
+    # Sélection et renommage des colonnes finales
+    df = df.loc[
+        :,
+        [
+            "code_bat_gestionnaire",
+            "fluide",
+            "type_conso",
+            "annee",
+            "annee_comparaison",
+            "conso",
+            "conso_comparaison",
+            "diff_vs_comparaison",
+        ],
+    ]
 
     return df
 
