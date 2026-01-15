@@ -4,6 +4,7 @@ from airflow.sdk.bases.operator import chain
 from utils.tasks.validation import create_validate_params_task
 from entities.dags import ALL_PARAM_PATHS
 from utils.tasks.etl import create_grist_etl_task
+from utils.control.structures import normalize_grist_dataframe
 
 from dags.sg.dsci.carte_identite_mef import process
 
@@ -19,42 +20,42 @@ validate_params = create_validate_params_task(
 def effectif():
     teletravail = create_grist_etl_task(
         selecteur="teletravail",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_teletravail,
     )
     teletravail_frequence = create_grist_etl_task(
         selecteur="teletravail_frequence",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_teletravail_frequence,
     )
     teletravail_opinion = create_grist_etl_task(
         selecteur="teletravail_opinion",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_teletravail_opinion,
     )
     effectif_direction_perimetre = create_grist_etl_task(
         selecteur="effectif_direction_perimetre",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_mef_par_direction,
     )
     effectif_direction = create_grist_etl_task(
         selecteur="effectif_direction",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_effectif_direction,
     )
     effectif_perimetre = create_grist_etl_task(
         selecteur="effectif_perimetre",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_effectifs_par_perimetre,
     )
     effectif_departements = create_grist_etl_task(
         selecteur="effectif_departements",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_effectif_par_departements,
     )
     masse_salariale = create_grist_etl_task(
         selecteur="masse_salariale",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_masse_salariale,
     )
 
@@ -77,32 +78,32 @@ def effectif():
 def budget():
     budget_total = create_grist_etl_task(
         selecteur="budget_total",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_budget_total,
     )
     budget_pilotable = create_grist_etl_task(
         selecteur="budget_pilotable",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_budget_pilotable,
     )
     budget_general = create_grist_etl_task(
         selecteur="budget_general",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_budget_general,
     )
     evolution_budget_mef = create_grist_etl_task(
         selecteur="evolution_budget_mef",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_evolution_budget_mef,
     )
     montant_intervention_invest = create_grist_etl_task(
         selecteur="montant_intervention_invest",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_montant_invest,
     )
     budget_ministere = create_grist_etl_task(
         selecteur="budget_ministere",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_budget_ministere,
     )
 
@@ -123,17 +124,17 @@ def budget():
 def taux_agent():
     engagement_agent = create_grist_etl_task(
         selecteur="engagement_agent",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_engagement_agent,
     )
     election_resultat = create_grist_etl_task(
         selecteur="election_resultat",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_resultat_elections,
     )
     taux_participation = create_grist_etl_task(
         selecteur="taux_participation",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_taux_participation,
     )
 
@@ -151,12 +152,12 @@ def taux_agent():
 def plafond():
     plafond_etpt = create_grist_etl_task(
         selecteur="plafond_etpt",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_plafond_etpt,
     )
     db_plafond_etpt = create_grist_etl_task(
         selecteur="db_plafond_etpt",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_db_plafond_etpt,
     )
     """ Task order """

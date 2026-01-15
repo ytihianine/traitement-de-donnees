@@ -4,22 +4,6 @@ import datetime
 import numpy as np
 
 
-def generic_convert_to_float(value: str) -> float:
-    if value:
-        value = round(float(value) / 100, 4)
-        return value
-    return None
-
-
-def clean_and_normalize_df(df: pd.DataFrame) -> pd.DataFrame:
-    df.columns = map(str.lower, df.columns)
-    # Drop des colonnes que si elles existent
-    df = df.drop(columns=["id", "commentaire_archive"], errors="ignore")
-    df = df.drop(df.filter(regex="^(grist|manual)").columns, axis=1)
-    df = df.fillna(np.nan).replace([np.nan], [None])
-    return df
-
-
 def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:
     semester_values = {"S1": 6, "Total": 12}
 
@@ -58,7 +42,6 @@ def process_teletravail(df: pd.DataFrame) -> pd.DataFrame:
 
 # Traitement spécifique pour la table teletravail_frequence
 def process_teletravail_frequence(df: pd.DataFrame) -> pd.DataFrame:
-    df = clean_and_normalize_df(df)
     # Exemple : remplacer 'ND' par ''
     df.replace("ND", None, inplace=True)
     print(df.columns)
@@ -70,7 +53,6 @@ def process_teletravail_frequence(df: pd.DataFrame) -> pd.DataFrame:
 
 # Traitement spécifique pour la table teletravail_frequence
 def process_teletravail_opinion(df: pd.DataFrame) -> pd.DataFrame:
-    df = clean_and_normalize_df(df)
     # Exemple : remplacer 'ND' par ''
     df.replace("ND", None, inplace=True)
     print(df.columns)
