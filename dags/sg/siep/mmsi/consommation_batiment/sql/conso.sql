@@ -219,7 +219,6 @@ CREATE TABLE IF NOT EXISTS siep.conso_annuelle_unpivot_comparaison (
     conso DOUBLE PRECISION,
     conso_comparaison DOUBLE PRECISION,
     diff_vs_comparaison DOUBLE PRECISION,
-    diff_vs_comparaison_pct DOUBLE PRECISION,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
     snapshot_id TEXT,
