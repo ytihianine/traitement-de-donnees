@@ -140,6 +140,53 @@ CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
         sum(sbo.indicateur_resident_occ_source) AS sum_indicateur_resident_occ_source
         FROM siep.bien_occupant sbo
         GROUP BY sbo.snapshot_id, sbo.import_timestamp, sbo.code_bat_gestionnaire
+    ),
+    -- CTE pour consolider l'état au niveau code_bat_ter
+    cte_etat_bat_consolide AS (
+        SELECT
+            sbic.snapshot_id,
+            sbic.import_timestamp,
+            sbic.code_bat_ter,
+            -- Compte les occurrences avec état "ouvert"
+            COUNT(CASE WHEN sbic.etat_bat = 'Ouvert' THEN 1 END) as nb_ouvert,
+            -- Compte les occurrences avec état "fermé"
+            COUNT(CASE WHEN sbic.etat_bat = 'Fermé' THEN 1 END) as nb_ferme,
+            -- Compte les occurrences avec état différent de N/A
+            COUNT(CASE WHEN sbic.etat_bat IS NOT NULL THEN 1 END) as nb_etat_non_null,
+            -- Vérifie si le bâtiment existe dans l'OAD
+            MAX(CASE
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM siep.bien sb
+                    WHERE sb.snapshot_id = sbic.snapshot_id
+                    AND sb.code_bat_ter = sbic.code_bat_ter
+                ) THEN 1
+                ELSE 0
+            END) as existe_dans_oad
+        FROM siep.bien_information_complementaire sbic
+        WHERE sbic.code_bat_ter IS NOT NULL
+        GROUP BY sbic.snapshot_id, sbic.import_timestamp, sbic.code_bat_ter
+    ),
+    cte_etat_bat_final AS (
+        SELECT
+            snapshot_id,
+            import_timestamp,
+            code_bat_ter,
+            CASE
+                -- Si au moins un gestionnaire marque le bâtiment comme "ouvert"
+                WHEN nb_ouvert > 0 THEN 'Ouvert'
+                -- Si aucun ouvert mais au moins un fermé
+                WHEN nb_ouvert = 0 AND nb_ferme > 0 THEN 'Fermé'
+                -- Si tous les états sont N/A
+                WHEN nb_etat_non_null = 0 THEN
+                    CASE
+                        WHEN existe_dans_oad = 1 THEN 'Ouvert'
+                        ELSE 'Fermé'
+                    END
+                -- Cas par défaut : prendre un état non N/A s'il existe
+                ELSE 'Indéterminé'
+            END as etat_bat_recalcule
+        FROM cte_etat_bat_consolide
     )
     SELECT
     -- bien_gestionnaire issues de l'OAD et OSFI
@@ -179,7 +226,8 @@ CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
     sbs.perimetre_spsi_initial as perimetre_spsi_initial,
     sbs.perimetre_spsi_maj as perimetre_spsi_maj,
     -- siep.bien_deet_energie_ges sbdeg && siep.bien_information_complementaire sbic
-    COALESCE(sbdeg.bat_assujettis_deet, sbic.bat_assujettis_deet) as bat_assujettis_deet,
+    sbdeg.bat_assujettis_deet as bat_assujettis_deet_oad,
+    sbic.bat_assujettis_deet as bat_assujettis_deet_osfi,
     -- siep.bien_proprietaire sbp
     sbp.locatif_domanial as locatif_domanial,
     -- siep.bien_reglementation sbr
@@ -200,8 +248,8 @@ CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
     COALESCE(cte_boa.sum_indicateur_sub_occ_source, sbic.indicateur_sub_occ_source) as sum_indicateur_sub_occ_source,
     COALESCE(cte_boa.sum_indicateur_poste_occ_source, sbic.indicateur_poste_occ_source) as sum_indicateur_poste_occ_source,
     cte_boa.sum_indicateur_resident_occ_source  as sum_indicateur_resident_occ_source,
-    -- siep.bien_information_complementaire sbic
-    sbic.etat_bat as etat_bat,
+    -- siep.bien_information_complementaire sbic && cte_etat_bat_final cte_ebf
+    cte_ebf.etat_bat_recalcule as etat_bat_recalcule,
     sbic.date_sortie_bat as date_sortie_bat,
     sbic.date_sortie_site as date_sortie_site,
     sbic.date_derniere_renovation as date_derniere_renovation,
@@ -264,4 +312,9 @@ CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
         ON cte_boa.snapshot_id = cte_bgoo.snapshot_id
         AND cte_boa.import_timestamp = ct.oad_import_timestamp
         AND cte_boa.code_bat_gestionnaire = cte_bgoo.code_bat_gestionnaire
+    -- Jointure avec l'état recalculé au niveau code_bat_ter
+    LEFT JOIN cte_etat_bat_final cte_ebf
+        ON cte_ebf.snapshot_id = cte_bgoo.snapshot_id
+        AND cte_ebf.import_timestamp = ct.osfi_import_timestamp
+        AND cte_ebf.code_bat_ter = cte_bgoo.code_bat_ter
     ;
