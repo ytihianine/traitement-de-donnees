@@ -422,42 +422,68 @@ def process_facture_annuelle_unpivot(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_facture_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFrame:
-    cols_to_drop = ["import_date", "import_timestamp", "snapshot_id"]
-    df = df.drop(columns=cols_to_drop)
+    # Filtrage initial des données
+    df_filtered = df[(df["annee"] >= 2019)].copy()
 
-    # Conserver les données qu'à partir de 2019
-    df = df.loc[df["annee"] >= 2019].copy()
-    df_comp = df.loc[df["annee"] >= 2019].copy()
+    # Agrégation des montants par année
+    factures_par_annee = df_filtered.groupby(
+        ["code_bat_gestionnaire", "annee", "fluide", "type_facture"], as_index=False
+    )["montant_facture"].sum()
 
-    # Renommer les colonnes
-    df_comp = df_comp.rename(
-        columns={
-            "annee": "annee_comparaison",
-            "montant_facture": "montant_facture_comparaison",
-        }
+    # Création du référentiel complet (toutes les combinaisons bâtiment/fluide/type_facture)
+    referentiel_complet = factures_par_annee.loc[
+        :, ["code_bat_gestionnaire", "fluide", "type_facture"]
+    ].drop_duplicates()
+
+    # Liste de toutes les années disponibles
+    annees_disponibles = pd.DataFrame(
+        data={"annee": factures_par_annee["annee"].unique()}
     )
 
-    # Fusionner les dataframes
-    df = pd.merge(
-        left=df,
-        right=df_comp,
-        on=["code_bat_gestionnaire", "fluide", "type_facture"],
+    # Produit cartésien : chaque bâtiment × fluide × année
+    grille_complete = referentiel_complet.merge(right=annees_disponibles, how="cross")
+
+    # Jointure avec les données réelles (LEFT JOIN)
+    factures_complete = grille_complete.merge(
+        right=factures_par_annee,
+        on=["code_bat_gestionnaire", "fluide", "type_facture", "annee"],
         how="left",
     )
-    df = df.loc[df["annee_comparaison"] <= df["annee"]]
 
-    # Calculer les évolutions de facture
+    # Remplacement des valeurs manquantes par 0
+    factures_complete["montant_facture"] = factures_complete["montant_facture"].fillna(
+        0
+    )
+
+    # Auto-jointure pour comparer chaque année avec toutes les années précédentes
+    df = factures_complete.merge(
+        factures_complete,
+        on=["code_bat_gestionnaire", "fluide", "type_facture"],
+        suffixes=("", "_comparaison"),
+    )
+
+    # Filtre : année actuelle >= année précédente
+    df = df.loc[df["annee"] >= df["annee_comparaison"]]
+
+    # Calcul de la différence
     df["diff_vs_comparaison"] = (
         df["montant_facture"] - df["montant_facture_comparaison"]
     )
-    valid = df["montant_facture_comparaison"].notna() & (
-        df["montant_facture_comparaison"] != 0
-    )
-    df["diff_vs_comparaison_pct"] = np.nan
-    df.loc[valid, "diff_vs_comparaison_pct"] = (
-        df.loc[valid, "diff_vs_comparaison"]
-        / df.loc[valid, "montant_facture_comparaison"]
-    )
+
+    # Sélection et renommage des colonnes finales
+    df = df.loc[
+        :,
+        [
+            "code_bat_gestionnaire",
+            "fluide",
+            "type_facture",
+            "annee",
+            "annee_comparaison",
+            "montant_facture",
+            "montant_facture_comparaison",
+            "diff_vs_comparaison",
+        ],
+    ]
 
     return df
 

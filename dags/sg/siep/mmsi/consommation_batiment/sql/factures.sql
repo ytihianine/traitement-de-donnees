@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS siep.facture_annuelle_unpivot_comparaison (
     montant_facture DOUBLE PRECISION,
     montant_facture_comparaison DOUBLE PRECISION,
     diff_vs_comparaison DOUBLE PRECISION,
-    diff_vs_comparaison_pct DOUBLE PRECISION,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
     snapshot_id TEXT,
