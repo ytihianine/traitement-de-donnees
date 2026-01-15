@@ -5,6 +5,7 @@ from airflow.sdk.bases.operator import chain
 from infra.mails.default_smtp import create_airflow_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
+from enums.database import LoadStrategy
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
@@ -52,14 +53,14 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
 def bien_georisques() -> None:
     """Task order"""
     chain(
-        # get_projet_snapshot(nom_projet="Outil aide diagnostic"),
-        # georisques_group(),
+        get_projet_snapshot(nom_projet="Outil aide diagnostic"),
+        georisques_group(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
         ensure_partition(),
-        copy_tmp_table_to_real_table(),
+        copy_tmp_table_to_real_table(load_strategy=LoadStrategy.APPEND),
         copy_s3_files(bucket="dsci"),
         del_s3_files(bucket="dsci"),
     )
