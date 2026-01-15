@@ -4,6 +4,7 @@ from airflow.sdk.bases.operator import chain
 from utils.tasks.validation import create_validate_params_task
 from entities.dags import ALL_PARAM_PATHS
 from utils.tasks.etl import create_grist_etl_task
+from utils.control.structures import normalize_grist_dataframe
 
 
 from dags.sg.sircom.tdb_interne import process
@@ -20,42 +21,42 @@ validate_params = create_validate_params_task(
 def abonnes_visites():
     reseaux_sociaux = create_grist_etl_task(
         selecteur="reseaux_sociaux",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_reseaux_sociaux,
     )
     visites_portail = create_grist_etl_task(
         selecteur="visites_portail",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_visites_portail,
     )
     visites_bercyinfo = create_grist_etl_task(
         selecteur="visites_bercyinfo",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_visites_bercyinfo,
     )
     visites_alize = create_grist_etl_task(
         selecteur="visites_alize",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_visites_alize,
     )
     visites_intranet_sg = create_grist_etl_task(
         selecteur="visites_intranet_sg",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_visites_intranet_sg,
     )
     performances_lettres = create_grist_etl_task(
         selecteur="performances_lettres",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_performances_lettres,
     )
     abonnes_aux_lettres = create_grist_etl_task(
         selecteur="abonnes_lettres",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_abonnes_aux_lettres,
     )
     ouverture_lettre_alize = create_grist_etl_task(
         selecteur="ouverture_lettre_alize",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_ouverture_lettre_alize,
     )
     chain(
@@ -76,7 +77,7 @@ def abonnes_visites():
 def budget():
     budget_depense = create_grist_etl_task(
         selecteur="synthese_depenses",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_budget_depense,
     )
     chain(budget_depense())
@@ -86,37 +87,37 @@ def budget():
 def enquetes():
     engagement_agents_mef = create_grist_etl_task(
         selecteur="engagement_agents_mef",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_engagement_agents_mef,
     )
     qualite_vie_travail = create_grist_etl_task(
         selecteur="qualite_vie_travail",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_qualite_vie_travail,
     )
     collab_inter_structure = create_grist_etl_task(
         selecteur="collab_inter_structure",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_collab_inter_structure,
     )
     obs_interne = create_grist_etl_task(
         selecteur="obs_interne",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_obs_interne,
     )
     enquete_360 = create_grist_etl_task(
         selecteur="enquete_360",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_enquete_360,
     )
     obs_interne_participation = create_grist_etl_task(
         selecteur="obs_interne_participation",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_obs_interne_participation,
     )
     engagement_environnement = create_grist_etl_task(
         selecteur="engagement_environnement",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_engagement_environnement,
     )
     chain(
@@ -136,27 +137,27 @@ def enquetes():
 def metiers():
     indicateurs_metiers = create_grist_etl_task(
         selecteur="indicateurs_metiers",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_indicateurs_metiers,
     )
     enquete_satisfaction = create_grist_etl_task(
         selecteur="enquete_satisfaction",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_enquete_satisfaction,
     )
     etudes = create_grist_etl_task(
         selecteur="etudes",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_etudes,
     )
     communique_presse = create_grist_etl_task(
         selecteur="communique_presse",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_communique_presse,
     )
     studio_graphique = create_grist_etl_task(
         selecteur="studio_graphique",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_studio_graphique,
     )
     chain(
@@ -174,17 +175,17 @@ def metiers():
 def ressources_humaines():
     rh_formation = create_grist_etl_task(
         selecteur="rh_formation",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_rh_formation,
     )
     rh_turnover = create_grist_etl_task(
         selecteur="rh_turnover",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_rh_turnover,
     )
     rh_contractuel = create_grist_etl_task(
         selecteur="rh_contractuel",
-        normalisation_process_func=process.clean_and_normalize_df,
+        normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_rh_contractuel,
     )
     chain([rh_formation(), rh_turnover(), rh_contractuel()])
