@@ -15,7 +15,7 @@ from dags.sg.srh.mentorat_merci.tasks import validate_params, generer_binomes
 
 
 # Mails
-nom_projet = "Données comptable"
+nom_projet = "Mentorat MERCI"
 LINK_DOC_PIPELINE = "Non-défini"  # noqa
 LINK_DOC_DATA = "Non-défini"  # noqa
 
