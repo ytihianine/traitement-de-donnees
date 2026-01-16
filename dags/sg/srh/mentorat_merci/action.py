@@ -136,10 +136,11 @@ def send_result(dfs: Mapping[str, pd.DataFrame], context: Mapping[str, Any]) -> 
     execution_date = get_execution_date(context=context)
     nom_projet = get_project_name(context=context)
     tmp_path = Path(
-        f"/tmp/mentorat_merci/binomes_v{execution_date.strftime(format="%Y%m%d_%Hh%M")}.xlsx"
+        f"/tmp/binomes_v{execution_date.strftime(format="%Y%m%d_%Hh%M")}.xlsx"
     )
 
     # Sauvegarder dans un fichier Excel avec plusieurs onglets
+    print(f"Saving file locally to {tmp_path}")
     with pd.ExcelWriter(path=tmp_path, engine="openpyxl") as writer:
         dfs["df_binomes"].to_excel(
             excel_writer=writer, sheet_name="Binômes", index=False
