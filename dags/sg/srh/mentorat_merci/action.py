@@ -16,7 +16,6 @@ def trouver_meilleurs_binomes(df: pd.DataFrame) -> Mapping[str, pd.DataFrame]:
     Trouve les meilleurs binômes en utilisant un algorithme glouton
     SEULS les binômes avec catégorie compatible sont évalués
     """
-    df = process.clean_data(df=df)
     df_mentors = pd.DataFrame(data=df[df["19. QA_STATUT"] == "Mentor"].copy())
     df_mentores = pd.DataFrame(data=df[df["19. QA_STATUT"] == "Mentoré"].copy())
 

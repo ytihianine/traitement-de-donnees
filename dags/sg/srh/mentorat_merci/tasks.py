@@ -1,14 +1,20 @@
 from entities.dags import ALL_PARAM_PATHS, ETLStep, TaskConfig
-from utils.tasks.etl import create_task
+from utils.tasks.etl import create_file_etl_task, create_task
 from utils.tasks.validation import create_validate_params_task
 
 from dags.sg.srh.mentorat_merci import action
+from dags.sg.srh.mentorat_merci import process
 
 
 validate_params = create_validate_params_task(
     required_paths=ALL_PARAM_PATHS,
     require_truthy=None,
     task_id="validate_dag_params",
+)
+
+
+clean_source = create_file_etl_task(
+    selecteur="agent_inscrit", process_func=process.clean_data
 )
 
 

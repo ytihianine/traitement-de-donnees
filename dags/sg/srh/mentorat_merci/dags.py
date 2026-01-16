@@ -11,7 +11,11 @@ from enums.dags import DagStatus
 from utils.config.tasks import get_s3_keys_source
 from utils.config.dag_params import create_default_args, create_dag_params
 
-from dags.sg.srh.mentorat_merci.tasks import validate_params, generer_binomes
+from dags.sg.srh.mentorat_merci.tasks import (
+    validate_params,
+    clean_source,
+    generer_binomes,
+)
 
 
 # Mails
@@ -58,7 +62,7 @@ def mentorat_merci() -> None:
     )
 
     # Ordre des tâches
-    chain(validate_params(), looking_for_files, generer_binomes())
+    chain(validate_params(), looking_for_files, clean_source(), generer_binomes())
 
 
 mentorat_merci()
