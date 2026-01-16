@@ -145,10 +145,10 @@ def send_result(dfs: Mapping[str, pd.DataFrame], context: Mapping[str, Any]) -> 
         dfs["df_binomes"].to_excel(
             excel_writer=writer, sheet_name="Binômes", index=False
         )
-        dfs["df_mentores_non_apparies"].to_excel(
+        dfs["df_mentors_non_apparies"].to_excel(
             excel_writer=writer, sheet_name="Mentors non appariés", index=False
         )
-        dfs["df_mentors_non_apparies"].to_excel(
+        dfs["df_mentores_non_apparies"].to_excel(
             excel_writer=writer, sheet_name="Mentorés non appariés", index=False
         )
 
