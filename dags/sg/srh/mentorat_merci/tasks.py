@@ -13,12 +13,12 @@ validate_params = create_validate_params_task(
 )
 
 
-clean_source = create_file_etl_task(
-    selecteur="agent_inscrit",
-    process_func=process.clean_data,
-    add_snapshot_id=False,
-    add_import_date=False,
-)
+# clean_source = create_file_etl_task(
+#     selecteur="agent_inscrit",
+#     process_func=process.clean_data,
+#     add_snapshot_id=False,
+#     add_import_date=False,
+# )
 
 
 generer_binomes = create_task(
@@ -26,7 +26,8 @@ generer_binomes = create_task(
     output_selecteur="agent_inscrit",
     input_selecteurs=["agent_inscrit"],
     steps=[
-        ETLStep(fn=action.trouver_meilleurs_binomes, read_data=True),
+        ETLStep(fn=process.clean_data, read_data=True),
+        ETLStep(fn=action.trouver_meilleurs_binomes, use_previous_output=True),
         ETLStep(fn=action.send_result, use_context=True, use_previous_output=True),
     ],
     add_import_date=False,
