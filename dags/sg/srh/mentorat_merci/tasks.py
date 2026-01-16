@@ -14,8 +14,8 @@ validate_params = create_validate_params_task(
 
 generer_binomes = create_task(
     task_config=TaskConfig(task_id="generer_binomes"),
-    output_selecteur="liste_certificats",
-    input_selecteurs=["certificats", "agents"],
+    output_selecteur="agent_inscrit",
+    input_selecteurs=["agent_inscrit"],
     steps=[
         ETLStep(fn=action.trouver_meilleurs_binomes, read_data=True),
         ETLStep(fn=action.send_result, use_context=True, use_previous_output=True),
