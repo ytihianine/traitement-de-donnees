@@ -14,7 +14,10 @@ validate_params = create_validate_params_task(
 
 
 clean_source = create_file_etl_task(
-    selecteur="agent_inscrit", process_func=process.clean_data
+    selecteur="agent_inscrit",
+    process_func=process.clean_data,
+    add_snapshot_id=False,
+    add_import_date=False,
 )
 
 
