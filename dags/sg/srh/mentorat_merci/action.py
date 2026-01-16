@@ -112,7 +112,7 @@ def generer_rapport(dfs: Mapping[str, pd.DataFrame]) -> str:
     rapport.append(f"\nNombre total de mentors: {len(dfs["df_mentors"])}")
     rapport.append(f"Nombre total de mentorés: {len(dfs["df_mentores"])}")
     rapport.append(f"Nombre de binômes créés: {len(df_binomes)}")
-    rapport.append(f"Mentors non appariés: {len(dfs["df_mentores_non_apparies"])}")
+    rapport.append(f"Mentors non appariés: {len(dfs["df_mentors_non_apparies"])}")
     rapport.append(f"Mentorés non appariés: {len(dfs["df_mentores_non_apparies"])}")
 
     if len(df_binomes) > 0:
