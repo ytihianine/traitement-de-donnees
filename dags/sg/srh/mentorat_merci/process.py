@@ -19,8 +19,8 @@ critere_categorie = {
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    df = pd.DataFrame(
-        data=df.loc[:, "27. Q9_Direction_Mentor"].fillna("Pas de préférence")
+    df["27. Q9_Direction_Mentor"] = df["27. Q9_Direction_Mentor"].fillna(
+        "Pas de préférence"
     )
     return df
 
