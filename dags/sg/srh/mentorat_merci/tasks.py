@@ -1,7 +1,16 @@
-from entities.dags import ETLStep, TaskConfig
+from entities.dags import ALL_PARAM_PATHS, ETLStep, TaskConfig
 from utils.tasks.etl import create_task
+from utils.tasks.validation import create_validate_params_task
 
 from dags.sg.srh.mentorat_merci import action
+
+
+validate_params = create_validate_params_task(
+    required_paths=ALL_PARAM_PATHS,
+    require_truthy=None,
+    task_id="validate_dag_params",
+)
+
 
 generer_binomes = create_task(
     task_config=TaskConfig(task_id="generer_binomes"),
