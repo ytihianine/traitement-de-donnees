@@ -77,12 +77,11 @@ def trouver_meilleurs_binomes(df: pd.DataFrame) -> Mapping[str, pd.DataFrame]:
     cols_to_keep = [
         "2. B_PRENOM",
         "1. A_NOM",
-        "Catégorie",
-        "Direction",
-        "Département",
-        "Email",
-        "Préférence Direction",
-        "Objectifs",
+        "5. E_CATEGORIE",
+        "6. F_DIRECTION",
+        "15. H2_Departement",
+        "27. Q9_Direction_Mentor",
+        "28. Q3_Objectif_Mentor",
     ]
     df_mentores_non_apparies = pd.DataFrame(
         data=df_mentores.loc[list(mentors_disponibles)][cols_to_keep]
