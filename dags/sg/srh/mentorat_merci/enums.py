@@ -1,17 +1,10 @@
 from enum import Enum
 
 
-class TypeBinome(Enum):
-    sans_binome = "Sans binome"
-    avec_binome = "Binome"
-
-
-class Raison(Enum):
-    sans_nom = "Nom pas renseigné dans les données sources"
-    sans_categorie = "Catégorie pas renseignée dans les données sources"
-    sans_localisation = "Localisation pas renseignée dans les données sources"
-    sans_mentor = "Sans mentor"
-    sans_mentore = "Sans mentoré"
+class ChoixDirection(Enum):
+    SANS_PREF = "pas de préférence"
+    MEME_DIR = "Même direction"
+    AUTRE_DIR = "Une autre direction"
 
 
 class ColName(str, Enum):

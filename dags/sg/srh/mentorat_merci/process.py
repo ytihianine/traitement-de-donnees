@@ -1,6 +1,8 @@
 import pandas as pd
 from typing import Any, List, Mapping, Tuple
 
+from dags.sg.srh.mentorat_merci.enums import ChoixDirection
+
 
 correspondance_objectifs = {
     "Transmettre ma culture administrative et ministérielle": "Améliorer ma culture administrative et ministérielle",
@@ -135,18 +137,18 @@ def calculer_score_direction(mentor: pd.Series, mentore: pd.Series) -> Tuple[int
         return 0, "Direction: données manquantes"
 
     # Pas de préférence = score automatique
-    if pref_dir == "Pas de préférence":
+    if pref_dir == ChoixDirection.SANS_PREF:
         return 200, "✓ Direction: pas de préférence"
 
     # Même direction
-    if pref_dir == "Même direction":
+    if pref_dir == ChoixDirection.MEME_DIR:
         if dir_mentor == dir_mentore:
             return 200, f"✓ Direction: même direction ({dir_mentor})"
         else:
             return 0, f"✗ Direction: {dir_mentor} ≠ {dir_mentore}"
 
     # Autre direction
-    if pref_dir == "Autre direction":
+    if pref_dir == ChoixDirection.AUTRE_DIR:
         if dir_mentor != dir_mentore:
             return 200, "✓ Direction: directions différentes"
         else:
