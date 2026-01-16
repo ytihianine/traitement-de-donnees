@@ -59,6 +59,7 @@ def read_dataframe(
     # Read the file content
 
     print(f"Read data from {file_path}")
+    print(f"File format: {file_format}")
     print(f"read_options: \n{read_options}")
     with file_handler.read(file_path) as file_obj:
         # Different handling based on format
