@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from pathlib import Path
+from typing import Any, Callable, Mapping, Optional
 from jinja2 import Environment, FileSystemLoader
 
 from airflow.utils.email import send_email_smtp
@@ -60,6 +61,7 @@ class MailMessage:
     to: list[str]
     mail_status: Optional[MailStatus] = None
     subject: Optional[str] = None
+    template_dir: Path | None = None
     html_content: Optional[str] = None
     template_parameters: dict = field(default_factory=dict)
     cc: Optional[list[str]] = None
@@ -79,6 +81,7 @@ class MailMessage:
                 )
 
             self.html_content = render_template(
+                template_dir=self.template_dir,
                 template_name=config["template_path"],
                 template_parameters=self.template_parameters,
             )
@@ -92,16 +95,22 @@ class MailMessage:
             )
 
 
-def render_template(template_name: str, template_parameters: dict) -> str:
-    root_folder = get_root_folder()
-    template_dir = os.path.join(
-        root_folder,
-        "infra",
-        "mails",
-        "templates",
-    )
+def render_template(
+    template_name: str,
+    template_parameters: Mapping[str, str],
+    template_dir: Path | None = None,
+) -> str:
+    if template_dir is None:
+        root_folder = get_root_folder()
+        template_dir = Path(
+            root_folder,
+            "infra",
+            "mails",
+            "templates",
+        )
+
     # Set up the Jinja environment with a loader pointing to the templates directory
-    env = Environment(loader=FileSystemLoader(searchpath=template_dir))
+    env = Environment(loader=FileSystemLoader(searchpath=str(template_dir)))
 
     # Load the template by name (just the filename, not full path)
     template = env.get_template(name=template_name)
