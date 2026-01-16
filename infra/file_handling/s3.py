@@ -106,7 +106,6 @@ class S3FileHandler(BaseFileHandler):
                 replace=True,
                 encrypt=False,  # Set to True if you need encryption
                 acl_policy=None,  # e.g., 'public-read' if needed
-                content_type=content_type,
             )
 
             print(f"Successfully wrote {key} with content type: {content_type}")
