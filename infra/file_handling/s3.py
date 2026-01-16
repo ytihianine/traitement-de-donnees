@@ -56,26 +56,61 @@ class S3FileHandler(BaseFileHandler):
             raise FileHandlerError(f"Error reading file from S3: {key}") from e
 
     def write(
-        self, file_path: Union[str, Path], content: Union[str, bytes, BinaryIO]
+        self,
+        file_path: Union[str, Path],
+        content: Union[str, bytes, BinaryIO],
+        content_type: Optional[str] = None,
     ) -> None:
-        """Write content to S3 using Airflow's S3Hook."""
+        """
+        Write content to S3 using Airflow's S3Hook.
+
+        Supports all file types: CSV, TSV, XLSX, Parquet, JSON, etc.
+
+        Args:
+            file_path: S3 key/path for the file
+            content: Content to write (str, bytes, or file-like object)
+            content_type: Optional MIME type. If not provided, will be inferred from file extension
+        """
         key = str(file_path)
         try:
             print(f"Writing file to {key}")
-            if isinstance(content, str):
-                content = content.encode("utf-8")
-            if isinstance(content, bytes):
-                content = io.BytesIO(content)
 
-            # Use S3Hook's load_file or load_string methods
-            if hasattr(content, "read"):
-                self.hook.load_file_obj(
-                    file_obj=content, key=key, bucket_name=self.bucket, replace=True
-                )
+            # Infer content type if not provided
+            if content_type is None:
+                content_type, _ = mimetypes.guess_type(key)
+                if content_type is None:
+                    content_type = "application/octet-stream"
+
+            # Convert content to bytes if it's a string
+            if isinstance(content, str):
+                content_bytes = content.encode("utf-8")
+                file_obj = io.BytesIO(initial_bytes=content_bytes)
+            # If already bytes, wrap in BytesIO
+            elif isinstance(content, bytes):
+                file_obj = io.BytesIO(initial_bytes=content)
+            # If it's already a file-like object, use it directly
+            elif hasattr(content, "read"):
+                file_obj = content
             else:
-                self.hook.load_string(
-                    string_data=content, key=key, bucket_name=self.bucket, replace=True
-                )
+                raise ValueError(f"Unsupported content type: {type(content)}")
+
+            # Ensure we're at the beginning of the stream
+            if hasattr(file_obj, "seek"):
+                file_obj.seek(0)
+
+            # Upload to S3 with content type
+            self.hook.load_file_obj(
+                file_obj=file_obj,
+                key=key,
+                bucket_name=self.bucket,
+                replace=True,
+                encrypt=False,  # Set to True if you need encryption
+                acl_policy=None,  # e.g., 'public-read' if needed
+                content_type=content_type,
+            )
+
+            print(f"Successfully wrote {key} with content type: {content_type}")
+
         except Exception as e:
             raise FileHandlerError(f"Error writing file to S3: {key}") from e
 
