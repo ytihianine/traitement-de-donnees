@@ -86,7 +86,7 @@ def extraire_objectifs(row: pd.Series, column: str) -> List[str]:
             obj = obj.split(sep=";")
             objectifs.extend(obj)
 
-    print(objectifs)
+    # print(objectifs)
     return objectifs
 
 
