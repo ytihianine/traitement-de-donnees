@@ -82,10 +82,9 @@ def extraire_objectifs(row: pd.Series, column: str) -> List[str]:
     """Extrait et ordonne les objectifs d'une personne"""
     objectifs = []
 
-    print(row.get(key=column))
     if pd.notna(row.get(key=column)) is True:
         obj = str(row[column]).strip()
-        print(obj)
+
         if obj:
             obj = obj.split(sep=";")
             objectifs.extend(obj)
@@ -106,9 +105,6 @@ def calculer_score_objectifs(mentor: pd.Series, mentore: pd.Series) -> Tuple[int
     correspondance = 0
     score = 0
     details = []
-
-    print(f"Objectifs du mentor: {obj_mentor}")
-    print(f"Objectifs du mentoré: {obj_mentore}")
 
     # Compare les objectifs par ordre de priorité
     max_compare = min(len(obj_mentor), len(obj_mentore), 5)

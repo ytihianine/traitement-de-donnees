@@ -20,17 +20,17 @@ def trouver_meilleurs_binomes(df: pd.DataFrame) -> Mapping[str, pd.DataFrame]:
     df_mentores = pd.DataFrame(data=df[df["19. QA_STATUT"] == "Mentoré"].copy())
 
     resultats = []
-    mentores_disponibles = set(df_mentors.index)
-    mentors_disponibles = set(df_mentores.index)
+    mentores_disponibles = set(df_mentores.index)
+    mentors_disponibles = set(df_mentors.index)
 
     # Calculer tous les scores possibles UNIQUEMENT pour les catégories compatibles
     tous_scores = []
     binomes_incompatibles = 0
 
     for idx_mentor in mentors_disponibles:
-        mentor = df_mentores.loc[idx_mentor]
+        mentor = df_mentors.loc[idx_mentor]
         for idx_mentore in mentores_disponibles:
-            mentore = df_mentors.loc[idx_mentore]
+            mentore = df_mentores.loc[idx_mentore]
 
             # # CRITÈRE ÉLIMINATOIRE : Vérifier d'abord la compatibilité des catégories
             # compatible, _ = self.verifier_categorie_compatible(mentor, mentore)
