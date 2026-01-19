@@ -14,6 +14,7 @@ from utils.tasks.s3 import copy_s3_files, del_s3_files
 
 from dags.sg.srh.mentorat_merci.tasks import (
     validate_params,
+    agent_inscrit,
     generer_binomes,
 )
 
@@ -65,6 +66,7 @@ def mentorat_merci() -> None:
     chain(
         validate_params(),
         looking_for_files,
+        agent_inscrit(),
         generer_binomes(),
         copy_s3_files(bucket="dsci"),
         del_s3_files(bucket="dsci"),
