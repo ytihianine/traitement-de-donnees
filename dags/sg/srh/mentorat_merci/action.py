@@ -153,6 +153,8 @@ def send_result(dfs: Mapping[str, pd.DataFrame], context: Mapping[str, Any]) -> 
         )
 
     rapport = generer_rapport(dfs=dfs)
+    print(rapport)
+
     html_content = render_template(
         template_dir=pathlib.Path(__file__).parent.resolve(),
         template_parameters={"rapport": rapport},

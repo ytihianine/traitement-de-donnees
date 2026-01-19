@@ -13,7 +13,6 @@ from utils.config.dag_params import create_default_args, create_dag_params
 
 from dags.sg.srh.mentorat_merci.tasks import (
     validate_params,
-    # clean_source,
     generer_binomes,
 )
 
