@@ -121,10 +121,10 @@ def generer_rapport(dfs: Mapping[str, pd.DataFrame]) -> str:
         rapport.append(f"Score maximum: {df_binomes['score_total'].max()}")
 
         rapport.append(
-            f"\nBinômes avec score parfait (2475): {len(df_binomes[df_binomes['score_total'] == 2475])}"
+            f"\nBinômes avec score parfait (2475p total): {len(df_binomes[df_binomes['score_total'] == 2475])}"
         )
         rapport.append(
-            f"Binômes avec catégorie OK (entre >1500): {len(df_binomes[df_binomes['score_categorie'] >= 1500])}"
+            f"Binômes avec catégorie OK: {len(df_binomes[df_binomes['score_categorie'] == 1500])}"
         )
 
     rapport.append("=" * 80)
