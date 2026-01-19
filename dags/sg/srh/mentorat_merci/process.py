@@ -82,6 +82,7 @@ def extraire_objectifs(row: pd.Series, column: str) -> List[str]:
     """Extrait et ordonne les objectifs d'une personne"""
     objectifs = []
 
+    print(row.get(key=column))
     if pd.notna(row.get(key=column)) is True:
         obj = str(row[column]).strip()
         print(obj)
