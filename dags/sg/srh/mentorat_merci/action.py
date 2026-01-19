@@ -133,7 +133,7 @@ def generer_rapport(dfs: Mapping[str, pd.DataFrame]) -> str:
 
 
 def send_result(dfs: Mapping[str, pd.DataFrame], context: Mapping[str, Any]) -> None:
-    execution_date = get_execution_date(context=context)
+    execution_date = get_execution_date(context=context, use_tz=True)
     nom_projet = get_project_name(context=context)
     tmp_path = Path(
         f"/tmp/binomes_v{execution_date.strftime(format="%Y%m%d_%Hh%M")}.xlsx"
