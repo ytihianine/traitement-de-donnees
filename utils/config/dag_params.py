@@ -3,6 +3,7 @@ from typing import Optional
 
 import pendulum
 from entities.dags import DBParams, DagParams, DagStatus, MailParams, DocsParams
+import pytz
 
 DEFAULT_OWNER = "airflow"
 DEFAULT_EMAIL_TO = ["yanis.tihianine@finances.gouv.fr"]
@@ -26,12 +27,17 @@ def get_dag_status(context: dict) -> DagStatus:
     return DagStatus(value=dag_status)
 
 
-def get_execution_date(context: dict) -> datetime:
+def get_execution_date(
+    context: dict, use_tz: bool = False, tz_zone: str = "Europe/Paris"
+) -> datetime:
     """Extract and validate execution date from context."""
     execution_date = context.get("data_interval_start")
 
     if not execution_date or not isinstance(execution_date, datetime):
         raise ValueError("Invalid execution date in Airflow context")
+
+    if use_tz:
+        execution_date = execution_date.replace(tzinfo=pytz.timezone(zone=tz_zone))
 
     return execution_date
 
