@@ -5,7 +5,7 @@ from dags.sg.srh.mentorat_merci.enums import ChoixDirection
 
 
 correspondance_objectifs = {
-    "Transmettre ma culture administrative et ministérielle": "Améliorer ma culture administrative et ministérielle",
+    "Transmettre ma culture administrative et ministérielle": "Améliorer ma culture administrative et ministérielle",  # noqa
     "Accompagner le mentoré dans la préparation des examens et concours": "Préparer un concours ou un examen professionnel",  # noqa
     "Transmettre mes compétences professionnelles, notamment d’un point de vue managérial": "Obtenir un accompagnement dans la montée en compétences d’un point de vue managérial",  # noqa
     "Développer mon réseau professionnel": "Développer mon réseau professionnel",
