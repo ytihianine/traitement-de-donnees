@@ -84,10 +84,10 @@ def trouver_meilleurs_binomes(df: pd.DataFrame) -> Mapping[str, pd.DataFrame]:
         "28. Q3_Objectif_Mentor",
     ]
     df_mentores_non_apparies = pd.DataFrame(
-        data=df_mentores.loc[list(mentors_disponibles)][cols_to_keep]
+        data=df_mentores.loc[list(mentores_disponibles)][cols_to_keep]
     )
     df_mentors_non_apparies = pd.DataFrame(
-        data=df_mentors.loc[list(mentores_disponibles)][cols_to_keep]
+        data=df_mentors.loc[list(mentors_disponibles)][cols_to_keep]
     )
 
     return {
