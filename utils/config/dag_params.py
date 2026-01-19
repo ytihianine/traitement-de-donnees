@@ -37,7 +37,7 @@ def get_execution_date(
         raise ValueError("Invalid execution date in Airflow context")
 
     if use_tz:
-        execution_date = execution_date.replace(tzinfo=pytz.timezone(zone=tz_zone))
+        execution_date = execution_date.astimezone(tz=pytz.timezone(zone=tz_zone))
 
     return execution_date
 
