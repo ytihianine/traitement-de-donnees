@@ -105,6 +105,9 @@ def calculer_score_objectifs(mentor: pd.Series, mentore: pd.Series) -> Tuple[int
     score = 0
     details = []
 
+    print(f"Objectifs du mentor: {obj_mentor}")
+    print(f"Objectifs du mentoré: {obj_mentore}")
+
     # Compare les objectifs par ordre de priorité
     max_compare = min(len(obj_mentor), len(obj_mentore), 5)
 
