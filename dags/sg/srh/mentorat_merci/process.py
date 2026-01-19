@@ -81,10 +81,10 @@ def calculer_score_categorie(mentor: pd.Series, mentore: pd.Series) -> Tuple[int
 def extraire_objectifs(row: pd.Series, column: str) -> List[str]:
     """Extrait et ordonne les objectifs d'une personne"""
     objectifs = []
-    print(row)
 
     if pd.notna(row.get(key=column)) is True:
         obj = str(row[column]).strip()
+        print(obj)
         if obj:
             obj = obj.split(sep=";")
             objectifs.extend(obj)
