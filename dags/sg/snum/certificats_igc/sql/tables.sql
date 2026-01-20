@@ -7,7 +7,8 @@ CREATE TABLE certificat_igc.aip (
     aip_balf_mail TEXT,
     aip_direction TEXT,
     import_timestamp TIMESTAMP NOT NULL,
-    import_date DATE NOT NULL
+    import_date DATE NOT NULL,
+    snapshot_id TEXT
 ) PARTITION BY RANGE (import_date);
 
 
@@ -30,5 +31,6 @@ CREATE TABLE certificat_igc.certificat (
     version TEXT,
     version_serveur TEXT,
     import_timestamp TIMESTAMP NOT NULL,
-    import_date DATE NOT NULL
+    import_date DATE NOT NULL,
+    snapshot_id TEXT
 ) PARTITION BY RANGE (import_date);
