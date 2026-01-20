@@ -32,21 +32,13 @@ def output_files() -> None:
         task_config=TaskConfig(task_id="liste_aip"),
         output_selecteur="liste_aip",
         input_selecteurs=["igc", "agents"],
-        steps=[
-            ETLStep(
-                fn=process.process_liste_aip,
-            )
-        ],
+        steps=[ETLStep(fn=process.process_liste_aip, read_data=True)],
     )
     liste_certificats = create_task(
         task_config=TaskConfig(task_id="liste_certificats"),
         output_selecteur="liste_certificats",
         input_selecteurs=["certificats", "agents"],
-        steps=[
-            ETLStep(
-                fn=process.process_liste_certificats,
-            )
-        ],
+        steps=[ETLStep(fn=process.process_liste_certificats, read_data=True)],
     )
 
     # ordre des tâches
