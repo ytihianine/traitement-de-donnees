@@ -10,6 +10,8 @@ from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
+    create_projet_snapshot,
+    get_projet_snapshot,
     import_file_to_db,
     ensure_partition,
     # set_dataset_last_update_date,
@@ -42,7 +44,7 @@ LINK_DOC_DATA = ""  # noqa
     default_args=create_default_args(retries=0),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.DEV,
+        dag_status=DagStatus.RUN,
         prod_schema="certificat_igc",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,
@@ -68,6 +70,8 @@ def certificats_igc() -> None:
     """ Task order """
     chain(
         looking_for_files,
+        create_projet_snapshot(),
+        get_projet_snapshot(),
         source_files(),
         output_files(),
         ensure_partition(),
