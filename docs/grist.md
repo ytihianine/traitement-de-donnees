@@ -148,7 +148,7 @@ L'ensemble des tables seront présentées sous forme de diagramme.
 
 ### Générer le script SQL
 
-Depuis [https://dbdiagram.io](https://dbdiagram.io), exporter le résultat au pour PostgreSQL.
+Depuis [https://dbdiagram.io](https://dbdiagram.io), exporter le résultat au bon format pour PostgreSQL.
 
 ### Créer le dag associé
 
