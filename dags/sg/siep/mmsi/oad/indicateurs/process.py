@@ -29,16 +29,25 @@ def process_oad_indic(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_accessibilite(df: pd.DataFrame) -> pd.DataFrame:
-    df = (
-        df.assign(
-            date_mise_en_accessibilite=pd.to_datetime(
-                df["date_mise_en_accessibilite"], dayfirst=True
-            ),
-            motif_derogation=df["motif_derogation"].str.split().str.join(" "),
-        )
-        .replace({"Oui": True, "Non": False})
-        .convert_dtypes()
-    )
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "attestation_accessibilite",
+        "beneficie_derogation",
+        "code_bat_ter",
+        "date_mise_en_accessibilite",
+        "fait_objet_adap",
+        "motif_derogation",
+        "numero_adap",
+        "presence_registre_accessibilite",
+    ]
+    df = df.loc[:, cols_to_keep]
+
+    df = df.assign(
+        date_mise_en_accessibilite=pd.to_datetime(
+            df["date_mise_en_accessibilite"], dayfirst=True
+        ),
+        motif_derogation=df["motif_derogation"].str.split().str.join(" "),
+    ).replace({"Oui": True, "Non": False})
 
     return df
 
@@ -74,6 +83,17 @@ def process_accessibilite_detail(df: pd.DataFrame) -> pd.DataFrame:
 
         return correspondance.get(niveau, "NC")
 
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "accessibilite_acces",
+        "accessibilite_accueil",
+        "accessibilite_general",
+        "accessibilite_sanitaire",
+        "accessibilite_services",
+        "code_bat_ter",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     df = df.melt(
         id_vars=["code_bat_ter"],
         value_vars=[
@@ -99,6 +119,19 @@ def process_accessibilite_detail(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_bacs(df: pd.DataFrame) -> pd.DataFrame:
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "classe_gtb",
+        "code_bat_ter",
+        "commentaire_general",
+        "commentaire_soumission",
+        "date_derniere_inspection",
+        "date_installation_gtb",
+        "presence_gtb",
+        "soumis_decret_bacs",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     df = (
         df.assign(
             date_installation_gtb=pd.to_datetime(
@@ -135,6 +168,16 @@ def process_bacs(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_bails(df: pd.DataFrame) -> pd.DataFrame:
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "code_bat_ter",
+        "date_debut_bail",
+        "date_fin_bail",
+        "duree_bail",
+        "type_contrat",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     df = df.assign(
         date_debut_bail=df["date_debut_bail"].apply(
             lambda x: datetime.strptime(x, "%d/%m/%Y") if isinstance(x, str) else pd.NaT
@@ -149,6 +192,32 @@ def process_bails(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_couts(df: pd.DataFrame) -> pd.DataFrame:
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "annee_charges_copropriete",
+        "annee_charges_locatives",
+        "annee_loyers_budgetaires",
+        "annee1_charges_fonct",
+        "annee1_loyer_ht_hc_ttc",
+        "annee2_charges_fonc",
+        "annee2_loyer_ht_hc_ttc",
+        "charges_copropriete",
+        "charges_fonc_annee1",
+        "charges_fonc_annee2",
+        "charges_locatives",
+        "code_bat_ter",
+        "codhc_surfacique_sub",
+        "loyer_annuel_ht_annee1",
+        "loyer_annuel_ht_annee2",
+        "loyer_budgetaire_ttc",
+        "loyer_hc_ttc_annee1",
+        "loyer_hc_ttc_annee2",
+        "loyer_surfacique_sub",
+        "loyers_budgetaires_2018",
+        "plafond_loyer_surfacique_sub",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     df = df.assign(
         annee_charges_copropriete=df["annee_charges_copropriete"].replace("-", None),
         annee_charges_locatives=df["annee_charges_locatives"].replace("-", None),
@@ -163,6 +232,24 @@ def process_couts(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_deet_energie(df: pd.DataFrame) -> pd.DataFrame:
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "annee1_conso_eau",
+        "annee1_conso_ef_et_ges",
+        "annee2_conso_eau",
+        "annee2_conso_ef_et_ges",
+        "bat_assujettis_deet",
+        "code_bat_ter",
+        "conso_eau_annee1",
+        "conso_eau_annee2",
+        "conso_ef_annee1",
+        "conso_ef_annee2",
+        "deet_commentaire",
+        "emission_ges_annee1",
+        "emission_ges_annee2",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     df = df.assign(
         annee1_conso_ef_et_ges=df["annee1_conso_ef_et_ges"].replace("-", None),
         annee2_conso_ef_et_ges=df["annee2_conso_ef_et_ges"].replace("-", None),
@@ -178,6 +265,85 @@ def process_deet_energie(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_eds(df: pd.DataFrame) -> pd.DataFrame:
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "code_bat_ter",
+        "eds_ascenseurs_constate",
+        "eds_ascenseurs_theorique",
+        "eds_charpente_constate",
+        "eds_charpente_theorique",
+        "eds_clotures_constate",
+        "eds_clotures_theorique",
+        "eds_couv_ext_constate",
+        "eds_couv_ext_theorique",
+        "eds_distri_chauff_constate",
+        "eds_distri_chauff_theorique",
+        "eds_distri_clim_constate",
+        "eds_distri_clim_theorique",
+        "eds_elec_cfa_info_constate",
+        "eds_elec_cfa_info_theorique",
+        "eds_elec_cfa_reseaux_constate",
+        "eds_elec_cfa_reseaux_theorique",
+        "eds_elec_cfo_dist_prim_constate",
+        "eds_elec_cfo_dist_prim_theorique",
+        "eds_elec_cfo_dist_sec_constate",
+        "eds_elec_cfo_dist_sec_theorique",
+        "eds_elec_cfo_ecl_constate",
+        "eds_elec_cfo_ecl_theorique",
+        "eds_emiss_chauff_constate",
+        "eds_emiss_chauff_theorique",
+        "eds_emiss_clim_constate",
+        "eds_emiss_clim_theorique",
+        "eds_es_amen_ext_constate",
+        "eds_es_amen_int_constate",
+        "eds_es_clos_couvert_structure_constate",
+        "eds_es_equipements_constate",
+        "eds_escal_int_constate",
+        "eds_escal_int_theorique",
+        "eds_espaces_verts_constate",
+        "eds_espaces_verts_theorique",
+        "eds_etat_de_sante_general",
+        "eds_facade_constate",
+        "eds_facade_theorique",
+        "eds_incendie_extinction_constate",
+        "eds_incendie_extinction_theorique",
+        "eds_incendie_securite_constate",
+        "eds_incendie_securite_theorique",
+        "eds_murs_int_constate",
+        "eds_murs_int_theorique",
+        "eds_ouvert_ext_constate",
+        "eds_ouvert_ext_theorique",
+        "eds_ouvert_int_constate",
+        "eds_ouvert_int_theorique",
+        "eds_plafonds_constate",
+        "eds_plafonds_theorique",
+        "eds_prod_chauff_constate",
+        "eds_prod_chauff_theorique",
+        "eds_prod_clim_constate",
+        "eds_prod_clim_theorique",
+        "eds_reseaux_constate",
+        "eds_reseaux_theorique",
+        "eds_sanit_distri_eau_constate",
+        "eds_sanit_distri_eau_theorique",
+        "eds_sanit_evac_constate",
+        "eds_sanit_evac_theorique",
+        "eds_sanit_prod_eau_constate",
+        "eds_sanit_prod_eau_theorique",
+        "eds_sanit_robin_constate",
+        "eds_sanit_robin_theorique",
+        "eds_signal_constate",
+        "eds_signal_theorique",
+        "eds_sols_constate",
+        "eds_sols_theorique",
+        "eds_structure_constate",
+        "eds_structure_theorique",
+        "eds_ventil_constate",
+        "eds_ventil_theorique",
+        "eds_voiries_constate",
+        "eds_voiries_theorique",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     common_col = ["code_bat_ter"]
 
     # Traitement partie "théorique"
@@ -238,6 +404,38 @@ def process_eds(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_exploitation(df: pd.DataFrame) -> pd.DataFrame:
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "code_bat_ter",
+        "ee_env_commentaire",
+        "ee_env_etat",
+        "ee_equipement_tech_etat",
+        "ee_equipements_tech_commentaire",
+        "exploitation_ascenseur_commentaire",
+        "exploitation_ascenseur_etat",
+        "exploitation_bureautique_commentaire",
+        "exploitation_bureautique_etat",
+        "exploitation_chauffage_commentaire",
+        "exploitation_chauffage_etat",
+        "exploitation_e_c_s_commentaire",
+        "exploitation_e_c_s_etat",
+        "exploitation_eclairage_artificiel_commentaire",
+        "exploitation_eclairage_artificiel_etat",
+        "exploitation_menuiseries_ext_commentaire",
+        "exploitation_menuiseries_ext_etat",
+        "exploitation_murs_ext_commentaire",
+        "exploitation_murs_ext_etat",
+        "exploitation_planchers_bas_commentaire",
+        "exploitation_planchers_bas_etat",
+        "exploitation_refroidissement_commentaire",
+        "exploitation_refroidissement_etat",
+        "exploitation_toiture_commentaire",
+        "exploitation_toiture_etat",
+        "exploitation_ventilation_commentaire",
+        "exploitation_ventilation_etat",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     common_col = ["code_bat_ter"]
 
     # Traitement partie "théorique"
@@ -286,6 +484,8 @@ def process_localisation(
 ) -> pd.DataFrame:
     # Merging data from both sources
     df = pd.merge(left=df_oad_carac, right=df_oad_indic, on="code_bat_ter", how="left")
+
+    # Conserver uniquement les colonnes de ce dataset
     cols_to_keep = [
         "code_bat_ter",
         "latitude",
@@ -344,6 +544,16 @@ def process_localisation(
 
 
 def process_notes(df: pd.DataFrame) -> pd.DataFrame:
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "code_bat_ter",
+        "completude",
+        "modernisation",
+        "optimisation",
+        "preservation",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     df = df.assign(
         modernisation=df["modernisation"].str.replace(",", "."),
         optimisation=df["optimisation"].str.replace(",", "."),
@@ -353,7 +563,16 @@ def process_notes(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_effectif(df: pd.DataFrame) -> pd.DataFrame:
-    # Aucune actions nécessaire
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "code_bat_ter",
+        "effectif_administratif",
+        "effectif_physique",
+        "nb_positions_de_travail",
+        "nb_postes",
+        "nb_residents",
+    ]
+    df = df.loc[:, cols_to_keep]
     return df
 
 
@@ -368,6 +587,16 @@ def process_proprietaire(df: pd.DataFrame) -> pd.DataFrame:
         statut_occupation = statut_occupation.strip()
 
         return correspondance.get(statut_occupation, "NC")
+
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "code_bat_ter",
+        "numero_proprietaire",
+        "statut_occupation",
+        "type_proprietaire",
+        "type_proprietaire_detail",
+    ]
+    df = df.loc[:, cols_to_keep]
 
     # Create calculated column
     df["locatif_domanial"] = list(map(get_locatif_domanial, df["statut_occupation"]))
@@ -390,6 +619,15 @@ def process_reglementation(df: pd.DataFrame) -> pd.DataFrame:
 
         return correspondance.get(reglementation, "NC")
 
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "classement_monument_historique",
+        "code_bat_ter",
+        "igh",
+        "reglementation",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     df = df.assign(
         igh=(df["igh"].str.lower().replace({"oui": True, "non": False})),
     )
@@ -411,6 +649,7 @@ def process_strategie(
         keep="first",
         ignore_index=True,
     )
+    # Conserver uniquement les colonnes de ce dataset
     cols_to_keep = [
         "code_bat_ter",
         "perimetre_spsi_initial",
@@ -426,15 +665,38 @@ def process_strategie(
 
 
 def process_surface(df: pd.DataFrame) -> pd.DataFrame:
-    # Aucune actions nécessaire
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "code_bat_ter",
+        "contenance_cadastrale",
+        "sba",
+        "sba_optimisee",
+        "shon",
+        "sub",
+        "sub_optimisee",
+        "sun",
+        "surface_aire_amenagee",
+        "surface_de_plancher",
+    ]
+    df = df.loc[:, cols_to_keep]
     return df
 
 
 def process_valeur(df: pd.DataFrame) -> pd.DataFrame:
-    # Aucune actions nécessaire
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "code_bat_ter",
+        "valorisation_chorus",
+    ]
+    df = df.loc[:, cols_to_keep]
     return df
 
 
 def process_typologie(df: pd.DataFrame) -> pd.DataFrame:
-    # Aucune actions nécessaire
+    # Conserver uniquement les colonnes de ce dataset
+    cols_to_keep = [
+        "code_bat_ter",
+        "usage_detaille_du_bien",
+    ]
+    df = df.loc[:, cols_to_keep]
     return df
