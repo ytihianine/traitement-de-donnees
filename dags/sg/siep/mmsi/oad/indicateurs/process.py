@@ -16,6 +16,12 @@ def filter_bien(df: pd.DataFrame, df_bien: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def filtrer_oad_indic(
+    df_oad_indic: pd.DataFrame, df_biens: pd.DataFrame
+) -> pd.DataFrame:
+    return filter_bien(df=df_oad_indic, df_bien=df_biens)
+
+
 def process_oad_indic(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["code_bat_ter"])
     df = df.drop_duplicates(subset=["code_bat_ter"], ignore_index=True)

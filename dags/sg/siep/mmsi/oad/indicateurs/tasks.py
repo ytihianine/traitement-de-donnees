@@ -21,7 +21,7 @@ def tasks_oad_indicateurs():
         task_config=TaskConfig(task_id="oad_indic"),
         output_selecteur="oad_indic",
         input_selecteurs=["oad_indic", "biens"],
-        steps=[ETLStep(fn=process.filter_bien, read_data=True)],
+        steps=[ETLStep(fn=process.filtrer_oad_indic, read_data=True)],
         # use_required_cols=False,
     )
     accessibilite = create_task(
