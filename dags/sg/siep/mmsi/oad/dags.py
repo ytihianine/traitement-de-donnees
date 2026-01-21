@@ -56,7 +56,7 @@ LINK_DOC_DATA = "Non-défini"  # noqa
     default_args=create_default_args(retries=0),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.RUN,
+        dag_status=DagStatus.DEV,
         prod_schema="siep",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,
