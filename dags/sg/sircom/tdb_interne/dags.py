@@ -65,7 +65,7 @@ def tdb_sircom() -> None:
         ),
         [abonnes_visites(), budget(), enquetes(), metiers(), ressources_humaines()],
         create_tmp_tables(),
-        import_file_to_db.partial(keep_file_id_col=True).expand(
+        import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
         copy_tmp_table_to_real_table(),
