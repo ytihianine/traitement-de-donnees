@@ -51,11 +51,12 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
     default_args=create_default_args(),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.DEV,
+        dag_status=DagStatus.RUN,
         prod_schema="siep",
         lien_pipeline=LINK_DOC_PIPELINE,
         lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
+        mail_enable=True,
+        mail_to=["mmsi.siep@finances.gouv.fr"],
     ),
     on_failure_callback=create_airflow_callback(
         mail_status=MailStatus.ERROR,
