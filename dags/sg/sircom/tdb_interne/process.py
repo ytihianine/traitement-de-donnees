@@ -8,6 +8,13 @@ from utils.control.number import is_in_range, is_upper
 from utils.dataframe import tag_last_value_rows
 
 
+def drop_additionals_columns(
+    df: pd.DataFrame, columns: list[str] = ["commentaire_archive", "id"]
+) -> pd.DataFrame:
+    df = df.drop(columns=columns)
+    return df
+
+
 def generic_convert_to_float(value: str | None) -> float | None:
     if value:
         result = round(number=float(value) / 100, ndigits=4)
@@ -55,6 +62,7 @@ def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:
 
 def process_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
     # Processing des données
+    df = drop_additionals_columns(df=df)
     df["date"] = pd.to_datetime(df["mois"], unit="s")
     df = pd.melt(
         df,
@@ -96,6 +104,7 @@ def process_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_abonnes_aux_lettres(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["date"] = pd.to_datetime(df["mois"], unit="s")
     df = df.drop(columns=["mois"])
 
@@ -125,6 +134,7 @@ def process_abonnes_aux_lettres(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_visites_portail(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["date"] = pd.to_datetime(df["mois"], unit="s")
     df = df.drop(columns=["mois"])
 
@@ -143,6 +153,7 @@ def process_visites_portail(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_visites_bercyinfo(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["date"] = pd.to_datetime(df["mois"], unit="s")
     df = df.drop(columns=["mois"])
 
@@ -161,6 +172,7 @@ def process_visites_bercyinfo(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_performances_lettres(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["date"] = pd.to_datetime(df["mois"], unit="s")
     df = df.drop(columns=["mois"])
 
@@ -195,6 +207,7 @@ def process_performances_lettres(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_visites_alize(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["date"] = pd.to_datetime(df["mois"], unit="s")
     df = df.drop(columns=["mois"])
 
@@ -213,6 +226,7 @@ def process_visites_alize(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_visites_intranet_sg(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["date"] = pd.to_datetime(df["mois"], unit="s")
     df = df.drop(columns=["mois"])
 
@@ -231,6 +245,7 @@ def process_visites_intranet_sg(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_budget_depense(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df = df.drop(columns=["faits_marquants"])
 
     txt_colnames = ["semestre", "type_depense"]
@@ -244,6 +259,7 @@ def process_budget_depense(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_engagement_agents_mef(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     # Clean
     df["indicateurs"] = df["indicateurs"].str.strip()
     cols_with_values = ["taux_engagement"]
@@ -260,6 +276,7 @@ def process_engagement_agents_mef(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_qualite_vie_travail(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     # Clean
     df["indicateurs"] = df["indicateurs"].str.strip()
     cols_with_values = ["taux_satisfaction"]
@@ -277,6 +294,7 @@ def process_qualite_vie_travail(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_collab_inter_structure(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     txt_colnames = ["structure", "indicateurs"]
     for colname in txt_colnames:
         df[colname] = df[colname].str.strip()
@@ -285,6 +303,7 @@ def process_collab_inter_structure(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_obs_interne(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["indicateurs"] = df["indicateurs"].str.strip()
     df["valeur"] = np.where(
         df["unite"] == "%", df["valeur"].apply(generic_convert_to_float), df["valeur"]
@@ -294,6 +313,7 @@ def process_obs_interne(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_indicateurs_metiers(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["indicateurs"] = df["indicateurs"].str.strip()
     df["unite"] = df["unite"].str.strip()
 
@@ -303,6 +323,7 @@ def process_indicateurs_metiers(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_enquete_satisfaction(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["indicateurs"] = df["indicateurs"].str.strip()
     df["unite"] = df["unite"].str.strip()
 
@@ -312,6 +333,7 @@ def process_enquete_satisfaction(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_etudes(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["demandeurs"] = df["demandeurs"].str.strip()
 
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
@@ -320,12 +342,14 @@ def process_etudes(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_communique_presse(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
     df = tag_last_value_rows(df=df, colname_max_value="date")
     return df
 
 
 def process_studio_graphique(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["demandeurs"] = df["demandeurs"].str.strip()
     df = df.dropna(subset=["semestre", "creation_graphique"])
 
@@ -335,6 +359,7 @@ def process_studio_graphique(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_rh_formation(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     df["indicateurs"] = df["indicateurs"].str.strip()
     df = df.drop(columns=["precision"])
 
@@ -344,6 +369,7 @@ def process_rh_formation(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_rh_turnover(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     # Ajout de la date
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
 
@@ -363,6 +389,7 @@ def process_rh_turnover(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_rh_contractuel(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     # Generate date
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
 
@@ -383,6 +410,7 @@ def process_rh_contractuel(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_obs_interne_participation(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     # Clean
     df = df.rename(columns={"taux_de_participation": "taux_participation"})
     df = df.replace("", None)
@@ -401,6 +429,7 @@ def process_obs_interne_participation(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_enquete_360(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     # Clean
     df = df.drop(columns=["unite"])
     df = df.replace("", None)
@@ -411,6 +440,7 @@ def process_enquete_360(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ouverture_lettre_alize(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     # Clean
     df = df.rename(columns={"taux_d_ouverture": "taux_ouverture"})
     df = df.replace("", None)
@@ -426,6 +456,7 @@ def process_ouverture_lettre_alize(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_engagement_environnement(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
     # Processing des données
     values_to_replace = {
         "tout_a_fait_d_accord": "Tout à fait d'accord",
