@@ -28,6 +28,7 @@ def process_oad_file(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = df.replace("NC", pd.NA)
     df = df.replace("s/o", pd.NA)
+    df = df.convert_dtypes()
     return df
 
 
