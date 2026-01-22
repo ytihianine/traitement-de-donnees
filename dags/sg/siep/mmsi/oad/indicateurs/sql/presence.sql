@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS siep.bien_effectif (
     effectif_administratif INTEGER,
     effectif_physique INTEGER,
     nb_positions_de_travail INTEGER,
-    nb_postes INTEGER,
+    nb_postes FLOAT,
     nb_residents FLOAT,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
