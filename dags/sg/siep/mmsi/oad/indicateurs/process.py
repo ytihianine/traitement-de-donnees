@@ -573,6 +573,16 @@ def process_effectif(df: pd.DataFrame) -> pd.DataFrame:
         "nb_residents",
     ]
     df = df.loc[:, cols_to_keep]
+
+    # Process
+    int_cols = [
+        "effectif_administratif",
+        "effectif_physique",
+        "nb_positions_de_travail",
+        "nb_postes",
+    ]
+    df[int_cols] = df[int_cols].astype("Int64")
+
     return df
 
 
