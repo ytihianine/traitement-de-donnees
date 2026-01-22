@@ -78,7 +78,7 @@ def oad_referentiel() -> None:
     chain(
         validate_params(),
         looking_for_files,
-        get_projet_snapshot(),
+        get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         bien_typologie(),
         create_tmp_tables(),
         import_file_to_db.expand(
