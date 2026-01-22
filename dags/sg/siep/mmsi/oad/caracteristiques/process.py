@@ -26,7 +26,8 @@ def process_oad_file(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[
         (df["presence_mef_bat"] == "Avec MEF") & (df["filtre_manuel_a_conserver"])
     ]
-    df = df.replace("NC", None)
+    df = df.replace("NC", pd.NA)
+    df = df.replace("s/o", pd.NA)
     return df
 
 
