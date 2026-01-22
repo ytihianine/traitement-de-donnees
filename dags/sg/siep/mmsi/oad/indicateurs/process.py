@@ -574,17 +574,6 @@ def process_effectif(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = df.loc[:, cols_to_keep]
 
-    # Process
-    int_cols = [
-        "effectif_administratif",
-        "effectif_physique",
-        "nb_positions_de_travail",
-        "nb_postes",
-    ]
-    # Convertir colonne par colonne pour gérer les NaN
-    for col in int_cols:
-        df[col] = df[col].astype("Int64")
-
     return df
 
 
