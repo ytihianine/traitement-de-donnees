@@ -8,8 +8,10 @@ from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.sql import (
     LoadStrategy,
+    _get_snapshot_id,
     create_tmp_tables,
     copy_tmp_table_to_real_table,
+    get_projet_snapshot,
     import_file_to_db,
     delete_tmp_tables,
     # set_dataset_last_update_date,
@@ -76,12 +78,13 @@ def oad_referentiel() -> None:
     chain(
         validate_params(),
         looking_for_files,
+        get_projet_snapshot(),
         bien_typologie(),
         create_tmp_tables(),
         import_file_to_db.expand(
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
-        copy_tmp_table_to_real_table(load_strategy=LoadStrategy.INCREMENTAL),
+        copy_tmp_table_to_real_table(load_strategy=LoadStrategy.APPEND),
         copy_s3_files(
             bucket="dsci",
         ),
