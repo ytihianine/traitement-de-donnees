@@ -32,7 +32,7 @@ from dags.sg.siep.mmsi.oad_referentiel.tasks import validate_params, bien_typolo
 # Mails
 nom_projet = "Outil aide diagnostic - référentiel"
 LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/cgefi/barometre?ref_type=heads"  # noqa
-LINK_DOC_DATA = ""  # noqa
+LINK_DOC_DATA = "Non-défini"  # noqa
 
 
 # Définition du DAG
