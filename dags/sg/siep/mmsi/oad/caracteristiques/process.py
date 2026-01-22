@@ -28,7 +28,7 @@ def process_oad_file(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = df.replace("NC", pd.NA)
     df = df.replace("s/o", pd.NA)
-    df = df.convert_dtypes()
+    df["code_insee_normalise"] = df["code_insee_normalise"].astype(str)
     return df
 
 
