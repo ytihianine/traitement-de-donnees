@@ -4,8 +4,7 @@ from datetime import datetime
 # Imports infra
 from infra.http_client.factory import create_http_client
 from infra.http_client.config import ClientConfig
-from enums.dags import HttpHandlerType
-#from dags.sg.dsci.weather_api.variables import PROXY, AGENT
+from enums.http import HttpHandlerType
 from utils.config.vars import AGENT, PROXY
 
 
