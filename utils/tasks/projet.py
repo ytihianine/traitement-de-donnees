@@ -7,12 +7,14 @@ from entities.dags import (
     DbInfo,
     Documentation,
     ProjetS3,
+    SelecteurInfo,
     SelecteurS3,
     SourceFichier,
 )
 from utils.config.tasks import (
     get_projet_documentation,
     get_projet_contact,
+    get_projet_selecteur_info,
     get_projet_source_fichier,
     get_projet_db_info,
     get_projet_s3,
@@ -66,6 +68,15 @@ def get_selecteur_s3_task(
     """Task to fetch selecteur S3 configurations at runtime."""
     s3_configs = get_projet_selecteur_s3(nom_projet=nom_projet, context=context)
     return s3_configs
+
+
+@task()
+def get_config_selecteur_info(
+    nom_projet: str | None = None, **context
+) -> list[SelecteurInfo]:
+    """Task to fetch selecteur S3 configurations at runtime."""
+    s3_db_configs = get_projet_selecteur_info(nom_projet=nom_projet, context=context)
+    return s3_db_configs
 
 
 @task_group()
