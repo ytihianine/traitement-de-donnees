@@ -6,10 +6,10 @@ from pprint import pprint
 from airflow.sdk import dag, task
 from airflow.sdk.bases.operator import chain
 
-# from infra.mails.default_smtp import create_airflow_callback, MailStatus
+# from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from infra.mails.default_smtp import (
     send_mail,
-    create_airflow_callback,
+    create_send_mail_callback,
     MailStatus,
     MailMessage,
 )
@@ -56,7 +56,7 @@ default_args: dict[str, Any] = {
             "lien_donnees": LINK_DOC_DONNEES,
         },
     },
-    on_failure_callback=create_airflow_callback(mail_status=MailStatus.ERROR),
+    on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )
 def dag_verification() -> None:
     @task
@@ -82,12 +82,12 @@ def dag_verification() -> None:
 
     @task
     def send_error_mail(**context) -> None:
-        mail_task = create_airflow_callback(mail_status=MailStatus.ERROR)
+        mail_task = create_send_mail_callback(mail_status=MailStatus.ERROR)
         mail_task(context=context)
 
     @task
     def send_success_mail(**context) -> None:
-        mail_task = create_airflow_callback(mail_status=MailStatus.SUCCESS)
+        mail_task = create_send_mail_callback(mail_status=MailStatus.SUCCESS)
         mail_task(context=context)
 
     # Ordre des tâches

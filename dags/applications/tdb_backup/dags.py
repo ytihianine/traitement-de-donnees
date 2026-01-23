@@ -4,7 +4,7 @@
 # from airflow.sdk.bases.operator import chain
 # from airflow.utils.dates import days_ago
 
-# from infra.mails.default_smtp import create_airflow_callback, MailStatus
+# from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
 # from dags.applications.tdb_backup.tasks import (
 #     validate_params,
@@ -44,10 +44,10 @@
 #         },
 #         "docs": {"lien_pipeline": LINK_DOC_PIPELINE},
 #     },
-#     on_failure_callback=create_airflow_callback(
+#     on_failure_callback=create_send_mail_callback(
 #         mail_status=MailStatus.ERROR,
 #     ),
-#     on_success_callback=create_airflow_callback(mail_status=MailStatus.SUCCESS),
+#     on_success_callback=create_send_mail_callback(mail_status=MailStatus.SUCCESS),
 #     default_args=default_args,
 # )
 # def sauvegarde_pipeline():

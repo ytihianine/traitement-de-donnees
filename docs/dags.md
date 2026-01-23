@@ -299,18 +299,18 @@ def calculer_taux_conversion(df: pd.DataFrame) -> pd.DataFrame:
 ### 1. Callbacks de Notification
 
 ```python
-from infra.mails.default_smtp import create_airflow_callback, MailStatus
+from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
 @dag(
     ...,
-    on_failure_callback=create_airflow_callback(mail_status=MailStatus.ERROR),
-    on_success_callback=create_airflow_callback(mail_status=MailStatus.SUCCESS)
+    on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
+    on_success_callback=create_send_mail_callback(mail_status=MailStatus.SUCCESS)
 )
 def mon_dag():
     # Tasks avec callbacks individuels
     risky_task = create_etl_task(
         selecteur="data_source",
-        on_failure_callback=create_airflow_callback(mail_status=MailStatus.ERROR)
+        on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR)
     )
 ```
 

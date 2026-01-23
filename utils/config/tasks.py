@@ -1,18 +1,49 @@
 """Functions for retrieving and managing project configurations."""
 
-from typing import List, Optional
+from typing import Any, Mapping, Optional
+import logging
 
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    before_sleep_log,
+)
 import pandas as pd
 
 from utils.config.dag_params import get_project_name
-from entities.dags import SelecteurConfig
+from entities.dags import (
+    Contact,
+    DbInfo,
+    Documentation,
+    ProjetS3,
+    SelecteurConfig,
+    SelecteurInfo,
+    SelecteurS3,
+    SourceFichier,
+    SourceGrist,
+)
 from utils.exceptions import ConfigError
 from infra.database.factory import create_db_handler
 from utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
 
 CONF_SCHEMA = "conf_projets"
+logger = logging.getLogger(name=__name__)
+
+# Configuration du retry decorator
+db_retry = retry(
+    retry=retry_if_exception_type(
+        exception_types=(ConnectionError, TimeoutError, Exception)
+    ),
+    stop=stop_after_attempt(max_attempt_number=3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    before_sleep=before_sleep_log(logger, log_level=logging.WARNING),
+    reraise=True,
+)
 
 
+@db_retry
 def get_config(nom_projet: str, selecteur: Optional[str] = None) -> pd.DataFrame:
     """Get configuration for a specific selecteur in a project.
 
@@ -26,7 +57,7 @@ def get_config(nom_projet: str, selecteur: Optional[str] = None) -> pd.DataFrame
     Raises:
         ValueError: If no configuration is found for the given project and selector
     """
-    db = create_db_handler(DEFAULT_PG_CONFIG_CONN_ID)
+    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     query = f"""
         SELECT nom_projet, selecteur, nom_source, filename, s3_key,
@@ -45,7 +76,7 @@ def get_config(nom_projet: str, selecteur: Optional[str] = None) -> pd.DataFrame
     # remove trailing semicolon to avoid DB API issues
     query = query.strip() + ";"
 
-    df = db.fetch_df(query, tuple(params))
+    df = db.fetch_df(query, parameters=tuple(params))
 
     if df.empty:
         raise ConfigError(
@@ -57,12 +88,14 @@ def get_config(nom_projet: str, selecteur: Optional[str] = None) -> pd.DataFrame
     return df.sort_values(by=["tbl_order"])
 
 
-def get_projet_config(nom_projet: str) -> list[SelecteurConfig]:
+def get_projet_config(
+    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
+) -> list[SelecteurConfig]:
     """Get configuration for a specific selecteur in a project.
 
     Args:
+        context: Airflow task context
         nom_projet: Project name
-        selecteur: Configuration selector
 
     Returns:
         SelecteurConfig dictionary with configuration details
@@ -70,10 +103,19 @@ def get_projet_config(nom_projet: str) -> list[SelecteurConfig]:
     Raises:
         ValueError: If no configuration is found for the given project and selector
     """
+    if nom_projet is None and context is None:
+        raise ValueError("nom_projet or context must be provided")
+    if nom_projet is None and context is not None:
+        nom_projet = get_project_name(context=context)
+
+    if nom_projet is None:
+        raise ValueError("Could not determine project name from context")
+
     df_projet_config = get_config(nom_projet=nom_projet)
     if df_projet_config.empty:
         raise ConfigError(
-            f"No configuration found for project {nom_projet}", nom_projet=nom_projet
+            message=f"No configuration found for project {nom_projet}",
+            nom_projet=nom_projet,
         )
 
     records = df_projet_config.to_dict("records")
@@ -98,7 +140,7 @@ def get_selecteur_config(nom_projet: str, selecteur: str) -> SelecteurConfig:
     df_selecteur_config = get_config(nom_projet=nom_projet, selecteur=selecteur)
     if df_selecteur_config.empty:
         raise ConfigError(
-            f"No configuration found for project {nom_projet} and selector {selecteur}",
+            message=f"No configuration found for project {nom_projet} and selector {selecteur}",
             nom_projet=nom_projet,
             selecteur=selecteur,
         )
@@ -107,6 +149,7 @@ def get_selecteur_config(nom_projet: str, selecteur: str) -> SelecteurConfig:
     return SelecteurConfig(**record)
 
 
+@db_retry
 def get_cols_mapping(
     nom_projet: str,
     selecteur: str,
@@ -118,10 +161,10 @@ def get_cols_mapping(
         Dataframe
         Columns: selecteur, colname_source, colname_dest
     """
-    db = create_db_handler(DEFAULT_PG_CONFIG_CONN_ID)
+    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     df = db.fetch_df(
-        f"""SELECT cpvcm.nom_projet, cpvcm.selecteur, cpvcm.colname_source, cpvcm.colname_dest
+        query=f"""SELECT cpvcm.nom_projet, cpvcm.selecteur, cpvcm.colname_source, cpvcm.colname_dest
             FROM {CONF_SCHEMA}.vue_cols_mapping cpvcm
             WHERE cpvcm.nom_projet = %s AND cpvcm.selecteur = %s;
         """,
@@ -145,85 +188,619 @@ def format_cols_mapping(
     return cols_map
 
 
-def get_required_cols(nom_projet: str, selecteur: str) -> pd.DataFrame:
+@db_retry
+def _get_db_info_tbl_names(
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+    selecteur: str | None = None,
+) -> list[DbInfo]:
+    """Get database info for a project and optionally a specific selecteur.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+        selecteur: Optional selecteur filter
+
+    Returns:
+        List of DbInfo objects ordered by tbl_order
     """
-    Permet de récupérer les colonnes d'un fichier.
-    Cas d'usage: 1 fichier source doit être séparé en plusieurs fichiers.
-    Output:
-        Dataframe
-        Columns: selecteur, colname_source, colname_dest
+    if nom_projet is None and context is None:
+        raise ValueError("nom_projet or context must be provided")
+
+    if nom_projet is None and context is not None:
+        nom_projet = get_project_name(context=context)
+
+    if nom_projet is None:
+        raise ValueError("Could not determine project name from context")
+
+    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+
+    query = f"""
+        SELECT cppd.projet, cppd.selecteur, cppd.tbl_name, cppd.tbl_order,
+               cppd.is_partitionned, cppd.partition_period, cppd.load_strategy
+        FROM {CONF_SCHEMA}.projet_database_vw cppd
+        WHERE cppd.tbl_name IS NOT NULL
+            AND cppd.tbl_name <> ''
+            AND cppd.projet = %s
     """
-    db = create_db_handler(DEFAULT_PG_CONFIG_CONN_ID)
 
-    df = db.fetch_df(
-        f"""SELECT cpvcr.nom_projet, cpvcr.selecteur, cpvcr.colname_dest
-            FROM {CONF_SCHEMA}.vue_cols_requises cpvcr
-            WHERE cpvcr.nom_projet = '{nom_projet}'
-                AND cpvcr.selecteur='{selecteur}';
-        """
-    )
+    params = [nom_projet]
 
-    return df
+    if selecteur is not None:
+        query += " AND cppd.selecteur = %s"
+        params.append(selecteur)
+
+    query += " ORDER BY cppd.tbl_order;"
+
+    df = db.fetch_df(query, parameters=tuple(params))
+
+    if df.empty:
+        return []
+
+    records = df.to_dict("records")
+    records = [{str(k): v for k, v in record.items()} for record in records]
+    return [DbInfo(**record) for record in records]
 
 
-def get_tbl_names(nom_projet: str, order_tbl: bool = False) -> List[str]:
+def get_tbl_names(
+    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
+) -> list[str]:
     """Get all table names for a project.
 
     Used for temporary table creation.
 
     Args:
+        context: Airflow task context
         nom_projet: Project name
 
     Returns:
-        List of table names
+        List of table names ordered by tbl_order
     """
-    db = create_db_handler(DEFAULT_PG_CONFIG_CONN_ID)
-
-    query = f"""SELECT vcp.tbl_name
-            FROM {CONF_SCHEMA}.vue_conf_projets vcp
-            WHERE vcp.tbl_name IS NOT NULL
-                AND vcp.tbl_name <> ''
-                AND vcp.nom_projet=%s
-            ORDER BY vcp.tbl_order;
-            ;
-        """
-
-    df = db.fetch_df(query, (nom_projet,))
-
-    if df.empty:
-        return []
-
-    return df.loc[:, "tbl_name"].tolist()
+    db_infos = _get_db_info_tbl_names(
+        context=context, nom_projet=nom_projet, selecteur=None
+    )
+    return [db_info["tbl_name"] for db_info in db_infos]
 
 
-def get_s3_keys_source(
-    context: Optional[dict] = None, nom_projet: Optional[str] = None
-) -> List[str]:
-    """Get all source S3 filepaths for a project.
-
-    Used for KeySensors.
+def get_selecteur_tbl_name(
+    nom_projet: str, selecteur: str, context: Mapping[str, Any] | None = None
+) -> str:
+    """Get table name for a specific selecteur.
 
     Args:
-        context: task context. Provided automatically by airflow
         nom_projet: Project name
+        selecteur: Selecteur name
+        context: Optional Airflow task context
 
     Returns:
-        List of S3 source filepaths
+        Table name for the specified selecteur
+
+    Raises:
+        ConfigError: If no table name is found
     """
+    db_infos = _get_db_info_tbl_names(
+        context=context, nom_projet=nom_projet, selecteur=selecteur
+    )
+
+    if not db_infos:
+        raise ConfigError(
+            message=f"No table name found for project {nom_projet} and selecteur {selecteur}",
+            nom_projet=nom_projet,
+            selecteur=selecteur,
+        )
+
+    return db_infos[0]["tbl_name"]
+
+
+@db_retry
+def get_grist_source(
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+    selecteur: str | None = None,
+) -> SourceGrist:
     if nom_projet is None and context is None:
         raise ValueError("nom_projet or context must be provided")
+
+    if selecteur is None:
+        raise ValueError("selecteur must be provided in the args")
+
+    if nom_projet is None and context:
+        nom_projet = get_project_name(context=context)
+
+    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+
+    query = f"""
+        SELECT cpssg.projet, cpssg.selecteur, cpssg.type_source, cpssg.id_source
+        FROM {CONF_SCHEMA}.selecteur_source_grist_vw cpssg
+        WHERE cpssg.projet = %s AND cpssg.selecteur = %s;
+    """
+
+    df = db.fetch_df(query, parameters=(nom_projet, selecteur))
+    records = df.to_dict("records")
+    return SourceGrist(**records[0])
+
+
+@db_retry
+def get_projet_contact(
+    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
+) -> list[Contact]:
+    if nom_projet is None and context is None:
+        raise ValueError("nom_projet or context must be provided")
+
     if nom_projet is None and context:
         nom_projet = get_project_name(context=context)
 
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     query = """
-        SELECT vcp.filepath_source_s3
-        FROM conf_projets.vue_conf_projets vcp
-        WHERE vcp.filepath_source_s3 IS NOT NULL
-            AND vcp.type_source='Fichier'
-            AND vcp.nom_projet = %s;
+        SELECT cppc.projet, cppc.contact_mail, cppc.is_mail_generic
+        FROM {CONF_SCHEMA}.projet_contact_vw cppc
+        WHERE cppc.projet = %s;
     """
 
     df = db.fetch_df(query, parameters=(nom_projet,))
-    return df.loc[:, "filepath_source_s3"].tolist()
+    records = df.to_dict("records")
+    records = [{str(k): v for k, v in record.items()} for record in records]
+    return [Contact(**record) for record in records]
+
+
+@db_retry
+def get_projet_documentation(
+    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
+) -> list[Documentation]:
+    if nom_projet is None and context is None:
+        raise ValueError("nom_projet or context must be provided")
+
+    if nom_projet is None and context:
+        nom_projet = get_project_name(context=context)
+
+    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+
+    query = """
+        SELECT cppd.projet, cppd.type_documentation, cppd.lien
+        FROM {CONF_SCHEMA}.projet_documentation_vw cppd
+        WHERE cppd.projet = %s;
+    """
+
+    df = db.fetch_df(query, parameters=(nom_projet,))
+    records = df.to_dict("records")
+    records = [{str(k): v for k, v in record.items()} for record in records]
+    return [Documentation(**record) for record in records]
+
+
+@db_retry
+def _get_db_info(
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+    selecteur: str | None = None,
+) -> list[DbInfo]:
+    """Get database info for a project and optionally a specific selecteur.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+        selecteur: Optional selecteur filter
+
+    Returns:
+        List of DbInfo objects
+    """
+    if nom_projet is None and context is None:
+        raise ValueError("nom_projet or context must be provided")
+
+    if nom_projet is None and context is not None:
+        nom_projet = get_project_name(context=context)
+
+    if nom_projet is None:
+        raise ValueError("Could not determine project name from context")
+
+    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+
+    query = f"""
+        SELECT cppd.projet, cppd.selecteur, cppd.tbl_name,
+            cppd.tbl_order, cppd.is_partitionned, cppd.partition_period,
+            cppd.load_strategy
+        FROM {CONF_SCHEMA}.projet_database_vw cppd
+        WHERE cppd.projet = %s
+    """
+
+    params = [nom_projet]
+
+    if selecteur is not None:
+        query += " AND cppd.selecteur = %s"
+        params.append(selecteur)
+
+    query += "ORDER BY cppd.tbl_order ASC;"
+
+    df = db.fetch_df(query, parameters=tuple(params))
+    records = df.to_dict("records")
+    records = [{str(k): v for k, v in record.items()} for record in records]
+    return [DbInfo(**record) for record in records]
+
+
+def get_projet_db_info(
+    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
+) -> list[DbInfo]:
+    """Get all database info for a project.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+
+    Returns:
+        List of DbInfo objects for all selecteurs in the project
+    """
+    return _get_db_info(context=context, nom_projet=nom_projet, selecteur=None)
+
+
+def get_selecteur_db_info(
+    nom_projet: str, selecteur: str, context: Mapping[str, Any] | None = None
+) -> DbInfo:
+    """Get database info for a specific selecteur.
+
+    Args:
+        nom_projet: Project name
+        selecteur: Selecteur name
+        context: Optional Airflow task context
+
+    Returns:
+        DbInfo object for the specified selecteur
+
+    Raises:
+        ConfigError: If no configuration is found
+    """
+    db_infos = _get_db_info(context=context, nom_projet=nom_projet, selecteur=selecteur)
+
+    if not db_infos:
+        raise ConfigError(
+            message=f"No database configuration found for project {nom_projet} and selecteur {selecteur}",  # noqa
+            nom_projet=nom_projet,
+            selecteur=selecteur,
+        )
+
+    return db_infos[0]
+
+
+@db_retry
+def _get_source_fichier(
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+    selecteur: str | None = None,
+) -> list[SourceFichier]:
+    """Get source fichier info for a project and optionally a specific selecteur.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+        selecteur: Optional selecteur filter
+
+    Returns:
+        List of SourceFichier objects
+    """
+    if nom_projet is None and context is None:
+        raise ValueError("nom_projet or context must be provided")
+
+    if nom_projet is None and context is not None:
+        nom_projet = get_project_name(context=context)
+
+    if nom_projet is None:
+        raise ValueError("Could not determine project name from context")
+
+    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+
+    query = f"""
+        SELECT cssf.projet, cssf.selecteur, cssf.type_source,
+            cssf.id_source, cssf.bucket, cssf.s3_key, cssf.filepath_source_s3
+        FROM {CONF_SCHEMA}.selecteur_source_fichier_vw cssf
+        WHERE cssf.projet = %s
+    """
+
+    params = [nom_projet]
+
+    if selecteur is not None:
+        query += " AND cssf.selecteur = %s"
+        params.append(selecteur)
+
+    query += ";"
+
+    df = db.fetch_df(query, parameters=tuple(params))
+    records = df.to_dict("records")
+    records = [{str(k): v for k, v in record.items()} for record in records]
+    return [SourceFichier(**record) for record in records]
+
+
+def get_projet_source_fichier(
+    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
+) -> list[SourceFichier]:
+    """Get all source fichier info for a project.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+
+    Returns:
+        List of SourceFichier objects for all selecteurs in the project
+    """
+    return _get_source_fichier(context=context, nom_projet=nom_projet, selecteur=None)
+
+
+def get_selecteur_source_fichier(
+    nom_projet: str, selecteur: str, context: Mapping[str, Any] | None = None
+) -> SourceFichier:
+    """Get source fichier info for a specific selecteur.
+
+    Args:
+        nom_projet: Project name
+        selecteur: Selecteur name
+        context: Optional Airflow task context
+
+    Returns:
+        SourceFichier object for the specified selecteur
+
+    Raises:
+        ConfigError: If no configuration is found
+    """
+    sources = _get_source_fichier(
+        context=context, nom_projet=nom_projet, selecteur=selecteur
+    )
+
+    if not sources:
+        raise ConfigError(
+            message=f"No source fichier found for project {nom_projet} and selecteur {selecteur}",
+            nom_projet=nom_projet,
+            selecteur=selecteur,
+        )
+
+    return sources[0]
+
+
+@db_retry
+def _get_selecteur_s3(
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+    selecteur: str | None = None,
+) -> list[SelecteurS3]:
+    """Get S3 configuration for a project and optionally a specific selecteur.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+        selecteur: Optional selecteur filter
+
+    Returns:
+        List of SelecteurS3 objects
+    """
+    if nom_projet is None and context is None:
+        raise ValueError("nom_projet or context must be provided")
+
+    if nom_projet is None and context is not None:
+        nom_projet = get_project_name(context=context)
+
+    if nom_projet is None:
+        raise ValueError("Could not determine project name from context")
+
+    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+
+    query = f"""
+        SELECT cpss3.projet, cpss3.selecteur, cpss3.filename,
+            cpss3.s3_key, cpss3.bucket, cpss3.projet_s3_key,
+            cpss3.projet_s3_key_tmp, cpss3.filepath_s3, cpss3.filepath_tmp_s3
+        FROM {CONF_SCHEMA}.selecteur_s3_vw cpss3
+        WHERE cpss3.projet = %s
+    """
+
+    params = [nom_projet]
+
+    if selecteur is not None:
+        query += " AND cpss3.selecteur = %s"
+        params.append(selecteur)
+
+    query += ";"
+
+    df = db.fetch_df(query, parameters=tuple(params))
+
+    if df.empty:
+        return []
+
+    records = df.to_dict("records")
+    records = [{str(k): v for k, v in record.items()} for record in records]
+    return [SelecteurS3(**record) for record in records]
+
+
+def get_projet_selecteur_s3(
+    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
+) -> list[SelecteurS3]:
+    """Get all S3 configurations for a project.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+
+    Returns:
+        List of SelecteurS3 objects for all selecteurs in the project
+    """
+    return _get_selecteur_s3(context=context, nom_projet=nom_projet, selecteur=None)
+
+
+def get_selecteur_s3(
+    selecteur: str,
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+) -> SelecteurS3:
+    """Get S3 configuration for a specific selecteur.
+
+    Args:
+        selecteur: Selecteur name
+        context: Optional Airflow task context
+        nom_projet: Project name
+
+    Returns:
+        SelecteurS3 object with S3 configuration
+
+    Raises:
+        ConfigError: If no S3 configuration is found
+    """
+    s3_configs = _get_selecteur_s3(
+        context=context, nom_projet=nom_projet, selecteur=selecteur
+    )
+
+    if not s3_configs:
+        raise ConfigError(
+            message=f"No S3 configuration found for project {nom_projet} and selecteur {selecteur}",
+            nom_projet=nom_projet,
+            selecteur=selecteur,
+        )
+
+    return s3_configs[0]
+
+
+@db_retry
+def get_projet_s3(
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+) -> ProjetS3:
+    """Get S3 configuration for a specific selecteur.
+
+    Args:
+        context: Optional Airflow task context
+        nom_projet: Project name
+
+    Returns:
+        ProjetS3 object with S3 configuration
+
+    Raises:
+        ConfigError: If no S3 configuration is found
+    """
+    if nom_projet is None and context is None:
+        raise ValueError("nom_projet or context must be provided")
+
+    if nom_projet is None and context is not None:
+        nom_projet = get_project_name(context=context)
+
+    if nom_projet is None:
+        raise ValueError("Could not determine project name from context")
+
+    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+
+    query = f"""
+        SELECT cpps3.projet, cpps3.bucket,
+            cpps3.key,
+            cpps3.key_tmp
+        FROM {CONF_SCHEMA}.projet_s3_vw cpps3
+        WHERE cpps3.projet = %s;
+    """
+
+    df = db.fetch_df(query, parameters=(nom_projet,))
+
+    if df.empty:
+        raise ConfigError(
+            message=f"No S3 configuration found for project {nom_projet}",
+            nom_projet=nom_projet,
+        )
+
+    record = df.iloc[0].to_dict()
+    record = {str(k): v for k, v in record.items()}
+    return ProjetS3(**record)
+
+
+@db_retry
+def _get_selecteur_info(
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+    selecteur: str | None = None,
+) -> list[SelecteurInfo]:
+    """Get S3 configuration for a project and optionally a specific selecteur.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+        selecteur: Optional selecteur filter
+
+    Returns:
+        List of SelecteurS3 objects
+    """
+    if nom_projet is None and context is None:
+        raise ValueError("nom_projet or context must be provided")
+
+    if nom_projet is None and context is not None:
+        nom_projet = get_project_name(context=context)
+
+    if nom_projet is None:
+        raise ValueError("Could not determine project name from context")
+
+    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+
+    query = f"""
+        SELECT cpss3db.projet, cpss3db.selecteur, cpss3db.filename,
+            cpss3db.s3_key, cpss3db.bucket, cpss3db.projet_s3_key,
+            cpss3db.projet_s3_key_tmp, cpss3db.filepath_s3,
+            cpss3db.filepath_tmp_s3,
+            cpss3db.tbl_name, cpss3db.tbl_order,
+            cpss3db.is_partitionned, cpss3db.partition_period,
+            cpss3db.load_strategy
+        FROM {CONF_SCHEMA}.selecteur_s3_db_vw cpss3db
+        WHERE cpss3db.projet = %s
+    """
+
+    params = [nom_projet]
+
+    if selecteur is not None:
+        query += " AND cpss3db.selecteur = %s"
+        params.append(selecteur)
+
+    query += "ORDER BY cpss3db.projet, cpss3db.tbl_order;"
+
+    df = db.fetch_df(query, parameters=tuple(params))
+
+    if df.empty:
+        return []
+
+    records = df.to_dict("records")
+    records = [{str(k): v for k, v in record.items()} for record in records]
+    return [SelecteurInfo(**record) for record in records]
+
+
+def get_projet_selecteur_info(
+    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
+) -> list[SelecteurInfo]:
+    """Get all S3 configurations for a project.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+
+    Returns:
+        List of SelecteurS3 objects for all selecteurs in the project
+    """
+    return _get_selecteur_info(context=context, nom_projet=nom_projet, selecteur=None)
+
+
+def get_selecteur_info(
+    selecteur: str,
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+) -> SelecteurInfo:
+    """Get S3 configuration for a specific selecteur.
+
+    Args:
+        selecteur: Selecteur name
+        context: Optional Airflow task context
+        nom_projet: Project name
+
+    Returns:
+        SelecteurS3 object with S3 configuration
+
+    Raises:
+        ConfigError: If no S3 configuration is found
+    """
+    s3_configs = _get_selecteur_info(
+        context=context, nom_projet=nom_projet, selecteur=selecteur
+    )
+
+    if not s3_configs:
+        raise ConfigError(
+            message=f"No S3 configuration found for project {nom_projet} and selecteur {selecteur}",
+            nom_projet=nom_projet,
+            selecteur=selecteur,
+        )
+
+    return s3_configs[0]

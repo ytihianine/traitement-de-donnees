@@ -1,8 +1,15 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Any, Mapping, Optional
 
 import pendulum
-from entities.dags import DBParams, DagParams, DagStatus, MailParams, DocsParams
+from entities.dags import (
+    DBParams,
+    DagParams,
+    DagStatus,
+    FeatureFlags,
+    MailParams,
+    DocsParams,
+)
 import pytz
 
 DEFAULT_OWNER = "airflow"
@@ -11,7 +18,7 @@ DEFAULT_EMAIL_CC = ["labo-data@finances.gouv.fr"]
 DEFAULT_TMP_SCHEMA = "temporaire"
 
 
-def get_project_name(context: dict) -> str:
+def get_project_name(context: Mapping[str, Any]) -> str:
     """Extract and validate project name from context."""
     nom_projet = context.get("params", {}).get("nom_projet")
     if not nom_projet:
@@ -19,7 +26,7 @@ def get_project_name(context: dict) -> str:
     return nom_projet
 
 
-def get_dag_status(context: dict) -> DagStatus:
+def get_dag_status(context: Mapping[str, Any]) -> DagStatus:
     """Extract and validate project name from context."""
     dag_status = context.get("params", {}).get("dag_status")
     if not dag_status:
@@ -28,7 +35,7 @@ def get_dag_status(context: dict) -> DagStatus:
 
 
 def get_execution_date(
-    context: dict, use_tz: bool = False, tz_zone: str = "Europe/Paris"
+    context: Mapping[str, Any], use_tz: bool = False, tz_zone: str = "Europe/Paris"
 ) -> datetime:
     """Extract and validate execution date from context."""
     execution_date = context.get("data_interval_start")
@@ -42,7 +49,7 @@ def get_execution_date(
     return execution_date
 
 
-def get_db_info(context: dict) -> DBParams:
+def get_db_info(context: Mapping[str, Any]) -> DBParams:
     """Extract and validate database info from context."""
     db_params = context.get("params", {}).get("db", {})
     prod_schema = db_params.get("prod_schema")
@@ -53,13 +60,10 @@ def get_db_info(context: dict) -> DBParams:
     if not tmp_schema:
         raise ValueError("tmp_schema must be defined in DAG parameters under db")
 
-    return {
-        "prod_schema": prod_schema,
-        "tmp_schema": tmp_schema,
-    }
+    return DBParams(prod_schema=prod_schema, tmp_schema=tmp_schema)
 
 
-def get_mail_info(context: dict) -> MailParams:
+def get_mail_info(context: Mapping[str, Any]) -> MailParams:
     """Extract and validate database info from context."""
     mail_params = context.get("params", {}).get("mail", {})
     mail_enabled = mail_params.get("enable", False)
@@ -77,7 +81,7 @@ def get_mail_info(context: dict) -> MailParams:
     return {"enable": mail_enabled, "to": mail_to, "cc": mail_cc, "bcc": mail_bcc}
 
 
-def get_doc_info(context: dict) -> DocsParams:
+def get_doc_info(context: Mapping[str, Any]) -> DocsParams:
     """Extract and validate documentation info from context."""
     mail_params = context.get("params", {}).get("docs", {})
     lien_pipeline = mail_params.get("lien_pipeline", False)
@@ -115,37 +119,16 @@ def create_default_args(
 def create_dag_params(
     nom_projet: str,
     dag_status: DagStatus,
-    prod_schema: str,
-    lien_pipeline: str = "Non renseigné",
-    lien_donnees: str = "Non renseigné",
-    tmp_schema: str = DEFAULT_TMP_SCHEMA,
-    mail_enable: bool = True,
-    mail_to: Optional[list[str]] = None,
-    mail_cc: Optional[list[str]] = None,
-    mail_bcc: Optional[list[str]] = None,
+    db_params: DBParams | None,
+    feature_flags: FeatureFlags,
 ) -> dict:
     """Create standard params for DAGs."""
-    if mail_to is None:
-        mail_to = DEFAULT_EMAIL_TO
-
-    if isinstance(mail_cc, list):
-        mail_cc = list(set(mail_cc + DEFAULT_EMAIL_CC))
-    if mail_cc is None:
-        mail_cc = DEFAULT_EMAIL_CC
-
     # Using DagParams for type checking
     dag_params = DagParams(
         nom_projet=nom_projet,
         dag_status=dag_status.value,
-        db={
-            "prod_schema": prod_schema,
-            "tmp_schema": tmp_schema,
-        },
-        mail={"enable": mail_enable, "to": mail_to, "cc": mail_cc, "bcc": mail_bcc},
-        docs={
-            "lien_pipeline": lien_pipeline,
-            "lien_donnees": lien_donnees,
-        },
+        db=db_params,
+        enable=feature_flags,
     )
 
-    return dict(dag_params)
+    return dict(dag_params.__dict__)

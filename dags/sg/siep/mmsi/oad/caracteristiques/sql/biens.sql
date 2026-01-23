@@ -305,8 +305,8 @@ CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
         AND scsb.code_bat_gestionnaire = cte_bgoo.code_bat_gestionnaire
     -- Jointure avec ref_typologie basée sur usage_detaille_du_bien coalescé
     LEFT JOIN siep.ref_typologie srt
-        ON srt.snapshot_id = cte_bgoo.snapshot_id
-        AND srt.usage_detaille_du_bien = COALESCE(sbt.usage_detaille_du_bien, sbic.usage_detaille_du_bien)
+        -- ON srt.snapshot_id = cte_bgoo.snapshot_id
+        ON srt.usage_detaille_du_bien = COALESCE(sbt.usage_detaille_du_bien, sbic.usage_detaille_du_bien)
     -- Jointure avec cte_bien_occupant_agrege
     LEFT JOIN cte_bien_occupant_agrege cte_boa
         ON cte_boa.snapshot_id = cte_bgoo.snapshot_id

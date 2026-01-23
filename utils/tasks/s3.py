@@ -1,15 +1,19 @@
 """MinIO/S3 task utilities using infrastructure handlers."""
 
 import logging
-from typing import Any, Dict, List, Optional
-import pytz
+from typing import Any, Mapping
+from entities.dags import ProjetS3
 
 from airflow.sdk import task
 
 from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
 from infra.file_handling.factory import create_file_handler
 from utils.config.dag_params import get_dag_status, get_execution_date, get_project_name
-from utils.config.tasks import get_projet_config
+from utils.config.tasks import (
+    get_projet_s3,
+    get_projet_selecteur_s3,
+    get_projet_source_fichier,
+)
 from enums.dags import DagStatus
 from enums.filesystem import FileHandlerType
 from utils.config.vars import (
@@ -19,14 +23,14 @@ from utils.config.vars import (
 
 @task
 def copy_s3_files(
-    bucket: str, connection_id: str = DEFAULT_S3_CONN_ID, **context: Dict[str, Any]
+    projet_s3: ProjetS3 | None = None,
+    connection_id: str = DEFAULT_S3_CONN_ID,
+    **context: Mapping[str, Any],
 ) -> None:
     """Copy files to S3 storage.
 
     Args:
         bucket: Target S3 bucket
-        source_key: Source key pattern
-        dest_key: Destination key pattern
         connection_id: S3 connection ID
         context: Airflow context
 
@@ -34,66 +38,57 @@ def copy_s3_files(
         ValueError: If project name not provided in params
         FileHandlerError: If file operations fail
     """
-    nom_projet = get_project_name(context=context)
+    # Récupérer les info du dag
     dag_status = get_dag_status(context=context)
+    nom_projet = get_project_name(context=context)
+    execution_date = get_execution_date(context=context, use_tz=False)
+    curr_day = execution_date.strftime(format="%Y%m%d")
+    curr_time = execution_date.strftime(format="%Hh%M")
+
+    if projet_s3 is None:
+        projet_s3 = get_projet_s3(nom_projet=nom_projet)
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 
+    # Créer les variables
     s3_handler = create_file_handler(
-        handler_type=FileHandlerType.S3, connection_id=connection_id, bucket=bucket
+        handler_type=FileHandlerType.S3,
+        connection_id=connection_id,
+        bucket=projet_s3["bucket"],
     )
 
-    # Get timing information
-    execution_date = get_execution_date(context=context)
+    # Récupérer la liste des key s3 pour tous les sélecteurs
+    projet_selecteur_s3 = get_projet_selecteur_s3(nom_projet=nom_projet)
 
-    paris_tz = pytz.timezone("Europe/Paris")
-    execution_date = execution_date.astimezone(paris_tz)
-    curr_day = execution_date.strftime("%Y%m%d")
-    curr_time = execution_date.strftime("%Hh%M")
+    # Copier la liste des sources dans le dossier final
+    for selecteur_s3 in projet_selecteur_s3:
+        target_key = f"{selecteur_s3['s3_key']}/{curr_day}/{curr_time}/{selecteur_s3['filename']}"
+        src_key = selecteur_s3["filepath_tmp_s3"]
 
-    # Get storage configuration
-    projet_config = get_projet_config(nom_projet=nom_projet)
+        try:
+            # Copy file
+            logging.info(msg=f"Copying {src_key} to {target_key}")
+            s3_handler.copy(source=src_key, destination=target_key)
+            logging.info(msg="Copy successful")
 
-    for config in projet_config:
-        src_key = config.filepath_tmp_s3
-        dst_key = config.s3_key
-        filename = config.filename
-
-        if not src_key or not dst_key:
-            continue
-
-        if filename is None or filename == "":
-            logging.info(
-                msg=f"Config filename is empty for project <{nom_projet}> and selecteur <{config.selecteur}>. \n Skipping s3 copy ..."  # noqa
+        except (FileHandlerError, FileNotFoundError) as e:
+            logging.error(msg=f"Failed to copy {src_key} to {target_key}: {str(e)}")
+            raise FileHandlerError(f"Failed to copy file: {e}") from e
+        except Exception as e:
+            logging.error(
+                msg=f"Unexpected error copying {src_key} to {target_key}: {str(e)}"
             )
-        else:
-            # Build destination path
-            target_key = f"{dst_key}/{curr_day}/{curr_time}/{filename}"
-
-            try:
-                # Copy file
-                logging.info(f"Copying {src_key} to {target_key}")
-                s3_handler.copy(source=src_key, destination=target_key)
-                logging.info("Copy successful")
-
-            except (FileHandlerError, FileNotFoundError) as e:
-                logging.error(f"Failed to copy {src_key} to {target_key}: {str(e)}")
-                raise FileHandlerError(f"Failed to copy file: {e}") from e
-            except Exception as e:
-                logging.error(
-                    f"Unexpected error copying {src_key} to {target_key}: {str(e)}"
-                )
-                raise
+            raise
 
 
 @task
 def del_s3_files(
-    bucket: str,
-    keys_to_delete: Optional[List[str]] = None,
+    projet_s3: ProjetS3 | None = None,
+    keys_to_delete: list[str] | None = None,
     connection_id: str = DEFAULT_S3_CONN_ID,
-    **context: Dict[str, Any],
+    **context: Mapping[str, Any],
 ) -> None:
     """Delete files from MinIO/S3 storage.
 
@@ -107,58 +102,48 @@ def del_s3_files(
         ValueError: If project name not provided in params
         FileHandlerError: If file operations fail
     """
+    # Récupérer les info du dag
     dag_status = get_dag_status(context=context)
+    nom_projet = get_project_name(context=context)
+
+    if projet_s3 is None:
+        projet_s3 = get_projet_s3(nom_projet=nom_projet)
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 
-    tmp_keys: List[str] = []
-    source_keys: List[str] = []
-
-    # Initialize S3 handler
+    # Créer les variables
     s3_handler = create_file_handler(
-        handler_type=FileHandlerType.S3, connection_id=connection_id, bucket=bucket
+        handler_type=FileHandlerType.S3,
+        connection_id=connection_id,
+        bucket=projet_s3["bucket"],
     )
 
-    if not keys_to_delete:
-        # Get project name from context
-        nom_projet = get_project_name(context=context)
+    # Récupérer les sources
+    projet_sources = get_projet_source_fichier(nom_projet=nom_projet)
 
-        # Get storage configuration
-        projet_config = get_projet_config(nom_projet=nom_projet)
+    # Récupérer les key s3 des sélecteurs
+    projet_selecteur_s3 = get_projet_selecteur_s3(nom_projet=nom_projet)
 
-        # Extract temporary and source keys
-        tmp_keys = [
-            config.filepath_tmp_s3 for config in projet_config if config.filepath_tmp_s3
-        ]
-
-        source_keys = [
-            config.filepath_source_s3
-            for config in projet_config
-            if config.filepath_source_s3
-        ]
-    else:
-        tmp_keys = [str(key) for key in keys_to_delete if key and str(key).strip()]
-
-    # Delete temporary files
-    if tmp_keys:
+    # Supprimer les sources
+    if projet_sources:
         try:
-            logging.info(f"Deleting {len(tmp_keys)} temporary files")
-            for key in tmp_keys:
-                s3_handler.delete(key)
-            logging.info("Temporary files deleted successfully")
+            logging.info(msg=f"Deleting {len(projet_sources)} source files")
+            for source in projet_sources:
+                s3_handler.delete(file_path=source["filepath_source_s3"])
+            logging.info(msg="Source files deleted successfully")
         except FileHandlerError as e:
-            logging.error(f"Failed to delete temporary files: {str(e)}")
+            logging.error(msg=f"Failed to delete source files: {str(e)}")
             raise
 
-    # Delete source files
-    if source_keys:
+    # Supprimer les key S3
+    if projet_selecteur_s3:
         try:
-            logging.info(f"Deleting {len(source_keys)} source files")
-            for key in source_keys:
-                s3_handler.delete(key)
-            logging.info("Source files deleted successfully")
+            logging.info(msg=f"Deleting {len(projet_selecteur_s3)} temporary files")
+            for selecteur_s3 in projet_selecteur_s3:
+                s3_handler.delete(file_path=selecteur_s3["filepath_tmp_s3"])
+            logging.info(msg="Temporary files deleted successfully")
         except FileHandlerError as e:
-            logging.error(f"Failed to delete source files: {str(e)}")
+            logging.error(msg=f"Failed to delete temporary files: {str(e)}")
             raise

@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
@@ -10,10 +9,10 @@ from utils.config.dag_params import (
     get_dag_status,
     get_execution_date,
     get_mail_info,
-    get_doc_info,
 )
 from entities.dags import DagStatus
 from enums.mail import MailPriority, MailStatus
+from utils.config.tasks import get_projet_contact, get_projet_documentation
 from utils.config.vars import (
     get_root_folder,
     DEFAULT_SMTP_CONN_ID,
@@ -136,7 +135,7 @@ def send_mail(mail_message: MailMessage, conn_id: str = DEFAULT_SMTP_CONN_ID) ->
     )
 
 
-def create_airflow_callback(mail_status: MailStatus) -> Callable:
+def create_send_mail_callback(mail_status: MailStatus) -> Callable:
     """
     Create an Airflow callback function for mail notifications.
 
@@ -149,20 +148,39 @@ def create_airflow_callback(mail_status: MailStatus) -> Callable:
 
     def _callback(context: dict[str, Any]) -> None:
         # If debug mode is ON, we don't want to send any mail
-        mail_info = get_mail_info(context=context)
+        mail_enable = get_mail_info(context=context)["enable"]
         dag_status = get_dag_status(context=context)
 
         if dag_status == DagStatus.DEV:
             print("Dag status parameter is set to DEV -> skipping this task ...")
             return
 
-        if not mail_info["enable"]:
+        if not mail_enable:
             print("Skipping! Mails are disabled for this dag ...")
             return
 
-        doc_info = get_doc_info(context=context)
+        projet_contact = get_projet_contact(context=context)
+        mail_to = [
+            contact["contact_mail"]
+            for contact in projet_contact
+            if contact["is_generic"]
+        ]
+        mail_cc = [
+            contact["contact_mail"]
+            for contact in projet_contact
+            if not contact["is_generic"]
+        ]
+
+        projet_docs = get_projet_documentation(context=context)
+        doc_pipeline = [
+            doc["lien"]
+            for doc in projet_docs
+            if doc["type_documentation"] == "pipeline"
+        ]
+        doc_data = [
+            doc["lien"] for doc in projet_docs if doc["type_documentation"] == "data"
+        ]
         execution_date = get_execution_date(context=context)
-        mail_cc = mail_info["cc"]
 
         if isinstance(mail_cc, list):
             mail_cc.extend(DEFAULT_MAIL_CC)
@@ -171,17 +189,16 @@ def create_airflow_callback(mail_status: MailStatus) -> Callable:
 
         mail_message = MailMessage(
             mail_status=mail_status,
-            to=mail_info["to"],
+            to=mail_to,
             cc=mail_cc,
-            bcc=mail_info["bcc"],
             template_parameters={
                 "dag_name": context["dag"].dag_id,
                 "dag_statut": mail_status.value,
                 "start_date": execution_date.replace(tzinfo=paris_tz).strftime(
                     format="%d-%m-%Y %H:%M:%S"
                 ),
-                "link_doc_pipeline": doc_info["lien_pipeline"],
-                "link_doc_donnees": doc_info["lien_donnees"],
+                "link_doc_pipeline": ";".join(doc_pipeline),
+                "link_doc_donnees": ";".join(doc_data),
             },
         )
 

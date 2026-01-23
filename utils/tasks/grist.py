@@ -7,7 +7,7 @@ from infra.http_client.adapters import RequestsClient
 from infra.http_client.config import ClientConfig
 from infra.grist.client import GristAPI
 from utils.config.dag_params import get_project_name
-from utils.config.tasks import get_selecteur_config
+from utils.config.tasks import get_grist_source, get_selecteur_s3
 
 from enums.filesystem import FileHandlerType
 from utils.config.vars import (
@@ -37,7 +37,8 @@ def download_grist_doc_to_s3(
     """Download SQLite from a specific Grist doc to S3"""
     nom_projet = get_project_name(context=context)
 
-    selecteur_config = get_selecteur_config(nom_projet=nom_projet, selecteur=selecteur)
+    source_grist = get_grist_source(nom_projet=nom_projet, selecteur=selecteur)
+    selecteur_s3 = get_selecteur_s3(nom_projet=nom_projet, selecteur=selecteur)
 
     # Instanciate Grist client
     if use_proxy:
@@ -51,8 +52,8 @@ def download_grist_doc_to_s3(
         http_client=request_client,
         base_url=grist_host,
         workspace_id=workspace_id,
-        doc_id=Variable.get(doc_id_key),
-        api_token=Variable.get(api_token_key),
+        doc_id=source_grist["id_source"],
+        api_token=Variable.get(key=api_token_key),
     )
 
     # Hooks
@@ -66,9 +67,9 @@ def download_grist_doc_to_s3(
     grist_response = grist_client.get_doc_sqlite_file()
 
     # Export sqlite file to S3
-    print(f"Exporting file to < {selecteur_config.filepath_tmp_s3} >")
+    print(f"Exporting file to < {selecteur_s3["filepath_tmp_s3"]} >")
     s3_handler.write(
-        file_path=selecteur_config.filepath_tmp_s3,
+        file_path=selecteur_s3["filepath_tmp_s3"],
         content=grist_response,
     )
     print("✅ Export done!")

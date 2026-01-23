@@ -5,6 +5,7 @@ from typing import TypedDict, List, ParamSpec, TypeVar, Callable, Any
 from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
 
 from enums.dags import DagStatus
+from utils.config.vars import DEFAULT_TMP_SCHEMA
 
 # ==================
 # Dags
@@ -77,9 +78,93 @@ class ETLStep:
     use_previous_output: bool = False
 
 
-class DBParams(TypedDict):
+class DbInfo(TypedDict):
+    projet: str
+    selecteur: str
+    tbl_name: str
+    tbl_order: int
+    is_partitionned: bool
+    partition_period: str
+    load_strategy: str
+
+
+class SourceGrist(TypedDict):
+    projet: str
+    selecteur: str
+    type_source: str
+    id_source: str
+
+
+class SourceFichier(TypedDict):
+    projet: str
+    selecteur: str
+    type_source: str
+    id_source: str
+    bucket: str
+    s3_key: str
+    filepath_source_s3: str
+
+
+class ProjetS3(TypedDict):
+    projet: str
+    bucket: str
+    key: str
+    key_tmp: str
+
+
+@dataclass(frozen=True)
+class SelecteurInfo:
+    projet: str
+    selecteur: str
+    filename: str
+    s3_key: str
+    bucket: str
+    projet_s3_key: str
+    projet_s3_key_tmp: str
+    filepath_s3: str
+    filepath_tmp_s3: str
+    tbl_name: str
+    tbl_order: int
+    is_partitionned: bool
+    partition_period: str
+    load_strategy: str
+
+
+class SelecteurS3(TypedDict):
+    projet: str
+    selecteur: str
+    filename: str
+    s3_key: str
+    bucket: str
+    projet_s3_key: str
+    projet_s3_key_tmp: str
+    filepath_s3: str
+    filepath_tmp_s3: str
+
+
+class ColumnMapping(TypedDict):
+    projet: str
+    selecteur: str
+    colname_source: str
+    colname_dest: str
+
+
+class Documentation(TypedDict):
+    projet: str
+    type_documentation: str
+    lien: str
+
+
+class Contact(TypedDict):
+    projet: str
+    contact_mail: str
+    is_generic: bool
+
+
+@dataclass(frozen=True)
+class DBParams:
     prod_schema: str
-    tmp_schema: str
+    tmp_schema: str = DEFAULT_TMP_SCHEMA
 
 
 class MailParams(TypedDict):
@@ -94,12 +179,21 @@ class DocsParams(TypedDict):
     lien_donnees: str
 
 
-class DagParams(TypedDict):
+@dataclass(frozen=True)
+class FeatureFlags:
+    db: bool
+    mail: bool
+    s3: bool
+    convert_files: bool
+    download_grist_doc: bool
+
+
+@dataclass(frozen=True)
+class DagParams:
     nom_projet: str
     dag_status: DagStatus | int
-    db: DBParams
-    mail: MailParams
-    docs: DocsParams
+    db: DBParams | None
+    enable: FeatureFlags
 
 
 # Top level keys
