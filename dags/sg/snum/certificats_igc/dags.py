@@ -3,7 +3,7 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
-from infra.mails.default_smtp import create_airflow_callback, MailStatus
+from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.sql import (
@@ -50,7 +50,7 @@ LINK_DOC_DATA = ""  # noqa
         lien_donnees=LINK_DOC_DATA,
         mail_enable=False,
     ),
-    on_failure_callback=create_airflow_callback(mail_status=MailStatus.ERROR),
+    on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )
 def certificats_igc() -> None:
 
@@ -63,8 +63,8 @@ def certificats_igc() -> None:
         poke_interval=timedelta(seconds=30),
         timeout=timedelta(minutes=13),
         soft_fail=True,
-        on_skipped_callback=create_airflow_callback(mail_status=MailStatus.SKIP),
-        on_success_callback=create_airflow_callback(mail_status=MailStatus.START),
+        on_skipped_callback=create_send_mail_callback(mail_status=MailStatus.SKIP),
+        on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
 
     """ Task order """

@@ -1,7 +1,7 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
-from infra.mails.default_smtp import MailStatus, create_airflow_callback
+from infra.mails.default_smtp import MailStatus, create_send_mail_callback
 from enums.dags import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
@@ -45,7 +45,7 @@ LINK_DOC_DATA = (
         mail_enable=True,
         mail_to=["arthur.lemonnier@finances.gouv.fr"],
     ),
-    on_failure_callback=create_airflow_callback(
+    on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,
     ),
 )

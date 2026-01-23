@@ -272,12 +272,12 @@ sender.send(message)
 ### Fonctions utilitaires
 
 ```python
-from infra.mails.default_smtp import create_airflow_callback
+from infra.mails.default_smtp import create_send_mail_callback
 from infra.mails.config import MailStatus
 
 # Création de callbacks Airflow pour notifications automatiques
-on_failure = create_airflow_callback(MailStatus.ERROR)
-on_success = create_airflow_callback(MailStatus.SUCCESS)
+on_failure = create_send_mail_callback(MailStatus.ERROR)
+on_success = create_send_mail_callback(MailStatus.SUCCESS)
 
 # Utilisation dans DAG
 @dag(

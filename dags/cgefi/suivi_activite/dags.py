@@ -2,7 +2,7 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 from datetime import timedelta
 
-from infra.mails.default_smtp import create_airflow_callback, MailStatus
+from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from enums.dags import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
@@ -49,7 +49,7 @@ LINK_DOC_DATA = (
         lien_donnees=LINK_DOC_DATA,
         mail_enable=False,
     ),
-    on_failure_callback=create_airflow_callback(mail_status=MailStatus.ERROR),
+    on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )
 def suivi_activite():
     """Task order"""

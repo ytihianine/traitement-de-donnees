@@ -6,3 +6,10 @@ class DagStatus(Enum):
 
     RUN = auto()
     DEV = auto()
+
+
+class TypeDocumentation(Enum):
+    """Type de documentation"""
+
+    PIPELINE = "pipeline"
+    DATA = "data"

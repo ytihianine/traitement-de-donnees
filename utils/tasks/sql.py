@@ -21,15 +21,12 @@ from utils.config.dag_params import (
     get_execution_date,
     get_project_name,
 )
-from utils.config.tasks import get_tbl_names
+from utils.config.tasks import get_projet_db_info, get_tbl_names
 from enums.database import (
     LoadStrategy,
     PartitionTimePeriod,
 )
-from entities.dags import (
-    DagStatus,
-    SelecteurConfig,
-)
+from entities.dags import DagStatus, DbInfo, SelecteurInfo
 from utils.control.structures import are_lists_egal
 from utils.config.vars import (
     DEFAULT_TMP_SCHEMA,
@@ -162,13 +159,6 @@ def determine_partition_period(
 # ------------------------------------------------------------------------------
 
 
-@task(task_id="get_tbl_names_from_postgresql")
-def get_tbl_names_from_postgresql(**context) -> list[str]:
-    nom_projet = get_project_name(context=context)
-    tbl_names = get_tbl_names(nom_projet=nom_projet)
-    return tbl_names
-
-
 @task
 def create_projet_snapshot(
     pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID, **context
@@ -222,7 +212,7 @@ def get_projet_snapshot(
 
 @task
 def ensure_partition(
-    time_period: PartitionTimePeriod = PartitionTimePeriod.DAY,
+    nom_projet: str | None = None,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     **context,
 ) -> None:
@@ -237,48 +227,54 @@ def ensure_partition(
     Returns:
         Le nom de la partition (créée ou existante)
     """
-    nom_projet = get_project_name(context=context)
+    if nom_projet is None:
+        nom_projet = get_project_name(context=context)
     dag_status = get_dag_status(context=context)
+    execution_date = get_execution_date(context=context)
+    db_info = get_db_info(context=context)
+    prod_schema = db_info.prod_schema
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
 
-    db_info = get_db_info(context=context)
-    prod_schema = db_info.get("prod_schema")
-
     # Récupérer les informations de la table parente
-    tbl_names = get_tbl_names(nom_projet=nom_projet)
+    tbl_info = get_projet_db_info(nom_projet=nom_projet)
 
-    db = create_db_handler(pg_conn_id)
-    # Get timing information
-    execution_date = get_execution_date(context=context)
+    db = create_db_handler(connection_id=pg_conn_id)
 
-    # Get partition period range
-    from_date, to_date = determine_partition_period(time_period, execution_date)
+    for tbl in tbl_info:
+        tbl_name = tbl["tbl_name"]
 
-    for tbl in tbl_names:
-        # Nom de la partition : parenttable_YYYY_MM
-        partition_name = (
-            f"{tbl}_{from_date.strftime('%Y%m%d')}_{to_date.strftime('%Y%m%d')}"
+        if not tbl["is_partitionned"]:
+            print(f"{tbl_name} is not partitinned ... skipping")
+            continue
+
+        # Get partition period range
+        from_date, to_date = determine_partition_period(
+            time_period=PartitionTimePeriod(value=tbl["partition_period"].upper()),
+            execution_date=execution_date,
         )
 
+        # Nom de la partition : parenttable_YYYY_MM
+        partition_name = f"{tbl_name}_{from_date.strftime(format='%Y%m%d')}_{to_date.strftime(format='%Y%m%d')}"  # noqa
+
         try:
-            logging.info(f"Creating partition {partition_name} for {tbl}.")
+            logging.info(msg=f"Creating partition {partition_name} for {tbl_name}.")
             # Créer la partition
             create_sql = f"""
                 CREATE TABLE IF NOT EXISTS {prod_schema}.{partition_name}
-                PARTITION OF {prod_schema}.{tbl}
+                PARTITION OF {prod_schema}.{tbl_name}
                 FOR VALUES FROM ('{from_date}') TO ('{to_date}');
             """
-            db.execute(create_sql)
-            logging.info(f"Partition {partition_name} created successfully.")
+            db.execute(query=create_sql)
+            logging.info(msg=f"Partition {partition_name} created successfully.")
         except psycopg2.errors.DuplicateTable:
             logging.info(
-                f"Partition {partition_name} already exists. Skipping creation."
+                msg=f"Partition {partition_name} already exists. Skipping creation."
             )
         except Exception as e:
-            logging.error(f"Error creating partition {partition_name}: {str(e)}")
+            logging.error(msg=f"Error creating partition {partition_name}: {str(e)}")
             raise
 
 
@@ -299,11 +295,11 @@ def create_tmp_tables(
         return
 
     db_info = get_db_info(context=context)
-    prod_schema = db_info.get("prod_schema", None)
-    tmp_schema = db_info.get("tmp_schema", None)
+    prod_schema = db_info.prod_schema
+    tmp_schema = db_info.tmp_schema
 
     # Hook
-    db = create_db_handler(pg_conn_id)
+    db = create_db_handler(connection_id=pg_conn_id)
 
     tbl_names = get_tbl_names(nom_projet=nom_projet)
 
@@ -353,20 +349,20 @@ def delete_tmp_tables(
     nom_projet = get_project_name(context=context)
 
     db_info = get_db_info(context=context)
-    tmp_schema = db_info.get("tmp_schema", None)
+    tmp_schema = db_info.tmp_schema
 
+    tbl_info = get_projet_db_info(nom_projet=nom_projet)
     # Hook
-    db = create_db_handler(pg_conn_id)
+    db = create_db_handler(connection_id=pg_conn_id)
 
-    tbl_names = get_tbl_names(nom_projet=nom_projet)
-
-    for tbl in tbl_names:
-        db.execute(query=f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl};")
+    for tbl in tbl_info:
+        tbl_name = tbl["tbl_name"]
+        db.execute(query=f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
 
 
 @task(task_id="copy_tmp_table_to_real_table")
 def copy_tmp_table_to_real_table(
-    load_strategy: LoadStrategy = LoadStrategy.FULL_LOAD,  # Either "FULL_LOAD" or "INCREMENTAL"
+    projet_db_info: list[DbInfo] | None = None,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     **context,
 ) -> None:
@@ -376,6 +372,7 @@ def copy_tmp_table_to_real_table(
     strategy:
         FULL_LOAD      -> delete all prod rows, insert everything from tmp
         INCREMENTAL    -> UPSERT + delete missing rows based on primary key
+        APPEND    -> ADD all rows from tmp to prod
     """
     nom_projet = get_project_name(context=context)
     dag_status = get_dag_status(context=context)
@@ -385,43 +382,39 @@ def copy_tmp_table_to_real_table(
         return
 
     db_info = get_db_info(context=context)
-    prod_schema = db_info.get("prod_schema", None)
-    tmp_schema = db_info.get("tmp_schema", None)
+    prod_schema = db_info.prod_schema
+    tmp_schema = db_info.tmp_schema
 
     # Hook
-    db_handler = create_db_handler(pg_conn_id)
+    db_handler = create_db_handler(connection_id=pg_conn_id)
 
-    tbl_names = get_tbl_names(nom_projet=nom_projet, order_tbl=True)
-    print(f"Tables to copy: {', '.join(tbl_names)}")
-    print(f"Load strategy : {load_strategy}")
+    if projet_db_info is None:
+        projet_db_info = get_projet_db_info(nom_projet=nom_projet)
+    print(f"Nombre de tables à copier: {len(projet_db_info)}")
 
     queries = []
-    if load_strategy == LoadStrategy.FULL_LOAD:
-        del_queries = []
-        insert_queries = []
-        for table in reversed(tbl_names):
-            prod_table = f"{prod_schema}.{table}"
-            del_queries.append(f"DELETE FROM {prod_table};")
+    for db_info in projet_db_info:
+        load_strategy = LoadStrategy(value=db_info["load_strategy"].upper())
+        tbl_name = db_info["tbl_name"]
+        prod_table = f"{prod_schema}.{tbl_name}"
+        tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
 
-        for table in tbl_names:
-            prod_table = f"{prod_schema}.{table}"
-            tmp_table = f"{tmp_schema}.tmp_{table}"
-            insert_queries.append(
-                f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
-            )
+        if load_strategy == LoadStrategy.APPEND:
+            query = f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
+            queries.append(query)
 
-        queries = del_queries + insert_queries
-    elif load_strategy == LoadStrategy.INCREMENTAL:
-        for table in reversed(tbl_names):
-            prod_table = f"{prod_schema}.{table}"
-            tmp_table = f"{tmp_schema}.tmp_{table}"
+        if load_strategy == LoadStrategy.FULL_LOAD:
+            del_query = f"DELETE FROM {prod_table};"
+            insert_query = f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
+            queries.append(del_query)
+            queries.append(insert_query)
 
+        if load_strategy == LoadStrategy.INCREMENTAL:
             pk_cols = _get_primary_keys(
-                schema=prod_schema, table=table, db_handler=db_handler
+                schema=prod_schema, table=tbl_name, db_handler=db_handler
             )
-            col_list = sort_db_colnames(tbl_name=table, pg_conn_id=pg_conn_id)
+            col_list = sort_db_colnames(tbl_name=tbl_name, pg_conn_id=pg_conn_id)
 
-            # UPSERT -- ({', '.join(col_list)})
             merge_query = f"""
                 MERGE INTO {prod_table} tbl_target
                 USING {tmp_table} tbl_source ON ({' AND '.join([f'tbl_source.{col} = tbl_target.{col}' for col in pk_cols])})
@@ -435,36 +428,13 @@ def copy_tmp_table_to_real_table(
                     DELETE;
                 */
             """
+            queries.append(merge_query)
 
-            # DELETE rows not in staging
-            # delete_query = f"""
-            #     DELETE FROM {prod_table} tbl_target
-            #     WHERE NOT EXISTS (
-            #         SELECT 1 FROM {tmp_table} tbl_source
-            #         WHERE
-            #           {" AND ".join([f"tbl_source.{col} = tbl_target.{col}" for col in pk_cols])}
-            #     );
-            # """
-            queries.append(merge_query)  # , delete_query]
-    elif load_strategy == LoadStrategy.APPEND:
-        insert_queries = []
-        for table in tbl_names:
-            prod_table = f"{prod_schema}.{table}"
-            tmp_table = f"{tmp_schema}.tmp_{table}"
-
-            insert_queries.append(
-                f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
-            )
-
-        queries = insert_queries
-    else:
-        raise ValueError(f"Unknown strategy: {load_strategy}")
-
-    if queries:
-        for q in queries:
-            db_handler.execute(query=q)
-    else:
-        print("No query to execute")
+        if queries:
+            for q in queries:
+                db_handler.execute(query=q)
+        else:
+            print("No query to execute")
 
 
 def sort_db_colnames(
@@ -540,14 +510,14 @@ def bulk_load_local_tsv_file_to_db(
 
 @task(map_index_template="{{ import_task_name }}")
 def import_file_to_db(
-    selecteur_config: SelecteurConfig,
+    selecteur_info: SelecteurInfo,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     s3_conn_id: str = DEFAULT_S3_CONN_ID,
     keep_file_id_col: bool = False,
     use_prod_schema: bool = True,
     **context,
 ) -> None:
-    selecteur = selecteur_config.selecteur
+    selecteur = selecteur_info.selecteur
     db_info = get_db_info(context=context)
     dag_status = get_dag_status(context=context)
     context = get_current_context()
@@ -558,14 +528,14 @@ def import_file_to_db(
         return
 
     if use_prod_schema:
-        schema = db_info["prod_schema"]
+        schema = db_info.prod_schema
     else:
-        schema = db_info["tmp_schema"]
+        schema = db_info.tmp_schema
 
     # Variables
-    local_filepath = selecteur_config.filepath_local
-    s3_filepath = selecteur_config.filepath_tmp_s3
-    tbl_name = selecteur_config.tbl_name
+    local_filepath = "/tmp/" + selecteur_info.filename
+    s3_filepath = selecteur_info.filepath_tmp_s3
+    tbl_name = selecteur_info.tbl_name
 
     if tbl_name is None or tbl_name == "":
         print(f"tbl_name is None for selecteur <{selecteur}>. Nothing to import to db")
@@ -663,7 +633,7 @@ def refresh_views(pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context) -> None:
     """Tâche pour actualiser les vues matérialisées"""
     dag_status = get_dag_status(context=context)
     db_info = get_db_info(context=context)
-    prod_schema = db_info.get("prod_schema", None)
+    prod_schema = db_info.prod_schema
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
