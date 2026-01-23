@@ -54,7 +54,6 @@ def configuration_projets() -> None:
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci",
-            doc_id_key="grist_doc_id_gestion_interne",
         ),
         process_data(),
         create_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, reset_id_seq=False),

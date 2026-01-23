@@ -28,7 +28,6 @@ from utils.config.vars import (
 def download_grist_doc_to_s3(
     selecteur: str,
     workspace_id: str,
-    doc_id_key: str,
     grist_host: str = DEFAULT_GRIST_HOST,
     api_token_key: str = "grist_secret_key",
     use_proxy: bool = True,
