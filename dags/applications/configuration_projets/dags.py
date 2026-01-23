@@ -4,14 +4,13 @@ from airflow.sdk.bases.operator import chain
 from entities.dags import DBParams, FeatureFlags
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
-from utils.config.tasks import get_projet_config
 from enums.dags import DagStatus
+from utils.tasks.projet import get_config_selecteur_info
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
-    LoadStrategy,
 )
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
@@ -47,8 +46,11 @@ LINK_DOC_DONNEE = "Non-défini"
 )
 def configuration_projets() -> None:
     """Tasks order"""
+
+    selecteur_s3_db = get_config_selecteur_info()
     chain(
         validate_params(),
+        selecteur_s3_db,
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci",
@@ -58,10 +60,10 @@ def configuration_projets() -> None:
         create_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, reset_id_seq=False),
         import_file_to_db.partial(
             pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, keep_file_id_col=True
-        ).expand(selecteur_config=get_projet_config(nom_projet=nom_projet)),
-        copy_tmp_table_to_real_table(
-            load_strategy=LoadStrategy.FULL_LOAD, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
-        ),
+        ).expand(selecteur_config=selecteur_s3_db),
+        copy_tmp_table_to_real_table.partial(
+            pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
+        ).expand(projet_db_info=selecteur_s3_db),
         delete_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
     )
 
