@@ -43,7 +43,7 @@ def weather_dag() -> None:
     transformed = transform_data(raw)
     loaded = load_data(transformed)
     # Ordre tâches
-    chain(validate_params, raw, transformed, loaded)
+    chain(validate_params(), raw, transformed, loaded)
 
 
 weather_dag()
