@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from datetime import datetime, timedelta
 from typing import Any, Mapping, Optional
 
@@ -131,4 +132,4 @@ def create_dag_params(
         enable=feature_flags,
     )
 
-    return dict(dag_params.__dict__)
+    return asdict(obj=dag_params)
