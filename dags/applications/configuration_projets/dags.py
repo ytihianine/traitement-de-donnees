@@ -49,7 +49,7 @@ def configuration_projets() -> None:
 
     selecteur_s3_db = get_config_selecteur_info()
     chain(
-        validate_params(),
+        # validate_params(),
         selecteur_s3_db,
         download_grist_doc_to_s3(
             selecteur="grist_doc",
