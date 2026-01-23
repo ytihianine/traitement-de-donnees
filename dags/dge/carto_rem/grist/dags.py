@@ -1,7 +1,7 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
-from infra.mails.default_smtp import create_airflow_callback, MailStatus
+from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.grist import download_grist_doc_to_s3
@@ -54,7 +54,7 @@ LINK_DOC_DATA = "To define"  # noqa
         lien_donnees=LINK_DOC_DATA,
         mail_enable=False,
     ),
-    on_failure_callback=create_airflow_callback(mail_status=MailStatus.ERROR),
+    on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )
 def cartographie_remuneration_grist() -> None:
     """Task order"""

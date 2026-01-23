@@ -12,9 +12,10 @@ from infra.file_handling.dataframe import read_dataframe
 from utils.config.dag_params import get_project_name
 from utils.dataframe import df_info
 from utils.config.tasks import (
-    get_selecteur_config,
     get_cols_mapping,
     format_cols_mapping,
+    get_selecteur_s3,
+    get_selecteur_source_fichier,
 )
 
 TaskParams = Dict[str, Any]
@@ -56,19 +57,22 @@ def create_parquet_converter_task(
 
         # Get input file path
         logging.info(
-            f"Getting configuration for project {nom_projet} and selector {selecteur}"
+            msg=f"Getting configuration for project {nom_projet} and selector {selecteur}"
         )
-        config = get_selecteur_config(nom_projet=nom_projet, selecteur=selecteur)
+        source = get_selecteur_source_fichier(
+            nom_projet=nom_projet, selecteur=selecteur
+        )
+        output = get_selecteur_s3(nom_projet=nom_projet, selecteur=selecteur)
 
         # Read input file based on extension
-        logging.info(f"Reading file from {config.filepath_source_s3}")
+        logging.info(msg=f"Reading file from {source['filepath_source_s3']}")
         df = read_dataframe(
             file_handler=s3_handler,
-            file_path=config.filepath_source_s3,
+            file_path=source["filepath_source_s3"],
             read_options=read_options,
         )
 
-        df_info(df, f"{task_params['task_id']} - Initial state")
+        df_info(df, df_name=f"{task_params['task_id']} - Initial state")
 
         if apply_cols_mapping:
             # Apply column mapping if available
@@ -76,9 +80,9 @@ def create_parquet_converter_task(
             if cols_mapping.empty:
                 print(f"No column mapping found for selecteur {selecteur}")
             else:
-                cols_mapping = format_cols_mapping(cols_mapping)
+                cols_mapping = format_cols_mapping(df_cols_map=cols_mapping)
                 df = df.set_axis(
-                    [" ".join(colname.split()) for colname in df.columns],
+                    labels=[" ".join(colname.split()) for colname in df.columns],
                     axis="columns",
                 )
                 df = df.rename(columns=cols_mapping, errors="raise")
@@ -87,12 +91,14 @@ def create_parquet_converter_task(
         # Apply custom processing
         if process_func:
             df = process_func(df)
-            df_info(df, f"{task_params['task_id']} - After processing")
+            df_info(df, df_name=f"{task_params['task_id']} - After processing")
 
         # Convert to parquet and save
         parquet_data = df.to_parquet(path=None, index=False)
-        logging.info(f"Saving to {config.filepath_tmp_s3}")
-        s3_handler.write(config.filepath_tmp_s3, parquet_data)
-        logging.info(f"Successfully saved parquet file to {config.filepath_tmp_s3}")
+        logging.info(msg=f"Saving to {output['filepath_tmp_s3']}")
+        s3_handler.write(file_path=output["filepath_tmp_s3"], content=parquet_data)
+        logging.info(
+            msg=f"Successfully saved parquet file to {output['filepath_tmp_s3']}"
+        )
 
     return convert_to_parquet

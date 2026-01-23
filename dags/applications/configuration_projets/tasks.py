@@ -31,7 +31,7 @@ def process_data() -> None:
     projets = create_grist_etl_task(
         selecteur="projets",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_projets,
+        process_func=process.process_projet,
     )
     selecteur = create_grist_etl_task(
         selecteur="selecteur",

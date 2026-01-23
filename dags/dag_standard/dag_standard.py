@@ -5,7 +5,7 @@ from airflow.sdk.bases.operator import chain
 
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
-from infra.mails.default_smtp import create_airflow_callback, MailStatus
+from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
 from utils.tasks.sql import (
     create_tmp_tables,
@@ -58,7 +58,7 @@ default_args = {
             "lien_donnees": LINK_DOC_DONNEES,
         },
     },
-    on_failure_callback=create_airflow_callback(mail_status=MailStatus.ERROR),
+    on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )
 def consommation_des_batiments():
     # Variables
@@ -75,8 +75,8 @@ def consommation_des_batiments():
         poke_interval=timedelta(minutes=1),
         timeout=timedelta(minutes=15),
         soft_fail=True,
-        on_skipped_callback=create_airflow_callback(mail_status=MailStatus.SKIP),
-        on_success_callback=create_airflow_callback(mail_status=MailStatus.START),
+        on_skipped_callback=create_send_mail_callback(mail_status=MailStatus.SKIP),
+        on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
 
     # Ordre des tâches

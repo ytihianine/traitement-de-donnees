@@ -1,3 +1,6 @@
+from typing import Any
+
+
 from enum import Enum, auto
 
 
@@ -8,7 +11,11 @@ class DatabaseType(Enum):
     SQLITE = auto()
 
 
-class PartitionTimePeriod(str, Enum):
+class PartitionTimePeriod(Enum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values) -> str:
+        return name.upper()
+
     DAY = auto()
     WEEK = auto()
     MONTH = auto()
@@ -17,6 +24,10 @@ class PartitionTimePeriod(str, Enum):
 
 class LoadStrategy(Enum):
     """Load strategies for data ingestion."""
+
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values) -> str:
+        return name.upper()
 
     FULL_LOAD = auto()
     INCREMENTAL = auto()

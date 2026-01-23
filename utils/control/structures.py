@@ -1,3 +1,4 @@
+from enum import Enum
 import pandas as pd
 import ast
 
@@ -32,6 +33,12 @@ def handle_grist_null_references(df: pd.DataFrame, columns: list[str]) -> pd.Dat
     return df
 
 
+def handle_grist_boolean_columns(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
+    for col in columns:
+        df[col] = df[col].replace({0: False, 1: True})
+    return df
+
+
 def are_lists_egal(list_A: list[str], list_B: list[str]) -> bool:
     # Convert to sets
     set_A = set(list_A)
@@ -61,3 +68,38 @@ def are_lists_egal(list_A: list[str], list_B: list[str]) -> bool:
         )
 
     return False
+
+
+def validate_enum_column(
+    df: pd.DataFrame, column: str, enum_class: type[Enum], allow_null: bool = True
+) -> None:
+    """
+    Valide que toutes les valeurs d'une colonne correspondent aux valeurs d'un Enum.
+
+    Args:
+        df: DataFrame à valider
+        column: Nom de la colonne à vérifier
+        enum_class: Classe Enum contenant les valeurs valides
+        allow_null: Si True, ignore les valeurs NaN/None
+
+    Raises:
+        ValueError: Si des valeurs invalides sont trouvées
+    """
+    valid_values = {e.value for e in enum_class}
+
+    if allow_null:
+        column_values = set(df[column].dropna().unique())
+    else:
+        column_values = set(df[column].unique())
+        if pd.isna(list(column_values)).any():
+            raise ValueError(
+                f"Valeurs null trouvées dans '{column}' alors que allow_null=False"
+            )
+
+    invalid_values = column_values - valid_values
+
+    if invalid_values:
+        raise ValueError(
+            f"Valeurs invalides dans '{column}': {invalid_values}. "
+            f"Valeurs acceptées: {valid_values}"
+        )
