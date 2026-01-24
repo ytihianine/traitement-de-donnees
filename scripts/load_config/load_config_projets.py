@@ -39,6 +39,9 @@ tbl_ordered = [
         "process_func": process.process_selecteur_database,
     },
 ]
+tbl_names = [action["tbl_name"] for action in tbl_ordered]
+print(tbl_names)
+tbl_names.reverse()
 
 ENV = os.environ.copy()
 DRY_RUN = False
@@ -55,6 +58,14 @@ pg_conn = psycopg2.connect(
 )
 pg_cur = pg_conn.cursor()
 # for each tbl
+
+if not DRY_RUN:
+    for tbl_desc in tbl_names:
+        # Delete rows
+        drop_query = f"DELETE FROM {schema}.{tbl_desc};"
+        print(drop_query)
+        pg_cur.execute(query=drop_query)
+
 for tbl in tbl_ordered:
     print(f"Start processing table <{tbl["tbl_name"]}>")
     # read data for sqlite file
