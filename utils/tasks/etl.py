@@ -1,10 +1,11 @@
 """Module for ETL task creation and execution."""
 
+from pathlib import Path
 from typing import Callable, Optional, Any
-from airflow import XComArg
-import pandas as pd
 
-from airflow.sdk import task
+import pandas as pd
+from airflow.sdk import task, XComArg
+
 
 from infra.file_handling.dataframe import read_dataframe
 from infra.file_handling.factory import create_default_s3_handler, create_local_handler
@@ -15,6 +16,7 @@ from utils.config.tasks import (
     get_selecteur_info,
     get_cols_mapping,
     format_cols_mapping,
+    get_selecteur_source_fichier,
 )
 from utils.config.dag_params import get_execution_date, get_project_name
 from types.dags import ETLStep, TaskConfig
@@ -77,24 +79,28 @@ def create_grist_etl_task(
         nom_projet = get_project_name(context=context)
 
         # Get config values related to the task
-        task_config = get_selecteur_info(nom_projet=nom_projet, selecteur=selecteur)
+        task_config = get_selecteur_source_fichier(
+            nom_projet=nom_projet, selecteur=selecteur
+        )
         doc_config = get_selecteur_info(nom_projet=nom_projet, selecteur=doc_selecteur)
-        if task_config.nom_source is None:
+        doc_local_path = Path("/tmp") / doc_config.filename
+
+        if task_config.id_source is None:
             raise ValueError(f"nom_source must be defined for selecteur {selecteur}")
 
         # Initialize hooks
         s3_handler = create_default_s3_handler()
         local_handler = create_local_handler()
         sqlite_handler = create_db_handler(
-            connection_id=doc_config.filepath_local, db_type=DatabaseType.SQLITE
+            connection_id=str(doc_local_path), db_type=DatabaseType.SQLITE
         )
 
         # Download Grist doc from S3 to local temp file
         grist_doc = s3_handler.read(file_path=doc_config.filepath_tmp_s3)
-        local_handler.write(file_path=str(doc_config.filepath_local), content=grist_doc)
+        local_handler.write(file_path=str(doc_local_path), content=grist_doc)
 
         # Get data of table
-        df = sqlite_handler.fetch_df(query=f"SELECT * FROM {task_config.nom_source}")
+        df = sqlite_handler.fetch_df(query=f"SELECT * FROM {task_config.id_source}")
 
         if normalisation_process_func is not None:
             df = normalisation_process_func(df)
@@ -151,7 +157,9 @@ def create_file_etl_task(
         s3_handler = create_default_s3_handler()
 
         # Get config values related to the task
-        task_config = get_selecteur_config(nom_projet=nom_projet, selecteur=selecteur)
+        task_config = get_selecteur_source_fichier(
+            nom_projet=nom_projet, selecteur=selecteur
+        )
 
         # Get data of table
         df = read_dataframe(

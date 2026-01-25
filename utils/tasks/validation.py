@@ -20,8 +20,7 @@ Usage example:
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 import logging
 
-from airflow import XComArg
-from airflow.sdk import task
+from airflow.sdk import task, XComArg
 
 from utils.exceptions import ConfigError
 
