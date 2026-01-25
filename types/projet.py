@@ -24,16 +24,14 @@ class SourceGrist:
 class SourceFichier:
     projet: str
     selecteur: str
+    bucket: str
+    s3_key: str
     # Source
     type_source: str
     id_source: str
-    bucket: str
-    s3_key: str
     filepath_source_s3: str
     # Destination
     filename: str
-    s3_key: str
-    bucket: str
     projet_s3_key: str
     projet_s3_key_tmp: str
     filepath_s3: str
