@@ -28,7 +28,7 @@ def get_partitions(schema: str, curseur: extensions.cursor) -> list[tuple[str, .
     return curseur.fetchall()
 
 
-def get_tbl_names(schema: str, curseur: extensions.cursor) -> list[tuple[str, ...]]:
+def list_table_names(schema: str, curseur: extensions.cursor) -> list[tuple[str, ...]]:
     curseur.execute(
         query=f"""
         SELECT c.relname AS table_name, c.relnamespace::regnamespace::text AS schema_name

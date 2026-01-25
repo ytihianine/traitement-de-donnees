@@ -2,7 +2,7 @@ import os
 
 import psycopg2
 
-from scripts.handle_partitions.commun import get_tbl_names, get_partitions, Actions
+from scripts.handle_partitions.commun import list_table_names, get_partitions, Actions
 from scripts.handle_partitions.partitions import (
     drop_partitions,
     create_partitions,
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     if config.action == Actions.CREATE:
         try:
             # Récupérer la liste des tables
-            table_names = get_tbl_names(schema=config.schema, curseur=pg_cur)
+            table_names = list_table_names(schema=config.schema, curseur=pg_cur)
             table_names = [
                 tbl for tbl in table_names if tbl[0].startswith(config.tbl_to_keep)
             ]
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     if config.action == Actions.UPDATE_TIMESTAMP:
         try:
             # Récupérer la liste des tables
-            table_names = get_tbl_names(schema=config.schema, curseur=pg_cur)
+            table_names = list_table_names(schema=config.schema, curseur=pg_cur)
             table_names = [
                 tbl for tbl in table_names if tbl[0].startswith(config.tbl_to_keep)
             ]
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     if config.action == Actions.UPDATE_SNAPSHOT:
         try:
             # Récupérer la liste des tables
-            table_names = get_tbl_names(schema=config.schema, curseur=pg_cur)
+            table_names = list_table_names(schema=config.schema, curseur=pg_cur)
             table_names = [
                 tbl for tbl in table_names if tbl[0].startswith(config.tbl_to_keep)
             ]
