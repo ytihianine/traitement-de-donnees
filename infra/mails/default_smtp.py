@@ -8,7 +8,7 @@ from airflow.utils.email import send_email_smtp
 from utils.config.dag_params import (
     get_dag_status,
     get_execution_date,
-    get_mail_info,
+    get_feature_flags,
 )
 from types.dags import DagStatus
 from enums.mail import MailPriority, MailStatus
@@ -148,7 +148,7 @@ def create_send_mail_callback(mail_status: MailStatus) -> Callable:
 
     def _callback(context: dict[str, Any]) -> None:
         # If debug mode is ON, we don't want to send any mail
-        mail_enable = get_mail_info(context=context)["enable"]
+        mail_enable = get_feature_flags(context=context).mail
         dag_status = get_dag_status(context=context)
 
         if dag_status == DagStatus.DEV:
@@ -161,25 +161,17 @@ def create_send_mail_callback(mail_status: MailStatus) -> Callable:
 
         projet_contact = get_projet_contact(context=context)
         mail_to = [
-            contact["contact_mail"]
-            for contact in projet_contact
-            if contact["is_generic"]
+            contact.contact_mail for contact in projet_contact if contact.is_generic
         ]
         mail_cc = [
-            contact["contact_mail"]
-            for contact in projet_contact
-            if not contact["is_generic"]
+            contact.contact_mail for contact in projet_contact if not contact.is_generic
         ]
 
         projet_docs = get_projet_documentation(context=context)
         doc_pipeline = [
-            doc["lien"]
-            for doc in projet_docs
-            if doc["type_documentation"] == "pipeline"
+            doc.lien for doc in projet_docs if doc.type_documentation == "pipeline"
         ]
-        doc_data = [
-            doc["lien"] for doc in projet_docs if doc["type_documentation"] == "data"
-        ]
+        doc_data = [doc.lien for doc in projet_docs if doc.type_documentation == "data"]
         execution_date = get_execution_date(context=context)
 
         if isinstance(mail_cc, list):
