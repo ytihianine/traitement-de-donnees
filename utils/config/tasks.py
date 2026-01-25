@@ -186,7 +186,7 @@ def get_table_name(
 
 
 @db_retry
-def get_grist_source(
+def get_source_grist(
     context: Mapping[str, Any] | None = None,
     nom_projet: str | None = None,
     selecteur: str | None = None,

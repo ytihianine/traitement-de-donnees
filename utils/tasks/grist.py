@@ -7,7 +7,7 @@ from infra.http_client.adapters import RequestsClient
 from infra.http_client.config import ClientConfig
 from infra.grist.client import GristAPI
 from utils.config.dag_params import get_project_name
-from utils.config.tasks import get_grist_source, get_selecteur_s3
+from utils.config.tasks import get_source_grist, get_selecteur_s3
 
 from enums.filesystem import FileHandlerType
 from utils.config.vars import (
@@ -36,7 +36,7 @@ def download_grist_doc_to_s3(
     """Download SQLite from a specific Grist doc to S3"""
     nom_projet = get_project_name(context=context)
 
-    source_grist = get_grist_source(nom_projet=nom_projet, selecteur=selecteur)
+    source_grist = get_source_grist(nom_projet=nom_projet, selecteur=selecteur)
     selecteur_s3 = get_selecteur_s3(nom_projet=nom_projet, selecteur=selecteur)
 
     # Instanciate Grist client

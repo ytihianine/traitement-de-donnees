@@ -13,6 +13,7 @@ from infra.database.factory import create_db_handler
 from utils.control.structures import remove_grist_internal_cols
 from utils.dataframe import df_info
 from utils.config.tasks import (
+    get_source_grist,
     get_selector_info,
     column_mapping_dataframe,
     column_mapping_dict,
@@ -79,7 +80,7 @@ def create_grist_etl_task(
         nom_projet = get_project_name(context=context)
 
         # Get config values related to the task
-        task_config = get_source_fichier(nom_projet=nom_projet, selecteur=selecteur)
+        task_config = get_source_grist(nom_projet=nom_projet, selecteur=selecteur)
         doc_config = get_selector_info(nom_projet=nom_projet, selecteur=doc_selecteur)
         doc_local_path = Path("/tmp") / doc_config.filename
 
