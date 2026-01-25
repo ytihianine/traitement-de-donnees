@@ -2,6 +2,7 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
+from types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_projet_config
 from enums.dags import DagStatus
@@ -44,10 +45,10 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        prod_schema="siep",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
+        db_params=DBParams(prod_schema="siep"),
+        feature_flags=FeatureFlags(
+            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_success_callback=create_send_mail_callback(mail_status=MailStatus.SUCCESS),
     on_failure_callback=create_send_mail_callback(

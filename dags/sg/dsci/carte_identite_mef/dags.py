@@ -2,6 +2,8 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
 from enums.dags import DagStatus
+from types.dags import DBParams, FeatureFlags
+from types.dags import DBParams
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -21,25 +23,21 @@ from dags.sg.dsci.carte_identite_mef.tasks import (
 
 
 nom_projet = "Carte_Identite_MEF"
-LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/sg/dsci/carte_identite_mef?ref_type=heads"  # noqa
-LINK_DOC_DATA = (
-    "https://grist.numerique.gouv.fr/o/catalogue/k9LvttaYoxe6/catalogage-MEF"
-)
 
 
 @dag(
     dag_id="carte_identite_mef",
-    default_args=create_default_args(),
     schedule="*/8 8-13,14-19 * * 1-5",
     catchup=False,
     max_consecutive_failed_dag_runs=1,
+    default_args=create_default_args(),
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        prod_schema="dsci",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
+        db_params=DBParams(prod_schema="dsci"),
+        feature_flags=FeatureFlags(
+            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
 )
 def carte_identite_mef_dag() -> None:

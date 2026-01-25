@@ -6,6 +6,7 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
+from types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.sql import (
@@ -35,8 +36,6 @@ from dags.sg.siep.mmsi.consommation_batiment.tasks import (
 
 # Mails
 nom_projet = "Consommation des bâtiments"
-LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/sg/siep/mmsi/consommation_batiment?ref_type=heads"  # noqa
-LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.fr/app/dataset?datasetId=49"  # noqa
 
 
 # Définition du DAG
@@ -52,11 +51,10 @@ LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        prod_schema="siep",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=True,
-        mail_to=["mmsi.siep@finances.gouv.fr"],
+        db_params=DBParams(prod_schema="siep"),
+        feature_flags=FeatureFlags(
+            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,

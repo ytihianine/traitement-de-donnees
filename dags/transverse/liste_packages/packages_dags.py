@@ -2,8 +2,12 @@ from typing import Literal
 
 from airflow.sdk import dag, task
 
+from types.dags import FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
+
+
+nom_projet = "Liste des packages installés"
 
 
 # Définition du DAG
@@ -16,10 +20,12 @@ from enums.dags import DagStatus
     description="Liste des packages installés dans l'instance",
     default_args=create_default_args(),
     params=create_dag_params(
-        nom_projet="liste-des-packages",
+        nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        prod_schema="Aucun",
-        mail_enable=False,
+        db_params=None,
+        feature_flags=FeatureFlags(
+            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
 )
 def liste_packages() -> None:

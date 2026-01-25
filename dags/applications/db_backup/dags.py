@@ -2,6 +2,7 @@ from datetime import timedelta
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
+from types.dags import FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
@@ -14,8 +15,7 @@ from utils.tasks.s3 import (
 from dags.applications.db_backup.tasks import validate_params, dump_databases
 
 
-LINK_DOC_PIPELINE = "TO COMPLETE"
-LINK_DOC_DATA = "Aucune"
+nom_projet = "Sauvegarde databases"
 
 
 # Définition du DAG
@@ -28,14 +28,12 @@ LINK_DOC_DATA = "Aucune"
     description="""Pipeline qui réalise des sauvegarde de la base de données""",
     default_args=create_default_args(),
     params=create_dag_params(
-        nom_projet="Sauvegarde databases",
+        nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        prod_schema="null",
-        mail_enable=False,
-        mail_to=["yanis.tihianine@finances.gouv.fr"],
-        mail_cc=["labo-data@finances.gouv.fr"],
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
+        db_params=None,
+        feature_flags=FeatureFlags(
+            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,

@@ -6,6 +6,7 @@ from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import MailStatus, create_send_mail_callback
+from types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_s3_keys_source, get_projet_config
 from enums.dags import DagStatus
@@ -40,8 +41,6 @@ from dags.sg.siep.mmsi.oad.indicateurs.tasks import (
 
 # Mails
 nom_projet = "Outil aide diagnostic"
-LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/cgefi/barometre?ref_type=heads"  # noqa
-LINK_DOC_DATA = "Non-défini"  # noqa
 
 
 # Définition du DAG
@@ -57,11 +56,10 @@ LINK_DOC_DATA = "Non-défini"  # noqa
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        prod_schema="siep",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
-        mail_to=["mmsi.siep@finances.gouv.fr"],
+        db_params=DBParams(prod_schema="siep"),
+        feature_flags=FeatureFlags(
+            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,

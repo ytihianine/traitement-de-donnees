@@ -3,6 +3,7 @@ from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
+from types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.sql import (
@@ -17,8 +18,6 @@ from utils.tasks.sql import (
 from dags.commun.code_geographique.tasks import code_geographique, geojson, code_iso
 
 nom_projet = "Code géographique"
-LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/cgefi/barometre?ref_type=heads"  # noqa
-LINK_DOC_DATA = "Indéfini"  # noqa
 
 
 # Définition du DAG
@@ -34,10 +33,10 @@ LINK_DOC_DATA = "Indéfini"  # noqa
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.DEV,
-        prod_schema="commun",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
+        db_params=DBParams(prod_schema="commun"),
+        feature_flags=FeatureFlags(
+            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,

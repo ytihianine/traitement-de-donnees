@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from enums.dags import DagStatus
+from types.dags import DBParams, FeatureFlags
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -43,11 +44,11 @@ LINK_DOC_DATA = (
     default_args=create_default_args(retries=1, retry_delay=timedelta(seconds=30)),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.DEV,
-        prod_schema="cgefi_poc",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
+        dag_status=DagStatus.RUN,
+        db_params=DBParams(prod_schema="cgefi_poc"),
+        feature_flags=FeatureFlags(
+            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )

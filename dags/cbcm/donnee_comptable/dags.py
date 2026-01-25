@@ -7,6 +7,7 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
 from enums.dags import DagStatus
+from types.dags import DBParams, FeatureFlags
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -38,8 +39,6 @@ from dags.cbcm.donnee_comptable.tasks import (
 
 # Mails
 nom_projet = "Données comptable"
-LINK_DOC_PIPELINE = "Non-défini"  # noqa
-LINK_DOC_DATA = "Non-défini"  # noqa
 
 
 # Définition du DAG
@@ -55,11 +54,10 @@ LINK_DOC_DATA = "Non-défini"  # noqa
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        prod_schema="donnee_comptable",
-        mail_enable=True,
-        mail_to=["romain.gobbo@finances.gouv.fr"],
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
+        db_params=DBParams(prod_schema="donnee_comptable"),
+        feature_flags=FeatureFlags(
+            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,

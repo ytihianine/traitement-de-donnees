@@ -6,6 +6,7 @@ from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
+from types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 
 from enums.dags import DagStatus
@@ -31,9 +32,6 @@ from dags.cgefi.barometre.tasks import (
 
 
 nom_projet = "Baromètre"
-mail_to = ["corpus.cgefi@finances.gouv.fr"]
-LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/cgefi/barometre?ref_type=heads"  # noqa
-LINK_DOC_DATA = ""  # noqa
 
 
 # Définition du DAG
@@ -48,11 +46,11 @@ LINK_DOC_DATA = ""  # noqa
     default_args=create_default_args(retries=0),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.DEV,
-        prod_schema="cgefi",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
+        dag_status=DagStatus.RUN,
+        db_params=DBParams(prod_schema="cgefi"),
+        feature_flags=FeatureFlags(
+            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )

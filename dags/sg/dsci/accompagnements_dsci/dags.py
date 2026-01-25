@@ -3,6 +3,7 @@ from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import MailStatus, create_send_mail_callback
 from enums.dags import DagStatus
+from types.dags import DBParams, FeatureFlags
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -23,10 +24,6 @@ from dags.sg.dsci.accompagnements_dsci.tasks import (
 
 # Variables
 nom_projet = "Accompagnements DSCI"
-LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/sg/dsci/carte_identite_mef?ref_type=heads"  # noqa
-LINK_DOC_DATA = (
-    "https://grist.numerique.gouv.fr/o/catalogue/k9LvttaYoxe6/catalogage-MEF"
-)
 
 
 @dag(
@@ -39,11 +36,10 @@ LINK_DOC_DATA = (
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        prod_schema="activite_dsci",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=True,
-        mail_to=["arthur.lemonnier@finances.gouv.fr"],
+        db_params=DBParams(prod_schema="activite_dsci"),
+        feature_flags=FeatureFlags(
+            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,

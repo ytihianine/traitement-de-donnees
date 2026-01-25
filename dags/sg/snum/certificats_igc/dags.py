@@ -4,6 +4,7 @@ from airflow.sdk.bases.operator import chain
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
+from types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.sql import (
@@ -44,11 +45,11 @@ LINK_DOC_DATA = ""  # noqa
     default_args=create_default_args(retries=0),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.RUN,
-        prod_schema="certificat_igc",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
+        dag_status=DagStatus.DEV,
+        db_params=DBParams(prod_schema="certificat_igc"),
+        feature_flags=FeatureFlags(
+            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )

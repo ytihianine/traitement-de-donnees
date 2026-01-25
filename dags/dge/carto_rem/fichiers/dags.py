@@ -4,6 +4,7 @@ from airflow.sdk.bases.operator import chain
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
+from types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.sql import (
@@ -15,10 +16,10 @@ from utils.tasks.sql import (
     # set_dataset_last_update_date,
 )
 
-# from utils.tasks.s3 import (
-#     copy_s3_files,
-#     del_s3_files,
-# )
+from utils.tasks.s3 import (
+    copy_s3_files,
+    del_s3_files,
+)
 from utils.config.tasks import get_s3_keys_source, get_projet_config
 
 from dags.dge.carto_rem.fichiers.tasks import (
@@ -30,8 +31,6 @@ from dags.dge.carto_rem.fichiers.tasks import (
 
 # Mails
 nom_projet = "Cartographie rémunération"
-LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/cgefi/barometre?ref_type=heads"  # noqa
-LINK_DOC_DATA = "To define"  # noqa
 
 
 # Définition du DAG
@@ -47,10 +46,10 @@ LINK_DOC_DATA = "To define"  # noqa
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.DEV,
-        prod_schema="cartographie_remuneration",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
+        db_params=DBParams(prod_schema="cartographie_remuneration"),
+        feature_flags=FeatureFlags(
+            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )
@@ -81,8 +80,8 @@ def cartographie_remuneration() -> None:
         ),
         copy_tmp_table_to_real_table(),
         refresh_views(),
-        # copy_s3_files(),
-        # del_s3_files(),
+        copy_s3_files(),
+        del_s3_files(),
         delete_tmp_tables(),
     )
 

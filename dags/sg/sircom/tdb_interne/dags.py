@@ -3,6 +3,7 @@ from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from enums.dags import DagStatus
+from types.dags import DBParams, FeatureFlags
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -44,11 +45,10 @@ LINK_DOC_DATA = (
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        prod_schema="sircom",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
-        mail_to=["brigitte.lekime@finances.gouv.fr"],
+        db_params=DBParams(prod_schema="sircom"),
+        feature_flags=FeatureFlags(
+            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,

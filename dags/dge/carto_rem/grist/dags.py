@@ -2,6 +2,7 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
+from types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.grist import download_grist_doc_to_s3
@@ -32,8 +33,6 @@ from dags.dge.carto_rem.grist.tasks import (
 
 # Mails
 nom_projet = "Cartographie rémunération - Grist"
-LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/cgefi/barometre?ref_type=heads"  # noqa
-LINK_DOC_DATA = "To define"  # noqa
 
 
 # Définition du DAG
@@ -49,10 +48,10 @@ LINK_DOC_DATA = "To define"  # noqa
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.DEV,
-        prod_schema="cartographie_remuneration",
-        lien_pipeline=LINK_DOC_PIPELINE,
-        lien_donnees=LINK_DOC_DATA,
-        mail_enable=False,
+        db_params=DBParams(prod_schema="cartographie_remuneration"),
+        feature_flags=FeatureFlags(
+            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
+        ),
     ),
     on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )
