@@ -62,6 +62,18 @@ def get_db_info(context: Mapping[str, Any]) -> DBParams:
     return DBParams(prod_schema=prod_schema, tmp_schema=tmp_schema)
 
 
+def get_feature_flags(context: Mapping[str, Any]) -> FeatureFlags:
+    """Extract and validate feature flags from context."""
+    feature_flags = context.get("params", {}).get("enable", {})
+    return FeatureFlags(
+        db=feature_flags.get("db", False),
+        mail=feature_flags.get("mail", False),
+        s3=feature_flags.get("s3", False),
+        convert_files=feature_flags.get("convert_files", False),
+        download_grist_doc=feature_flags.get("download_grist_doc", False),
+    )
+
+
 def create_default_args(
     retries: int = 0, retry_delay: Optional[timedelta] = None, **kwargs
 ) -> dict:
