@@ -255,7 +255,7 @@ def get_grist_source(
 
     df = db.fetch_df(query, parameters=(nom_projet, selecteur))
     records = df.to_dict("records")
-    return SourceGrist(**records[0])
+    return SourceGrist(**{str(k): v for k, v in records[0].items()})
 
 
 @db_retry
