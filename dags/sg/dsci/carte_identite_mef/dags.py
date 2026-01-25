@@ -2,8 +2,8 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
 from enums.dags import DagStatus
-from types.dags import DBParams, FeatureFlags
-from types.dags import DBParams
+from _types.dags import DBParams, FeatureFlags
+from _types.dags import DBParams
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,

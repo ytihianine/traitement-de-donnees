@@ -19,7 +19,7 @@ from utils.config.tasks import (
     get_source_fichier,
 )
 from utils.config.dag_params import get_execution_date, get_project_name
-from types.dags import ETLStep, TaskConfig
+from _types.dags import ETLStep, TaskConfig
 from enums.database import DatabaseType
 
 

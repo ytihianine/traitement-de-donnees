@@ -1,7 +1,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from types.dags import ALL_PARAM_PATHS
+from _types.dags import ALL_PARAM_PATHS
 from utils.control.structures import normalize_grist_dataframe
 from utils.tasks.etl import create_grist_etl_task
 

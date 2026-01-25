@@ -1,7 +1,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from types.dags import ETLStep, TaskConfig
+from _types.dags import ETLStep, TaskConfig
 from utils.tasks.file import create_parquet_converter_task
 from utils.tasks.etl import create_task
 

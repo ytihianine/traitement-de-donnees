@@ -6,7 +6,7 @@ from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import MailStatus, create_send_mail_callback
-from types.dags import DBParams, FeatureFlags
+from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_s3_keys_source, get_projet_config
 from enums.dags import DagStatus

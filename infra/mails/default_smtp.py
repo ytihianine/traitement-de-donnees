@@ -10,7 +10,7 @@ from utils.config.dag_params import (
     get_execution_date,
     get_feature_flags,
 )
-from types.dags import DagStatus
+from _types.dags import DagStatus
 from enums.mail import MailPriority, MailStatus
 from utils.config.tasks import get_list_contact, get_list_documentation
 from utils.config.vars import (

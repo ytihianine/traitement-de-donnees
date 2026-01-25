@@ -8,7 +8,7 @@ import requests
 
 from .base import AbstractHTTPClient
 from .config import ClientConfig
-from .types import HTTPResponse
+from ._types import HTTPResponse
 from .exceptions import (
     APIError,
     AuthenticationError,

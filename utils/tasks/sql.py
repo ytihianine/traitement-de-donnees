@@ -26,8 +26,8 @@ from enums.database import (
     LoadStrategy,
     PartitionTimePeriod,
 )
-from types.dags import DagStatus
-from types.projet import DbInfo, SelecteurInfo
+from _types.dags import DagStatus
+from _types.projet import DbInfo, SelecteurInfo
 from utils.control.structures import are_lists_egal
 from utils.config.vars import (
     DEFAULT_TMP_SCHEMA,

@@ -1,4 +1,4 @@
-from types.dags import ALL_PARAM_PATHS, ETLStep, TaskConfig
+from _types.dags import ALL_PARAM_PATHS, ETLStep, TaskConfig
 from utils.tasks.etl import create_task, create_file_etl_task
 from utils.tasks.validation import create_validate_params_task
 

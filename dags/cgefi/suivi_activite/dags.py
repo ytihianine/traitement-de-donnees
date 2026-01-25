@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from enums.dags import DagStatus
-from types.dags import DBParams, FeatureFlags
+from _types.dags import DBParams, FeatureFlags
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,

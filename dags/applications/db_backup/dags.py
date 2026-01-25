@@ -2,7 +2,7 @@ from datetime import timedelta
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
-from types.dags import FeatureFlags
+from _types.dags import FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
