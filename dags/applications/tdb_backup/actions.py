@@ -7,7 +7,7 @@ from dags.applications.tdb_backup.process import convert_str_to_ascii_str
 from infra.file_handling.factory import create_file_handler
 from infra.http_client.config import ClientConfig
 from infra.http_client.adapters import RequestsClient
-from utils.config.tasks import get_selecteur_config
+from utils.config.tasks import get_projet_s3_info
 from enums.filesystem import FileHandlerType
 from utils.config.vars import (
     get_root_folder,
@@ -78,7 +78,7 @@ def get_dashboard_export(
     access_token: str, dashboards_info: list[dict[str, str]]
 ) -> None:
     # config
-    config = get_selecteur_config(nom_projet="", selecteur="")
+    projet_s3 = get_projet_s3_info(nom_projet="tdb_backup")
 
     # Variables
     http_client = RequestsClient(http_client_config)
@@ -122,7 +122,7 @@ def get_dashboard_export(
         dashboard_title = convert_str_to_ascii_str(dashboard["title"])
         s3_handler.write(
             content=zip_data,
-            file_path=f"{config.s3_key}/{curr_day}/{curr_time}/{dashboard_title}/{filename}",
+            file_path=f"{projet_s3.key}/{curr_day}/{curr_time}/{dashboard_title}/{filename}",
         )
 
 
