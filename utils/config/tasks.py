@@ -1,8 +1,10 @@
 """Functions for retrieving and managing project configurations."""
 
+from dataclasses import is_dataclass
 from typing import Any, Mapping, Optional
 import logging
 
+from attr import asdict
 from tenacity import (
     retry,
     stop_after_attempt,
@@ -704,3 +706,20 @@ def get_selector_info(
         )
 
     return s3_configs[0]
+
+
+def serialize_dataclass(obj: Any) -> Any:
+    """
+    Serialize dataclasses (or lists of dataclasses) into
+    Airflow-safe primitives when needed.
+    """
+    if is_dataclass(obj):
+        return asdict(inst=obj)
+
+    if isinstance(obj, list):
+        return [serialize_dataclass(obj=item) for item in obj]
+
+    if isinstance(obj, dict):
+        return {k: serialize_dataclass(obj=v) for k, v in obj.items()}
+
+    return obj
