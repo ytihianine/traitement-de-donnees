@@ -59,9 +59,9 @@ def configuration_projets() -> None:
         ),
         process_data(),
         create_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, reset_id_seq=False),
-        import_file_to_db.partial(
-            pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, keep_file_id_col=True
-        ).expand(selecteur_info=get_list_selector_info(nom_projet=nom_projet)),
+        import_file_to_db.partial(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID).expand(
+            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        ),
         copy_tmp_table_to_real_table.partial(
             pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
         ).expand(projet_db_info=selecteur_s3_db),
