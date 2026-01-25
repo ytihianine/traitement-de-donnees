@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import subprocess
 
 from airflow.sdk import Variable
@@ -6,7 +7,7 @@ from airflow.sdk import Variable
 from infra.database.factory import create_db_handler
 from infra.file_handling.factory import create_file_handler
 from utils.config.dag_params import get_project_name
-from utils.config.tasks import get_projet_config
+from utils.config.tasks import get_list_source_fichier
 from enums.filesystem import FileHandlerType
 from utils.config.vars import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
 
@@ -17,7 +18,7 @@ def create_dump_files(context: dict) -> None:
     """
     # config
     nom_projet = get_project_name(context=context)
-    projet_config = get_projet_config(nom_projet=nom_projet)
+    source_configs = get_list_source_fichier(nom_projet=nom_projet)
 
     # Variables
     db_handler = create_db_handler(connection_id="db_data_store")
@@ -43,7 +44,9 @@ def create_dump_files(context: dict) -> None:
     env = os.environ.copy()
     env["PGPASSWORD"] = Variable.get("db_main_password")
 
-    for config in projet_config:
+    for config in source_configs:
+        local_path = Path("/tmp") / config.filename
+
         # Construct pg_dump command (without file output)
         command = [
             "pg_dump",
@@ -53,10 +56,10 @@ def create_dump_files(context: dict) -> None:
             "-Fc",  # Custom format
             "--no-owner",
             "-d",
-            config.nom_source,
+            config.id_source,
         ]
 
-        print(f"Executing dump for database: {config.nom_source}")
+        print(f"Executing dump for database: {config.id_source}")
 
         # Local + S3 dump
         with subprocess.Popen(
@@ -67,18 +70,18 @@ def create_dump_files(context: dict) -> None:
 
             if proc.returncode != 0:
                 raise ValueError(
-                    f"Error dumping {config.nom_source}: {stderr.decode().strip() or 'Unknown error'}"
+                    f"Error dumping {config.id_source}: {stderr.decode().strip() or 'Unknown error'}"
                 )
 
             # --- 1. Write dump locally (atomic write via file_handler) ---
-            local_handler.write(file_path=config.filepath_local, content=stdout)
+            local_handler.write(file_path=local_path, content=stdout)
 
             # --- 2. Upload local dump to S3 ---
-            with open(config.filepath_local, "rb") as f:
+            with open(local_path, "rb") as f:
                 s3_handler.write(file_path=config.filepath_tmp_s3, content=f)
 
             print(
-                f"Successfully dumped {config.nom_source} to local: {config.filepath_local}, and uploaded to S3: {config.filepath_tmp_s3}"  # noqa
+                f"Successfully dumped {config.id_source} to local: {local_path}, and uploaded to S3: {config.filepath_tmp_s3}"  # noqa
             )
 
-            local_handler.delete(file_path=config.filepath_local)
+            local_handler.delete(file_path=local_path)
