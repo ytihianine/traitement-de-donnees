@@ -12,7 +12,7 @@ from utils.config.dag_params import (
 )
 from types.dags import DagStatus
 from enums.mail import MailPriority, MailStatus
-from utils.config.tasks import get_projet_contact, get_projet_documentation
+from utils.config.tasks import get_list_contact, get_list_documentation
 from utils.config.vars import (
     get_root_folder,
     DEFAULT_SMTP_CONN_ID,
@@ -159,7 +159,7 @@ def create_send_mail_callback(mail_status: MailStatus) -> Callable:
             print("Skipping! Mails are disabled for this dag ...")
             return
 
-        projet_contact = get_projet_contact(context=context)
+        projet_contact = get_list_contact(context=context)
         mail_to = [
             contact.contact_mail for contact in projet_contact if contact.is_generic
         ]
@@ -167,7 +167,7 @@ def create_send_mail_callback(mail_status: MailStatus) -> Callable:
             contact.contact_mail for contact in projet_contact if not contact.is_generic
         ]
 
-        projet_docs = get_projet_documentation(context=context)
+        projet_docs = get_list_documentation(context=context)
         doc_pipeline = [
             doc.lien for doc in projet_docs if doc.type_documentation == "pipeline"
         ]
