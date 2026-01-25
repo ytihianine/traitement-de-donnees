@@ -18,6 +18,14 @@ class SourceGrist:
     selecteur: str
     type_source: str
     id_source: str
+    # s3
+    filename: str
+    s3_key: str
+    bucket: str
+    projet_s3_key: str
+    projet_s3_key_tmp: str
+    filepath_s3: str
+    filepath_tmp_s3: str
 
 
 @dataclass(frozen=True)
