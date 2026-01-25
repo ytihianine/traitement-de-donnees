@@ -8,8 +8,6 @@ from types.dags import (
     DagParams,
     DagStatus,
     FeatureFlags,
-    MailParams,
-    DocsParams,
 )
 import pytz
 
@@ -62,41 +60,6 @@ def get_db_info(context: Mapping[str, Any]) -> DBParams:
         raise ValueError("tmp_schema must be defined in DAG parameters under db")
 
     return DBParams(prod_schema=prod_schema, tmp_schema=tmp_schema)
-
-
-def get_mail_info(context: Mapping[str, Any]) -> MailParams:
-    """Extract and validate database info from context."""
-    mail_params = context.get("params", {}).get("mail", {})
-    mail_enabled = mail_params.get("enable", False)
-    mail_to = mail_params.get("to")
-    mail_cc = mail_params.get("cc")
-    mail_bcc = mail_params.get("bcc")
-
-    if mail_enabled is None:
-        raise ValueError(
-            "mail_enabled must be defined in DAG parameters under mail section"
-        )
-    if not mail_to:
-        raise ValueError("mail_to must be defined in DAG parameters under mail section")
-
-    return {"enable": mail_enabled, "to": mail_to, "cc": mail_cc, "bcc": mail_bcc}
-
-
-def get_doc_info(context: Mapping[str, Any]) -> DocsParams:
-    """Extract and validate documentation info from context."""
-    mail_params = context.get("params", {}).get("docs", {})
-    lien_pipeline = mail_params.get("lien_pipeline", False)
-    lien_donnees = mail_params.get("lien_donnees")
-
-    if not lien_pipeline:
-        print("Set default value to lien_pipeline dag parameter")
-        lien_pipeline = "Non-défini"
-
-    if not lien_donnees:
-        print("Set default value to lien_pipeline dag parameter")
-        lien_donnees = "Non-défini"
-
-    return {"lien_pipeline": lien_pipeline, "lien_donnees": lien_donnees}
 
 
 def create_default_args(
