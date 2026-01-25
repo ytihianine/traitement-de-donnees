@@ -203,7 +203,14 @@ def get_source_grist(
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     query = f"""
-        SELECT cpssg.projet, cpssg.selecteur, cpssg.type_source, cpssg.id_source
+        SELECT cpssg.projet, cpssg.selecteur, cpssg.type_source, cpssg.id_source,
+            cpssg.filename,
+            cpssg.s3_key,
+            cpssg.bucket,
+            cpssg.projet_s3_key,
+            cpssg.projet_s3_key_tmp,
+            cpssg.filepath_s3,
+            cpssg.filepath_tmp_s3
         FROM {CONF_SCHEMA}.selecteur_source_grist_vw cpssg
         WHERE cpssg.projet = %s AND cpssg.selecteur = %s;
     """
