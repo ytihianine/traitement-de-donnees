@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Any, Mapping, Optional
 
 import pendulum
-from entities.dags import (
+from types.dags import (
     DBParams,
     DagParams,
     DagStatus,

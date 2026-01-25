@@ -1,4 +1,4 @@
-from entities.dags import (
+from types.dags import (
     KEY_NOM_PROJET,
     KEY_MAIL,
     KEY_MAIL_ENABLE,

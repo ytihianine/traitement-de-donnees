@@ -2,7 +2,7 @@
 
 import logging
 from typing import Any, Mapping
-from entities.dags import ProjetS3
+from types.dags import ProjetS3
 
 from airflow.sdk import task
 

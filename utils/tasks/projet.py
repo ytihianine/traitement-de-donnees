@@ -2,7 +2,7 @@
 
 from airflow.sdk import chain, task, task_group
 
-from entities.dags import (
+from types.dags import (
     Contact,
     DbInfo,
     Documentation,

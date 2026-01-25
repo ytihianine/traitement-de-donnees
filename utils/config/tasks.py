@@ -13,7 +13,7 @@ from tenacity import (
 import pandas as pd
 
 from utils.config.dag_params import get_project_name
-from entities.dags import (
+from types.dags import (
     Contact,
     DbInfo,
     Documentation,

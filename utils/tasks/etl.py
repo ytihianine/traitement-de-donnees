@@ -17,7 +17,7 @@ from utils.config.tasks import (
     format_cols_mapping,
 )
 from utils.config.dag_params import get_execution_date, get_project_name
-from entities.dags import ETLStep, TaskConfig
+from types.dags import ETLStep, TaskConfig
 from enums.database import DatabaseType
 
 
