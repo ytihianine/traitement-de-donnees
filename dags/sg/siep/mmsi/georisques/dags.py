@@ -61,8 +61,8 @@ def bien_georisques() -> None:
         ),
         ensure_partition(),
         copy_tmp_table_to_real_table(load_strategy=LoadStrategy.APPEND),
-        copy_s3_files(bucket="dsci"),
-        del_s3_files(bucket="dsci"),
+        copy_s3_files(),
+        del_s3_files(),
     )
 
 

@@ -70,8 +70,8 @@ def chorus_service_prescripteur() -> None:
             load_strategy=LoadStrategy.FULL_LOAD,
         ),
         refresh_views(),
-        copy_s3_files(bucket="dsci"),
-        del_s3_files(bucket="dsci"),
+        copy_s3_files(),
+        del_s3_files(),
         delete_tmp_tables(),
         # set_dataset_last_update_date(
         #     dataset_ids=[49, 50, 51, 52, 53, 54],

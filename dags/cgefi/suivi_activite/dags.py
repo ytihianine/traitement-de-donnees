@@ -72,7 +72,7 @@ def suivi_activite():
             selecteur_config=get_projet_config(nom_projet=nom_projet)
         ),
         copy_tmp_table_to_real_table(),
-        del_s3_files(bucket="dsci"),
+        del_s3_files(),
         delete_tmp_tables(),
     )
 

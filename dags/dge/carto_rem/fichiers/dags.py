@@ -81,8 +81,8 @@ def cartographie_remuneration() -> None:
         ),
         copy_tmp_table_to_real_table(),
         refresh_views(),
-        # copy_s3_files(bucket="dsci"),
-        # del_s3_files(bucket="dsci"),
+        # copy_s3_files(),
+        # del_s3_files(),
         delete_tmp_tables(),
     )
 

@@ -86,8 +86,8 @@ def barometre() -> None:
         ),
         copy_tmp_table_to_real_table(),
         # set_dataset_last_update_date(db_hook=POSTGRE_HOOK, dataset_ids=[3]),
-        copy_s3_files(bucket="dsci"),
-        del_s3_files(bucket="dsci"),
+        copy_s3_files(),
+        del_s3_files(),
         end_task,
     )
 

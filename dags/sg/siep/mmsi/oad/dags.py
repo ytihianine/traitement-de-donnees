@@ -115,8 +115,8 @@ def oad() -> None:
             load_strategy=LoadStrategy.APPEND,
         ),
         refresh_views(),
-        copy_s3_files(bucket="dsci"),
-        del_s3_files(bucket="dsci"),
+        copy_s3_files(),
+        del_s3_files(),
         delete_tmp_tables(),
         end_task,
     )

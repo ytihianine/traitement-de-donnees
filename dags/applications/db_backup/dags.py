@@ -47,8 +47,8 @@ def sauvegarde_database() -> None:
     chain(
         validate_params(),
         dump_databases(),
-        copy_s3_files(bucket="dsci"),
-        del_s3_files(bucket="dsci"),
+        copy_s3_files(),
+        del_s3_files(),
     )
 
 

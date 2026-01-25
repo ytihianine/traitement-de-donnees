@@ -68,8 +68,8 @@ def mentorat_merci() -> None:
         looking_for_files,
         agent_inscrit(),
         generer_binomes(),
-        copy_s3_files(bucket="dsci"),
-        del_s3_files(bucket="dsci"),
+        copy_s3_files(),
+        del_s3_files(),
     )
 
 
