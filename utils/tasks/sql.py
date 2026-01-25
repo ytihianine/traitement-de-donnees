@@ -461,15 +461,16 @@ def sort_db_colnames(
             WHERE
                 isc.table_schema = %s
                 AND isc.table_name = %s
-                AND (isc.column_default NOT LIKE 'nextval%%' OR isc.column_default IS NULL)
             ORDER BY table_schema ASC, table_name ASC, column_name ASC;
         """,
         parameters=(schema, tbl_name),
     )
 
-    cols = df.loc[:, "column_name"].tolist()
     if keep_file_id_col:
         logging.info(msg="Parameter keep_file_id_col is deprecated")
+        cols = df.loc[:, "column_name"].tolist()
+    else:
+        cols = df.loc[df["column_name"] != "id", "column_name"].tolist()
 
     sorted_cols = sorted(cols)
     logging.info(msg=f"Sorted columns for table {tbl_name}: {sorted_cols}")
