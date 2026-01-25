@@ -19,6 +19,7 @@ from utils.config.tasks import (
     get_list_database_info,
     get_projet_s3_info,
     get_projet_selecteur_s3,
+    serialize_dataclass,
 )
 
 
@@ -76,6 +77,7 @@ def get_config_selecteur_info(
 ) -> list[SelecteurInfo]:
     """Task to fetch selecteur S3 configurations at runtime."""
     s3_db_configs = get_list_selector_info(nom_projet=nom_projet, context=context)
+    s3_db_configs = serialize_dataclass(obj=s3_db_configs)
     return s3_db_configs
 
 
