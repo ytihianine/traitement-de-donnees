@@ -55,11 +55,6 @@ def process_data() -> None:
         process_func=process.process_selecteur,
     )
     # Selecteur
-    selecteur = create_grist_etl_task(
-        selecteur="selecteur",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_selecteur,
-    )
     selecteur_source = create_grist_etl_task(
         selecteur="selecteur_source",
         normalisation_process_func=normalize_grist_dataframe,
@@ -91,7 +86,6 @@ def process_data() -> None:
             projet_documentation(),
             projet_s3(),
             projet_selecteur(),
-            selecteur(),
             selecteur_source(),
             selecteur_database(),
             selecteur_s3(),
