@@ -13,12 +13,11 @@ from tenacity import (
 import pandas as pd
 
 from utils.config.dag_params import get_project_name
-from types.dags import (
+from types.projet import (
     Contact,
     DbInfo,
     Documentation,
     ProjetS3,
-    SelecteurConfig,
     SelecteurInfo,
     SelecteurS3,
     SourceFichier,
@@ -86,67 +85,6 @@ def get_config(nom_projet: str, selecteur: Optional[str] = None) -> pd.DataFrame
         )
 
     return df.sort_values(by=["tbl_order"])
-
-
-def get_projet_config(
-    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
-) -> list[SelecteurConfig]:
-    """Get configuration for a specific selecteur in a project.
-
-    Args:
-        context: Airflow task context
-        nom_projet: Project name
-
-    Returns:
-        SelecteurConfig dictionary with configuration details
-
-    Raises:
-        ValueError: If no configuration is found for the given project and selector
-    """
-    if nom_projet is None and context is None:
-        raise ValueError("nom_projet or context must be provided")
-    if nom_projet is None and context is not None:
-        nom_projet = get_project_name(context=context)
-
-    if nom_projet is None:
-        raise ValueError("Could not determine project name from context")
-
-    df_projet_config = get_config(nom_projet=nom_projet)
-    if df_projet_config.empty:
-        raise ConfigError(
-            message=f"No configuration found for project {nom_projet}",
-            nom_projet=nom_projet,
-        )
-
-    records = df_projet_config.to_dict("records")
-    # Ensure all keys are strings for dataclass compatibility
-    records = [{str(k): v for k, v in record.items()} for record in records]
-    return [SelecteurConfig(**record) for record in records]
-
-
-def get_selecteur_config(nom_projet: str, selecteur: str) -> SelecteurConfig:
-    """Get configuration for a specific selecteur in a project.
-
-    Args:
-        nom_projet: Project name
-        selecteur: Configuration selector
-
-    Returns:
-        SelecteurConfig dictionary with configuration details
-
-    Raises:
-        ValueError: If no configuration is found for the given project and selector
-    """
-    df_selecteur_config = get_config(nom_projet=nom_projet, selecteur=selecteur)
-    if df_selecteur_config.empty:
-        raise ConfigError(
-            message=f"No configuration found for project {nom_projet} and selector {selecteur}",
-            nom_projet=nom_projet,
-            selecteur=selecteur,
-        )
-
-    record = df_selecteur_config.iloc[0].to_dict()
-    return SelecteurConfig(**record)
 
 
 @db_retry
@@ -259,7 +197,7 @@ def get_tbl_names(
     db_infos = _get_db_info_tbl_names(
         context=context, nom_projet=nom_projet, selecteur=None
     )
-    return [db_info["tbl_name"] for db_info in db_infos]
+    return [db_info.tbl_name for db_info in db_infos]
 
 
 def get_selecteur_tbl_name(
@@ -289,7 +227,7 @@ def get_selecteur_tbl_name(
             selecteur=selecteur,
         )
 
-    return db_infos[0]["tbl_name"]
+    return db_infos[0].tbl_name
 
 
 @db_retry
