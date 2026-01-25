@@ -2,7 +2,7 @@
 
 import logging
 from typing import Any, Mapping
-from types.dags import ProjetS3
+from types.projet import ProjetS3
 
 from airflow.sdk import task
 
@@ -56,7 +56,7 @@ def copy_s3_files(
     s3_handler = create_file_handler(
         handler_type=FileHandlerType.S3,
         connection_id=connection_id,
-        bucket=projet_s3["bucket"],
+        bucket=projet_s3.bucket,
     )
 
     # Récupérer la liste des key s3 pour tous les sélecteurs
@@ -64,8 +64,10 @@ def copy_s3_files(
 
     # Copier la liste des sources dans le dossier final
     for selecteur_s3 in projet_selecteur_s3:
-        target_key = f"{selecteur_s3['s3_key']}/{curr_day}/{curr_time}/{selecteur_s3['filename']}"
-        src_key = selecteur_s3["filepath_tmp_s3"]
+        target_key = (
+            f"{selecteur_s3.s3_key}/{curr_day}/{curr_time}/{selecteur_s3.filename}"
+        )
+        src_key = selecteur_s3.filepath_tmp_s3
 
         try:
             # Copy file
@@ -117,7 +119,7 @@ def del_s3_files(
     s3_handler = create_file_handler(
         handler_type=FileHandlerType.S3,
         connection_id=connection_id,
-        bucket=projet_s3["bucket"],
+        bucket=projet_s3.bucket,
     )
 
     # Récupérer les sources
@@ -131,7 +133,7 @@ def del_s3_files(
         try:
             logging.info(msg=f"Deleting {len(projet_sources)} source files")
             for source in projet_sources:
-                s3_handler.delete(file_path=source["filepath_source_s3"])
+                s3_handler.delete(file_path=source.filepath_source_s3)
             logging.info(msg="Source files deleted successfully")
         except FileHandlerError as e:
             logging.error(msg=f"Failed to delete source files: {str(e)}")
@@ -142,7 +144,7 @@ def del_s3_files(
         try:
             logging.info(msg=f"Deleting {len(projet_selecteur_s3)} temporary files")
             for selecteur_s3 in projet_selecteur_s3:
-                s3_handler.delete(file_path=selecteur_s3["filepath_tmp_s3"])
+                s3_handler.delete(file_path=selecteur_s3.filepath_tmp_s3)
             logging.info(msg="Temporary files deleted successfully")
         except FileHandlerError as e:
             logging.error(msg=f"Failed to delete temporary files: {str(e)}")

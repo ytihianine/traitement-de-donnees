@@ -65,10 +65,10 @@ def create_parquet_converter_task(
         output = get_selecteur_s3(nom_projet=nom_projet, selecteur=selecteur)
 
         # Read input file based on extension
-        logging.info(msg=f"Reading file from {source['filepath_source_s3']}")
+        logging.info(msg=f"Reading file from {source.filepath_source_s3}")
         df = read_dataframe(
             file_handler=s3_handler,
-            file_path=source["filepath_source_s3"],
+            file_path=source.filepath_source_s3,
             read_options=read_options,
         )
 
@@ -95,10 +95,8 @@ def create_parquet_converter_task(
 
         # Convert to parquet and save
         parquet_data = df.to_parquet(path=None, index=False)
-        logging.info(msg=f"Saving to {output['filepath_tmp_s3']}")
-        s3_handler.write(file_path=output["filepath_tmp_s3"], content=parquet_data)
-        logging.info(
-            msg=f"Successfully saved parquet file to {output['filepath_tmp_s3']}"
-        )
+        logging.info(msg=f"Saving to {output.filepath_tmp_s3}")
+        s3_handler.write(file_path=output.filepath_tmp_s3, content=parquet_data)
+        logging.info(msg=f"Successfully saved parquet file to {output.filepath_tmp_s3}")
 
     return convert_to_parquet

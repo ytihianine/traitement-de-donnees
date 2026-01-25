@@ -12,7 +12,7 @@ from infra.database.factory import create_db_handler
 from utils.control.structures import remove_grist_internal_cols
 from utils.dataframe import df_info
 from utils.config.tasks import (
-    get_selecteur_config,
+    get_selecteur_info,
     get_cols_mapping,
     format_cols_mapping,
 )
@@ -77,10 +77,8 @@ def create_grist_etl_task(
         nom_projet = get_project_name(context=context)
 
         # Get config values related to the task
-        task_config = get_selecteur_config(nom_projet=nom_projet, selecteur=selecteur)
-        doc_config = get_selecteur_config(
-            nom_projet=nom_projet, selecteur=doc_selecteur
-        )
+        task_config = get_selecteur_info(nom_projet=nom_projet, selecteur=selecteur)
+        doc_config = get_selecteur_info(nom_projet=nom_projet, selecteur=doc_selecteur)
         if task_config.nom_source is None:
             raise ValueError(f"nom_source must be defined for selecteur {selecteur}")
 
@@ -226,7 +224,7 @@ def _execute_step(
     # Read data if required
     if step.read_data and input_selecteurs:
         for sel in input_selecteurs:
-            cfg = get_selecteur_config(nom_projet=nom_projet, selecteur=sel)
+            cfg = get_selecteur_info(nom_projet=nom_projet, selecteur=sel)
             df = read_dataframe(
                 file_handler=s3_handler,
                 file_path=cfg.filepath_tmp_s3,
@@ -323,7 +321,7 @@ def create_task(
             )
 
         # Resolve configs
-        output_config = get_selecteur_config(
+        output_config = get_selecteur_info(
             nom_projet=nom_projet, selecteur=output_selecteur
         )
 

@@ -26,7 +26,8 @@ from enums.database import (
     LoadStrategy,
     PartitionTimePeriod,
 )
-from types.dags import DagStatus, DbInfo, SelecteurInfo
+from types.dags import DagStatus
+from types.projet import DbInfo, SelecteurInfo
 from utils.control.structures import are_lists_egal
 from utils.config.vars import (
     DEFAULT_TMP_SCHEMA,
@@ -244,15 +245,15 @@ def ensure_partition(
     db = create_db_handler(connection_id=pg_conn_id)
 
     for tbl in tbl_info:
-        tbl_name = tbl["tbl_name"]
+        tbl_name = tbl.tbl_name
 
-        if not tbl["is_partitionned"]:
+        if not tbl.is_partitionned:
             print(f"{tbl_name} is not partitinned ... skipping")
             continue
 
         # Get partition period range
         from_date, to_date = determine_partition_period(
-            time_period=PartitionTimePeriod(value=tbl["partition_period"].upper()),
+            time_period=PartitionTimePeriod(value=tbl.partition_period.upper()),
             execution_date=execution_date,
         )
 
@@ -356,7 +357,7 @@ def delete_tmp_tables(
     db = create_db_handler(connection_id=pg_conn_id)
 
     for tbl in tbl_info:
-        tbl_name = tbl["tbl_name"]
+        tbl_name = tbl.tbl_name
         db.execute(query=f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
 
 
@@ -394,8 +395,8 @@ def copy_tmp_table_to_real_table(
 
     queries = []
     for db_info in projet_db_info:
-        load_strategy = LoadStrategy(value=db_info["load_strategy"].upper())
-        tbl_name = db_info["tbl_name"]
+        load_strategy = LoadStrategy(value=db_info.load_strategy.upper())
+        tbl_name = db_info.tbl_name
         prod_table = f"{prod_schema}.{tbl_name}"
         tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
 
