@@ -56,7 +56,7 @@ def generer_create_table(fichier_parquet, nom_table=None):
         colonnes = []
         for col_name, col_type in df.dtypes.items():
             # Nettoyer le nom de colonne (remplacer espaces, caractères spéciaux)
-            col_name_clean = col_name.strip().replace(" ", "_").replace("-", "_")
+            col_name_clean = str(col_name).strip().replace(" ", "_").replace("-", "_")
             type_pg = mapper_type_postgres(col_type)
             colonnes.append(f"    {col_name_clean} {type_pg}")
 
