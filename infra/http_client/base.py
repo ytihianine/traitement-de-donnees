@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 from urllib.parse import urljoin
 
 from .config import ClientConfig
-from ._types import HTTPResponse
+from .types import HTTPResponse
 
 
 class AbstractHTTPClient(ABC):
