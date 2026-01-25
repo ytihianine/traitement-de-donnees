@@ -234,7 +234,7 @@ CREATE TABLE conf_projets."selecteur_column_mapping" (
 );
 
 
--- Vue pour get_projet_s3()
+-- Vue pour get_projet_s3_info()
 DROP VIEW conf_projets.projet_s3_vw;
 CREATE OR REPLACE VIEW conf_projets.projet_s3_vw AS
 SELECT
@@ -299,7 +299,7 @@ INNER JOIN conf_projets.selecteur_source cpss
 INNER JOIN conf_projets.projet_s3 cpps3 ON cpp.id = cpps3.id_projet
 WHERE cpss.type_source = 'Fichier';
 
--- Vue pour get_cols_mapping()
+-- Vue pour column_mapping_dataframe()
 DROP VIEW conf_projets.cols_mapping_vw;
 CREATE OR REPLACE VIEW conf_projets.cols_mapping_vw AS
 SELECT
@@ -323,7 +323,7 @@ SELECT
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_documentation cppd ON cpp.id = cppd.id_projet;
 
--- Vue pour get_projet_documentation()
+-- Vue pour get_list_documentation()
 DROP VIEW conf_projets.projet_documentation_vw;
 CREATE OR REPLACE VIEW conf_projets.projet_documentation_vw AS
 SELECT
@@ -333,7 +333,7 @@ SELECT
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_documentation cppd ON cpp.id = cppd.id_projet;
 
--- Vue pour get_projet_contact()
+-- Vue pour get_list_contact()
 DROP VIEW conf_projets.projet_contact_vw;
 CREATE OR REPLACE VIEW conf_projets.projet_contact_vw AS
 SELECT

@@ -243,35 +243,6 @@ def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_storage_path(df: pd.DataFrame) -> pd.DataFrame:
-    # Rename
-    cols_to_rename = {
-        "projet": "id_projet",
-        "selecteur": "id_selecteur",
-        "db_tbl_name": "tbl_name",
-    }
-    df = (
-        df.rename(columns=cols_to_rename)
-        .pipe(replace_values, to_replace={0: None}, cols=["id_projet", "id_selecteur"])
-        .assign(
-            local_tmp_dir=df["local_tmp_dir"].str.strip(),
-            s3_bucket=df["s3_bucket"].str.strip(),
-            s3_key=df["s3_key"].str.strip(),
-            s3_tmp_key=df["s3_tmp_key"].str.strip(),
-        )
-        .convert_dtypes()
-    )
-    df = df.dropna(subset=["id_projet", "id_selecteur"])
-    df["tbl_name"] = df["tbl_name"].replace(r"^\s+$", np.nan, regex=True)
-
-    # Sort columns to match db cols order
-    cols = df.columns
-    sorted_cols = sorted(cols)
-    df = df.loc[:, sorted_cols]
-
-    return df
-
-
 def process_col_mapping(df: pd.DataFrame) -> pd.DataFrame:
     # Rename
     cols_to_rename = {
@@ -307,33 +278,5 @@ def process_col_mapping(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["id_projet", "id_selecteur"])
 
     df = df.loc[df["to_keep"]]
-
-    return df
-
-
-def process_col_requises(df: pd.DataFrame) -> pd.DataFrame:
-    # Rename
-    cols_to_rename = {
-        "projet": "id_projet",
-        "selecteur": "id_selecteur",
-        "colonne_requise": "id_correspondance_colonne",
-    }
-    col_to_keep = ["id", "id_projet", "id_selecteur", "id_correspondance_colonne"]
-    df = (
-        df.rename(columns=cols_to_rename)
-        .pipe(
-            replace_values,
-            to_replace={0: None},
-            cols=["id_projet", "id_selecteur", "id_correspondance_colonne"],
-        )
-        .convert_dtypes()
-    )
-    df = df.dropna(subset=["id_projet", "id_selecteur", "id_correspondance_colonne"])
-    df = df.drop(columns=list(set(df.columns) - set(col_to_keep)))
-
-    # Sort columns to match db cols order
-    cols = df.columns
-    sorted_cols = sorted(cols)
-    df = df.loc[:, sorted_cols]
 
     return df

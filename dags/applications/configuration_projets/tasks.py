@@ -28,35 +28,58 @@ def process_data() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_service,
     )
+    # Projet
     projets = create_grist_etl_task(
         selecteur="projets",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_projet,
     )
+    projet_contact = create_grist_etl_task(
+        selecteur="projet_contact",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_projet_contact,
+    )
+    projet_documentation = create_grist_etl_task(
+        selecteur="projet_documentation",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_projet_documentation,
+    )
+    projet_s3 = create_grist_etl_task(
+        selecteur="projet_s3",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_projet_s3,
+    )
+    projet_selecteur = create_grist_etl_task(
+        selecteur="projet_selecteur",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_selecteur,
+    )
+    # Selecteur
     selecteur = create_grist_etl_task(
         selecteur="selecteur",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_selecteur,
     )
-    source = create_grist_etl_task(
-        selecteur="source",
+    selecteur_source = create_grist_etl_task(
+        selecteur="selecteur_source",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_source,
     )
-    storage_paths = create_grist_etl_task(
-        selecteur="storage_path",
+    selecteur_database = create_grist_etl_task(
+        selecteur="selecteur_database",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_storage_path,
+        process_func=process.process_selecteur_database,
     )
-    col_mapping = create_grist_etl_task(
-        selecteur="col_mapping",
+    selecteur_s3 = create_grist_etl_task(
+        selecteur="selecteur_s3",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_selecteur_s3,
+    )
+
+    selecteur_column_mapping = create_grist_etl_task(
+        selecteur="selecteur_column_mapping",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_col_mapping,
-    )
-    col_requises = create_grist_etl_task(
-        selecteur="col_requises",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_col_requises,
     )
 
     chain(
@@ -64,10 +87,14 @@ def process_data() -> None:
             ref_direction(),
             ref_service(),
             projets(),
+            projet_contact(),
+            projet_documentation(),
+            projet_s3(),
+            projet_selecteur(),
             selecteur(),
-            source(),
-            storage_paths(),
-            col_mapping(),
-            col_requises(),
+            selecteur_source(),
+            selecteur_database(),
+            selecteur_s3(),
+            selecteur_column_mapping(),
         ]
     )
