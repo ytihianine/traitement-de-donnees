@@ -81,7 +81,7 @@ def create_grist_etl_task(
 
         # Get config values related to the task
         task_config = get_source_grist(nom_projet=nom_projet, selecteur=selecteur)
-        doc_config = get_selector_info(nom_projet=nom_projet, selecteur=doc_selecteur)
+        doc_config = get_source_grist(nom_projet=nom_projet, selecteur=doc_selecteur)
         doc_local_path = Path("/tmp") / doc_config.filename
 
         if task_config.id_source is None:
