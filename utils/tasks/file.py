@@ -12,10 +12,10 @@ from infra.file_handling.dataframe import read_dataframe
 from utils.config.dag_params import get_project_name
 from utils.dataframe import df_info
 from utils.config.tasks import (
-    get_cols_mapping,
-    format_cols_mapping,
+    column_mapping_dataframe,
+    column_mapping_dict,
     get_selecteur_s3,
-    get_selecteur_source_fichier,
+    get_source_fichier,
 )
 
 TaskParams = Dict[str, Any]
@@ -59,9 +59,7 @@ def create_parquet_converter_task(
         logging.info(
             msg=f"Getting configuration for project {nom_projet} and selector {selecteur}"
         )
-        source = get_selecteur_source_fichier(
-            nom_projet=nom_projet, selecteur=selecteur
-        )
+        source = get_source_fichier(nom_projet=nom_projet, selecteur=selecteur)
         output = get_selecteur_s3(nom_projet=nom_projet, selecteur=selecteur)
 
         # Read input file based on extension
@@ -76,11 +74,13 @@ def create_parquet_converter_task(
 
         if apply_cols_mapping:
             # Apply column mapping if available
-            cols_mapping = get_cols_mapping(nom_projet=nom_projet, selecteur=selecteur)
+            cols_mapping = column_mapping_dataframe(
+                nom_projet=nom_projet, selecteur=selecteur
+            )
             if cols_mapping.empty:
                 print(f"No column mapping found for selecteur {selecteur}")
             else:
-                cols_mapping = format_cols_mapping(df_cols_map=cols_mapping)
+                cols_mapping = column_mapping_dict(df_cols_map=cols_mapping)
                 df = df.set_axis(
                     labels=[" ".join(colname.split()) for colname in df.columns],
                     axis="columns",

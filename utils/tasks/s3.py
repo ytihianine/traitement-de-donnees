@@ -10,9 +10,9 @@ from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
 from infra.file_handling.factory import create_file_handler
 from utils.config.dag_params import get_dag_status, get_execution_date, get_project_name
 from utils.config.tasks import (
-    get_projet_s3,
+    get_projet_s3_info,
     get_projet_selecteur_s3,
-    get_projet_source_fichier,
+    get_list_source_fichier,
 )
 from enums.dags import DagStatus
 from enums.filesystem import FileHandlerType
@@ -46,7 +46,7 @@ def copy_s3_files(
     curr_time = execution_date.strftime(format="%Hh%M")
 
     if projet_s3 is None:
-        projet_s3 = get_projet_s3(nom_projet=nom_projet)
+        projet_s3 = get_projet_s3_info(nom_projet=nom_projet)
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
@@ -109,7 +109,7 @@ def del_s3_files(
     nom_projet = get_project_name(context=context)
 
     if projet_s3 is None:
-        projet_s3 = get_projet_s3(nom_projet=nom_projet)
+        projet_s3 = get_projet_s3_info(nom_projet=nom_projet)
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
@@ -123,7 +123,7 @@ def del_s3_files(
     )
 
     # Récupérer les sources
-    projet_sources = get_projet_source_fichier(nom_projet=nom_projet)
+    projet_sources = get_list_source_fichier(nom_projet=nom_projet)
 
     # Récupérer les key s3 des sélecteurs
     projet_selecteur_s3 = get_projet_selecteur_s3(nom_projet=nom_projet)

@@ -13,10 +13,10 @@ from infra.database.factory import create_db_handler
 from utils.control.structures import remove_grist_internal_cols
 from utils.dataframe import df_info
 from utils.config.tasks import (
-    get_selecteur_info,
-    get_cols_mapping,
-    format_cols_mapping,
-    get_selecteur_source_fichier,
+    get_selector_info,
+    column_mapping_dataframe,
+    column_mapping_dict,
+    get_source_fichier,
 )
 from utils.config.dag_params import get_execution_date, get_project_name
 from types.dags import ETLStep, TaskConfig
@@ -79,10 +79,8 @@ def create_grist_etl_task(
         nom_projet = get_project_name(context=context)
 
         # Get config values related to the task
-        task_config = get_selecteur_source_fichier(
-            nom_projet=nom_projet, selecteur=selecteur
-        )
-        doc_config = get_selecteur_info(nom_projet=nom_projet, selecteur=doc_selecteur)
+        task_config = get_source_fichier(nom_projet=nom_projet, selecteur=selecteur)
+        doc_config = get_selector_info(nom_projet=nom_projet, selecteur=doc_selecteur)
         doc_local_path = Path("/tmp") / doc_config.filename
 
         if task_config.id_source is None:
@@ -157,9 +155,7 @@ def create_file_etl_task(
         s3_handler = create_default_s3_handler()
 
         # Get config values related to the task
-        task_config = get_selecteur_source_fichier(
-            nom_projet=nom_projet, selecteur=selecteur
-        )
+        task_config = get_source_fichier(nom_projet=nom_projet, selecteur=selecteur)
 
         # Get data of table
         df = read_dataframe(
@@ -171,14 +167,16 @@ def create_file_etl_task(
         df_info(df=df, df_name=f"{selecteur} - Source normalisée")
         if apply_cols_mapping:
             # Apply column mapping if available
-            cols_mapping = get_cols_mapping(nom_projet=nom_projet, selecteur=selecteur)
+            cols_mapping = column_mapping_dataframe(
+                nom_projet=nom_projet, selecteur=selecteur
+            )
             if cols_mapping.empty:
                 print(f"No column mapping found for selecteur {selecteur}")
             else:
                 print(
                     "apply_cols_mapping set to True. Renaming the dataframe labels ..."
                 )
-                cols_mapping = format_cols_mapping(df_cols_map=cols_mapping)
+                cols_mapping = column_mapping_dict(df_cols_map=cols_mapping)
                 print(f"Columns mapping: \n{cols_mapping}")
                 df = df.set_axis(
                     labels=[" ".join(colname.split()) for colname in df.columns],
@@ -232,7 +230,7 @@ def _execute_step(
     # Read data if required
     if step.read_data and input_selecteurs:
         for sel in input_selecteurs:
-            cfg = get_selecteur_info(nom_projet=nom_projet, selecteur=sel)
+            cfg = get_selector_info(nom_projet=nom_projet, selecteur=sel)
             df = read_dataframe(
                 file_handler=s3_handler,
                 file_path=cfg.filepath_tmp_s3,
@@ -329,7 +327,7 @@ def create_task(
             )
 
         # Resolve configs
-        output_config = get_selecteur_info(
+        output_config = get_selector_info(
             nom_projet=nom_projet, selecteur=output_selecteur
         )
 

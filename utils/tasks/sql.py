@@ -21,7 +21,7 @@ from utils.config.dag_params import (
     get_execution_date,
     get_project_name,
 )
-from utils.config.tasks import get_projet_db_info, get_tbl_names
+from utils.config.tasks import get_list_database_info, get_list_table_name
 from enums.database import (
     LoadStrategy,
     PartitionTimePeriod,
@@ -240,7 +240,7 @@ def ensure_partition(
         return
 
     # Récupérer les informations de la table parente
-    tbl_info = get_projet_db_info(nom_projet=nom_projet)
+    tbl_info = get_list_database_info(nom_projet=nom_projet)
 
     db = create_db_handler(connection_id=pg_conn_id)
 
@@ -302,7 +302,7 @@ def create_tmp_tables(
     # Hook
     db = create_db_handler(connection_id=pg_conn_id)
 
-    tbl_names = get_tbl_names(nom_projet=nom_projet)
+    tbl_names = get_list_table_name(nom_projet=nom_projet)
 
     rows_result = db.fetch_all(
         query="""SELECT COUNT(*) as count_tmp_tables
@@ -352,7 +352,7 @@ def delete_tmp_tables(
     db_info = get_db_info(context=context)
     tmp_schema = db_info.tmp_schema
 
-    tbl_info = get_projet_db_info(nom_projet=nom_projet)
+    tbl_info = get_list_database_info(nom_projet=nom_projet)
     # Hook
     db = create_db_handler(connection_id=pg_conn_id)
 
@@ -390,7 +390,7 @@ def copy_tmp_table_to_real_table(
     db_handler = create_db_handler(connection_id=pg_conn_id)
 
     if projet_db_info is None:
-        projet_db_info = get_projet_db_info(nom_projet=nom_projet)
+        projet_db_info = get_list_database_info(nom_projet=nom_projet)
     print(f"Nombre de tables à copier: {len(projet_db_info)}")
 
     queries = []

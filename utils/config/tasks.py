@@ -43,52 +43,7 @@ db_retry = retry(
 
 
 @db_retry
-def get_config(nom_projet: str, selecteur: Optional[str] = None) -> pd.DataFrame:
-    """Get configuration for a specific selecteur in a project.
-
-    Args:
-        nom_projet: Project name
-        selecteur: Configuration selector
-
-    Returns:
-        SelecteurConfig dictionary with configuration details
-
-    Raises:
-        ValueError: If no configuration is found for the given project and selector
-    """
-    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
-
-    query = f"""
-        SELECT nom_projet, selecteur, nom_source, filename, s3_key,
-               filepath_source_s3, filepath_local, filepath_s3,
-               filepath_tmp_s3, tbl_name, tbl_order
-        FROM {CONF_SCHEMA}.vue_conf_projets
-        WHERE nom_projet = %s
-    """
-
-    params = [nom_projet]
-
-    if selecteur:
-        query += " AND selecteur = %s"
-        params.append(selecteur)
-
-    # remove trailing semicolon to avoid DB API issues
-    query = query.strip() + ";"
-
-    df = db.fetch_df(query, parameters=tuple(params))
-
-    if df.empty:
-        raise ConfigError(
-            f"No configuration found for project {nom_projet} and selector {selecteur}",
-            nom_projet=nom_projet,
-            selecteur=selecteur,
-        )
-
-    return df.sort_values(by=["tbl_order"])
-
-
-@db_retry
-def get_cols_mapping(
+def column_mapping_dataframe(
     nom_projet: str,
     selecteur: str,
 ) -> pd.DataFrame:
@@ -111,7 +66,7 @@ def get_cols_mapping(
     return df
 
 
-def format_cols_mapping(
+def column_mapping_dict(
     df_cols_map: pd.DataFrame, selecteur: Optional[str] = None
 ) -> dict[str, str]:
     print("Colonnes du dataframe de mapping: ", df_cols_map.columns)
@@ -180,7 +135,7 @@ def _get_db_info_tbl_names(
     return [DbInfo(**record) for record in records]
 
 
-def get_tbl_names(
+def get_list_table_name(
     context: Mapping[str, Any] | None = None, nom_projet: str | None = None
 ) -> list[str]:
     """Get all table names for a project.
@@ -200,7 +155,7 @@ def get_tbl_names(
     return [db_info.tbl_name for db_info in db_infos]
 
 
-def get_selecteur_tbl_name(
+def get_table_name(
     nom_projet: str, selecteur: str, context: Mapping[str, Any] | None = None
 ) -> str:
     """Get table name for a specific selecteur.
@@ -259,7 +214,7 @@ def get_grist_source(
 
 
 @db_retry
-def get_projet_contact(
+def get_list_contact(
     context: Mapping[str, Any] | None = None, nom_projet: str | None = None
 ) -> list[Contact]:
     if nom_projet is None and context is None:
@@ -283,7 +238,7 @@ def get_projet_contact(
 
 
 @db_retry
-def get_projet_documentation(
+def get_list_documentation(
     context: Mapping[str, Any] | None = None, nom_projet: str | None = None
 ) -> list[Documentation]:
     if nom_projet is None and context is None:
@@ -355,7 +310,7 @@ def _get_db_info(
     return [DbInfo(**record) for record in records]
 
 
-def get_projet_db_info(
+def get_list_database_info(
     context: Mapping[str, Any] | None = None, nom_projet: str | None = None
 ) -> list[DbInfo]:
     """Get all database info for a project.
@@ -370,7 +325,7 @@ def get_projet_db_info(
     return _get_db_info(context=context, nom_projet=nom_projet, selecteur=None)
 
 
-def get_selecteur_db_info(
+def get_database_info(
     nom_projet: str, selecteur: str, context: Mapping[str, Any] | None = None
 ) -> DbInfo:
     """Get database info for a specific selecteur.
@@ -446,7 +401,7 @@ def _get_source_fichier(
     return [SourceFichier(**record) for record in records]
 
 
-def get_projet_source_fichier(
+def get_list_source_fichier(
     context: Mapping[str, Any] | None = None, nom_projet: str | None = None
 ) -> list[SourceFichier]:
     """Get all source fichier info for a project.
@@ -461,7 +416,7 @@ def get_projet_source_fichier(
     return _get_source_fichier(context=context, nom_projet=nom_projet, selecteur=None)
 
 
-def get_selecteur_source_fichier(
+def get_source_fichier(
     nom_projet: str, selecteur: str, context: Mapping[str, Any] | None = None
 ) -> SourceFichier:
     """Get source fichier info for a specific selecteur.
@@ -592,7 +547,7 @@ def get_selecteur_s3(
 
 
 @db_retry
-def get_projet_s3(
+def get_projet_s3_info(
     context: Mapping[str, Any] | None = None,
     nom_projet: str | None = None,
 ) -> ProjetS3:
@@ -641,7 +596,7 @@ def get_projet_s3(
 
 
 @db_retry
-def _get_selecteur_info(
+def _get_selector_info(
     context: Mapping[str, Any] | None = None,
     nom_projet: str | None = None,
     selecteur: str | None = None,
@@ -697,7 +652,7 @@ def _get_selecteur_info(
     return [SelecteurInfo(**record) for record in records]
 
 
-def get_projet_selecteur_info(
+def get_list_selector_info(
     context: Mapping[str, Any] | None = None, nom_projet: str | None = None
 ) -> list[SelecteurInfo]:
     """Get all S3 configurations for a project.
@@ -709,10 +664,10 @@ def get_projet_selecteur_info(
     Returns:
         List of SelecteurS3 objects for all selecteurs in the project
     """
-    return _get_selecteur_info(context=context, nom_projet=nom_projet, selecteur=None)
+    return _get_selector_info(context=context, nom_projet=nom_projet, selecteur=None)
 
 
-def get_selecteur_info(
+def get_selector_info(
     selecteur: str,
     context: Mapping[str, Any] | None = None,
     nom_projet: str | None = None,
@@ -730,7 +685,7 @@ def get_selecteur_info(
     Raises:
         ConfigError: If no S3 configuration is found
     """
-    s3_configs = _get_selecteur_info(
+    s3_configs = _get_selector_info(
         context=context, nom_projet=nom_projet, selecteur=selecteur
     )
 
