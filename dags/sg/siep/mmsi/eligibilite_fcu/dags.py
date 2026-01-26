@@ -28,8 +28,6 @@ from dags.sg.siep.mmsi.eligibilite_fcu.task import (
 
 
 nom_projet = "France Chaleur Urbaine (FCU)"
-LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/sg/siep/mmsi/eligibilite_fcu?ref_type=heads"  # noqa
-LINK_DOC_DATA = "https://catalogue-des-donnees.lab.incubateur.finances.rie.gouv.fr/app/dataset?datasetId=49"  # noqa
 
 
 # Définition du DAG

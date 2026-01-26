@@ -29,8 +29,6 @@ from dags.sg.snum.certificats_igc.tasks import source_files, output_files
 
 
 nom_projet = "Certificat IGC"
-LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/cgefi/barometre?ref_type=heads"  # noqa
-LINK_DOC_DATA = ""  # noqa
 
 
 # Définition du DAG

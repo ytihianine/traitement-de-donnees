@@ -27,8 +27,6 @@ from dags.cbcm.ref_service_prescripteur.tasks import grist_source, validate_para
 
 # Variables
 nom_projet = "Données comptable - référentiel"
-LINK_DOC_PIPELINE = "Non-défini"  # noqa
-LINK_DOC_DATA = "Non-défini"  # noqa
 
 
 # Définition du DAG
