@@ -1,138 +1,115 @@
 -- Create
 CREATE SCHEMA IF NOT EXISTS conf_projets;
 
+
 DROP TABLE conf_projets."ref_direction" CASCADE;
 CREATE TABLE conf_projets."ref_direction" (
-  "id" serial,
+  "id" int,
   "direction" text,
-  PRIMARY KEY ("id")
-DROP TABLE conf_projets."ref_direction" CASCADE;
-CREATE TABLE conf_projets."ref_direction" (
-  "id" serial,
-  "direction" text,
-  PRIMARY KEY ("id")
+  PRIMARY KEY ("id"),
+  UNIQUE ("direction")
 );
 
 
 CREATE TABLE conf_projets."ref_service" (
-  "id" serial,
+  "id" int,
   "id_direction" int,
   "service" text,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("id_direction") REFERENCES conf_projets."ref_direction" ("id")
+  FOREIGN KEY ("id_direction") REFERENCES conf_projets."ref_direction" ("id"),
+  UNIQUE ("service")
 );
 
 
 DROP TABLE conf_projets."projet" CASCADE;
 CREATE TABLE conf_projets."projet" (
-  "id" serial,
+  "id" int,
   "id_direction" int,
   "id_service" int,
   "projet" text,
   PRIMARY KEY ("id"),
   FOREIGN KEY ("id_direction") REFERENCES conf_projets."ref_direction" ("id"),
-  FOREIGN KEY ("id_service") REFERENCES conf_projets."ref_service" ("id")
+  FOREIGN KEY ("id_service") REFERENCES conf_projets."ref_service" ("id"),
+  UNIQUE ("id_direction", "id_service", "projet")
 );
 
 
 DROP TABLE conf_projets."projet_documentation";
 CREATE TABLE conf_projets."projet_documentation" (
-  "id" serial UNIQUE,
+  "id" int,
   "id_projet" int,
   "type_documentation" text,
   "lien" text,
-  PRIMARY KEY ("id_projet", "type_documentation"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id")
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
+  UNIQUE ("id_projet", "type_documentation")
 );
 
 DROP TABLE conf_projets."projet_s3";
 CREATE TABLE conf_projets."projet_s3" (
-  "id" serial UNIQUE,
+  "id" int,
   "id_projet" int,
   "bucket" text,
   "key" text,
   "key_tmp" text,
-  PRIMARY KEY ("id_projet"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id")
-);
-
-
-DROP TABLE conf_projets."projet_s3";
-CREATE TABLE conf_projets."projet_s3" (
-  "id" serial UNIQUE,
-  "id_projet" int,
-  "bucket" text,
-  "key" text,
-  "key_tmp" text,
-  PRIMARY KEY ("id_projet"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id")
-);
-
-
-DROP TABLE conf_projets."projet_variable";
-CREATE TABLE conf_projets."projet_variable" (
-  "id" serial UNIQUE,
-  "id_projet" int,
-  "variable_type" text,
-  "variable_nom" text,
-  PRIMARY KEY ("id_projet"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id")
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
+  UNIQUE ("id_projet")
 );
 
 
 DROP TABLE conf_projets."projet_contact";
 CREATE TABLE conf_projets."projet_contact" (
-  "id" serial UNIQUE,
+  "id" int,
   "id_projet" int,
   "contact_mail" text,
   "is_mail_generic" bool,
-  PRIMARY KEY ("id_projet", "contact_mail"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id")
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
+  UNIQUE ("id_projet", "contact_mail")
 );
 
+DROP TABLE conf_projets."projet_selecteur";
+CREATE TABLE conf_projets."projet_selecteur" (
+  "id" int,
+  "id_projet" int,
+  "selecteur" text,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
+  UNIQUE ("id_projet", "selecteur")
+);
 
 DROP TABLE conf_projets."selecteur_source";
 CREATE TABLE conf_projets."selecteur_source" (
-  "id" serial UNIQUE,
+  "id" int,
   "id_projet" int,
   "id_selecteur" int,
   "type_source" text,
   "id_source" text,
-  PRIMARY KEY ("id_projet", "id_selecteur"),
+  PRIMARY KEY ("id"),
   FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id")
-);
-
-
-DROP TABLE conf_projets."selecteur_source";
-CREATE TABLE conf_projets."selecteur_source" (
-  "id" serial UNIQUE,
-  "id_projet" int,
-  "id_selecteur" int,
-  "type_source" text,
-  "id_source" text,
-  PRIMARY KEY ("id_projet", "id_selecteur"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id")
+  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id"),
+  UNIQUE ("id_projet", "id_selecteur", "type_source", "id_source")
 );
 
 
 DROP TABLE conf_projets."selecteur_s3";
 CREATE TABLE conf_projets."selecteur_s3" (
-  "id" serial UNIQUE,
+  "id" int,
   "id_projet" int,
   "id_selecteur" int,
   "key" text,
   "filename" text,
-  PRIMARY KEY ("id_projet", "id_selecteur"),
+  PRIMARY KEY ("id"),
   FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id")
+  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id"),
+  UNIQUE ("id_projet", "id_selecteur", "filename")
 );
 
 
 DROP TABLE conf_projets."selecteur_database";
 CREATE TABLE conf_projets."selecteur_database" (
-  "id" serial UNIQUE,
+  "id" int,
   "id_projet" int,
   "id_selecteur" int,
   "tbl_name" text,
@@ -140,24 +117,26 @@ CREATE TABLE conf_projets."selecteur_database" (
   "is_partitionned" bool,
   "partition_period" text,
   "load_strategy" text,
-  PRIMARY KEY ("id_projet", "id_selecteur"),
+  PRIMARY KEY ("id"),
   FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id")
+  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id"),
+  UNIQUE ("id_projet", "id_selecteur", "tbl_name")
 );
 
 
 DROP TABLE conf_projets."selecteur_column_mapping";
 CREATE TABLE conf_projets."selecteur_column_mapping" (
-  "id" serial UNIQUE,
+  "id" int,
   "id_projet" int,
   "id_selecteur" int,
   "colname_source" text,
   "colname_dest" text,
   "to_keep" bool,
   "date_archivage" date,
-  PRIMARY KEY ("id_projet", "id_selecteur", "colname_source"),
+  PRIMARY KEY ("id"),
   FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id")
+  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id"),
+  UNIQUE ("id_projet", "id_selecteur", "colname_source")
 );
 
 
@@ -250,15 +229,6 @@ INNER JOIN conf_projets.selecteur_column_mapping scm ON ps.id = scm.id_selecteur
     AND ps.id_projet = scm.id_projet
 WHERE scm.to_keep = true;
 
--- Vue pour get_selecteur_database()
-DROP VIEW conf_projets.projet_documentation_vw;
-CREATE OR REPLACE VIEW conf_projets.projet_documentation_vw AS
-SELECT
-    cpp.projet,
-    cppd.type_documentation,
-    cppd.lien
-FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_documentation cppd ON cpp.id = cppd.id_projet;
 
 -- Vue pour get_list_documentation()
 DROP VIEW conf_projets.projet_documentation_vw;
@@ -328,13 +298,3 @@ INNER JOIN conf_projets.selecteur_database cpsd
   ON cpps.id = cpsd.id_selecteur
     AND cpps.id_projet = cpsd.id_projet
 ;
-
-
--- Vue pour les variables de projet (au cas où)
-CREATE OR REPLACE VIEW conf_projets.vue_projet_variables AS
-SELECT
-    p.projet,
-    pv.variable_type,
-    pv.variable_nom
-FROM projet p
-INNER JOIN projet_variable pv ON p.id = pv.id_projet;
