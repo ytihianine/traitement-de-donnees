@@ -40,6 +40,9 @@ nom_projet = "Configuration des projets"
             db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
         ),
     ),
+    on_success_callback=create_send_mail_callback(
+        mail_status=MailStatus.SUCCESS,
+    ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,
     ),
