@@ -1,11 +1,4 @@
 from _types.dags import (
-    KEY_NOM_PROJET,
-    KEY_MAIL,
-    KEY_MAIL_ENABLE,
-    KEY_MAIL_TO,
-    KEY_MAIL_CC,
-    KEY_DOCS,
-    KEY_DOCS_LIEN_PIPELINE,
     ETLStep,
     TaskConfig,
 )
