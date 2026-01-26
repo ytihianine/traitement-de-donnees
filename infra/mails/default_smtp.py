@@ -14,6 +14,7 @@ from _types.dags import DagStatus
 from enums.mail import MailPriority, MailStatus
 from utils.config.tasks import get_list_contact, get_list_documentation
 from utils.config.vars import (
+    FF_MAIL_DISABLED_MSG,
     get_root_folder,
     DEFAULT_SMTP_CONN_ID,
     DEFAULT_MAIL_CC,
@@ -156,7 +157,7 @@ def create_send_mail_callback(mail_status: MailStatus) -> Callable:
             return
 
         if not mail_enable:
-            print("Skipping! Mails are disabled for this dag ...")
+            print(FF_MAIL_DISABLED_MSG)
             return
 
         projet_contact = get_list_contact(context=context)
