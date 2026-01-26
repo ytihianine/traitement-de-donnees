@@ -422,7 +422,7 @@ def copy_tmp_table_to_real_table(
                     tbl_name=tbl_name,
                     pg_conn_id=pg_conn_id,
                     keep_file_id_col=True,
-                    schema=prod_table,
+                    schema=prod_schema,
                 )
 
                 merge_query = f"""
