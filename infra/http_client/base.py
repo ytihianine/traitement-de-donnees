@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 from urllib.parse import urljoin
 
-from .config import ClientConfig
-from .types import HTTPResponse
+from infra.http_client.config import ClientConfig
+from infra.http_client.types import HTTPResponse
 
 
 class AbstractHTTPClient(ABC):

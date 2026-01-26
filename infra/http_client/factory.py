@@ -2,9 +2,9 @@
 
 from enums.http import HttpHandlerType
 
-from .adapters import HttpxClient, RequestsClient
-from .base import AbstractHTTPClient
-from .config import ClientConfig
+from infra.http_client.adapters import HttpxClient, RequestsClient
+from infra.http_client.base import AbstractHTTPClient
+from infra.http_client.config import ClientConfig
 
 
 def create_http_client(

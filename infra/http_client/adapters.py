@@ -6,10 +6,10 @@ from typing import Any, Dict, Optional
 import httpx
 import requests
 
-from .base import AbstractHTTPClient
-from .config import ClientConfig
-from .types import HTTPResponse
-from .exceptions import (
+from infra.http_client.base import AbstractHTTPClient
+from infra.http_client.config import ClientConfig
+from infra.http_client.types import HTTPResponse
+from infra.http_client.exceptions import (
     APIError,
     AuthenticationError,
     AuthorizationError,
