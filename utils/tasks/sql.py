@@ -419,7 +419,10 @@ def copy_tmp_table_to_real_table(
                 )
                 print(f"Table <{tbl_name}> primary key: {pk_cols}")
                 col_list = sort_db_colnames(
-                    tbl_name=tbl_name, pg_conn_id=pg_conn_id, keep_file_id_col=True
+                    tbl_name=tbl_name,
+                    pg_conn_id=pg_conn_id,
+                    keep_file_id_col=True,
+                    schema=prod_table,
                 )
 
                 merge_query = f"""
