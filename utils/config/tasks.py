@@ -390,8 +390,21 @@ def _get_source_fichier(
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     query = f"""
-        SELECT cssf.projet, cssf.selecteur, cssf.type_source,
-            cssf.id_source, cssf.bucket, cssf.s3_key, cssf.filepath_source_s3
+        SELECT
+            cssf.projet,
+            cssf.selecteur,
+            cssf.bucket,
+            cssf.s3_key,
+            -- Source
+            cssf.type_source,
+            cssf.id_source,
+            cssf.filepath_source_s3,
+            -- Destination
+            cssf.filename,
+            cssf.projet_s3_key,
+            cssf.projet_s3_key_tmp,
+            cssf.filepath_s3,
+            cssf.filepath_tmp_s3
         FROM {CONF_SCHEMA}.selecteur_source_fichier_vw cssf
         WHERE cssf.projet = %s
     """
