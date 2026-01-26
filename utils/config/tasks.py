@@ -438,6 +438,24 @@ def get_list_source_fichier(
     return _get_source_fichier(context=context, nom_projet=nom_projet, selecteur=None)
 
 
+def get_list_source_fichier_key(
+    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
+) -> list[str]:
+    """Get all source fichier s3_key for a project.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+
+    Returns:
+        List of SourceFichier objects for all selecteurs in the project
+    """
+    source_fichiers = _get_source_fichier(
+        context=context, nom_projet=nom_projet, selecteur=None
+    )
+    return [source.filepath_source_s3 for source in source_fichiers]
+
+
 def get_source_fichier(
     nom_projet: str, selecteur: str, context: Mapping[str, Any] | None = None
 ) -> SourceFichier:
