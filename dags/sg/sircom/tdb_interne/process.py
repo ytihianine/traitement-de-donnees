@@ -90,7 +90,6 @@ def process_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Clean
-    df = df.fillna(np.nan).replace([np.nan], [None])
     df = df.replace("", None)
     df = df.dropna(subset=["abonnes"])
 
@@ -187,7 +186,7 @@ def process_performances_lettres(df: pd.DataFrame) -> pd.DataFrame:
     df = pd.melt(
         df,
         id_vars=["date"],
-        value_vars=colnames_mapping.keys(),
+        value_vars=list(colnames_mapping.keys()),
         var_name="indicateurs",
         value_name="taux",
     )
@@ -493,7 +492,6 @@ def process_engagement_environnement(df: pd.DataFrame) -> pd.DataFrame:
 
     df.replace(values_to_replace, inplace=True)
     # Clean
-    df = df.fillna(np.nan).replace([np.nan], [None])
     df = df.replace("", None)
     df = df.dropna(subset=["annee", "nombre_votants"])
 
