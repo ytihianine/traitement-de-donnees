@@ -56,6 +56,7 @@ def configuration_projets() -> None:
             workspace_id="dsci",
         ),
         process_data(),
+        delete_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
         create_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, reset_id_seq=False),
         import_file_to_db.partial(
             pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, keep_file_id_col=True
