@@ -18,6 +18,10 @@ from utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
 from utils.config.tasks import get_list_selector_info
 
 from utils.tasks.validation import validate_dag_parameters
+from utils.tasks.s3 import (
+    copy_s3_files,
+    del_s3_files,
+)
 from dags.applications.configuration_projets.tasks import (
     process_data,
 )
@@ -65,6 +69,8 @@ def configuration_projets() -> None:
             pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, keep_file_id_col=True
         ).expand(selecteur_info=get_list_selector_info(nom_projet=nom_projet)),
         copy_tmp_table_to_real_table(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
+        copy_s3_files(),
+        del_s3_files(),
         delete_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
     )
 
