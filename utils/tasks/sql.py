@@ -394,7 +394,7 @@ def copy_tmp_table_to_real_table(
     print(f"Nombre de tables à copier: {len(projet_db_info)}")
 
     try:
-        db_handler.execute("SET session_replication_role = replica;")
+        db_handler.execute(query="SET session_replication_role = replica;")
         print("Désactivation des triggers de réplication")
         queries = []
         for db_info in projet_db_info:
@@ -417,7 +417,10 @@ def copy_tmp_table_to_real_table(
                 pk_cols = _get_primary_keys(
                     schema=prod_schema, table=tbl_name, db_handler=db_handler
                 )
-                col_list = sort_db_colnames(tbl_name=tbl_name, pg_conn_id=pg_conn_id)
+                print(f"Table <{tbl_name}> primary key: {pk_cols}")
+                col_list = sort_db_colnames(
+                    tbl_name=tbl_name, pg_conn_id=pg_conn_id, keep_file_id_col=True
+                )
 
                 merge_query = f"""
                     MERGE INTO {prod_table} tbl_target
@@ -440,10 +443,10 @@ def copy_tmp_table_to_real_table(
             else:
                 print("No query to execute")
     except Exception as e:
-        db_handler.execute("SET session_replication_role = DEFAULT;")
+        db_handler.execute(query="SET session_replication_role = DEFAULT;")
         print("Réactivation des triggers de réplication")
         raise e
-    db_handler.execute("SET session_replication_role = DEFAULT;")
+    db_handler.execute(query="SET session_replication_role = DEFAULT;")
     print("Réactivation des triggers de réplication")
 
 
