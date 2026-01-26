@@ -17,7 +17,7 @@ Usage example:
     )
 """
 
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 import logging
 
 from airflow.sdk import task, XComArg
@@ -59,11 +59,19 @@ def _is_missing(value: Any) -> bool:
 
 
 @task(task_id="validate_dag_params")
-def validate_dag_parameters(params: Dict[str, Any]) -> List[str]:
+def validate_dag_parameters(**context: Mapping[str, Any]) -> None:
     """Validate that params conform to DagParams structure.
 
     Returns a list of error messages. Empty list means validation passed.
     """
+    params = context.get("params", None)
+
+    if params is None:
+        raise ConfigError("DAG params are required")
+
+    if not isinstance(params, dict):
+        raise ConfigError("DAG params must be a dictionary")
+
     errors: List[str] = []
 
     # Check nom_projet
@@ -123,4 +131,8 @@ def validate_dag_parameters(params: Dict[str, Any]) -> List[str]:
                         f"Field 'enable.{flag}' must be a boolean, got {type(enable[flag]).__name__}"
                     )
 
-    return errors
+    if len(errors) > 0:
+        logging.error("Validation errors: %s", errors)
+        raise ConfigError("DAG params validation failed")
+
+    logging.info("DAG params validation passed")
