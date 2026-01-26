@@ -1,0 +1,6 @@
+apache-airflow-providers-standard==1.10.2
+pyxlsb==1.0.10
+openpyxl==3.1.5
+boto3==1.35.99 # To solve Nubonyxia MinIO issue
+xlrd==2.0.2
+tenacity==9.1.2
