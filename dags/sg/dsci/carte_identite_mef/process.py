@@ -34,7 +34,6 @@ def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:
 
 # Traitement spécifique pour la table TELETRAVAIL
 def process_teletravail(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
     # Conversion en epoch time not working
     df["date"] = pd.to_datetime(df["date"], unit="s")
     return df
@@ -45,7 +44,6 @@ def process_teletravail_frequence(df: pd.DataFrame) -> pd.DataFrame:
     # Exemple : remplacer 'ND' par ''
     df.replace("ND", None, inplace=True)
     print(df.columns)
-    df = df.fillna(np.nan).replace([np.nan], [None])
     # Conversion en epoch time not working
     print("Traitement de la table teletravail_frequence effectué.")
     return df
@@ -56,7 +54,6 @@ def process_teletravail_opinion(df: pd.DataFrame) -> pd.DataFrame:
     # Exemple : remplacer 'ND' par ''
     df.replace("ND", None, inplace=True)
     print(df.columns)
-    df = df.fillna(np.nan).replace([np.nan], [None])
     # Conversion en epoch time not working
     print("Traitement de la table teletravail_opinion effectué.")
     return df
@@ -65,7 +62,6 @@ def process_teletravail_opinion(df: pd.DataFrame) -> pd.DataFrame:
 # Traitement spécifique pour Effectifs_MEFR_par_direction
 def process_mef_par_direction(df: pd.DataFrame) -> pd.DataFrame:
     # Exemple : Suppression des colonnes vides et conversion de valeurs
-    df = df.fillna(np.nan).replace([np.nan], [None])
 
     print("Traitement de la table Effectifs_MEFR_par_direction effectué.")
     return df
@@ -73,7 +69,6 @@ def process_mef_par_direction(df: pd.DataFrame) -> pd.DataFrame:
 
 # Traitement spécifique pour Effectif_2022
 def process_effectif_direction(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
     df = df.rename(
         columns={
             "nombre_d_agent": "nombre_agents",
@@ -85,7 +80,6 @@ def process_effectif_direction(df: pd.DataFrame) -> pd.DataFrame:
 
 # Traitement spécifique pour Effectifs_par_perimetre
 def process_effectifs_par_perimetre(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
     # Renommer la colonne 'type' en 'type_budget'
     df = df.rename(columns={"type": "type_budget"})
 
@@ -95,7 +89,6 @@ def process_effectifs_par_perimetre(df: pd.DataFrame) -> pd.DataFrame:
 
 # Traitement spécifique pour Effectifs_par_d partements
 def process_effectif_par_departements(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
 
     print("Traitement de la table Effectifs_par_departements effectué.")
     return df
@@ -103,7 +96,6 @@ def process_effectif_par_departements(df: pd.DataFrame) -> pd.DataFrame:
 
 # Traitement spécifique pour # Traitement spécifique pour Budget_total
 def process_budget_total(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
     df = df.rename(
         columns={
             "etiquettes_de_lignes": "libelle",
@@ -120,7 +112,6 @@ def process_budget_total(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_budget_pilotable(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
     # Exemple : Remplacer les valeurs négatives par 0
     print("Traitement de la table Budget_pilotable effectué.")
     return df
@@ -128,7 +119,6 @@ def process_budget_pilotable(df: pd.DataFrame) -> pd.DataFrame:
 
 # Fonction pour Budget_General
 def process_budget_general(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
     df = df.rename(
         columns={
             "etiquettes_de_lignes": "libelle",
@@ -146,7 +136,6 @@ def process_budget_general(df: pd.DataFrame) -> pd.DataFrame:
 
 # Fonction pour Evolution_budget_mef
 def process_evolution_budget_mef(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
 
     print("Traitement de la table Evolution_budget_mef effectué.")
     return df
@@ -154,7 +143,7 @@ def process_evolution_budget_mef(df: pd.DataFrame) -> pd.DataFrame:
 
 # Fonction pour Montant_intervention_invest
 # def process_montant_invest(df: pd.DataFrame) -> pd.DataFrame:
-#     df = df.fillna(np.nan).replace([np.nan], [None])
+#
 
 #     print("Traitement de la table Montant_intervention_invest effectué.")
 #     return df
@@ -162,7 +151,6 @@ def process_evolution_budget_mef(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_montant_invest(df: pd.DataFrame) -> pd.DataFrame:
     # Remplacer les NaN par None
-    df = df.fillna(np.nan).replace([np.nan], [None])
     df = df.rename(
         columns={
             "source": "source_montant",
@@ -183,7 +171,6 @@ def process_montant_invest(df: pd.DataFrame) -> pd.DataFrame:
 
 # Fonction pour Engagement_Agent
 def process_engagement_agent(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
 
     print("Traitement de la table Engagement_Agent effectué.")
     return df
@@ -191,7 +178,6 @@ def process_engagement_agent(df: pd.DataFrame) -> pd.DataFrame:
 
 # Fonction pour RESULTAT_ELECTIONS
 def process_resultat_elections(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
 
     print("Traitement de la table RESULTAT_ELECTIONS effectué.")
     return df
@@ -200,7 +186,6 @@ def process_resultat_elections(df: pd.DataFrame) -> pd.DataFrame:
 # Fonction pour Taux_participation
 def process_taux_participation(df: pd.DataFrame) -> pd.DataFrame:
     # Remplacer les valeurs NaN par None
-    df = df.fillna(np.nan).replace([np.nan], [None])
 
     # Unpivoter les colonnes d'années
     df_unpivoted = df.melt(
@@ -219,7 +204,6 @@ def process_taux_participation(df: pd.DataFrame) -> pd.DataFrame:
 
 # Fonction pour plafond_etpt
 def process_plafond_etpt(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
     df = df.rename(
         columns={
             "Designation_ministere_ou_budget_annexe": "designation_ministere_ou_budget_annexe",
@@ -236,7 +220,6 @@ def process_plafond_etpt(df: pd.DataFrame) -> pd.DataFrame:
 
 # Fonction pour db_plafond_etpt
 def process_db_plafond_etpt(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
     df = df.rename(
         columns={
             "Source": "source",
@@ -256,7 +239,6 @@ def process_db_plafond_etpt(df: pd.DataFrame) -> pd.DataFrame:
 
 # Fonction pour masse_salariale
 def process_masse_salariale(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
     df = df.rename(
         columns={
             "designation_du_ministere_ou_du_budget": "designation_ministere_ou_compte",
@@ -267,7 +249,6 @@ def process_masse_salariale(df: pd.DataFrame) -> pd.DataFrame:
 
 # Fonction pour masse_salariale
 def process_budget_ministere(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(np.nan).replace([np.nan], [None])
     df = df.rename(
         columns={
             "budgets_annexes": "budget_annexe",
