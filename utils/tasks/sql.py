@@ -393,49 +393,58 @@ def copy_tmp_table_to_real_table(
         projet_db_info = get_list_database_info(nom_projet=nom_projet)
     print(f"Nombre de tables à copier: {len(projet_db_info)}")
 
-    queries = []
-    for db_info in projet_db_info:
-        load_strategy = LoadStrategy(value=db_info.load_strategy.upper())
-        tbl_name = db_info.tbl_name
-        prod_table = f"{prod_schema}.{tbl_name}"
-        tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
+    try:
+        db_handler.execute("SET session_replication_role = replica;")
+        print("Désactivation des triggers de réplication")
+        queries = []
+        for db_info in projet_db_info:
+            load_strategy = LoadStrategy(value=db_info.load_strategy.upper())
+            tbl_name = db_info.tbl_name
+            prod_table = f"{prod_schema}.{tbl_name}"
+            tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
 
-        if load_strategy == LoadStrategy.APPEND:
-            query = f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
-            queries.append(query)
+            if load_strategy == LoadStrategy.APPEND:
+                query = f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
+                queries.append(query)
 
-        if load_strategy == LoadStrategy.FULL_LOAD:
-            del_query = f"DELETE FROM {prod_table};"
-            insert_query = f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
-            queries.append(del_query)
-            queries.append(insert_query)
+            if load_strategy == LoadStrategy.FULL_LOAD:
+                del_query = f"DELETE FROM {prod_table};"
+                insert_query = f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
+                queries.append(del_query)
+                queries.append(insert_query)
 
-        if load_strategy == LoadStrategy.INCREMENTAL:
-            pk_cols = _get_primary_keys(
-                schema=prod_schema, table=tbl_name, db_handler=db_handler
-            )
-            col_list = sort_db_colnames(tbl_name=tbl_name, pg_conn_id=pg_conn_id)
+            if load_strategy == LoadStrategy.INCREMENTAL:
+                pk_cols = _get_primary_keys(
+                    schema=prod_schema, table=tbl_name, db_handler=db_handler
+                )
+                col_list = sort_db_colnames(tbl_name=tbl_name, pg_conn_id=pg_conn_id)
 
-            merge_query = f"""
-                MERGE INTO {prod_table} tbl_target
-                USING {tmp_table} tbl_source ON ({' AND '.join([f'tbl_source.{col} = tbl_target.{col}' for col in pk_cols])})
-                WHEN MATCHED THEN
-                    UPDATE SET {", ".join([f"{col}=tbl_source.{col}" for col in col_list if col not in pk_cols])}
-                WHEN NOT MATCHED THEN
-                    INSERT ({', '.join(col_list)})
-                        VALUES ({', '.join([f'tbl_source.{col}' for col in col_list])})
-                /* Only for PG v17+
-                WHEN NOT MATCHED BY SOURCE THEN
-                    DELETE;
-                */
-            """
-            queries.append(merge_query)
+                merge_query = f"""
+                    MERGE INTO {prod_table} tbl_target
+                    USING {tmp_table} tbl_source ON ({' AND '.join([f'tbl_source.{col} = tbl_target.{col}' for col in pk_cols])})
+                    WHEN MATCHED THEN
+                        UPDATE SET {", ".join([f"{col}=tbl_source.{col}" for col in col_list if col not in pk_cols])}
+                    WHEN NOT MATCHED THEN
+                        INSERT ({', '.join(col_list)})
+                            VALUES ({', '.join([f'tbl_source.{col}' for col in col_list])})
+                    /* Only for PG v17+
+                    WHEN NOT MATCHED BY SOURCE THEN
+                        DELETE;
+                    */
+                """
+                queries.append(merge_query)
 
-        if queries:
-            for q in queries:
-                db_handler.execute(query=q)
-        else:
-            print("No query to execute")
+            if queries:
+                for q in queries:
+                    db_handler.execute(query=q)
+            else:
+                print("No query to execute")
+    except Exception as e:
+        db_handler.execute("SET session_replication_role = DEFAULT;")
+        print("Réactivation des triggers de réplication")
+        raise e
+    db_handler.execute("SET session_replication_role = DEFAULT;")
+    print("Réactivation des triggers de réplication")
 
 
 def sort_db_colnames(
