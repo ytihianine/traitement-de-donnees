@@ -73,6 +73,7 @@ DROP TABLE conf_projets."projet_selecteur";
 CREATE TABLE conf_projets."projet_selecteur" (
   "id" int,
   "id_projet" int,
+  "type_selecteur" text,
   "selecteur" text,
   PRIMARY KEY ("id"),
   FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
