@@ -19,7 +19,6 @@ from utils.config.tasks import (
     get_list_database_info,
     get_projet_s3_info,
     get_projet_selecteur_s3,
-    serialize_dataclass,
 )
 
 
