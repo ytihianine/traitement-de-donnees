@@ -100,8 +100,9 @@ class PostgresDBHandler(BaseDBHandler):
         """Fetch results as a pandas DataFrame."""
         try:
             start_time = time.time()
-            df = self.hook.get_pandas_df(query, parameters=parameters)
-            logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
+            logging.info(msg=f"Running statement:\n {query}")
+            df = self.hook.get_pandas_df(sql=query, parameters=parameters)
+            logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
             return df
         except Exception as e:
             raise DatabaseError(f"Error fetching DataFrame: {str(e)}") from e
