@@ -7,14 +7,6 @@ from utils.tasks.etl import (
 )
 
 from dags.applications.catalogue.update import actions, process
-from utils.tasks.validation import create_validate_params_task
-
-
-validate_params = create_validate_params_task(
-    required_paths=ALL_PARAM_PATHS,
-    require_truthy=None,
-    task_id="validate_dag_params",
-)
 
 
 @task_group()

@@ -6,6 +6,7 @@ from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_list_selector_info
 from enums.dags import DagStatus
+from utils.tasks.validation import validate_dag_parameters
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.tasks.sql import (
     create_tmp_tables,
@@ -16,7 +17,6 @@ from utils.tasks.sql import (
 from utils.tasks.s3 import copy_s3_files, del_s3_files
 
 from dags.applications.catalogue.grist.tasks import (
-    validate_params,
     referentiels_grist,
     source_grist,
 )
@@ -51,7 +51,7 @@ nom_projet = "Catalogue"
 def catalogue() -> None:
     """Task order"""
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="catalogue",

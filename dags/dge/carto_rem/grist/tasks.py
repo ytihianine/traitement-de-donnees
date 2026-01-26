@@ -1,8 +1,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from utils.tasks.validation import create_validate_params_task
-from _types.dags import ALL_PARAM_PATHS, ETLStep, TaskConfig
+from _types.dags import ETLStep, TaskConfig
 from utils.tasks.etl import (
     create_task,
     create_grist_etl_task,
@@ -10,12 +9,6 @@ from utils.tasks.etl import (
 from utils.control.structures import normalize_grist_dataframe
 
 from dags.dge.carto_rem.grist import process, actions
-
-validate_params = create_validate_params_task(
-    required_paths=ALL_PARAM_PATHS,
-    require_truthy=None,
-    task_id="validate_dag_params",
-)
 
 
 @task_group

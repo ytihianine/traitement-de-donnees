@@ -8,7 +8,6 @@ from utils.config.dag_params import create_dag_params, create_default_args
 # from utils.tasks.s3 import copy_s3_files, del_s3_files
 
 from dags.applications.catalogue.update.tasks import (
-    validate_params,
     source_database,
     update_grist_catalogue,
     # update_catalogue,

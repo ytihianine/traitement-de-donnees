@@ -7,14 +7,7 @@ from dags.sg.dsci.weather_api import actions
 from dags.sg.dsci.weather_api import process
 
 # --- Imports & Config de YT ---
-from utils.tasks.validation import create_validate_params_task
-from _types.dags import ALL_PARAM_PATHS
 
-
-# Créat tâche de validation
-validate_params = create_validate_params_task(
-    required_paths=ALL_PARAM_PATHS, require_truthy=None, task_id="validate_dag_params"
-)
 
 # 1. Tâche d'Extraction
 

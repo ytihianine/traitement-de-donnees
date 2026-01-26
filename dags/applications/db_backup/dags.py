@@ -12,7 +12,7 @@ from utils.tasks.s3 import (
     del_s3_files,
 )
 
-from dags.applications.db_backup.tasks import validate_params, dump_databases
+from dags.applications.db_backup.tasks import dump_databases
 
 
 nom_projet = "Sauvegarde databases"
