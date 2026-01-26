@@ -38,7 +38,7 @@ nom_projet = "Accompagnements DSCI"
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="activite_dsci"),
         feature_flags=FeatureFlags(
-            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=True
         ),
     ),
     on_failure_callback=create_send_mail_callback(
