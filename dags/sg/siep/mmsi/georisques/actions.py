@@ -19,7 +19,7 @@ from dags.sg.siep.mmsi.georisques.process import (
 def get_bien_from_db(context: dict) -> pd.DataFrame:
     # Hook & config
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
-    schema = get_db_info(context=context)["prod_schema"]
+    schema = get_db_info(context=context).prod_schema
     snapshot_id = context["ti"].xcom_pull(
         key="snapshot_id", task_ids="get_projet_snapshot"
     )
