@@ -22,8 +22,8 @@ from utils.tasks.s3 import (
 )
 from utils.config.tasks import get_s3_keys_source, get_projet_config
 
+from utils.tasks.validation import validate_dag_parameters
 from dags.dge.carto_rem.fichiers.tasks import (
-    validate_params,
     source_files,
     output_files,
 )
@@ -70,7 +70,7 @@ def cartographie_remuneration() -> None:
 
     """ Task order """
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         looking_for_files,
         source_files(),
         output_files(),

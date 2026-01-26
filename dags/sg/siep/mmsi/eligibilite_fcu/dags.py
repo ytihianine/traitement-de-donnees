@@ -16,6 +16,7 @@ from utils.tasks.sql import (
     import_file_to_db,
 )
 
+from utils.tasks.validation import validate_dag_parameters
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -56,6 +57,7 @@ nom_projet = "France Chaleur Urbaine (FCU)"
 def eligibilite_fcu_dag() -> None:
 
     chain(
+        validate_dag_parameters(),
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         get_eligibilite_fcu(),
         process_fcu_result(),

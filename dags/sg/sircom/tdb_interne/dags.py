@@ -12,9 +12,10 @@ from utils.tasks.sql import (
 )
 from utils.config.tasks import get_projet_config
 from utils.config.dag_params import create_default_args, create_dag_params
+
+from utils.tasks.validation import validate_dag_parameters
 from utils.tasks.grist import download_grist_doc_to_s3
 from dags.sg.sircom.tdb_interne.tasks import (
-    validate_params,
     abonnes_visites,
     budget,
     enquetes,
@@ -53,7 +54,7 @@ nom_projet = "TdB interne - SIRCOM"
 def tdb_sircom() -> None:
     """Task order"""
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci",

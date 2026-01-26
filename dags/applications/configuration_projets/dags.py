@@ -15,10 +15,10 @@ from utils.tasks.sql import (
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
 
-from utils.config.tasks import get_list_selector_info, serialize_dataclass
+from utils.config.tasks import get_list_selector_info
 
+from utils.tasks.validation import validate_dag_parameters
 from dags.applications.configuration_projets.tasks import (
-    validate_params,
     process_data,
 )
 
@@ -49,7 +49,7 @@ def configuration_projets() -> None:
 
     selecteur_s3_db = get_config_selecteur_info()
     chain(
-        # validate_params(),
+        validate_dag_parameters(),
         selecteur_s3_db,
         download_grist_doc_to_s3(
             selecteur="grist_doc",

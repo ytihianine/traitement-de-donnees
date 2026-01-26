@@ -7,6 +7,7 @@ from utils.config.dag_params import create_dag_params, create_default_args
 
 # from utils.tasks.s3 import copy_s3_files, del_s3_files
 
+from utils.tasks.validation import validate_dag_parameters
 from dags.applications.catalogue.update.tasks import (
     source_database,
     update_grist_catalogue,
@@ -45,7 +46,7 @@ nom_projet = "Catalogue - Update"
 def catalogue_update() -> None:
     """Task order"""
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         source_database(),
         update_grist_catalogue(),
         # [

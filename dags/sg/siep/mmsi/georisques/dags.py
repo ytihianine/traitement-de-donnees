@@ -16,6 +16,7 @@ from utils.tasks.sql import (
 )
 from utils.config.tasks import get_projet_config
 
+from utils.tasks.validation import validate_dag_parameters
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -52,6 +53,7 @@ nom_projet = "Géorisques"
 def bien_georisques() -> None:
     """Task order"""
     chain(
+        validate_dag_parameters(),
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         georisques_group(),
         create_tmp_tables(reset_id_seq=False),

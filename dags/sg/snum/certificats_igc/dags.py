@@ -25,6 +25,7 @@ from utils.tasks.s3 import (
 )
 from utils.config.tasks import get_s3_keys_source, get_projet_config
 
+from utils.tasks.validation import validate_dag_parameters
 from dags.sg.snum.certificats_igc.tasks import source_files, output_files
 
 
@@ -68,6 +69,7 @@ def certificats_igc() -> None:
 
     """ Task order """
     chain(
+        validate_dag_parameters(),
         looking_for_files,
         create_projet_snapshot(),
         get_projet_snapshot(),

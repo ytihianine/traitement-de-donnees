@@ -27,9 +27,9 @@ from utils.tasks.s3 import (
 from utils.config.tasks import get_s3_keys_source, get_projet_config
 from utils.config.dag_params import create_default_args, create_dag_params
 
+from utils.tasks.validation import validate_dag_parameters
 from dags.cbcm.donnee_comptable.tasks import (
     source_files,
-    validate_params,
     add_new_sp,
     get_sp,
     ajout_sp,
@@ -80,7 +80,7 @@ def chorus_donnees_comptables() -> None:
 
     # Ordre des tâches
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         looking_for_files,
         create_projet_snapshot(nom_projet=nom_projet),
         get_projet_snapshot(nom_projet=nom_projet),

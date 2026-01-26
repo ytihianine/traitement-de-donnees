@@ -26,8 +26,8 @@ from utils.tasks.s3 import (
 )
 from utils.config.tasks import get_s3_keys_source, get_projet_config
 
+from utils.tasks.validation import validate_dag_parameters
 from dags.sg.siep.mmsi.consommation_batiment.tasks import (
-    validate_params,
     conso_mens_parquet,
     source_files,
     additionnal_files,
@@ -77,7 +77,7 @@ def consommation_des_batiments() -> None:
 
     # Ordre des tâches
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         looking_for_files,
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         conso_mens_parquet(),

@@ -6,6 +6,7 @@ from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
+
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
@@ -14,7 +15,7 @@ from utils.tasks.sql import (
     refresh_views,
     # set_dataset_last_update_date,
 )
-
+from utils.tasks.validation import validate_dag_parameters
 from dags.commun.code_geographique.tasks import code_geographique, geojson, code_iso
 
 nom_projet = "Code géographique"
@@ -49,6 +50,7 @@ def informations_geographiques() -> None:
 
     # Ordre des tâches
     chain(
+        validate_dag_parameters(),
         create_projet_snapshot(),
         get_projet_snapshot(),
         code_geographique(),

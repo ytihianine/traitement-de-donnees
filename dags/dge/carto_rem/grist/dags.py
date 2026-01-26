@@ -22,8 +22,8 @@ from utils.tasks.s3 import (
 )
 from utils.config.tasks import get_projet_config
 
+from utils.tasks.validation import validate_dag_parameters
 from dags.dge.carto_rem.grist.tasks import (
-    validate_params,
     referentiels,
     source_grist,
     get_db_data,
@@ -58,7 +58,7 @@ nom_projet = "Cartographie rémunération - Grist"
 def cartographie_remuneration_grist() -> None:
     """Task order"""
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci",

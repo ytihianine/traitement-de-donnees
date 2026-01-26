@@ -11,10 +11,11 @@ from enums.dags import DagStatus
 from _types.dags import DBParams, FeatureFlags
 from utils.config.tasks import get_s3_keys_source
 from utils.config.dag_params import create_default_args, create_dag_params
+
+from utils.tasks.validation import validate_dag_parameters
 from utils.tasks.s3 import copy_s3_files, del_s3_files
 
 from dags.sg.srh.mentorat_merci.tasks import (
-    validate_params,
     agent_inscrit,
     generer_binomes,
 )
@@ -65,7 +66,7 @@ def mentorat_merci() -> None:
 
     # Ordre des tâches
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         looking_for_files,
         agent_inscrit(),
         generer_binomes(),

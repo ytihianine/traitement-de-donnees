@@ -12,6 +12,7 @@ from utils.tasks.s3 import (
     del_s3_files,
 )
 
+from utils.tasks.validation import validate_dag_parameters
 from dags.applications.db_backup.tasks import dump_databases
 
 
@@ -43,7 +44,7 @@ nom_projet = "Sauvegarde databases"
 def sauvegarde_database() -> None:
     """Task order"""
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         dump_databases(),
         copy_s3_files(),
         del_s3_files(),

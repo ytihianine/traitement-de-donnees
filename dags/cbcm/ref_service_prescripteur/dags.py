@@ -22,7 +22,8 @@ from utils.tasks.s3 import (
     del_s3_files,
 )
 
-from dags.cbcm.ref_service_prescripteur.tasks import grist_source, validate_params
+from utils.tasks.validation import validate_dag_parameters
+from dags.cbcm.ref_service_prescripteur.tasks import grist_source
 
 
 # Variables
@@ -56,7 +57,7 @@ def chorus_service_prescripteur() -> None:
 
     # Ordre des tâches
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         download_grist_doc_to_s3(
             selecteur="grist_doc", workspace_id="dsci", doc_id_key="grist_doc_id_cbcm"
         ),

@@ -7,6 +7,8 @@ from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_projet_config
 from enums.dags import DagStatus
+
+from utils.tasks.validation import validate_dag_parameters
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
@@ -51,6 +53,7 @@ def api_operat_ademe() -> None:
 
     # Ordre des tâches
     chain(
+        validate_dag_parameters(),
         taches(),
         create_tmp_tables(),
         import_file_to_db.expand(

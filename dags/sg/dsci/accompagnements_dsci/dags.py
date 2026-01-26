@@ -14,8 +14,8 @@ from utils.tasks.grist import download_grist_doc_to_s3
 from utils.config.tasks import get_projet_config
 from utils.config.dag_params import create_dag_params, create_default_args
 
+from utils.tasks.validation import validate_dag_parameters
 from dags.sg.dsci.accompagnements_dsci.tasks import (
-    validate_params,
     referentiels,
     bilaterales,
     correspondant,
@@ -49,7 +49,7 @@ def accompagnements_dsci_dag() -> None:
 
     # Ordre des tâches
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci",

@@ -18,6 +18,7 @@ from utils.tasks.sql import (
     # set_dataset_last_update_date,
 )
 
+from utils.tasks.validation import validate_dag_parameters
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -27,7 +28,7 @@ from utils.config.tasks import (
     get_projet_config,
 )
 
-from dags.sg.siep.mmsi.oad_referentiel.tasks import validate_params, bien_typologie
+from dags.sg.siep.mmsi.oad_referentiel.tasks import bien_typologie
 
 
 # Mails
@@ -75,7 +76,7 @@ def oad_referentiel() -> None:
 
     """ Task order """
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         looking_for_files,
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         bien_typologie(),

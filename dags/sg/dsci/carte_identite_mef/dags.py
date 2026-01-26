@@ -12,9 +12,10 @@ from utils.tasks.sql import (
 )
 from utils.config.tasks import get_projet_config
 from utils.config.dag_params import create_dag_params, create_default_args
+
 from utils.tasks.grist import download_grist_doc_to_s3
+from utils.tasks.validation import validate_dag_parameters
 from dags.sg.dsci.carte_identite_mef.tasks import (
-    validate_params,
     effectif,
     budget,
     taux_agent,
@@ -43,7 +44,7 @@ nom_projet = "Carte_Identite_MEF"
 def carte_identite_mef_dag() -> None:
     """Tasks order"""
     chain(
-        validate_params(),
+        validate_dag_parameters(),
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci",
