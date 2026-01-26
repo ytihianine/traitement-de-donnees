@@ -25,10 +25,6 @@ from dags.sg.sircom.tdb_interne.tasks import (
 
 # Mails
 nom_projet = "TdB interne - SIRCOM"
-LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/traitement-des-donnees/-/tree/main/dags/sg/sircom/tdb_interne?ref_type=heads"  # noqa
-LINK_DOC_DATA = (
-    "https://grist.numerique.gouv.fr/o/catalogue/k9LvttaYoxe6/catalogage-MEF"
-)
 
 
 # Définition du DAG

@@ -12,9 +12,6 @@
 # )
 
 
-# LINK_DOC_PIPELINE = "https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/airflow-demo/-/tree/main/dags/transverse/sauvegarde?ref_type=heads"  # noqa
-
-
 # default_args = {
 #     "owner": "airflow",
 #     "depends_on_past": False,
