@@ -204,6 +204,7 @@ SELECT
     cpps.selecteur,
     cpss.type_source,
     cpss.id_source,
+    CONCAT(cpps3.key, '/', cpss.id_source) as filepath_source_s3,
     cpss3.filename,
     COALESCE(cpss3.key, cpps3.key) as s3_key,
     cpps3.bucket,
