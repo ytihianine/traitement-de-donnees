@@ -1,13 +1,13 @@
 """Utilities to validate DAG `params` at runtime.
 
 This module provides a factory that creates an Airflow task which checks
-that required parameters are present in the DAG `params` mapping and
-optionally enforces that some flags are truthy (e.g. `mail.enable`).
+that required parameters are present in the DAG `params` mapping and validates
+the structure against the DagParams dataclass.
 
 Usage example:
-    validate_params = create_validate_params_task(
-        required_paths=["nom_projet", "mail.to", "mail.enable"],
-        require_truthy=["mail.enable"],
+    validate_params = create_validate_dag_params_task(
+        validate_db=True,
+        validate_mail=True,
         task_id="validate_dag_params",
     )
 
@@ -23,6 +23,8 @@ import logging
 from airflow.sdk import task, XComArg
 
 from utils.exceptions import ConfigError
+from _types.dags import DagParams, DBParams, FeatureFlags
+from enums.dags import DagStatus
 
 
 def _get_by_path(mapping: Dict[str, Any], path: str) -> Tuple[Any, bool]:
@@ -56,71 +58,69 @@ def _is_missing(value: Any) -> bool:
     return False
 
 
-def create_validate_params_task(
-    required_paths: Iterable[str],
-    require_truthy: Optional[Iterable[str]] = None,
-    task_id: str = "validate_dag_params",
-) -> Callable[..., XComArg]:
-    """Create an Airflow @task that validates DAG `params`.
+@task(task_id="validate_dag_params")
+def validate_dag_parameters(params: Dict[str, Any]) -> List[str]:
+    """Validate that params conform to DagParams structure.
 
-    Args:
-        required_paths: iterable of dot-separated parameter paths that must exist
-            in `params` (e.g. "mail.to", "nom_projet"). Presence is enforced;
-            empty strings/lists/None count as missing.
-        require_truthy: optional iterable of paths that must evaluate to True
-            (useful for boolean flags like "mail.enable"). If a path is listed
-            here and either missing or falsy, it will be reported as invalid.
-        task_id: Airflow task id to assign to generated task
-
-    Returns:
-        A callable that when invoked returns the Airflow task (so you can
-        include it in DAG definitions). Example: "validate = create_validate_params_task(...); validate()"
+    Returns a list of error messages. Empty list means validation passed.
     """
+    errors: List[str] = []
 
-    required_paths = list(required_paths)
-    require_truthy = set(require_truthy or [])
+    # Check nom_projet
+    if "nom_projet" not in params:
+        errors.append("Field 'nom_projet' is required")
+    elif _is_missing(params["nom_projet"]):
+        errors.append("Field 'nom_projet' cannot be empty")
 
-    @task(task_id=task_id)
-    def _validator(**context: Dict[str, Any]) -> None:
-        params: Dict[str, Any] = context.get("params", {}) or {}
-
-        missing: List[str] = []
-        falsy: List[str] = []
-
-        # Check keys existence in dag parameters
-        for path in required_paths:
-            value, found = _get_by_path(params, path)
-            if not found or _is_missing(value):
-                missing.append(path)
-
-        # Check keys truthiness in dag parameters
-        for path in require_truthy:
-            value, found = _get_by_path(params, path)
-            if not found:
-                missing.append(path)
-            else:
-                # require actual truthy value for this flag
-                if not bool(value):
-                    falsy.append(path)
-
-        if missing or falsy:
-            msg_parts: List[str] = []
-            if missing:
-                msg_parts.append(f"Missing or empty params: {', '.join(missing)}")
-            if falsy:
-                msg_parts.append(
-                    f"Params required to be truthy but falsy: {', '.join(falsy)}"
+    # Check dag_status
+    if "dag_status" not in params:
+        errors.append("Field 'dag_status' is required")
+    else:
+        dag_status = params["dag_status"]
+        if isinstance(dag_status, str):
+            try:
+                DagStatus[dag_status.upper()]
+            except KeyError:
+                errors.append(
+                    f"Invalid dag_status: {dag_status}. Must be one of: {', '.join([s.name for s in DagStatus])}"
+                )
+        elif isinstance(dag_status, int):
+            valid_values = [s.value for s in DagStatus]
+            if dag_status not in valid_values:
+                errors.append(
+                    f"Invalid dag_status value: {dag_status}. Must be one of: {valid_values}"
                 )
 
-            detail = "; ".join(msg_parts)
-            logging.error("DAG params validation failed: %s", detail)
-            raise ConfigError(
-                "DAG params validation failed",
-                detail=detail,
-                missing=missing,
-                falsy=falsy,
-            )
+    # Check db (optional, but if present must be valid)
+    if "db" in params and params["db"] is not None:
+        db = params["db"]
+        if not isinstance(db, dict):
+            errors.append("Field 'db' must be a dictionary")
+        else:
+            if "prod_schema" not in db:
+                errors.append("Missing required field: db.prod_schema")
+            elif _is_missing(db["prod_schema"]):
+                errors.append("Field 'db.prod_schema' cannot be empty")
 
-        logging.info("DAG params validation passed. Required params present.")
+            # tmp_schema is optional with default value
+            if "tmp_schema" in db and _is_missing(db["tmp_schema"]):
+                errors.append("Field 'db.tmp_schema' cannot be empty if provided")
 
-    return _validator
+    # Check enable (required)
+    if "enable" not in params:
+        errors.append("Missing required field: enable")
+    else:
+        enable = params["enable"]
+        if not isinstance(enable, dict):
+            errors.append("Field 'enable' must be a dictionary")
+        else:
+            required_flags = ["db", "mail", "s3", "convert_files", "download_grist_doc"]
+            for flag in required_flags:
+                if flag not in enable:
+                    errors.append(f"Missing required field: enable.{flag}")
+                elif not isinstance(enable[flag], bool):
+                    errors.append(
+                        f"Field 'enable.{flag}' must be a boolean, got {type(enable[flag]).__name__}"
+                    )
+
+    return errors
