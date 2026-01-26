@@ -16,14 +16,13 @@ from utils.tasks.sql import (
     import_file_to_db,
     ensure_partition,
     # set_dataset_last_update_date,
-    LoadStrategy,
 )
 
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from utils.config.tasks import get_s3_keys_source, get_projet_config
+from utils.config.tasks import get_s3_keys_source, get_list_selector_info
 
 from utils.tasks.validation import validate_dag_parameters
 from dags.sg.snum.certificats_igc.tasks import source_files, output_files
@@ -78,15 +77,11 @@ def certificats_igc() -> None:
         ensure_partition(),
         create_tmp_tables(),
         import_file_to_db.expand(
-            selecteur_config=get_projet_config(nom_projet=nom_projet)
+            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
-        copy_tmp_table_to_real_table(load_strategy=LoadStrategy.APPEND),
-        copy_s3_files(
-            bucket="dsci",
-        ),
-        del_s3_files(
-            bucket="dsci",
-        ),
+        copy_tmp_table_to_real_table(),
+        copy_s3_files(),
+        del_s3_files(),
         delete_tmp_tables(),
     )
 

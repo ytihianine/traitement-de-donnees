@@ -4,9 +4,8 @@ from airflow.sdk.bases.operator import chain
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
-from utils.config.tasks import get_projet_config
+from utils.config.tasks import get_list_selector_info
 from enums.dags import DagStatus
-from enums.database import LoadStrategy
 from utils.tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
@@ -63,10 +62,10 @@ def eligibilite_fcu_dag() -> None:
         process_fcu_result(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.expand(
-            selecteur_config=get_projet_config(nom_projet=nom_projet)
+            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
         ensure_partition(),
-        copy_tmp_table_to_real_table(load_strategy=LoadStrategy.APPEND),
+        copy_tmp_table_to_real_table(),
         copy_s3_files(),
         del_s3_files(),
         delete_tmp_tables(),

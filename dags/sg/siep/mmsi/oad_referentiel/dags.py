@@ -25,7 +25,7 @@ from utils.tasks.s3 import (
 )
 from utils.config.tasks import (
     get_s3_keys_source,
-    get_projet_config,
+    get_list_selector_info,
 )
 
 from dags.sg.siep.mmsi.oad_referentiel.tasks import bien_typologie
@@ -82,16 +82,12 @@ def oad_referentiel() -> None:
         bien_typologie(),
         create_tmp_tables(),
         import_file_to_db.expand(
-            selecteur_config=get_projet_config(nom_projet=nom_projet)
+            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
         copy_tmp_table_to_real_table(load_strategy=LoadStrategy.APPEND),
         refresh_views(),
-        copy_s3_files(
-            bucket="dsci",
-        ),
-        del_s3_files(
-            bucket="dsci",
-        ),
+        copy_s3_files(),
+        del_s3_files(),
         delete_tmp_tables(),
     )
 

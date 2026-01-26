@@ -32,7 +32,7 @@ default_args = {
 
 # Définition du DAG
 @dag(
-    "dag_standard",
+    dag_id="dag_standard",
     schedule=timedelta(seconds=30),
     max_active_runs=1,
     max_consecutive_failed_dag_runs=1,
@@ -63,8 +63,6 @@ default_args = {
 def consommation_des_batiments():
     # Variables
     nom_projet = "Dag standard"
-    tmp_schema = "temporaire"
-    prod_schema = "siep"
 
     looking_for_files = S3KeySensor(
         task_id="looking_for_files",

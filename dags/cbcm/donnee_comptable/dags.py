@@ -24,7 +24,7 @@ from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from utils.config.tasks import get_s3_keys_source, get_projet_config
+from utils.config.tasks import get_s3_keys_source, get_list_selector_info
 from utils.config.dag_params import create_default_args, create_dag_params
 
 from utils.tasks.validation import validate_dag_parameters
@@ -91,7 +91,7 @@ def chorus_donnees_comptables() -> None:
         datasets_additionnels(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.expand(
-            selecteur_config=get_projet_config(nom_projet=nom_projet)
+            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
         ensure_partition(),
         copy_tmp_table_to_real_table(

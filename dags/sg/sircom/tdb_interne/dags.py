@@ -10,7 +10,7 @@ from utils.tasks.sql import (
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
 )
-from utils.config.tasks import get_projet_config
+from utils.config.tasks import get_list_selector_info
 from utils.config.dag_params import create_default_args, create_dag_params
 
 from utils.tasks.validation import validate_dag_parameters
@@ -63,7 +63,7 @@ def tdb_sircom() -> None:
         [abonnes_visites(), budget(), enquetes(), metiers(), ressources_humaines()],
         create_tmp_tables(),
         import_file_to_db.expand(
-            selecteur_config=get_projet_config(nom_projet=nom_projet)
+            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
         copy_tmp_table_to_real_table(),
         delete_tmp_tables(),

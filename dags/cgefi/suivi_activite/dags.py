@@ -12,7 +12,7 @@ from utils.tasks.sql import (
     delete_tmp_tables,
 )
 from utils.tasks.validation import validate_dag_parameters
-from utils.config.tasks import get_projet_config
+from utils.config.tasks import get_list_selector_info
 from utils.config.dag_params import create_dag_params, create_default_args
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.tasks.s3 import del_s3_files
@@ -49,7 +49,7 @@ nom_projet = "Emploi et formation"
     ),
     on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )
-def suivi_activite():
+def suivi_activite() -> None:
     """Task order"""
     chain(
         validate_dag_parameters(),
@@ -68,7 +68,7 @@ def suivi_activite():
         ],
         create_tmp_tables(),
         import_file_to_db.partial(keep_file_id_col=True).expand(
-            selecteur_config=get_projet_config(nom_projet=nom_projet)
+            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
         copy_tmp_table_to_real_table(),
         del_s3_files(),

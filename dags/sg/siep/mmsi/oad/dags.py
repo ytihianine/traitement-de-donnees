@@ -8,7 +8,7 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from infra.mails.default_smtp import MailStatus, create_send_mail_callback
 from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
-from utils.config.tasks import get_s3_keys_source, get_projet_config
+from utils.config.tasks import get_s3_keys_source, get_list_selector_info
 from enums.dags import DagStatus
 from utils.tasks.sql import (
     LoadStrategy,
@@ -106,12 +106,10 @@ def oad() -> None:
         tasks_oad_indicateurs(),
         create_tmp_tables(),
         import_file_to_db.expand(
-            selecteur_config=get_projet_config(nom_projet=nom_projet)
+            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
         ensure_partition(),
-        copy_tmp_table_to_real_table(
-            load_strategy=LoadStrategy.APPEND,
-        ),
+        copy_tmp_table_to_real_table(),
         refresh_views(),
         copy_s3_files(),
         del_s3_files(),

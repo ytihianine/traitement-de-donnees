@@ -23,7 +23,7 @@ from utils.tasks.s3 import (
     del_s3_files,
 )
 from utils.config.tasks import (
-    get_projet_config,
+    get_list_selector_info,
     get_s3_keys_source,
 )
 
@@ -82,7 +82,7 @@ def barometre() -> None:
         source_files(),
         create_tmp_tables(),
         import_file_to_db.expand(
-            selecteur_config=get_projet_config(nom_projet=nom_projet)
+            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
         copy_tmp_table_to_real_table(),
         # set_dataset_last_update_date(db_hook=POSTGRE_HOOK, dataset_ids=[3]),
