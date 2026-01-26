@@ -442,7 +442,12 @@ def process_enquete_360(df: pd.DataFrame) -> pd.DataFrame:
 def process_ouverture_lettre_alize(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     # Clean
-    df = df.rename(columns={"taux_d_ouverture": "taux_ouverture"})
+    df = df.rename(
+        columns={
+            "taux_d_ouverture": "taux_ouverture",
+            "nombre_d_agents": "nombre_agent",
+        }
+    )
     df = df.replace("", None)
     df = df.dropna(subset=["taux_ouverture"])
 
