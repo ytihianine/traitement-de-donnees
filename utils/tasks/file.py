@@ -9,7 +9,8 @@ import pandas as pd
 from infra.file_handling.factory import create_default_s3_handler
 from infra.file_handling.dataframe import read_dataframe
 
-from utils.config.dag_params import get_project_name
+from utils.config.dag_params import get_feature_flags, get_project_name
+from utils.config.vars import FF_CONVERT_DISABLED_MSG
 from utils.dataframe import df_info
 from utils.config.tasks import (
     column_mapping_dataframe,
@@ -54,6 +55,11 @@ def create_parquet_converter_task(
         s3_handler = create_default_s3_handler()
 
         nom_projet = get_project_name(context=context)
+        convert_file_enable = get_feature_flags(context=context).convert_files
+
+        if not convert_file_enable:
+            print(FF_CONVERT_DISABLED_MSG)
+            return
 
         # Get input file path
         logging.info(

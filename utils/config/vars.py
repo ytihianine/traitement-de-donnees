@@ -41,3 +41,14 @@ DEFAULT_S3_BUCKET = "dsci"
 
 # Grist
 DEFAULT_GRIST_HOST = "https://grist.numerique.gouv.fr"
+
+# Feature flags messages
+FF_MAIL_DISABLED_MSG = "Mail feature flag is disabled ! Skipping mail sending ..."
+FF_S3_DISABLED_MSG = "S3 feature flag is disabled ! Skipping S3 operations ..."
+FF_DB_DISABLED_MSG = (
+    "Database feature flag is disabled ! Skipping database operations ..."
+)
+FF_CONVERT_DISABLED_MSG = "File conversion to parquet feature flag is disabled ! Skipping File conversion operations ..."
+FF_DOWNLOAD_GRIST_DOC_DISABLED_MSG = (
+    "Download Grist Doc feature flag is disabled ! Skipping Grist document download ..."
+)

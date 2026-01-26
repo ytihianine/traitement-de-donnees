@@ -8,7 +8,12 @@ from airflow.sdk import task
 
 from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
 from infra.file_handling.factory import create_file_handler
-from utils.config.dag_params import get_dag_status, get_execution_date, get_project_name
+from utils.config.dag_params import (
+    get_dag_status,
+    get_execution_date,
+    get_feature_flags,
+    get_project_name,
+)
 from utils.config.tasks import (
     get_projet_s3_info,
     get_projet_selecteur_s3,
@@ -18,6 +23,7 @@ from enums.dags import DagStatus
 from enums.filesystem import FileHandlerType
 from utils.config.vars import (
     DEFAULT_S3_CONN_ID,
+    FF_S3_DISABLED_MSG,
 )
 
 
@@ -40,6 +46,7 @@ def copy_s3_files(
     """
     # Récupérer les info du dag
     dag_status = get_dag_status(context=context)
+    s3_enable = get_feature_flags(context=context).s3
     nom_projet = get_project_name(context=context)
     execution_date = get_execution_date(context=context, use_tz=False)
     curr_day = execution_date.strftime(format="%Y%m%d")
@@ -50,6 +57,10 @@ def copy_s3_files(
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
+
+    if not s3_enable:
+        print(FF_S3_DISABLED_MSG)
         return
 
     # Créer les variables
@@ -106,6 +117,7 @@ def del_s3_files(
     """
     # Récupérer les info du dag
     dag_status = get_dag_status(context=context)
+    s3_enable = get_feature_flags(context=context).s3
     nom_projet = get_project_name(context=context)
 
     if projet_s3 is None:
@@ -113,6 +125,10 @@ def del_s3_files(
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
+
+    if not s3_enable:
+        print(FF_S3_DISABLED_MSG)
         return
 
     # Créer les variables

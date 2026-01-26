@@ -6,7 +6,7 @@ from infra.file_handling.factory import create_file_handler
 from infra.http_client.adapters import RequestsClient
 from infra.http_client.config import ClientConfig
 from infra.grist.client import GristAPI
-from utils.config.dag_params import get_project_name
+from utils.config.dag_params import get_feature_flags, get_project_name
 from utils.config.tasks import get_source_grist, get_selecteur_s3
 
 from enums.filesystem import FileHandlerType
@@ -14,6 +14,7 @@ from utils.config.vars import (
     DEFAULT_GRIST_HOST,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_CONN_ID,
+    FF_DOWNLOAD_GRIST_DOC_DISABLED_MSG,
     PROXY,
     AGENT,
 )
@@ -35,6 +36,11 @@ def download_grist_doc_to_s3(
 ) -> None:
     """Download SQLite from a specific Grist doc to S3"""
     nom_projet = get_project_name(context=context)
+    grist_enable = get_feature_flags(context=context).download_grist_doc
+
+    if not grist_enable:
+        print(FF_DOWNLOAD_GRIST_DOC_DISABLED_MSG)
+        return
 
     source_grist = get_source_grist(nom_projet=nom_projet, selecteur=selecteur)
     selecteur_s3 = get_selecteur_s3(nom_projet=nom_projet, selecteur=selecteur)
