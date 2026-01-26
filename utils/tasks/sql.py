@@ -19,6 +19,7 @@ from utils.config.dag_params import (
     get_dag_status,
     get_db_info,
     get_execution_date,
+    get_feature_flags,
     get_project_name,
 )
 from utils.config.tasks import get_list_database_info, get_list_table_name
@@ -34,6 +35,7 @@ from utils.config.vars import (
     DEFAULT_PG_DATA_CONN_ID,
     DEFAULT_PG_CONFIG_CONN_ID,
     DEFAULT_S3_CONN_ID,
+    FF_DB_DISABLED_MSG,
 )
 
 # ------------------------------------------------------------------------------
@@ -166,12 +168,17 @@ def create_projet_snapshot(
 ) -> None:
     """ """
     nom_projet = get_project_name(context=context)
+    db_enable = get_feature_flags(context=context).db
     execution_date = get_execution_date(context=context)
     dag_status = get_dag_status(context=context)
 
     if dag_status == DagStatus.DEV:
         print(f"Pipeline start execution date: {execution_date}")
         print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
+
+    if not db_enable:
+        print(FF_DB_DISABLED_MSG)
         return
 
     # Hook
@@ -231,12 +238,17 @@ def ensure_partition(
     if nom_projet is None:
         nom_projet = get_project_name(context=context)
     dag_status = get_dag_status(context=context)
+    db_enable = get_feature_flags(context=context).db
     execution_date = get_execution_date(context=context)
     db_info = get_db_info(context=context)
     prod_schema = db_info.prod_schema
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
+
+    if not db_enable:
+        print(FF_DB_DISABLED_MSG)
         return
 
     # Récupérer les informations de la table parente
@@ -377,9 +389,14 @@ def copy_tmp_table_to_real_table(
     """
     nom_projet = get_project_name(context=context)
     dag_status = get_dag_status(context=context)
+    db_enable = get_feature_flags(context=context).db
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
+
+    if not db_enable:
+        print(FF_DB_DISABLED_MSG)
         return
 
     db_info = get_db_info(context=context)
