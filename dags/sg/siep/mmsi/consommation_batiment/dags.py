@@ -23,7 +23,7 @@ from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from utils.config.tasks import get_s3_keys_source, get_list_selector_info
+from utils.config.tasks import get_list_source_fichier_key, get_list_selector_info
 
 from utils.tasks.validation import validate_dag_parameters
 from dags.sg.siep.mmsi.consommation_batiment.tasks import (
@@ -65,7 +65,7 @@ def consommation_des_batiments() -> None:
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
         bucket_name="dsci",
-        bucket_key=get_s3_keys_source(nom_projet=nom_projet),
+        bucket_key=get_list_source_fichier_key(nom_projet=nom_projet),
         mode="reschedule",
         poke_interval=timedelta(seconds=30),
         timeout=timedelta(minutes=13),

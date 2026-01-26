@@ -9,7 +9,7 @@ from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from enums.dags import DagStatus
 
 from _types.dags import DBParams, FeatureFlags
-from utils.config.tasks import get_s3_keys_source
+from utils.config.tasks import get_list_source_fichier_key
 from utils.config.dag_params import create_default_args, create_dag_params
 
 from utils.tasks.validation import validate_dag_parameters
@@ -55,7 +55,7 @@ def mentorat_merci() -> None:
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
         bucket_name="dsci",
-        bucket_key=get_s3_keys_source(nom_projet=nom_projet),
+        bucket_key=get_list_source_fichier_key(nom_projet=nom_projet),
         mode="reschedule",
         poke_interval=timedelta(seconds=30),
         timeout=timedelta(minutes=13),

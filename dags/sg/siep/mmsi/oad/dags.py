@@ -8,7 +8,7 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from infra.mails.default_smtp import MailStatus, create_send_mail_callback
 from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
-from utils.config.tasks import get_s3_keys_source, get_list_selector_info
+from utils.config.tasks import get_list_source_fichier_key, get_list_selector_info
 from enums.dags import DagStatus
 from utils.tasks.sql import (
     LoadStrategy,
@@ -70,7 +70,7 @@ def oad() -> None:
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
         bucket_name="dsci",
-        bucket_key=get_s3_keys_source(nom_projet=nom_projet),
+        bucket_key=get_list_source_fichier_key(nom_projet=nom_projet),
         mode="reschedule",
         poke_interval=timedelta(seconds=30),
         timeout=timedelta(minutes=13),
