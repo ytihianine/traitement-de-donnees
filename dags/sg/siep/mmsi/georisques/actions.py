@@ -80,7 +80,7 @@ def get_risque(
             ):
                 wait_time = retry_delay * (attempt + 1)  # Backoff exponentiel optionnel
                 print(
-                    f"⚠️ Erreur {response.status_code}, nouvelle tentative dans {wait_time}s... ({attempt + 1}/{max_retries})"
+                    f"⚠️ Erreur {response.status_code}, nouvelle tentative dans {wait_time}s... ({attempt + 1}/{max_retries})"  # noqa
                 )
                 time.sleep(wait_time)
                 continue
@@ -92,7 +92,7 @@ def get_risque(
             if attempt < max_retries - 1:
                 wait_time = retry_delay * (attempt + 1)
                 print(
-                    f"⚠️ Exception: {str(e)}, nouvelle tentative dans {wait_time}s... ({attempt + 1}/{max_retries})"
+                    f"⚠️ Exception: {str(e)}, nouvelle tentative dans {wait_time}s... ({attempt + 1}/{max_retries})"  # noqa
                 )
                 time.sleep(wait_time)
             else:

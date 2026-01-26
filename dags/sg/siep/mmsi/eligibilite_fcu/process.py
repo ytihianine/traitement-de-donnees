@@ -63,11 +63,7 @@ def process_result(df: pd.DataFrame) -> pd.DataFrame:
 def get_eligibilite_fcu(
     api_client: AbstractHTTPClient, url: str, latitude: float, longitude: float
 ) -> dict[str, str]:
-    result_json = {
-        "api_status": None,
-        "api_status_code": None,
-        "api_raison": None,
-    }
+    result_json = {}
 
     if not can_perform_api_call(lat=latitude, lon=longitude):
         result_json["api_status"] = "Echec"

@@ -163,7 +163,7 @@ def process_unpivot_conso_mens(
 
 
 def calculer_dju_moyen(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.groupby(["code_bat_gestionnaire", "mois_conso"], as_index=False).mean()
+    df = df.groupby(by=["code_bat_gestionnaire", "mois_conso"], as_index=False).mean()
     df = df.rename(columns={"degres_jours_de_chauffage": "dju_moyen"})
     df = df.fillna(np.nan).replace([np.nan], [None])
     return df

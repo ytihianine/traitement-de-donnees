@@ -28,8 +28,13 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
         key="snapshot_id", task_ids="get_projet_snapshot"
     )
     df_oad = db_hook.fetch_df(
-        query="""SELECT sbl.code_bat_ter, sbl.latitude, sbl.longitude, sbl.import_timestamp as import_timestamp_oad
-            FROM siep.bien_localisation sbl
+        query="""
+        SELECT
+            sbl.code_bat_ter,
+            sbl.latitude,
+            sbl.longitude,
+            sbl.import_timestamp as import_timestamp_oad
+        FROM siep.bien_localisation sbl
             WHERE sbl.snapshot_id = %s
             AND sbl.import_timestamp = (
                 SELECT MAX(import_timestamp)
