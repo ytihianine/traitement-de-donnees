@@ -204,9 +204,13 @@ SELECT
     cpps.selecteur,
     cpss.type_source,
     cpss.id_source,
+    cpss3.filename,
+    COALESCE(cpss3.key, cpps3.key) as s3_key,
     cpps3.bucket,
-    cpps3.key as s3_key,
-    CONCAT(cpps3.key, '/', cpss.id_source) as filepath_source_s3
+    cpps3.key as projet_s3_key,
+    cpps3.key_tmp as projet_s3_key_tmp,
+    CONCAT(COALESCE(cpss3.key, cpps3.key), '/', cpss3.filename) as filepath_s3,
+    CONCAT(cpps3.key_tmp, '/', cpss3.filename) as filepath_tmp_s3
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_selecteur cpps
   ON cpp.id = cpps.id_projet
@@ -214,6 +218,8 @@ INNER JOIN conf_projets.selecteur_source cpss
   ON cpps.id = cpss.id_selecteur
   AND cpps.id_projet = cpss.id_projet
 INNER JOIN conf_projets.projet_s3 cpps3 ON cpp.id = cpps3.id_projet
+INNER JOIN conf_projets.selecteur_s3 cpss3 ON cpps.id = cpss3.id_selecteur
+    AND cpps.id_projet = cpss3.id_projet
 WHERE cpss.type_source = 'Fichier';
 
 -- Vue pour column_mapping_dataframe()
