@@ -44,7 +44,7 @@ nom_projet = "TdB interne - SIRCOM"
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="sircom"),
         feature_flags=FeatureFlags(
-            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
+            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=True
         ),
     ),
     on_failure_callback=create_send_mail_callback(
