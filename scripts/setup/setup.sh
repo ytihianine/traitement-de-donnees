@@ -1,7 +1,7 @@
 #! /bin/bash
 
 PYTHON_VERSION="3.12"
-AIRFLOW_VERSION="3.1.5"
+AIRFLOW_VERSION="3.1.6"
 
 # Pour régler certains problèmes d'installation des packages
 
