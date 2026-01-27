@@ -141,6 +141,20 @@ CREATE TABLE conf_projets."selecteur_column_mapping" (
 );
 
 
+DROP TABLE conf_projets."projet_snapshot";
+CREATE TABLE conf_projets."projet_snapshot"(
+  "id" bigserial,
+  "id_projet" int NOT NULL,
+  "snapshot_id" text NOT NULL,
+	"creation_timestamp" timestamp NOT NULL,
+  PRIMARY KEY ("id"),
+  UNIQUE ("id_projet", "snapshot_id"),
+  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id")
+)
+
+
+
+
 -- Vue pour get_projet_s3_info()
 DROP VIEW conf_projets.projet_s3_vw;
 CREATE OR REPLACE VIEW conf_projets.projet_s3_vw AS
@@ -299,10 +313,10 @@ INNER JOIN conf_projets.projet_selecteur cpps
   ON cpp.id = cpps.id_projet
 INNER JOIN conf_projets.projet_s3 cpps3
   ON cpp.id = cpps3.id_projet
-INNER JOIN conf_projets.selecteur_s3 cpss3
+LEFT JOIN conf_projets.selecteur_s3 cpss3
   ON cpps.id = cpss3.id_selecteur
     AND cpps.id_projet = cpss3.id_projet
-INNER JOIN conf_projets.selecteur_database cpsd
+LEFT JOIN conf_projets.selecteur_database cpsd
   ON cpps.id = cpsd.id_selecteur
     AND cpps.id_projet = cpsd.id_projet
 ;
