@@ -92,7 +92,7 @@ def _get_snapshot_id(nom_projet: str, db_handler: BaseDBHandler) -> str:
         WITH cte_id_projet AS (
             SELECT id as id_projet
             FROM conf_projets.projet
-            WHERE nom_projet = %(nom_projet)s
+            WHERE projet = %(nom_projet)s
         ),
         ranked_snapshots AS (
             SELECT psi.snapshot_id,
