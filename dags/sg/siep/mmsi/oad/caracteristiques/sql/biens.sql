@@ -112,6 +112,7 @@ CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
             ON oad.snapshot_id = osfi.snapshot_id
     ),
     cte_bien_gest_oad_osfi AS (
+        -- Liste complète des biens entre l'OAD et l'OSFI par snapshot_id
         SELECT DISTINCT
             code_bat_ter,
             code_gestionnaire,
@@ -126,6 +127,7 @@ CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
             snapshot_id
         FROM siep.bien_information_complementaire
     ), cte_bien_occupant_agrege AS (
+        -- Agrégation des indicateurs à la maille code_bat_gestionnaire (bien gestionnaire)
         SELECT
         sbo.code_bat_gestionnaire,
         sbo.snapshot_id,
