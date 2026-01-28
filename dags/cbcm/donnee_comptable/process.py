@@ -1,4 +1,6 @@
+from typing import Mapping, Any
 import uuid
+import json
 import pandas as pd
 import numpy as np
 
@@ -69,6 +71,30 @@ corr_nature_sous_nature = {
     4.4: "4.4 : Subventions européennes",
     6.0: "6.0 : Dépenses sans ordonnancement",
 }
+
+
+def create_row_id(name_seed: str, row: Mapping[str, Any]) -> str:
+    """
+    Créer un ID unique à partir des colonnes fournies.
+
+    Args:
+        name_seed: nom à ajouter aux valeurs des colonnes
+        row: ligne du dataFrame qui contient les données pour générer l'ID
+
+    Return:
+        str: format uuid5
+
+    Notes:
+        Il est nécessire de garantir que les valeurs fournies pour chaque ligne seront les même.
+        (i.e réaliser le processing avant de faire appel à cette fonction)
+    """
+    # Namespace pour générer des UUID déterministes
+    NAMESPACE = uuid.uuid5(namespace=uuid.NAMESPACE_DNS, name=name_seed)
+
+    # Serialize dict to str
+    row_string = json.dumps(obj=row, sort_keys=True, ensure_ascii=False)
+
+    return str(uuid.uuid5(namespace=NAMESPACE, name=row_string))
 
 
 # ======================================================
@@ -206,6 +232,12 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
         df["annee_exercice"].astype(str) + df["societe"] + df["num_dp"].astype(str)
     )
 
+    # Ajouter un ID unique à chaque ligne
+    df["id_row"] = [
+        create_row_id(name_seed="demande_paiement.ZDEP53", row=row)
+        for row in df.to_dict("records")
+    ]
+
     # Convertir les colonnes temporelles
     date_cols = ["date_comptable"]
     df = convert_str_cols_to_date(
@@ -242,11 +274,16 @@ def process_demande_paiement_flux(df: pd.DataFrame) -> pd.DataFrame:
     # Renommer les colonnes
     df = df.rename(columns={"type_flux": "dp_flux_3"})
 
+    # Ajouter un ID unique à chaque ligne
+    df["id_row"] = [
+        create_row_id(name_seed="demande_paiement_flux.INFBUD55", row=row)
+        for row in df.to_dict("records")
+    ]
+
     # Ajouter les colonnes complémentaires
     df["id_dp"] = (
         df["annee_exercice"].astype(str) + df["societe"] + df["num_dp_flux"].astype(str)
     )
-    df["id"] = list(df.reset_index(drop=True).index.values)
 
     return df
 
@@ -322,6 +359,12 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
 
     # Suppression des doublons
     df = df.drop_duplicates(subset=["id_dp_cf_cc"])
+
+    # Ajouter un ID unique à chaque ligne
+    df["id_row"] = [
+        create_row_id(name_seed="demande_paiement_journal_pieces.ZJDP", row=row)
+        for row in df.to_dict("records")
+    ]
 
     # Regroupement
     df_grouped = df.groupby(by=["id_dp"], as_index=False)["id_dp_cf_cc"].count()
@@ -424,10 +467,6 @@ def process_demande_paiement_complet(
 # ======================================================
 def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
     """fichier INFDEP56"""
-    # Namespace pour générer des UUID déterministes
-    NAMESPACE = uuid.uuid5(
-        namespace=uuid.NAMESPACE_DNS, name="delai-global-paiement.infdep56"
-    )
 
     # Nettoyer les champs textuels
     txt_cols = [
@@ -449,11 +488,12 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
     # Filtrer les lignes
     df = df.loc[df["societe"].isin(["ADCE", "CSND"])]
 
+    # AJOUTER UN ID UNIQUE POUR CHAQUE LIGNE
+
     # Ajouter les colonnes complémentaires
     df["mois_nom"] = df.loc[:, "mois"].map(corr_num_mois).fillna("Non déterminé")
     df["mois_nombre_nom"] = df.loc[:, "mois_nom"].map(corr_mois).fillna(-1)
     df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
-    df["id"] = list(df.reset_index(drop=True).index.values)
 
     # Arrondir les valeurs
     df["delai_global_paiement"] = df["delai_global_paiement"].round(2)
