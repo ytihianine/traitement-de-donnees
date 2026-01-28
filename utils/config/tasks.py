@@ -59,9 +59,9 @@ def column_mapping_dataframe(
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     df = db.fetch_df(
-        query=f"""SELECT cpvcm.nom_projet, cpvcm.selecteur, cpvcm.colname_source, cpvcm.colname_dest
-            FROM {CONF_SCHEMA}.vue_cols_mapping cpvcm
-            WHERE cpvcm.nom_projet = %s AND cpvcm.selecteur = %s;
+        query=f"""SELECT cpcm.projet, cpcm.selecteur, cpcm.colname_source, cpcm.colname_dest
+            FROM {CONF_SCHEMA}.cols_mapping_vw cpcm
+            WHERE cpcm.projet = %s AND cpcm.selecteur = %s;
         """,
         parameters=(nom_projet, selecteur),
     )
