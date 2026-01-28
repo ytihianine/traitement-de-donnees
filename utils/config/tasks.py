@@ -1,10 +1,8 @@
 """Functions for retrieving and managing project configurations."""
 
-from dataclasses import is_dataclass
 from typing import Any, Mapping, Optional
 import logging
 
-from attr import asdict
 from tenacity import (
     retry,
     stop_after_attempt,
@@ -234,7 +232,7 @@ def get_list_contact(
 
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
-    query = """
+    query = f"""
         SELECT cppc.projet, cppc.contact_mail, cppc.is_mail_generic
         FROM {CONF_SCHEMA}.projet_contact_vw cppc
         WHERE cppc.projet = %s;
