@@ -161,20 +161,74 @@ def fetch_from_db() -> None:
     )
 
 
-# @task_group(group_id="load_to_grist")
-# def load_to_grist() -> None:
-#     load_all_cf_cc = ""
+@task_group(group_id="load_to_grist")
+def load_to_grist() -> None:
+    load_new_cf_cc = create_task(
+        task_config=TaskConfig(task_id="load_new_cf_cc"),
+        output_selecteur="load_new_cf_cc",
+        steps=[
+            ETLStep(
+                fn=actions.load_new_cf_cc,
+            )
+        ],
+        add_import_date=False,
+        add_snapshot_id=False,
+    )
 
-#     load_demande_achat = ""
+    # load_demande_achat = create_task(
+    #     task_config=TaskConfig(task_id="load_demande_achat"),
+    #     output_selecteur="load_demande_achat",
+    #     steps=[
+    #         ETLStep(
+    #             fn=actions.load_demande_achat,
+    #         )
+    #     ],
+    #     add_import_date=False,
+    #     add_snapshot_id=False,
+    # )
 
-#     load_demande_paiement_complet = ""
+    # load_demande_paiement_complet = create_task(
+    #     task_config=TaskConfig(task_id="load_demande_paiement_complet"),
+    #     output_selecteur="load_demande_paiement_complet",
+    #     steps=[
+    #         ETLStep(
+    #             fn=actions.load_demande_paiement_complet,
+    #         )
+    #     ],
+    #     add_import_date=False,
+    #     add_snapshot_id=False,
+    # )
 
-#     load_delai_global_paiement = ""
+    # load_delai_global_paiement = create_task(
+    #     task_config=TaskConfig(task_id="load_delai_global_paiement"),
+    #     output_selecteur="load_delai_global_paiement",
+    #     steps=[
+    #         ETLStep(
+    #             fn=actions.load_delai_global_paiement,
+    #         )
+    #     ],
+    #     add_import_date=False,
+    #     add_snapshot_id=False,
+    # )
 
-#     load_engagement_juridique = ""
+    # load_engagement_juridique = create_task(
+    #     task_config=TaskConfig(task_id="load_delai_global_paiement"),
+    #     output_selecteur="load_delai_global_paiement",
+    #     steps=[
+    #         ETLStep(
+    #             fn=actions.load_delai_global_paiement,
+    #         )
+    #     ],
+    #     add_import_date=False,
+    #     add_snapshot_id=False,
+    # )
 
-#     chain(
-#         [
-
-#         ]
-#     )
+    chain(
+        [
+            load_new_cf_cc(),
+            # load_demande_achat(),
+            # load_demande_paiement_complet(),
+            # load_delai_global_paiement(),
+            # load_engagement_juridique(),
+        ]
+    )

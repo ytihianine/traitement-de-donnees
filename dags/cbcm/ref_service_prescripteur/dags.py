@@ -21,7 +21,11 @@ from utils.tasks.s3 import (
 )
 
 from utils.tasks.validation import validate_dag_parameters
-from dags.cbcm.ref_service_prescripteur.tasks import grist_source, fetch_from_db
+from dags.cbcm.ref_service_prescripteur.tasks import (
+    grist_source,
+    fetch_from_db,
+    load_to_grist,
+)
 
 
 # Variables
@@ -61,6 +65,7 @@ def chorus_service_prescripteur() -> None:
         ),
         grist_source(),
         fetch_from_db(),
+        load_to_grist(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.partial(keep_file_id_col=True).expand(
             selecteur_info=get_list_selector_info(nom_projet=nom_projet)
