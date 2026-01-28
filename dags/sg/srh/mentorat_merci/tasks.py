@@ -8,6 +8,7 @@ from dags.sg.srh.mentorat_merci import process
 agent_inscrit = create_file_etl_task(
     selecteur="agent_inscrit",
     process_func=process.clean_data,
+    apply_cols_mapping=False,
     add_import_date=False,
     add_snapshot_id=False,
 )
