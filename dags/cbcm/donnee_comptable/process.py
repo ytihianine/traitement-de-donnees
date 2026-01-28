@@ -111,14 +111,14 @@ def process_demande_achat(df: pd.DataFrame) -> pd.DataFrame:
     txt_cols = ["centre_financier", "centre_cout"]
     df = normalize_whitespace_columns(df, columns=txt_cols)
 
-    # Retirer les lignes sans date de réplication
-    df = df.loc[df["date_replication"].notna()]
-
     # Convertir les colonnes temporelles
     date_cols = ["date_creation_da", "date_replication"]
     df = convert_str_cols_to_date(
         df=df, columns=date_cols, str_date_format="%d/%m/%Y", errors="coerce"
     )
+
+    # Retirer les lignes sans date de réplication
+    df = df.loc[df["date_replication"].notna()]
 
     # Ajouter les colonnes complémentaires
     df["delai_traitement_da"] = (
