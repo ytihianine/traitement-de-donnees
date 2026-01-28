@@ -7,6 +7,7 @@ import pandas as pd
 
 from utils.config.dag_params import get_execution_date, get_project_name
 from infra.mails.default_smtp import MailMessage, render_template, send_mail
+from utils.config.tasks import get_list_contact
 
 from dags.sg.srh.mentorat_merci import process
 
@@ -121,7 +122,7 @@ def generer_rapport(dfs: Mapping[str, pd.DataFrame]) -> str:
         rapport.append(f"Score maximum: {df_binomes['score_total'].max()}")
 
         rapport.append(
-            f"\nBinômes avec score parfait (2475p total): {len(df_binomes[df_binomes['score_total'] == 2475])}"
+            f"\nBinômes avec score parfait (2475p total): {len(df_binomes[df_binomes['score_total'] == 2475])}"  # noqa
         )
         rapport.append(
             f"Binômes avec catégorie OK: {len(df_binomes[df_binomes['score_categorie'] == 1000])}"
@@ -135,6 +136,11 @@ def generer_rapport(dfs: Mapping[str, pd.DataFrame]) -> str:
 def send_result(dfs: Mapping[str, pd.DataFrame], context: Mapping[str, Any]) -> None:
     execution_date = get_execution_date(context=context, use_tz=True)
     nom_projet = get_project_name(context=context)
+    projet_contact = get_list_contact(nom_projet=nom_projet)
+    mail_to = [contact.contact_mail for contact in projet_contact if contact.is_generic]
+    mail_cc = [
+        contact.contact_mail for contact in projet_contact if not contact.is_generic
+    ]
     tmp_path = Path(
         f"/tmp/binomes_v{execution_date.strftime(format="%Y%m%d_%Hh%M")}.xlsx"
     )
@@ -162,7 +168,8 @@ def send_result(dfs: Mapping[str, pd.DataFrame], context: Mapping[str, Any]) -> 
     )
 
     mail_message = MailMessage(
-        to=["yanis.tihianine@finances.gouv.fr"],
+        to=mail_to,
+        cc=mail_cc,
         subject=f"[{nom_projet}] - Binômes générés",
         html_content=html_content,
         files=[str(tmp_path)],
