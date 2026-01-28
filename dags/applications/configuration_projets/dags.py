@@ -5,7 +5,6 @@ from _types.dags import DBParams, FeatureFlags
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
-from utils.tasks.projet import get_config_selecteur_info
 from utils.tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -54,10 +53,8 @@ nom_projet = "Configuration des projets"
 def configuration_projets() -> None:
     """Tasks order"""
 
-    selecteur_s3_db = get_config_selecteur_info()
     chain(
         validate_dag_parameters(),
-        selecteur_s3_db,
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci",
