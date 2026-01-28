@@ -488,7 +488,11 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
     # Filtrer les lignes
     df = df.loc[df["societe"].isin(["ADCE", "CSND"])]
 
-    # AJOUTER UN ID UNIQUE POUR CHAQUE LIGNE
+    # Ajouter un ID unique à chaque ligne
+    df["id_row_dgp"] = [
+        create_row_id(name_seed="delai_global_paiement.INFDEP56", row=row)
+        for row in df.to_dict("records")
+    ]
 
     # Ajouter les colonnes complémentaires
     df["mois_nom"] = df.loc[:, "mois"].map(corr_num_mois).fillna("Non déterminé")
