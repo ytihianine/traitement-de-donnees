@@ -72,7 +72,7 @@ def _create_snapshot_id(
             %(snapshot_id)s,
             %(creation_timestamp)s
         FROM conf_projets.projet p
-        WHERE p.nom_projet = %(nom_projet)s
+        WHERE p.projet = %(nom_projet)s
         AND EXISTS (SELECT 1 FROM conf_projets.projet WHERE nom_projet = %(nom_projet)s);
     """
 
