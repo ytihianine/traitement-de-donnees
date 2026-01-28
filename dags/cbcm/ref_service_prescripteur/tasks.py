@@ -1,9 +1,11 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from utils.tasks.etl import create_grist_etl_task
+from utils.tasks.etl import create_grist_etl_task, create_task
+from _types.dags import TaskConfig, ETLStep
 
 from dags.cbcm.ref_service_prescripteur import process
+from dags.cbcm.ref_service_prescripteur import actions
 from utils.control.structures import normalize_grist_dataframe
 
 
@@ -87,3 +89,92 @@ def grist_source() -> None:
             engagement_juridique_sp_manuel(),
         ]
     )
+
+
+@task_group(group_id="fetch_from_db")
+def fetch_from_db() -> None:
+    get_all_cf_cc = create_task(
+        task_config=TaskConfig(task_id="get_all_cf_cc"),
+        output_selecteur="get_all_cf_cc",
+        steps=[
+            ETLStep(
+                fn=actions.get_all_cf_cc,
+            )
+        ],
+        add_import_date=False,
+        add_snapshot_id=False,
+    )
+    get_demande_achat = create_task(
+        task_config=TaskConfig(task_id="get_all_cf_cc"),
+        output_selecteur="get_demande_achat",
+        steps=[
+            ETLStep(
+                fn=actions.get_demande_achat,
+            )
+        ],
+        add_import_date=False,
+        add_snapshot_id=False,
+    )
+    get_demande_paiement_complet = create_task(
+        task_config=TaskConfig(task_id="get_all_cf_cc"),
+        output_selecteur="get_demande_paiement_complet",
+        steps=[
+            ETLStep(
+                fn=actions.get_demande_paiement_complet,
+            )
+        ],
+        add_import_date=False,
+        add_snapshot_id=False,
+    )
+    get_delai_global_paiement = create_task(
+        task_config=TaskConfig(task_id="get_all_cf_cc"),
+        output_selecteur="get_delai_global_paiement",
+        steps=[
+            ETLStep(
+                fn=actions.get_delai_global_paiement,
+            )
+        ],
+        add_import_date=False,
+        add_snapshot_id=False,
+    )
+
+    get_engagement_juridique = create_task(
+        task_config=TaskConfig(task_id="get_all_cf_cc"),
+        output_selecteur="get_engagement_juridique",
+        steps=[
+            ETLStep(
+                fn=actions.get_engagement_juridique,
+            )
+        ],
+        add_import_date=False,
+        add_snapshot_id=False,
+    )
+
+    chain(
+        [
+            get_all_cf_cc(),
+            get_demande_achat(),
+            get_demande_paiement_complet(),
+            get_delai_global_paiement(),
+            get_engagement_juridique(),
+        ]
+    )
+
+
+# @task_group(group_id="load_to_grist")
+# def load_to_grist() -> None:
+#     load_all_cf_cc = ""
+
+#     load_demande_achat = ""
+
+#     load_demande_paiement_complet = ""
+
+#     load_delai_global_paiement = ""
+
+#     load_engagement_juridique = ""
+
+#     chain(
+#         [
+
+#         ]
+#     )
