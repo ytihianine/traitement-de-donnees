@@ -106,4 +106,4 @@ class Documentation:
 class Contact:
     projet: str
     contact_mail: str
-    is_generic: bool
+    is_mail_generic: bool
