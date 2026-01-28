@@ -79,7 +79,7 @@ def datasets_additionnels() -> None:
             "demande_paiement",
             "demande_paiement_carte_achat",
             "demande_paiement_flux",
-            "demande_paiement_journal_pieces_sp",
+            "demande_paiement_journal_pieces",
             "demande_paiement_sfp",
         ],
         steps=[ETLStep(fn=process.process_demande_paiement_complet, read_data=True)],
