@@ -49,10 +49,10 @@ nom_projet = "Données comptable"
     default_args=create_default_args(),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.DEV,
+        dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="donnee_comptable"),
         feature_flags=FeatureFlags(
-            db=False,
+            db=True,
             mail=False,
             s3=False,
             convert_files=False,
