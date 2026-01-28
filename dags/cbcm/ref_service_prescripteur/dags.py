@@ -13,7 +13,6 @@ from utils.tasks.sql import (
     import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
-    LoadStrategy,
     # set_dataset_last_update_date,
 )
 from utils.tasks.s3 import (
