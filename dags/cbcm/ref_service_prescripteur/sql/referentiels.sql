@@ -72,3 +72,34 @@ CREATE TABLE donnee_comptable."service_prescripteur" (
   FOREIGN KEY ("designation_uo") REFERENCES donnee_comptable."ref_uo" ("id"),
   FOREIGN KEY ("designation_cc") REFERENCES donnee_comptable."ref_cc" ("id")
 );
+
+/*
+  Services prescripteurs renseignés manuellement
+*/
+CREATE TABLE donnee_comptable."delai_global_paiement_sp_manuel" (
+  "id" bigint,
+  "id_dgp" text,
+  "id_service_prescripteur" int,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE donnee_comptable."demande_achat_sp_manuel" (
+  "id" bigint,
+  "id_da" bigint,
+  "id_service_prescripteur" int,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE donnee_comptable."demande_paiement_sp_manuel" (
+  "id" BIGINT,
+  "id_dp" text,
+  "id_service_prescripteur" int,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE donnee_comptable."engagement_juridique_sp_manuel" (
+  "id" BIGINT,
+  "id_ej" bigint,
+  "id_service_prescripteur" int,
+  PRIMARY KEY ("id")
+);
