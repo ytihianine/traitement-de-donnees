@@ -450,6 +450,7 @@ def process_demande_paiement_complet(
 
     # Supprimer les colonnes en doublon
     duplicate_to_drop = [
+        "id_row_dp_",
         "societe_",
         "centre_financier_",
         "automatisation_wf_cpt_",
