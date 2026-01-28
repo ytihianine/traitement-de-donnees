@@ -105,7 +105,7 @@ def fetch_from_db() -> None:
         add_snapshot_id=False,
     )
     get_demande_achat = create_task(
-        task_config=TaskConfig(task_id="get_all_cf_cc"),
+        task_config=TaskConfig(task_id="get_demande_achat"),
         output_selecteur="get_demande_achat",
         steps=[
             ETLStep(
@@ -116,7 +116,7 @@ def fetch_from_db() -> None:
         add_snapshot_id=False,
     )
     get_demande_paiement_complet = create_task(
-        task_config=TaskConfig(task_id="get_all_cf_cc"),
+        task_config=TaskConfig(task_id="get_demande_paiement_complet"),
         output_selecteur="get_demande_paiement_complet",
         steps=[
             ETLStep(
@@ -127,7 +127,7 @@ def fetch_from_db() -> None:
         add_snapshot_id=False,
     )
     get_delai_global_paiement = create_task(
-        task_config=TaskConfig(task_id="get_all_cf_cc"),
+        task_config=TaskConfig(task_id="get_delai_global_paiement"),
         output_selecteur="get_delai_global_paiement",
         steps=[
             ETLStep(
@@ -139,7 +139,7 @@ def fetch_from_db() -> None:
     )
 
     get_engagement_juridique = create_task(
-        task_config=TaskConfig(task_id="get_all_cf_cc"),
+        task_config=TaskConfig(task_id="get_engagement_juridique"),
         output_selecteur="get_engagement_juridique",
         steps=[
             ETLStep(
