@@ -162,10 +162,14 @@ def create_send_mail_callback(mail_status: MailStatus) -> Callable:
 
         projet_contact = get_list_contact(context=context)
         mail_to = [
-            contact.contact_mail for contact in projet_contact if contact.is_generic
+            contact.contact_mail
+            for contact in projet_contact
+            if contact.is_mail_generic
         ]
         mail_cc = [
-            contact.contact_mail for contact in projet_contact if not contact.is_generic
+            contact.contact_mail
+            for contact in projet_contact
+            if not contact.is_mail_generic
         ]
 
         projet_docs = get_list_documentation(context=context)

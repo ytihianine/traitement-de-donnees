@@ -137,9 +137,13 @@ def send_result(dfs: Mapping[str, pd.DataFrame], context: Mapping[str, Any]) -> 
     execution_date = get_execution_date(context=context, use_tz=True)
     nom_projet = get_project_name(context=context)
     projet_contact = get_list_contact(nom_projet=nom_projet)
-    mail_to = [contact.contact_mail for contact in projet_contact if contact.is_generic]
+    mail_to = [
+        contact.contact_mail for contact in projet_contact if contact.is_mail_generic
+    ]
     mail_cc = [
-        contact.contact_mail for contact in projet_contact if not contact.is_generic
+        contact.contact_mail
+        for contact in projet_contact
+        if not contact.is_mail_generic
     ]
     tmp_path = Path(
         f"/tmp/binomes_v{execution_date.strftime(format="%Y%m%d_%Hh%M")}.xlsx"
