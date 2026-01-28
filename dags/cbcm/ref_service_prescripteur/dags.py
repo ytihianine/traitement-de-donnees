@@ -70,7 +70,6 @@ def chorus_service_prescripteur() -> None:
         copy_tmp_table_to_real_table(
             load_strategy=LoadStrategy.FULL_LOAD,
         ),
-        refresh_views(),
         copy_s3_files(),
         del_s3_files(),
         delete_tmp_tables(),
