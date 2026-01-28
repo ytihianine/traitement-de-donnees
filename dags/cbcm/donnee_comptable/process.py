@@ -340,7 +340,7 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_demande_paiement_complet_sp(
+def process_demande_paiement_complet(
     df_demande_paiement: pd.DataFrame,
     df_demande_paiement_carte_achat: pd.DataFrame,
     df_demande_paiement_flux: pd.DataFrame,
@@ -396,8 +396,14 @@ def process_demande_paiement_complet_sp(
     )
 
     # Supprimer les colonnes en doublon
-    duplicate_to_drop = "societe_|centre_financier_|automatisation_wf_cpt_|import_timestamp_|import_date_"
-    df = df.drop(df.filter(regex=duplicate_to_drop).columns, axis=1)  # type: ignore
+    duplicate_to_drop = [
+        "societe_",
+        "centre_financier_",
+        "automatisation_wf_cpt_",
+        "import_timestamp_",
+        "import_date_",
+    ]
+    df = df.drop(df.filter(regex="|".join(duplicate_to_drop)).columns, axis=1)  # type: ignore
 
     # Ajout des colonnes calculées
     conditions = [
@@ -447,57 +453,3 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
     df["delai_global_paiement"] = df["delai_global_paiement"].round(2)
 
     return df
-
-
-# ======================================================
-# Ajout des services prescipteurs
-# ======================================================
-def add_service_prescripteurs(
-    df: pd.DataFrame, df_service_prescripteur: pd.DataFrame
-) -> pd.DataFrame:
-    df = pd.merge(
-        left=df,
-        right=df_service_prescripteur,
-        how="left",
-        on=["cf_cc"],
-    )
-
-    return df
-
-
-def add_service_prescripteurs_to_demande_achat(
-    df_demande_achat: pd.DataFrame, df_service_prescripteur: pd.DataFrame
-) -> pd.DataFrame:
-    return add_service_prescripteurs(
-        df=df_demande_achat,
-        df_service_prescripteur=df_service_prescripteur,
-    )
-
-
-def add_service_prescripteurs_to_engagement_juridique(
-    df_engagement_juridique: pd.DataFrame, df_service_prescripteur: pd.DataFrame
-) -> pd.DataFrame:
-    return add_service_prescripteurs(
-        df=df_engagement_juridique,
-        df_service_prescripteur=df_service_prescripteur,
-    )
-
-
-def add_service_prescripteurs_to_demande_paiement_journal_pieces(
-    df_demande_paiement_journal_pieces: pd.DataFrame,
-    df_service_prescripteur: pd.DataFrame,
-) -> pd.DataFrame:
-    return add_service_prescripteurs(
-        df=df_demande_paiement_journal_pieces,
-        df_service_prescripteur=df_service_prescripteur,
-    )
-
-
-def add_service_prescripteurs_to_delai_global_paiement(
-    df_delai_global_paiement: pd.DataFrame,
-    df_service_prescripteur: pd.DataFrame,
-) -> pd.DataFrame:
-    return add_service_prescripteurs(
-        df=df_delai_global_paiement,
-        df_service_prescripteur=df_service_prescripteur,
-    )

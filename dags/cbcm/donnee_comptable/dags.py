@@ -14,7 +14,6 @@ from utils.tasks.sql import (
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     ensure_partition,
-    LoadStrategy,
     create_projet_snapshot,
     get_projet_snapshot,
     refresh_views,
@@ -30,9 +29,6 @@ from utils.config.dag_params import create_default_args, create_dag_params
 from utils.tasks.validation import validate_dag_parameters
 from dags.cbcm.donnee_comptable.tasks import (
     source_files,
-    add_new_sp,
-    get_sp,
-    ajout_sp,
     datasets_additionnels,
 )
 
@@ -53,10 +49,14 @@ nom_projet = "Données comptable"
     default_args=create_default_args(),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.RUN,
+        dag_status=DagStatus.DEV,
         db_params=DBParams(prod_schema="donnee_comptable"),
         feature_flags=FeatureFlags(
-            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+            db=False,
+            mail=False,
+            s3=False,
+            convert_files=False,
+            download_grist_doc=False,
         ),
     ),
     on_failure_callback=create_send_mail_callback(
@@ -85,18 +85,13 @@ def chorus_donnees_comptables() -> None:
         create_projet_snapshot(nom_projet=nom_projet),
         get_projet_snapshot(nom_projet=nom_projet),
         source_files(),
-        add_new_sp(),
-        get_sp(),
-        ajout_sp(),
         datasets_additionnels(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.expand(
             selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
         ensure_partition(),
-        copy_tmp_table_to_real_table(
-            load_strategy=LoadStrategy.APPEND,
-        ),
+        copy_tmp_table_to_real_table(),
         refresh_views(),
         copy_s3_files(),
         del_s3_files(),
