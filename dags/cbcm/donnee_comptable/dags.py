@@ -90,7 +90,7 @@ def chorus_donnees_comptables() -> None:
         import_file_to_db.expand(
             selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
-        # ensure_partition(),
+        ensure_partition(),
         copy_tmp_table_to_real_table(),
         refresh_views(),
         copy_s3_files(),
