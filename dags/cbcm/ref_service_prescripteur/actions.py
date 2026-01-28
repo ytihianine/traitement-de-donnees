@@ -108,7 +108,7 @@ def get_delai_global_paiement() -> pd.DataFrame:
     df = db_handler.fetch_df(
         query="""
             select
-                id_row_dgp,
+                id_row_dgp::text,
                 centre_financier,
                 centre_cout
             from
