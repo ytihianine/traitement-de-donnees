@@ -235,7 +235,16 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
     # Ajouter un ID unique à chaque ligne
     df["id_row_dp"] = [
         create_row_id(name_seed="demande_paiement.ZDEP53", row=row)
-        for row in df.to_dict("records")
+        for row in df[
+            txt_cols
+            + [
+                "annee_exercice",
+                "nature_sous_nature",
+                "montant_dp",
+                "type_piece_dp",
+                "num_dp",
+            ]
+        ].to_dict("records")
     ]
 
     # Convertir les colonnes temporelles
