@@ -14,7 +14,6 @@ from utils.tasks.sql import (
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     LoadStrategy,
-    refresh_views,
     # set_dataset_last_update_date,
 )
 from utils.tasks.s3 import (
@@ -67,9 +66,7 @@ def chorus_service_prescripteur() -> None:
         import_file_to_db.partial(keep_file_id_col=True).expand(
             selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
-        copy_tmp_table_to_real_table(
-            load_strategy=LoadStrategy.FULL_LOAD,
-        ),
+        copy_tmp_table_to_real_table(),
         copy_s3_files(),
         del_s3_files(),
         delete_tmp_tables(),
