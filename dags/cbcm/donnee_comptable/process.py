@@ -235,7 +235,8 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
     # Ajouter un ID unique à chaque ligne
     df["id_row_dp"] = [
         create_row_id(name_seed="demande_paiement.ZDEP53", row=row)
-        for row in df[
+        for row in df.loc[
+            :,
             txt_cols
             + [
                 "annee_exercice",
@@ -243,7 +244,7 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
                 "montant_dp",
                 "type_piece_dp",
                 "num_dp",
-            ]
+            ],
         ].to_dict("records")
     ]
 
