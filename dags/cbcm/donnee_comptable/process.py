@@ -233,7 +233,7 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Ajouter un ID unique à chaque ligne
-    df["id_row"] = [
+    df["id_row_dp"] = [
         create_row_id(name_seed="demande_paiement.ZDEP53", row=row)
         for row in df.to_dict("records")
     ]
@@ -275,7 +275,7 @@ def process_demande_paiement_flux(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"type_flux": "dp_flux_3"})
 
     # Ajouter un ID unique à chaque ligne
-    df["id_row"] = [
+    df["id_row_dp_flux"] = [
         create_row_id(name_seed="demande_paiement_flux.INFBUD55", row=row)
         for row in df.to_dict("records")
     ]
@@ -361,7 +361,7 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop_duplicates(subset=["id_dp_cf_cc"])
 
     # Ajouter un ID unique à chaque ligne
-    df["id_row"] = [
+    df["id_row_dp_journal_piece"] = [
         create_row_id(name_seed="demande_paiement_journal_pieces.ZJDP", row=row)
         for row in df.to_dict("records")
     ]
