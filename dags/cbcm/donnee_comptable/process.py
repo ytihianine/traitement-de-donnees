@@ -1,3 +1,4 @@
+import uuid
 import pandas as pd
 import numpy as np
 
@@ -98,7 +99,6 @@ def process_demande_achat(df: pd.DataFrame) -> pd.DataFrame:
         df["date_replication"] - df["date_creation_da"]
     ).dt.days
     df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
-    df["id"] = list(df.reset_index(drop=True).index.values)
 
     # Catégoriser les données
     df["mois"] = df["date_creation_da"].dt.month
@@ -402,6 +402,7 @@ def process_demande_paiement_complet(
         "automatisation_wf_cpt_",
         "import_timestamp_",
         "import_date_",
+        "snapshot_id_",
     ]
     df = df.drop(df.filter(regex="|".join(duplicate_to_drop)).columns, axis=1)  # type: ignore
 
@@ -423,6 +424,11 @@ def process_demande_paiement_complet(
 # ======================================================
 def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
     """fichier INFDEP56"""
+    # Namespace pour générer des UUID déterministes
+    NAMESPACE = uuid.uuid5(
+        namespace=uuid.NAMESPACE_DNS, name="delai-global-paiement.infdep56"
+    )
+
     # Nettoyer les champs textuels
     txt_cols = [
         "type_piece",
