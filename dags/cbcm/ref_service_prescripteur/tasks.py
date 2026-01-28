@@ -49,6 +49,27 @@ def grist_source() -> None:
         process_func=process.process_service_prescripteur,
         normalisation_process_func=normalize_grist_dataframe,
     )
+    # Services prescripteurs renseignés manuellement
+    delai_global_paiement_sp_manuel = create_grist_etl_task(
+        selecteur="delai_global_paiement_sp_manuel",
+        process_func=process.process_delai_global_paiement_sp_manuel,
+        normalisation_process_func=normalize_grist_dataframe,
+    )
+    demande_achat_sp_manuel = create_grist_etl_task(
+        selecteur="demande_achat_sp_manuel",
+        process_func=process.process_demande_achat_sp_manuel,
+        normalisation_process_func=normalize_grist_dataframe,
+    )
+    demande_paiement_sp_manuel = create_grist_etl_task(
+        selecteur="demande_paiement_sp_manuel",
+        process_func=process.process_demande_paiement_sp_manuel,
+        normalisation_process_func=normalize_grist_dataframe,
+    )
+    engagement_juridique_sp_manuel = create_grist_etl_task(
+        selecteur="engagement_juridique_sp_manuel",
+        process_func=process.process_engagement_juridique_sp_manuel,
+        normalisation_process_func=normalize_grist_dataframe,
+    )
 
     chain(
         [
@@ -60,5 +81,9 @@ def grist_source() -> None:
             ref_sp_choisi(),
             ref_sp_pilotage(),
             sp(),
+            delai_global_paiement_sp_manuel(),
+            demande_achat_sp_manuel(),
+            demande_paiement_sp_manuel(),
+            engagement_juridique_sp_manuel(),
         ]
     )

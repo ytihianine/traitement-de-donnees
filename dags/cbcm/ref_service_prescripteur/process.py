@@ -1,6 +1,7 @@
 import pandas as pd
 
 from utils.control.text import normalize_whitespace_columns
+from utils.control.structures import handle_grist_null_references
 from utils.control.number import convert_to_numeric
 
 
@@ -102,5 +103,56 @@ def process_service_prescripteur(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = convert_to_numeric(df=df, columns=num_cols, errors="coerce")
     df[num_cols] = df[num_cols].replace({0: pd.NA})
+
+    return df
+
+
+# ======================================================
+# Services prescripteurs - Renseignés manuellement
+# ======================================================
+def process_delai_global_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
+    # Renommer les colonnes
+    rename = {"service_prescripteur": "id_service_prescripteur"}
+    df = df.rename(columns=rename)
+
+    # Handle Grist références
+    ref_cols = ["id_service_prescripteur"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    return df
+
+
+def process_demande_achat_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
+    # Renommer les colonnes
+    rename = {"service_prescripteur": "id_service_prescripteur"}
+    df = df.rename(columns=rename)
+
+    # Handle Grist références
+    ref_cols = ["id_service_prescripteur"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    return df
+
+
+def process_demande_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
+    # Renommer les colonnes
+    rename = {"service_prescripteur": "id_service_prescripteur"}
+    df = df.rename(columns=rename)
+
+    # Handle Grist références
+    ref_cols = ["id_service_prescripteur"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    return df
+
+
+def process_engagement_juridique_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
+    # Renommer les colonnes
+    rename = {"service_prescripteur": "id_service_prescripteur"}
+    df = df.rename(columns=rename)
+
+    # Handle Grist références
+    ref_cols = ["id_service_prescripteur"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
 
     return df
