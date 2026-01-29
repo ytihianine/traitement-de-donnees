@@ -191,8 +191,8 @@ def load_new_cf_cc(df_get_all_cf_cc: pd.DataFrame, df_sp: pd.DataFrame) -> None:
         )
         try:
             grist_client.post_records(tbl_name="Service_prescripteur", json=data)
-        except Exception:
-            print("Les nouveaux couples à ajouter existent déjà dans Grist !!")
+        except Exception as e:
+            print(f"Erreur lors de l'ajout des lignes: {e}")
     else:
         print("Aucun nouveau couple CF-CC ... Skipping")
 
