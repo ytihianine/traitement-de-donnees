@@ -220,6 +220,7 @@ def load_demande_achat(
     df = df.loc[df["_merge"] == "left_only"]
 
     # Les envoyers dans Grist
+    print(f"Nb de lignes sans cf_cc: {len(df)}")
 
 
 def load_demande_paiement_complet(
@@ -247,35 +248,7 @@ def load_demande_paiement_complet(
     df = df.loc[df["_merge"] == "left_only"]
 
     # Intégrer ces lignes dans Grist
-    new_cf_cc = df.rename(
-        columns={
-            "centre_cout": "Centre_de_cout",
-            "centre_financier": "Centre_financier",
-        }
-    ).to_dict(orient="records")
-    print(f"Nouveau couple CF-CC sans SP: {len(new_cf_cc)}")
-
-    if len(new_cf_cc) > 0:
-        print("Ajout des nouveaux couples CF-CC dans Grist")
-        data = {"records": [{"fields": record} for record in new_cf_cc]}
-
-        print(f"Exemple: {data['records'][0]}")
-
-        http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
-        request_client = RequestsClient(config=http_config)
-        grist_client = GristAPI(
-            http_client=request_client,
-            base_url=DEFAULT_GRIST_HOST,
-            workspace_id="dsci",
-            doc_id=Variable.get(key="grist_doc_id_cbcm"),
-            api_token=Variable.get(key="grist_secret_key"),
-        )
-        try:
-            grist_client.post_records(tbl_name="Service_prescripteur", json=data)
-        except Exception:
-            print("Les nouveaux couples à ajouter existent déjà dans Grist !!")
-    else:
-        print("Aucun nouveau couple CF-CC ... Skipping")
+    print(f"Nb de lignes sans cf_cc: {len(df)}")
 
 
 def load_delai_global_paiement(
@@ -303,35 +276,7 @@ def load_delai_global_paiement(
     df = df.loc[df["_merge"] == "left_only"]
 
     # Intégrer ces lignes dans Grist
-    new_cf_cc = df.rename(
-        columns={
-            "centre_cout": "Centre_de_cout",
-            "centre_financier": "Centre_financier",
-        }
-    ).to_dict(orient="records")
-    print(f"Nouveau couple CF-CC sans SP: {len(new_cf_cc)}")
-
-    if len(new_cf_cc) > 0:
-        print("Ajout des nouveaux couples CF-CC dans Grist")
-        data = {"records": [{"fields": record} for record in new_cf_cc]}
-
-        print(f"Exemple: {data['records'][0]}")
-
-        http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
-        request_client = RequestsClient(config=http_config)
-        grist_client = GristAPI(
-            http_client=request_client,
-            base_url=DEFAULT_GRIST_HOST,
-            workspace_id="dsci",
-            doc_id=Variable.get(key="grist_doc_id_cbcm"),
-            api_token=Variable.get(key="grist_secret_key"),
-        )
-        try:
-            grist_client.post_records(tbl_name="Service_prescripteur", json=data)
-        except Exception:
-            print("Les nouveaux couples à ajouter existent déjà dans Grist !!")
-    else:
-        print("Aucun nouveau couple CF-CC ... Skipping")
+    print(f"Nb de lignes sans cf_cc: {len(df)}")
 
 
 def load_engagement_juridique(
@@ -359,32 +304,4 @@ def load_engagement_juridique(
     df = df.loc[df["_merge"] == "left_only"]
 
     # Intégrer ces lignes dans Grist
-    new_cf_cc = df.rename(
-        columns={
-            "centre_cout": "Centre_de_cout",
-            "centre_financier": "Centre_financier",
-        }
-    ).to_dict(orient="records")
-    print(f"Nouveau couple CF-CC sans SP: {len(new_cf_cc)}")
-
-    if len(new_cf_cc) > 0:
-        print("Ajout des nouveaux couples CF-CC dans Grist")
-        data = {"records": [{"fields": record} for record in new_cf_cc]}
-
-        print(f"Exemple: {data['records'][0]}")
-
-        http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
-        request_client = RequestsClient(config=http_config)
-        grist_client = GristAPI(
-            http_client=request_client,
-            base_url=DEFAULT_GRIST_HOST,
-            workspace_id="dsci",
-            doc_id=Variable.get(key="grist_doc_id_cbcm"),
-            api_token=Variable.get(key="grist_secret_key"),
-        )
-        try:
-            grist_client.post_records(tbl_name="Service_prescripteur", json=data)
-        except Exception:
-            print("Les nouveaux couples à ajouter existent déjà dans Grist !!")
-    else:
-        print("Aucun nouveau couple CF-CC ... Skipping")
+    print(f"Nb de lignes sans cf_cc: {len(df)}")
