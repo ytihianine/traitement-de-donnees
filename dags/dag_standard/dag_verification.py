@@ -32,13 +32,13 @@ nom_projet = "Configuration des projets"
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        db_params=DBParams(prod_schema="donnee_comptable"),
+        db_params=None,
         feature_flags=FeatureFlags(
             db=True,
-            mail=False,
-            s3=False,
-            convert_files=False,
-            download_grist_doc=False,
+            mail=True,
+            s3=True,
+            convert_files=True,
+            download_grist_doc=True,
         ),
     ),
 )
