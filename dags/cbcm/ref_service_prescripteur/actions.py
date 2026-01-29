@@ -246,7 +246,7 @@ def load_demande_paiement_complet(
 
     # Conserver uniquement les nouvelles
     df = df.loc[df["_merge"] == "left_only"]
-    df = df.drop_duplicate()
+    df = df.drop_duplicates()
 
     # Intégrer ces lignes dans Grist
     print(f"Nb de lignes sans cf_cc: {len(df)}")
