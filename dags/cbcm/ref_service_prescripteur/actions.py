@@ -221,6 +221,7 @@ def load_demande_achat(
 
     # Les envoyers dans Grist
     print(f"Nb de lignes sans cf_cc: {len(df)}")
+    print(df.columns)
 
 
 def load_demande_paiement_complet(
@@ -231,6 +232,7 @@ def load_demande_paiement_complet(
     df_get_demande_paiement_complet = df_get_demande_paiement_complet.loc[
         (df_get_demande_paiement_complet["centre_financier"] == "Ind")
         | (df_get_demande_paiement_complet["centre_cout"] == "Ind")
+        | (df_get_demande_paiement_complet["unique_multiple"] == "Multiple")
     ]
 
     # Merge pour comparer
@@ -247,6 +249,7 @@ def load_demande_paiement_complet(
 
     # Intégrer ces lignes dans Grist
     print(f"Nb de lignes sans cf_cc: {len(df)}")
+    print(df.columns)
 
 
 def load_delai_global_paiement(
@@ -273,6 +276,7 @@ def load_delai_global_paiement(
 
     # Intégrer ces lignes dans Grist
     print(f"Nb de lignes sans cf_cc: {len(df)}")
+    print(df.columns)
 
 
 def load_engagement_juridique(
@@ -299,3 +303,4 @@ def load_engagement_juridique(
 
     # Intégrer ces lignes dans Grist
     print(f"Nb de lignes sans cf_cc: {len(df)}")
+    print(df.columns)
