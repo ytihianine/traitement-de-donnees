@@ -232,7 +232,7 @@ def load_demande_paiement_complet(
     df_get_demande_paiement_complet = df_get_demande_paiement_complet.loc[
         (df_get_demande_paiement_complet["centre_financier"] == "Ind")
         | (df_get_demande_paiement_complet["centre_cout"] == "Ind")
-        | (df_get_demande_paiement_complet["unique_multiple"] == "Multiple")
+        | (df_get_demande_paiement_complet["unique_multi"] == "Multiple")
     ]
 
     # Merge pour comparer
