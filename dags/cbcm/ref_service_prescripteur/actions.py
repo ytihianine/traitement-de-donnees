@@ -149,8 +149,8 @@ def get_engagement_juridique() -> pd.DataFrame:
 def load_new_cf_cc(df_get_all_cf_cc: pd.DataFrame, df_sp: pd.DataFrame) -> None:
     # Filtrer les lignes
     df_get_all_cf_cc = df_get_all_cf_cc.loc[
-        (df_get_all_cf_cc["centre_financier"] != "Ind")
-        | (df_get_all_cf_cc["centre_cout"] != "Ind")
+        (df_get_all_cf_cc["centre_financier"] == "Ind")
+        | (df_get_all_cf_cc["centre_cout"] == "Ind")
     ]
 
     # Merge pour comparer
@@ -203,8 +203,8 @@ def load_demande_achat(
 ) -> None:
     # Filtrer les lignes
     df_get_demande_achat = df_get_demande_achat.loc[
-        (df_get_demande_achat["centre_financier"] != "Ind")
-        | (df_get_demande_achat["centre_cout"] != "Ind")
+        (df_get_demande_achat["centre_financier"] == "Ind")
+        | (df_get_demande_achat["centre_cout"] == "Ind")
     ]
 
     # Merge pour comparer
@@ -229,8 +229,8 @@ def load_demande_paiement_complet(
 ) -> None:
     # Filtrer les lignes
     df_get_demande_paiement_complet = df_get_demande_paiement_complet.loc[
-        (df_get_demande_paiement_complet["centre_financier"] != "Ind")
-        | (df_get_demande_paiement_complet["centre_cout"] != "Ind")
+        (df_get_demande_paiement_complet["centre_financier"] == "Ind")
+        | (df_get_demande_paiement_complet["centre_cout"] == "Ind")
     ]
 
     # Merge pour comparer
@@ -255,8 +255,8 @@ def load_delai_global_paiement(
 ) -> None:
     # Filtrer les lignes
     df_get_delai_global_paiement = df_get_delai_global_paiement.loc[
-        (df_get_delai_global_paiement["centre_financier"] != "Ind")
-        | (df_get_delai_global_paiement["centre_cout"] != "Ind")
+        (df_get_delai_global_paiement["centre_financier"] == "Ind")
+        | (df_get_delai_global_paiement["centre_cout"] == "Ind")
     ]
 
     # Merge pour comparer
@@ -281,8 +281,8 @@ def load_engagement_juridique(
 ) -> None:
     # Filtrer les lignes
     df_get_engagement_juridique = df_get_engagement_juridique.loc[
-        (df_get_engagement_juridique["centre_financier"] != "Ind")
-        | (df_get_engagement_juridique["centre_cout"] != "Ind")
+        (df_get_engagement_juridique["centre_financier"] == "Ind")
+        | (df_get_engagement_juridique["centre_cout"] == "Ind")
     ]
 
     # Merge pour comparer
