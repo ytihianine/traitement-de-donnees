@@ -108,13 +108,13 @@ def get_delai_global_paiement() -> pd.DataFrame:
     df = db_handler.fetch_df(
         query="""
             select
-                id_row_dgp::text,
+                id_dgp::text,
                 centre_financier,
                 centre_cout
             from
                 donnee_comptable.delai_global_paiement
             group by
-                id_row_dgp,
+                id_dgp,
                 centre_financier,
                 centre_cout
             ;
