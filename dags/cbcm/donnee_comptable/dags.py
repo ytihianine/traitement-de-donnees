@@ -16,7 +16,6 @@ from utils.tasks.sql import (
     ensure_partition,
     create_projet_snapshot,
     get_projet_snapshot,
-    refresh_views,
     # set_dataset_last_update_date,
 )
 from utils.tasks.s3 import (
@@ -92,7 +91,6 @@ def chorus_donnees_comptables() -> None:
         ),
         ensure_partition(),
         copy_tmp_table_to_real_table(),
-        refresh_views(),
         copy_s3_files(),
         del_s3_files(),
         delete_tmp_tables(),
