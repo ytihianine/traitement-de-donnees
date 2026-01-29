@@ -193,7 +193,7 @@ def load_to_grist() -> None:
         output_selecteur="load_demande_paiement_complet",
         input_selecteurs=[
             "get_demande_paiement_complet",
-            "load_demande_paiement_complet",
+            "demande_paiement_sp_manuel",
         ],
         steps=[
             ETLStep(
