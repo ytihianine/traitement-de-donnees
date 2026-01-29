@@ -136,6 +136,59 @@ def send_mail(mail_message: MailMessage, conn_id: str = DEFAULT_SMTP_CONN_ID) ->
     )
 
 
+def _callback(context: dict[str, Any], mail_status: MailStatus) -> None:
+    # If debug mode is ON, we don't want to send any mail
+    mail_enable = get_feature_flags(context=context).mail
+    dag_status = get_dag_status(context=context)
+
+    if dag_status == DagStatus.DEV:
+        print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
+
+    if not mail_enable:
+        print(FF_MAIL_DISABLED_MSG)
+        return
+
+    projet_contact = get_list_contact(context=context)
+    mail_to = [
+        contact.contact_mail for contact in projet_contact if contact.is_mail_generic
+    ]
+    mail_cc = [
+        contact.contact_mail
+        for contact in projet_contact
+        if not contact.is_mail_generic
+    ]
+
+    projet_docs = get_list_documentation(context=context)
+    doc_pipeline = [
+        doc.lien for doc in projet_docs if doc.type_documentation == "pipeline"
+    ]
+    doc_data = [doc.lien for doc in projet_docs if doc.type_documentation == "data"]
+    execution_date = get_execution_date(context=context)
+
+    if isinstance(mail_cc, list):
+        mail_cc.extend(DEFAULT_MAIL_CC)
+    if mail_cc is None:
+        mail_cc = DEFAULT_MAIL_CC
+
+    mail_message = MailMessage(
+        mail_status=mail_status,
+        to=mail_to,
+        cc=mail_cc,
+        template_parameters={
+            "dag_name": context["dag"].dag_id,
+            "dag_statut": mail_status.value,
+            "start_date": execution_date.replace(tzinfo=paris_tz).strftime(
+                format="%d-%m-%Y %H:%M:%S"
+            ),
+            "link_doc_pipeline": ";".join(doc_pipeline),
+            "link_doc_donnees": ";".join(doc_data),
+        },
+    )
+
+    send_mail(mail_message=mail_message)
+
+
 def create_send_mail_callback(mail_status: MailStatus) -> Callable:
     """
     Create an Airflow callback function for mail notifications.
@@ -147,58 +200,7 @@ def create_send_mail_callback(mail_status: MailStatus) -> Callable:
         Callable: Callback function for Airflow
     """
 
-    def _callback(context: dict[str, Any]) -> None:
-        # If debug mode is ON, we don't want to send any mail
-        mail_enable = get_feature_flags(context=context).mail
-        dag_status = get_dag_status(context=context)
+    def callback(context: dict[str, Any]) -> None:
+        _callback(context=context, mail_status=mail_status)
 
-        if dag_status == DagStatus.DEV:
-            print("Dag status parameter is set to DEV -> skipping this task ...")
-            return
-
-        if not mail_enable:
-            print(FF_MAIL_DISABLED_MSG)
-            return
-
-        projet_contact = get_list_contact(context=context)
-        mail_to = [
-            contact.contact_mail
-            for contact in projet_contact
-            if contact.is_mail_generic
-        ]
-        mail_cc = [
-            contact.contact_mail
-            for contact in projet_contact
-            if not contact.is_mail_generic
-        ]
-
-        projet_docs = get_list_documentation(context=context)
-        doc_pipeline = [
-            doc.lien for doc in projet_docs if doc.type_documentation == "pipeline"
-        ]
-        doc_data = [doc.lien for doc in projet_docs if doc.type_documentation == "data"]
-        execution_date = get_execution_date(context=context)
-
-        if isinstance(mail_cc, list):
-            mail_cc.extend(DEFAULT_MAIL_CC)
-        if mail_cc is None:
-            mail_cc = DEFAULT_MAIL_CC
-
-        mail_message = MailMessage(
-            mail_status=mail_status,
-            to=mail_to,
-            cc=mail_cc,
-            template_parameters={
-                "dag_name": context["dag"].dag_id,
-                "dag_statut": mail_status.value,
-                "start_date": execution_date.replace(tzinfo=paris_tz).strftime(
-                    format="%d-%m-%Y %H:%M:%S"
-                ),
-                "link_doc_pipeline": ";".join(doc_pipeline),
-                "link_doc_donnees": ";".join(doc_data),
-            },
-        )
-
-        send_mail(mail_message=mail_message)
-
-    return _callback
+    return callback
