@@ -166,11 +166,8 @@ def load_to_grist() -> None:
     load_new_cf_cc = create_task(
         task_config=TaskConfig(task_id="load_new_cf_cc"),
         output_selecteur="load_new_cf_cc",
-        steps=[
-            ETLStep(
-                fn=actions.load_new_cf_cc,
-            )
-        ],
+        input_selecteurs=["get_all_cf_cc", "sp"],
+        steps=[ETLStep(fn=actions.load_new_cf_cc, read_data=True)],
         add_import_date=False,
         add_snapshot_id=False,
     )
