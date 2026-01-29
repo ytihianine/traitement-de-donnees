@@ -232,22 +232,6 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
         df["annee_exercice"].astype(str) + df["societe"] + df["num_dp"].astype(str)
     )
 
-    # Ajouter un ID unique à chaque ligne
-    df["id_row_dp"] = [
-        create_row_id(name_seed="demande_paiement.ZDEP53", row=row)
-        for row in df.loc[
-            :,
-            txt_cols
-            + [
-                "annee_exercice",
-                "nature_sous_nature",
-                "montant_dp",
-                "type_piece_dp",
-                "num_dp",
-            ],
-        ].to_dict("records")
-    ]
-
     # Convertir les colonnes temporelles
     date_cols = ["date_comptable"]
     df = convert_str_cols_to_date(
@@ -283,12 +267,6 @@ def process_demande_paiement_flux(df: pd.DataFrame) -> pd.DataFrame:
 
     # Renommer les colonnes
     df = df.rename(columns={"type_flux": "dp_flux_3"})
-
-    # Ajouter un ID unique à chaque ligne
-    df["id_row_dp_flux"] = [
-        create_row_id(name_seed="demande_paiement_flux.INFBUD55", row=row)
-        for row in df.to_dict("records")
-    ]
 
     # Ajouter les colonnes complémentaires
     df["id_dp"] = (
@@ -369,12 +347,6 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
 
     # Suppression des doublons
     df = df.drop_duplicates(subset=["id_dp_cf_cc"])
-
-    # Ajouter un ID unique à chaque ligne
-    df["id_row_dp_journal_piece"] = [
-        create_row_id(name_seed="demande_paiement_journal_pieces.ZJDP", row=row)
-        for row in df.to_dict("records")
-    ]
 
     # Regroupement
     df_grouped = df.groupby(by=["id_dp"], as_index=False)["id_dp_cf_cc"].count()
@@ -500,7 +472,7 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[df["societe"].isin(["ADCE", "CSND"])]
 
     # Ajouter un ID unique à chaque ligne
-    df["id_row_dgp"] = [
+    df["id_dgp"] = [
         create_row_id(name_seed="delai_global_paiement.INFDEP56", row=row)
         for row in df.to_dict("records")
     ]
