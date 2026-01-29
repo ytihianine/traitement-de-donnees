@@ -561,13 +561,15 @@ def import_file_to_db(
         schema = db_info.tmp_schema
 
     # Variables
-    local_filepath = "/tmp/" + selecteur_info.filename
-    s3_filepath = selecteur_info.filepath_tmp_s3
     tbl_name = selecteur_info.tbl_name
 
     if tbl_name is None or tbl_name == "":
         print(f"tbl_name is None for selecteur <{selecteur}>. Nothing to import to db")
     else:
+        # Variables
+        local_filepath = "/tmp/" + selecteur_info.filename
+        s3_filepath = selecteur_info.filepath_tmp_s3
+
         # Hooks
         db_handler = create_db_handler(connection_id=pg_conn_id)
         s3_handler = create_default_s3_handler(connection_id=s3_conn_id)
