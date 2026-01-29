@@ -256,7 +256,7 @@ def get_list_documentation(
 
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
-    query = """
+    query = f"""
         SELECT cppd.projet, cppd.type_documentation, cppd.lien
         FROM {CONF_SCHEMA}.projet_documentation_vw cppd
         WHERE cppd.projet = %s;
