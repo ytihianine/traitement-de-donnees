@@ -170,6 +170,7 @@ def load_to_grist() -> None:
         steps=[ETLStep(fn=actions.load_new_cf_cc, read_data=True)],
         add_import_date=False,
         add_snapshot_id=False,
+        export_output=False,
     )
 
     # load_demande_achat = create_task(
