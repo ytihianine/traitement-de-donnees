@@ -1,6 +1,5 @@
 """Configuration task group for retrieving project configuration at runtime."""
 
-from calendar import c
 from typing import Any, Mapping
 from airflow.sdk import chain, task, task_group
 from dataclasses import asdict
@@ -88,7 +87,7 @@ def get_config_selecteur_info(
 
 
 @task_group()
-def configuration(nom_projet: str | None = None, **context) -> None:
+def config_projet_group(nom_projet: str | None = None, **context) -> None:
     """
     Groupe de tâches pour récupérer la configuration du projet
 
