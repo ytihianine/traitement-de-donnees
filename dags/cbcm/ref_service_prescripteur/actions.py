@@ -154,16 +154,17 @@ def load_new_cf_cc(df_get_all_cf_cc: pd.DataFrame, df_sp: pd.DataFrame) -> None:
     ]
 
     # Merge pour comparer
+    on_cols = ["centre_financier", "centre_cout"]
     df = pd.merge(
         left=df_get_all_cf_cc,
-        right=df_sp[["centre_financier", "centre_cout"]],
+        right=df_sp[on_cols],
         how="left",
-        on=["centre_financier", "centre_cout"],
+        on=on_cols,
         indicator=True,
     )
 
     # Conserver uniquement les nouvelles
-    df = df.loc[df["_merge"] == "left_only"]
+    df = df.loc[df["_merge"] == "left_only", on_cols]
 
     # Intégrer ces lignes dans Grist
     new_cf_cc = df.rename(
