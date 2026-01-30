@@ -222,7 +222,7 @@ def load_demande_achat(
     # Merge pour comparer
     df = pd.merge(
         left=df_get_demande_achat,
-        right=df_demande_achat_sp_manuel,
+        right=df_demande_achat_sp_manuel["id_da"],
         how="left",
         on=["id_da"],
         indicator=True,
@@ -250,7 +250,7 @@ def load_demande_paiement_complet(
     # Merge pour comparer
     df = pd.merge(
         left=df_get_demande_paiement_complet,
-        right=df_demande_paiement_sp_manuel,
+        right=df_demande_paiement_sp_manuel["id_dp"],
         how="left",
         on=["id_dp"],
         indicator=True,
@@ -278,7 +278,7 @@ def load_delai_global_paiement(
     # Merge pour comparer
     df = pd.merge(
         left=df_get_delai_global_paiement,
-        right=df_delai_global_paiement_sp_manuel,
+        right=df_delai_global_paiement_sp_manuel["id_dgp"],
         how="left",
         on=["id_dgp"],
         indicator=True,
@@ -305,7 +305,7 @@ def load_engagement_juridique(
     # Merge pour comparer
     df = pd.merge(
         left=df_get_engagement_juridique,
-        right=df_engagement_juridique_sp_manuel,
+        right=df_engagement_juridique_sp_manuel["id_ej"],
         how="left",
         on=["id_ej"],
         indicator=True,
