@@ -184,10 +184,8 @@ def _send_to_grist(
             doc_id=Variable.get(key="grist_doc_id_cbcm"),
             api_token=Variable.get(key="grist_secret_key"),
         )
-        try:
-            grist_client.post_records(tbl_name=grist_tbl_name, json=data)
-        except Exception as e:
-            print(f"Erreur lors de l'ajout des lignes: {e}")
+        grist_client.post_records(tbl_name=grist_tbl_name, json=data)
+
     else:
         print(
             f"Aucune nouvelle ligne à ajouter dans la table {grist_tbl_name} ... Skipping"
