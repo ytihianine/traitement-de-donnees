@@ -5,7 +5,7 @@ import textwrap
 from typing import Optional
 from datetime import datetime, timedelta
 
-import psycopg2
+from psycopg2 import sql
 from airflow.sdk import task
 from airflow.sdk import get_current_context
 
@@ -275,17 +275,21 @@ def ensure_partition(
         try:
             logging.info(msg=f"Creating partition {partition_name} for {tbl_name}.")
             # Créer la partition
-            create_sql = f"""
+            create_sql = sql.SQL(
+                """
                 CREATE TABLE IF NOT EXISTS {prod_schema}.{partition_name}
                 PARTITION OF {prod_schema}.{tbl_name}
                 FOR VALUES FROM ('{from_date}') TO ('{to_date}');
             """
-            db.execute(query=create_sql)
-            logging.info(msg=f"Partition {partition_name} created successfully.")
-        except psycopg2.errors.DuplicateTable:
-            logging.info(
-                msg=f"Partition {partition_name} already exists. Skipping creation."
+            ).format(
+                prod_schema=sql.Identifier(prod_schema),
+                partition_name=sql.Identifier(partition_name),
+                tbl_name=sql.Identifier(tbl_name),
+                from_date=sql.Literal(from_date.strftime(format="%Y-%m-%d")),
+                to_date=sql.Literal(to_date.strftime(format="%Y-%m-%d")),
             )
+            db.execute(query=str(create_sql))
+            logging.info(msg=f"Partition {partition_name} created successfully.")
         except Exception as e:
             logging.error(msg=f"Error creating partition {partition_name}: {str(e)}")
             raise
@@ -442,7 +446,8 @@ def copy_tmp_table_to_real_table(
                     schema=prod_schema,
                 )
 
-                merge_query = f"""
+                merge_query = sql.SQL(
+                    """
                     MERGE INTO {prod_table} tbl_target
                     USING {tmp_table} tbl_source ON ({' AND '.join([f'tbl_source.{col} = tbl_target.{col}' for col in pk_cols])})
                     WHEN MATCHED THEN
@@ -454,6 +459,10 @@ def copy_tmp_table_to_real_table(
                         DELETE
                     ;
                 """
+                ).format(
+                    prod_table=sql.Identifier(prod_schema, tbl_name),
+                    tmp_table=sql.Identifier(tmp_schema, f"tmp_{tbl_name}"),
+                )
                 queries.append(merge_query)
 
         if queries:
@@ -525,7 +534,8 @@ def bulk_load_local_tsv_file_to_db(
     """
     logging.info(f"Bulk importing {local_filepath} to {schema}.tmp_{tbl_name}")
 
-    copy_sql = f"""
+    copy_sql = sql.SQL(
+        """
         COPY {schema}.tmp_{tbl_name} ({', '.join(column_names)})
         FROM STDIN WITH (
             FORMAT TEXT,
@@ -534,8 +544,12 @@ def bulk_load_local_tsv_file_to_db(
             NULL 'NULL'
         )
     """
+    ).format(
+        schema=sql.Identifier(schema),
+        tbl_name=sql.Identifier(tbl_name),
+    )
 
-    db_handler.copy_expert(sql=copy_sql, filepath=local_filepath)
+    db_handler.copy_expert(sql=str(copy_sql), filepath=local_filepath)
     logging.info(
         msg=f"Successfully loaded {local_filepath} into {schema}.tmp_{tbl_name}"
     )
