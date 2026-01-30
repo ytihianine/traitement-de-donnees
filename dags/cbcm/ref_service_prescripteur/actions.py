@@ -87,14 +87,16 @@ def get_demande_paiement_complet() -> pd.DataFrame:
                 id_dp,
                 centre_financier,
                 centre_cout,
-                unique_multi
+                unique_multi,
+                texte_de_poste
             from
                 donnee_comptable.demande_paiement_complet
             group by
                 id_dp,
                 centre_financier,
                 centre_cout,
-                unique_multi
+                unique_multi,
+                texte_de_poste
             ;
         """
     )
@@ -110,13 +112,19 @@ def get_delai_global_paiement() -> pd.DataFrame:
             select
                 id_dgp::text,
                 centre_financier,
-                centre_cout
+                centre_cout,
+                annee_exercice,
+                societe,
+                type_piece
             from
                 donnee_comptable.delai_global_paiement
             group by
                 id_dgp,
                 centre_financier,
-                centre_cout
+                centre_cout,
+                annee_exercice,
+                societe,
+                type_piece
             ;
         """
     )
@@ -132,13 +140,17 @@ def get_engagement_juridique() -> pd.DataFrame:
             select
                 id_ej,
                 centre_financier,
-                centre_cout
+                centre_cout,
+                orga,
+                gac
             from
                 donnee_comptable.engagement_juridique
             group by
                 id_ej,
                 centre_financier,
-                centre_cout
+                centre_cout,
+                orga,
+                gac
             ;
         """
     )
