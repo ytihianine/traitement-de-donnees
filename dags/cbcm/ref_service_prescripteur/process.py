@@ -123,7 +123,7 @@ def process_delai_global_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_drop = [
         "centre_de_cout",
         "centre_financier",
-        "annee_exercie",
+        "annee_exercice",
         "societe",
         "type_piece",
     ]
