@@ -1,5 +1,14 @@
-import time
+import logging
 from typing import Optional
+
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    retry_if_result,
+    before_sleep_log,
+)
 from infra.http_client.types import HTTPResponse
 import pandas as pd
 
@@ -14,6 +23,9 @@ from dags.sg.siep.mmsi.georisques.process import (
     format_query_param,
     format_risque_results,
 )
+
+
+logger = logging.getLogger(name=__name__)
 
 
 def get_bien_from_db(context: dict) -> pd.DataFrame:
@@ -45,9 +57,25 @@ def get_bien_from_db(context: dict) -> pd.DataFrame:
     return df
 
 
-def get_risque(
-    http_client, url: str, query_param: str, max_retries: int = 3, retry_delay: int = 15
-) -> Optional[HTTPResponse]:
+def _should_retry_response(response: Optional[HTTPResponse]) -> bool:
+    """Determine if response should trigger a retry."""
+    if response is None:
+        return True
+    retry_status_codes = {400, 404, 429, 500, 502, 503, 504}
+    return response.status_code in retry_status_codes
+
+
+@retry(
+    stop=stop_after_attempt(max_attempt_number=3),
+    wait=wait_exponential(multiplier=3, min=1, max=10),
+    retry=(
+        retry_if_exception_type(exception_types=Exception)
+        | retry_if_result(predicate=_should_retry_response)
+    ),
+    before_sleep=before_sleep_log(logger, log_level=logging.WARNING),
+    reraise=False,
+)
+def get_risque(http_client, url: str, query_param: str) -> Optional[HTTPResponse]:
     """
     Effectue une requête avec retry en cas d'erreur.
 
@@ -55,51 +83,24 @@ def get_risque(
         http_client: Client HTTP
         url: URL de l'API
         query_param: Paramètres de la requête
-        max_retries: Nombre maximum de tentatives
-        retry_delay: Délai d'attente entre chaque tentative (en secondes)
 
     Returns:
         HTTPResponse ou None en cas d'échec après tous les retries
     """
-    retry_status_codes = {429, 500, 502, 503, 504}  # Codes d'erreur à retry
+    full_url = f"{url}?{query_param}"
+    response = http_client.get(endpoint=full_url, timeout=180)
 
-    for attempt in range(max_retries):
-        try:
-            full_url = f"{url}?{query_param}"
-            response = response = http_client.get(endpoint=full_url, timeout=180)
+    # Return response if successful (200) or non-retryable error
+    if response and response.status_code == 200:
+        return response
 
-            # Si succès, retourner la réponse
-            if response and response.status_code == 200:
-                return response
+    # If response has retryable status code, trigger retry
+    if response and response.status_code in {429, 500, 502, 503, 504}:
+        logger.warning(msg=f"⚠️ Erreur {response.status_code}, nouvelle tentative...")
+        raise Exception(f"Retryable status code: {response.status_code}")
 
-            # Si erreur à retry et pas la dernière tentative
-            if (
-                response
-                and response.status_code in retry_status_codes
-                and attempt < max_retries - 1
-            ):
-                wait_time = retry_delay * (attempt + 1)  # Backoff exponentiel optionnel
-                print(
-                    f"⚠️ Erreur {response.status_code}, nouvelle tentative dans {wait_time}s... ({attempt + 1}/{max_retries})"  # noqa
-                )
-                time.sleep(wait_time)
-                continue
-
-            # Sinon retourner la réponse (même en erreur)
-            return response
-
-        except Exception as e:
-            if attempt < max_retries - 1:
-                wait_time = retry_delay * (attempt + 1)
-                print(
-                    f"⚠️ Exception: {str(e)}, nouvelle tentative dans {wait_time}s... ({attempt + 1}/{max_retries})"  # noqa
-                )
-                time.sleep(wait_time)
-            else:
-                print(f"❌ Échec après {max_retries} tentatives: {str(e)}")
-                return None
-
-    return None
+    # For other errors, return response without retry
+    return response
 
 
 def get_georisques(df: pd.DataFrame) -> pd.DataFrame:
