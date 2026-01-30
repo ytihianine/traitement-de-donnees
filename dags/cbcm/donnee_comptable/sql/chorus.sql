@@ -179,6 +179,7 @@ CREATE TABLE donnee_comptable.demande_paiement_complet (
 	num_dp bigint,
 	montant_dp double precision,
 	statut_piece text,
+    texte_de_poste text,
 	mois int,
 	mois_nom text,
 	mois_nombre_nom text,
