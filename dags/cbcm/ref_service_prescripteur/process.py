@@ -119,6 +119,16 @@ def process_delai_global_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
     ref_cols = ["id_service_prescripteur"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
 
+    # Drop columns
+    cols_to_drop = [
+        "centre_de_cout",
+        "centre_financier",
+        "annee_exercie",
+        "societe",
+        "type_piece",
+    ]
+    df = df.drop(columns=cols_to_drop)
+
     return df
 
 
@@ -130,6 +140,13 @@ def process_demande_achat_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    # Drop columns
+    cols_to_drop = [
+        "centre_de_cout",
+        "centre_financier",
+    ]
+    df = df.drop(columns=cols_to_drop)
 
     return df
 
@@ -143,6 +160,14 @@ def process_demande_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
     ref_cols = ["id_service_prescripteur"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
 
+    # Drop columns
+    cols_to_drop = [
+        "centre_de_cout",
+        "centre_financier",
+        "texte_de_poste",
+    ]
+    df = df.drop(columns=cols_to_drop)
+
     return df
 
 
@@ -154,5 +179,14 @@ def process_engagement_juridique_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    # Drop columns
+    cols_to_drop = [
+        "centre_de_cout",
+        "centre_financier",
+        "orga",
+        "gac",
+    ]
+    df = df.drop(columns=cols_to_drop)
 
     return df
