@@ -323,9 +323,10 @@ def create_tmp_tables(
     rows_result = db.fetch_all(
         query="""SELECT COUNT(*) as count_tmp_tables
             FROM information_schema.tables
-            WHERE table_schema='temporaire'
+            WHERE table_schema= %s
                 AND table_name LIKE 'tmp_%';
-            """
+        """,
+        parameters=(tmp_schema,),
     )
 
     drop_queries = []
