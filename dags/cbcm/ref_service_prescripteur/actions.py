@@ -266,9 +266,9 @@ def load_demande_achat(
 
     # Conserver uniquement les nouvelles
     df = df.loc[df["_merge"] == "left_only"]
+    df = df.drop(columns=["_merge"])
 
     # Les envoyers dans Grist
-    print(f"Nb de lignes sans cf_cc: {len(df)}")
     print(df.columns)
     _send_to_grist(
         df=df,
@@ -303,10 +303,10 @@ def load_demande_paiement_complet(
 
     # Conserver uniquement les nouvelles
     df = df.loc[df["_merge"] == "left_only"]
+    df = df.drop(columns=["_merge"])
     df = df.drop_duplicates(subset=["centre_financier", "centre_cout", "unique_multi"])
 
     # Intégrer ces lignes dans Grist
-    print(f"Nb de lignes sans cf_cc: {len(df)}")
     print(df.columns)
     _send_to_grist(
         df=df,
@@ -341,9 +341,9 @@ def load_delai_global_paiement(
 
     # Conserver uniquement les nouvelles
     df = df.loc[df["_merge"] == "left_only"]
+    df = df.drop(columns=["_merge"])
 
     # Intégrer ces lignes dans Grist
-    print(f"Nb de lignes sans cf_cc: {len(df)}")
     print(df.columns)
     _send_to_grist(
         df=df,
@@ -380,6 +380,7 @@ def load_engagement_juridique(
 
     # Conserver uniquement les nouvelles
     df = df.loc[df["_merge"] == "left_only"]
+    df = df.drop(columns=["_merge"])
 
     # Intégrer ces lignes dans Grist
     print(df.columns)
