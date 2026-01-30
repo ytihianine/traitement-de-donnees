@@ -456,11 +456,11 @@ def copy_tmp_table_to_real_table(
                 """
                 queries.append(merge_query)
 
-            if queries:
-                for q in queries:
-                    db_handler.execute(query=q)
-            else:
-                print("No query to execute")
+        if queries:
+            for q in queries:
+                db_handler.execute(query=q)
+        else:
+            print("No query to execute")
     except Exception as e:
         db_handler.execute(query="SET session_replication_role = DEFAULT;")
         print("Réactivation des triggers de réplication")
