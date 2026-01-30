@@ -45,7 +45,8 @@ CREATE TABLE donnee_comptable."ref_cc" (
 
 CREATE TABLE donnee_comptable."ref_service_prescripteur_choisi" (
   "id" INTEGER PRIMARY KEY,
-  "service_prescripteur" text
+  "service_prescripteur" text,
+  "mail" text
 );
 
 CREATE TABLE donnee_comptable."service_prescripteur" (

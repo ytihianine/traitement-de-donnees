@@ -61,7 +61,7 @@ def process_ref_sp_pilotage(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_ref_sp_choisi(df: pd.DataFrame) -> pd.DataFrame:
     # Nettoyage des données textuelles
-    txt_cols = ["service_prescripteur"]
+    txt_cols = ["service_prescripteur", "mail"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
     return df
 
