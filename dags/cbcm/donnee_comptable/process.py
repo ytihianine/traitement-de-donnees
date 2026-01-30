@@ -333,7 +333,7 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     ].fillna("Ind")
 
     # Nettoyer les champs textuels
-    txt_cols = ["societe", "centre_cout", "centre_financier"]
+    txt_cols = ["societe", "centre_cout", "centre_financier", "texte_de_poste"]
     df = normalize_whitespace_columns(df, columns=txt_cols)
 
     # Ajouter les colonnes complémentaires

@@ -17,6 +17,7 @@ CREATE TABLE donnee_comptable.demande_paiement_journal_pieces (
 	id_dp_cf_cc text,
 	nb_poste int,
 	unique_multi text,
+	texte_de_poste text,
 	import_timestamp timestamp not null,
 	import_date date not null,
 	snapshot_id text
