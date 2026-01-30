@@ -312,7 +312,7 @@ def load_demande_paiement_complet(
             "id_da": "id_da",
             "centre_financier": "Centre_financier",
             "centre_cout": "Centre_de_cout",
-            "unique_multiple": "Unique_multiple",
+            "unique_multi": "Unique_multiple",
             "texte_de_poste": "Texte_de_poste",
         },
         grist_tbl_name="Demande_paiement_sp_manuel",
