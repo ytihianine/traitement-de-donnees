@@ -164,6 +164,7 @@ def process_demande_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_drop = [
         "centre_de_cout",
         "centre_financier",
+        "unique_multiple",
         "texte_de_poste",
     ]
     df = df.drop(columns=cols_to_drop)
