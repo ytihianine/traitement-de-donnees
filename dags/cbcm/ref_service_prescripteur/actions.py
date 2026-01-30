@@ -1,3 +1,4 @@
+from typing import Mapping
 from airflow.sdk import Variable
 from infra.http_client.adapters import RequestsClient
 from infra.http_client.config import ClientConfig
@@ -158,6 +159,41 @@ def get_engagement_juridique() -> pd.DataFrame:
     return df
 
 
+# ========================================
+# Envoyer les nouvelles données sur Grist
+# ========================================
+def _send_to_grist(
+    df: pd.DataFrame, rename_columns: Mapping[str, str], grist_tbl_name: str
+) -> None:
+    # Intégrer ces lignes dans Grist
+    new_rows = df.rename(columns=rename_columns).to_dict(orient="records")
+    print(f"Nombre de nouvelles lignes à envoyer: {len(new_rows)}")
+
+    if len(new_rows) > 0:
+        print(f"Ajout des nouvelles lignes dans la table {grist_tbl_name}")
+        data = {"records": [{"fields": record} for record in new_rows]}
+
+        print(f"Exemple: {data['records'][0]}")
+
+        http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
+        request_client = RequestsClient(config=http_config)
+        grist_client = GristAPI(
+            http_client=request_client,
+            base_url=DEFAULT_GRIST_HOST,
+            workspace_id="dsci",
+            doc_id=Variable.get(key="grist_doc_id_cbcm"),
+            api_token=Variable.get(key="grist_secret_key"),
+        )
+        try:
+            grist_client.post_records(tbl_name=grist_tbl_name, json=data)
+        except Exception as e:
+            print(f"Erreur lors de l'ajout des lignes: {e}")
+    else:
+        print(
+            f"Aucune nouvelle ligne à ajouter dans la table {grist_tbl_name} ... Skipping"
+        )
+
+
 def load_new_cf_cc(df_get_all_cf_cc: pd.DataFrame, df_sp: pd.DataFrame) -> None:
     # Filtrer les lignes
     df_get_all_cf_cc = df_get_all_cf_cc.loc[
@@ -234,6 +270,15 @@ def load_demande_achat(
     # Les envoyers dans Grist
     print(f"Nb de lignes sans cf_cc: {len(df)}")
     print(df.columns)
+    _send_to_grist(
+        df=df,
+        rename_columns={
+            "id_da": "id_da",
+            "centre_financier": "Centre_financier",
+            "centre_cout": "Centre_de_cout",
+        },
+        grist_tbl_name="Demande_achat_sp_manuel",
+    )
 
 
 def load_demande_paiement_complet(
@@ -263,6 +308,16 @@ def load_demande_paiement_complet(
     # Intégrer ces lignes dans Grist
     print(f"Nb de lignes sans cf_cc: {len(df)}")
     print(df.columns)
+    _send_to_grist(
+        df=df,
+        rename_columns={
+            "id_da": "id_da",
+            "centre_financier": "Centre_financier",
+            "centre_cout": "Centre_de_cout",
+            "texte_de_poste": "Texte_de_poste",
+        },
+        grist_tbl_name="Demande_paiement_sp_manuel",
+    )
 
 
 def load_delai_global_paiement(
@@ -290,6 +345,18 @@ def load_delai_global_paiement(
     # Intégrer ces lignes dans Grist
     print(f"Nb de lignes sans cf_cc: {len(df)}")
     print(df.columns)
+    _send_to_grist(
+        df=df,
+        rename_columns={
+            "id_da": "id_da",
+            "centre_financier": "Centre_financier",
+            "centre_cout": "Centre_de_cout",
+            "annee_exercice": "Annee_exercice",
+            "societe": "Societe",
+            "type_piece": "Type_piece",
+        },
+        grist_tbl_name="Delai_global_paiement_sp_manuel",
+    )
 
 
 def load_engagement_juridique(
@@ -315,5 +382,16 @@ def load_engagement_juridique(
     df = df.loc[df["_merge"] == "left_only"]
 
     # Intégrer ces lignes dans Grist
-    print(f"Nb de lignes sans cf_cc: {len(df)}")
     print(df.columns)
+    _send_to_grist(
+        df=df,
+        rename_columns={
+            "id_da": "id_da",
+            "centre_financier": "Centre_financier",
+            "centre_cout": "Centre_de_cout",
+            "annee_exercice": "Annee_exercice",
+            "orga": "Orga",
+            "gac": "gac",
+        },
+        grist_tbl_name="Engagement_juridique_sp_manuel",
+    )
