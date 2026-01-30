@@ -21,7 +21,7 @@ Le framework propose une architecture en couches :
 - **DAGs (`dags/`)** : Orchestration des traitements métiers
 - **Infrastructure (`infra/`)** : Interaction avec les systèmes externes (base de données, S3, HTTP, mails)
 - **Enums (`enums/`)** : Enums transverses nécessaires dans les dags, tâches, fonctions ...
-- **Entities (`entities/`)** : Types transverses nécessaires dans les dags, tâches, fonctions ...
+- **Types (`_types/`)** : Types transverses nécessaires dans les dags, tâches, fonctions ...
 - **Utilitaires (`utils/`)** : Tâches réutilisables et configuration
 
 Les dags doivent respecter [cette organisation](./convention.md#dags)
@@ -52,7 +52,9 @@ Chaque DAG doit définir ses paramètres selon la structure TypedDict suivante :
 
 ```python
 from airflow.sdk import dag
-from entities.dags import DagParams, DagStatus
+from enums.dags import DagStatus
+from _types.dags import DBParams, FeatureFlags
+from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
 @dag(
     dag_id="id_unique_du_dag",
@@ -61,40 +63,35 @@ from entities.dags import DagParams, DagStatus
     max_consecutive_failed_dag_runs=1,
     catchup=False,
     tags=["Tag1", "Tag2"],
-    description="Traitement des données comptables issues de Chorus",
+    description="Description courte",  # noqa
     default_args=create_default_args(),
     params=create_dag_params(
-        nom_projet="Mon Projet",
-        dag_status=DagStatus.DEV,
-        prod_schema="production",
-        mail_enable=False,
-        mail_to=None,
-        mail_cc=None,
-        lien_pipeline="https://...",
-        lien_donnees="https://...",
+        nom_projet=nom_projet,
+        dag_status=DagStatus.RUN,
+        db_params=DBParams(prod_schema="schema"),
+        feature_flags=FeatureFlags(
+            db=True,
+            mail=False,
+            s3=False,
+            convert_files=False,
+            download_grist_doc=False,
+        ),
+    ),
+    on_failure_callback=create_send_mail_callback(
+        mail_status=MailStatus.ERROR,
     ),
     # Autres arguments
 )
 ```
 
+Les FeatureFlags permettent d'activer/désactiver certaines fonctionnalités du dag et/ou des tâches sans avoir à modifier le code.  
+
+
 ## Tâches Pré-définies Disponibles
 
 ### 1. Validation des Paramètres
 
-```python
-from utils.tasks.validation import create_validate_params_task
-
-# Création de la tâche de validation
-validate_params = create_validate_params_task(
-    required_paths=[
-        "nom_projet",
-        "dag_status",
-        "db.prod_schema",
-        "db.tmp_schema",
-        "mail.to"
-    ],
-)
-```
+Une tâche générique est disponible: `from utils.tasks.validation import validate_dag_parameters`
 
 ### 2. Tâches ETL (Extract, Transform, Load)
 
@@ -107,7 +104,6 @@ from utils.tasks.etl import create_grist_etl_task
 grist_doc = download_grist_doc_to_s3(
     selecteur="grist_doc,
     workspace_id="grist_ws_id",
-    doc_id_key="grist_doc_ic,
     grist_host=DEFAULT_GRIST_HOST,
     api_token_key="grist_secret_key",
     use_proxy=True,
@@ -124,8 +120,8 @@ grist_etl = create_grist_etl_task(
 
 #### ETL Générique
 ```python
+from _types_.dags import TaskConfig, ETLStep
 from utils.tasks.etl import create_task
-from entities.dags import TaskConfig, ETLStep
 
 # ETL générique avec traitement personnalisé
 etl_task = create_task(
@@ -201,15 +197,7 @@ import_task = import_file_to_db.partial(
 create_partition = ensure_partition()
 
 # Copie des données vers production
-copy_to_prod = copy_tmp_table_to_real_table(
-    load_strategy=LoadStrategy.FULL_LOAD,
-)
-copy_to_prod = copy_tmp_table_to_real_table(
-    load_strategy=LoadStrategy.INCREMENTAL,
-)
-copy_to_prod = copy_tmp_table_to_real_table(
-    load_strategy=LoadStrategy.APPEND,
-)
+copy_to_prod = copy_tmp_table_to_real_table()
 ```
 
 ### 5. Opérations S3
@@ -218,10 +206,10 @@ copy_to_prod = copy_tmp_table_to_real_table(
 from utils.tasks.s3 import copy_s3_files, del_s3_files
 
 # Copie de fichiers S3
-copy_files = copy_s3_files(bucket="mon-bucket")
+copy_files = copy_s3_files()
 
 # Suppression de fichiers S3
-delete_files = del_s3_files(bucket="mon-bucket")
+delete_files = del_s3_files()
 ```
 
 ## Bonnes Pratiques
@@ -248,12 +236,6 @@ def my_dag():
 from utils.config.vars import (
     DEFAULT_S3_BUCKET, DEFAULT_PG_DATA_CONN_ID
 )
-
-# ✅ Bon : Validation systématique
-validate_params = create_validate_params_task(
-    required_paths=["nom_projet", "db.prod_schema"],
-    task_id="validate_params"
-)
 ```
 
 ### 3. Gestion des Dépendances
@@ -261,7 +243,7 @@ validate_params = create_validate_params_task(
 ```python
 # ✅ Bon : Utilisation de chain pour la lisibilité
 chain(
-    validate_params(),
+    validate_dag_parameters(),
     extract_data(),
     [transform_data(), compute_metrics()],  # Parallélisation
     load_data(),
