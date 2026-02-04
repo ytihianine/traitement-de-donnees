@@ -560,6 +560,17 @@ def import_file_to_db(
     else:
         schema = db_info.tmp_schema
 
+    dag_status = get_dag_status(context=context)
+    db_enable = get_feature_flags(context=context).db
+
+    if dag_status == DagStatus.DEV:
+        print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
+
+    if not db_enable:
+        print(FF_DB_DISABLED_MSG)
+        return
+
     # Variables
     tbl_name = selecteur_info.tbl_name
 
