@@ -216,6 +216,11 @@ def get_source_grist(
     """
 
     df = db.fetch_df(query, parameters=(nom_projet, selecteur))
+    if df.empty:
+        raise ConfigError(
+            message=f"No configuration found for projet <{nom_projet}> and selector <{selecteur}>"
+        )  # noqa
+
     records = df.to_dict("records")
     return SourceGrist(**{str(k): v for k, v in records[0].items()})
 
