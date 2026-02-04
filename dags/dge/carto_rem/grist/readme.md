@@ -1,3 +1,3 @@
 Test DrawIO
 
-![Schéma test](./schema.drawio.svg)  
+![Schéma test](./schema.drawio.png)  
