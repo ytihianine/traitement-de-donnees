@@ -118,7 +118,7 @@ def process_agent_revalorisation(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_agent_contrat_grist(df: pd.DataFrame) -> pd.DataFrame:
+def process_agent_contrat_complement(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(
         columns=[
             "agent",
@@ -155,7 +155,7 @@ def process_agent_contrat_grist(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_agent_remuneration_autres_elements(df: pd.DataFrame) -> pd.DataFrame:
+def process_agent_remuneration_complement(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=["agent"])
     df = df.rename(
         columns={
@@ -201,23 +201,4 @@ def process_agent_experience_pro(df: pd.DataFrame) -> pd.DataFrame:
     df["id_position_grille"].replace(0, np.nan, inplace=True)
     # df = df.reset_index(drop=True)
     # df["id"] = df.index
-    return df
-
-
-"""
-    Functions de processing des datasets additionnels
-"""
-
-
-def process_agent_contrat_complet(
-    df_agent_contrat: pd.DataFrame, df_agent_contrat_db: pd.DataFrame
-) -> pd.DataFrame:
-    # Merge des dataframes
-    df = pd.merge(
-        left=df_agent_contrat_db,
-        right=df_agent_contrat,
-        how="left",
-        on=["matricule_agent"],
-    )
-
     return df

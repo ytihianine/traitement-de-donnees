@@ -1,14 +1,12 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from _types.dags import ETLStep, TaskConfig
 from utils.tasks.etl import (
-    create_task,
     create_grist_etl_task,
 )
 from utils.control.structures import normalize_grist_dataframe
 
-from dags.dge.carto_rem.grist import process, actions
+from dags.dge.carto_rem.grist import process
 
 
 @task_group
@@ -87,15 +85,15 @@ def source_grist() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_agent_revalorisation,
     )
-    agent_contrat = create_grist_etl_task(
-        selecteur="agent_contrat",
+    agent_contrat_complement = create_grist_etl_task(
+        selecteur="agent_contrat_complement",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_agent_contrat_grist,
+        process_func=process.process_agent_contrat_complement,
     )
-    agent_remuneration_autres_elements = create_grist_etl_task(
-        selecteur="agent_remuneration_autres_elements",
+    agent_remuneration_complement = create_grist_etl_task(
+        selecteur="agent_remuneration_complement",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_agent_remuneration_autres_elements,
+        process_func=process.process_agent_remuneration_complement,
     )
     agent_experience_pro = create_grist_etl_task(
         selecteur="agent_experience_pro",
@@ -108,47 +106,8 @@ def source_grist() -> None:
         [
             agent_diplome(),
             agent_revalorisation(),
-            agent_contrat(),
-            agent_remuneration_autres_elements(),
+            agent_contrat_complement(),
+            agent_remuneration_complement(),
             agent_experience_pro(),
         ]
     )
-
-
-@task_group(group_id="get_db_data")
-def get_db_data() -> None:
-    agent_contrat_db = create_task(
-        task_config=TaskConfig(task_id="agent_contrat_db"),
-        output_selecteur="agent_contrat_db",
-        steps=[
-            ETLStep(
-                fn=actions.get_agent_contrat,
-                use_context=True,
-            )
-        ],
-        add_import_date=False,
-        add_snapshot_id=False,
-    )
-
-    chain(agent_contrat_db())
-
-
-@task_group(group_id="dataset_additionnel")
-def datasets_additionnels() -> None:
-    agent_contrat_complet = create_task(
-        task_config=TaskConfig(task_id="agent_contrat_complet"),
-        output_selecteur="agent_contrat_complet",
-        input_selecteurs=[
-            "agent_contrat",
-            "agent_contrat_db",
-        ],
-        steps=[
-            ETLStep(
-                fn=process.process_agent_contrat_complet,
-            )
-        ],
-        add_import_date=False,
-        add_snapshot_id=False,
-    )
-
-    chain(agent_contrat_complet())

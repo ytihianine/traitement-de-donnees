@@ -11,8 +11,6 @@ from utils.tasks.sql import (
     copy_tmp_table_to_real_table,
     import_file_to_db,
     delete_tmp_tables,
-    refresh_views,
-    LoadStrategy,
     # set_dataset_last_update_date,
 )
 
@@ -26,8 +24,6 @@ from utils.tasks.validation import validate_dag_parameters
 from dags.dge.carto_rem.grist.tasks import (
     referentiels,
     source_grist,
-    get_db_data,
-    datasets_additionnels,
 )
 
 
@@ -65,14 +61,11 @@ def cartographie_remuneration_grist() -> None:
             doc_id_key="grist_doc_id_carto_rem",
         ),
         [referentiels(), source_grist()],
-        get_db_data(),
-        datasets_additionnels(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.partial(keep_file_id_col=True).expand(
             selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
-        copy_tmp_table_to_real_table(load_strategy=LoadStrategy.FULL_LOAD),
-        refresh_views(),
+        copy_tmp_table_to_real_table(),
         copy_s3_files(),
         del_s3_files(),
         delete_tmp_tables(),
