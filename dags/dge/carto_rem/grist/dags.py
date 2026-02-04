@@ -50,7 +50,7 @@ nom_projet = "Cartographie rémunération - Grist"
         dag_status=DagStatus.DEV,
         db_params=DBParams(prod_schema="cartographie_remuneration"),
         feature_flags=FeatureFlags(
-            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
+            db=False, mail=False, s3=False, convert_files=False, download_grist_doc=True
         ),
     ),
     on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
