@@ -114,6 +114,66 @@ class GristAPI:
         df = pd.DataFrame(data=results, columns=colonnes)  # type: ignore
         return df
 
+    def send_dataframe_to_grist(
+        self,
+        df: pd.DataFrame,
+        tbl_name: str,
+        rename_columns: Optional[dict[str, str]] = None,
+        batch_size: int = 400,
+        skip_empty: bool = True,
+        base_url: Optional[str] = None,
+        doc_id: Optional[str] = None,
+        api_token: Optional[str] = None,
+    ) -> None:
+        """Send a pandas DataFrame to a Grist table.
+
+        Args:
+            df (pd.DataFrame): DataFrame to send to Grist
+            tbl_name (str): Name of the Grist table
+            rename_columns (dict[str, str], optional): Mapping to rename DataFrame columns before sending. Defaults to None.
+            base_url (str, optional): Grist base URL. Defaults to None (uses instance default).
+            doc_id (str, optional): Grist document ID. Defaults to None (uses instance default).
+            api_token (str, optional): API token for authentication. Defaults to None (uses instance default).
+            batch_size (int, optional): Number of records per batch. Defaults to 400.
+            skip_empty (bool, optional): Skip sending if DataFrame is empty. Defaults to True.
+
+        Returns:
+            None
+
+        Notes:
+            The DataFrame is converted to a list of records
+        """
+        # Rename columns if mapping is provided
+        df_to_send = df.rename(columns=rename_columns) if rename_columns else df.copy()
+
+        # Convert DataFrame to list of records
+        new_rows = df_to_send.to_dict(orient="records")
+        print(f"Nombre de nouvelles lignes à envoyer: {len(new_rows)}")
+
+        if len(new_rows) == 0:
+            if skip_empty:
+                print(
+                    f"Aucune nouvelle ligne à ajouter dans la table {tbl_name} ... Skipping"
+                )
+                return
+            else:
+                raise ValueError("DataFrame is empty. No records to send.")
+
+        # Prepare data in Grist format
+        data = {"records": [{"fields": record} for record in new_rows]}
+        print(f"Ajout des nouvelles lignes dans la table {tbl_name}")
+        print(f"Exemple: {data['records'][0]}")
+
+        # Send to Grist using post_records with batching
+        self.post_records(
+            base_url=base_url,
+            doc_id=doc_id,
+            tbl_name=tbl_name,
+            json=data,
+            api_token=api_token,
+            batch_size=batch_size,
+        )
+
     def get_records(
         self,
         base_url: Optional[str] = None,
