@@ -24,6 +24,7 @@ from utils.tasks.validation import validate_dag_parameters
 from dags.dge.carto_rem.grist.tasks import (
     referentiels,
     source_grist,
+    load_to_grist,
 )
 
 
@@ -61,6 +62,7 @@ def cartographie_remuneration_grist() -> None:
             doc_id_key="grist_doc_id_carto_rem",
         ),
         [referentiels(), source_grist()],
+        load_to_grist(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.partial(keep_file_id_col=True).expand(
             selecteur_info=get_list_selector_info(nom_projet=nom_projet)

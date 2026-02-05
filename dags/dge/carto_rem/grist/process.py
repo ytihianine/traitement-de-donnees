@@ -82,9 +82,11 @@ def process_ref_fonction_dge(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-"""
-    Functions de processing des Grist source
-"""
+# ===========================================
+# Functions de processing des Grist source
+# ===========================================
+def process_agent(df: pd.DataFrame) -> pd.DataFrame:
+    return df
 
 
 def process_agent_diplome(df: pd.DataFrame) -> pd.DataFrame:
