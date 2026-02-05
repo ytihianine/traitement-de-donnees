@@ -314,7 +314,7 @@ def _get_db_info(
         query += " AND cppd.selecteur = %s"
         params.append(selecteur)
 
-    query += "ORDER BY cppd.load_strategy ASC, cppd.tbl_order DESC;"
+    query += "ORDER BY cppd.load_strategy ASC, cppd.tbl_order ASC;"
 
     df = db.fetch_df(query, parameters=tuple(params))
     records = df.to_dict("records")
