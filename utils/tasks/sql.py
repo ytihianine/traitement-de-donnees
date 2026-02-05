@@ -450,8 +450,10 @@ def copy_tmp_table_to_real_table(
                     WHEN NOT MATCHED THEN
                         INSERT ({', '.join(col_list)})
                             VALUES ({', '.join([f'tbl_source.{col}' for col in col_list])})
+                    /* Need to implement soft_delete first
                     WHEN NOT MATCHED BY SOURCE THEN
                         DELETE
+                    */
                     ;
                 """
                 queries.append(merge_query)
