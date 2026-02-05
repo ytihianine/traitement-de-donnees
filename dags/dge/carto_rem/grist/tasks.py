@@ -126,7 +126,7 @@ def load_to_grist() -> None:
     get_agent_db = create_task(
         task_config=TaskConfig(task_id="get_agent_db"),
         output_selecteur="get_agent_db",
-        steps=[ETLStep(fn=actions.get_agent_db, read_data=True)],
+        steps=[ETLStep(fn=actions.get_agent_db, use_context=True)],
         add_import_date=False,
         add_snapshot_id=False,
         export_output=True,
