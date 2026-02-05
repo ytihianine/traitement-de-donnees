@@ -124,7 +124,6 @@ def process_agent_contrat_complement(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(
         columns=[
             "agent",
-            "duree_contrat_en_cours_auto",
             "date_debut_contrat_actuel_dge",
             "date_fin_contrat_cdd_en_cours_au_soir",
         ]
