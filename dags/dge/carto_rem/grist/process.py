@@ -90,7 +90,7 @@ def process_agent(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_agent_diplome(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(columns=["agent", "id"])
+    df = df.drop(columns=["agent"])
     df = df.rename(
         columns={
             "niveau_diplome_associe": "id_niveau_diplome_associe",
@@ -107,7 +107,7 @@ def process_agent_diplome(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_agent_revalorisation(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(columns=["agent", "id"])
+    df = df.drop(columns=["agent"])
     df = df.rename(columns={"base_revalorisation": "id_base_revalorisation"})
     df["historique"] = df["historique"].str.strip().str.split().str.join(" ")
     date_cols = ["date_dernier_renouvellement", "date_derniere_revalorisation"]
@@ -125,7 +125,6 @@ def process_agent_contrat_complement(df: pd.DataFrame) -> pd.DataFrame:
         columns=[
             "agent",
             "duree_contrat_en_cours_auto",
-            "id",
             "date_debut_contrat_actuel_dge",
             "date_fin_contrat_cdd_en_cours_au_soir",
         ]
