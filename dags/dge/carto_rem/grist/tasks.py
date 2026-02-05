@@ -136,7 +136,14 @@ def load_to_grist() -> None:
         task_config=TaskConfig(task_id="load_agent"),
         output_selecteur="load_agent",
         input_selecteurs=["get_agent_db", "agent"],
-        steps=[ETLStep(fn=actions.load_agent, read_data=True)],
+        steps=[
+            ETLStep(
+                fn=actions.load_agent,
+                read_data=True,
+                use_context=True,
+                kwargs={"grist_doc_selecteur": "grist_doc"},
+            )
+        ],
         add_import_date=False,
         add_snapshot_id=False,
         export_output=False,
