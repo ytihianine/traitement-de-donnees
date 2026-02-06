@@ -1,42 +1,11 @@
-from numpy import float64
 import pandas as pd
 
 from utils.control.text import convert_str_cols_to_date, normalize_whitespace_columns
 
 
-"""
-    Functions de processing des fichiers sources
-"""
-
-
-def process_agent_elem_rem(df: pd.DataFrame) -> pd.DataFrame:
-    # Clean columns
-    df["matricule_agent"] = df["matricule_agent"].astype("int64")
-
-    txt_cols = ["libelle_element", "uuid"]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
-    # Filter les lignes
-    elems_to_keep = [
-        "TRAITEMENT BRUT",
-        "INDEMNITE DE RESIDENCE",
-        "IND. MENSUELLE TECHNICITE",
-        "I.F.S.E.",
-        "IND. COMPENSATRICE CSG",
-    ]
-    df = df.loc[df["libelle_element"].isin(elems_to_keep)]
-
-    # Data processing
-    df["montant_a_payer"] = (
-        df["montant_a_payer"].str.replace(",", ".", regex=False).astype(float64)
-    )
-    df["montant_a_deduire"] = (
-        df["montant_a_deduire"].str.replace(",", ".", regex=False).astype(float64)
-    )
-
-    return df
-
-
+# ================================================
+#   Functions de processing des fichiers sources
+# ================================================
 def process_agent_info_carriere(df: pd.DataFrame) -> pd.DataFrame:
     txt_cols = ["dge_perimetre", "nom_usuel", "prenom", "echelon"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)

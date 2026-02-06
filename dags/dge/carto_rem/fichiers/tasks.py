@@ -12,12 +12,12 @@ from dags.dge.carto_rem.fichiers import process
 
 @task_group
 def source_files() -> None:
-    agent_elem_rem = create_file_etl_task(
-        selecteur="agent_elem_rem",
-        process_func=process.process_agent_elem_rem,
-        add_import_date=False,
-        add_snapshot_id=False,
-    )
+    # agent_elem_rem = create_file_etl_task(
+    #     selecteur="agent_elem_rem",
+    #     process_func=process.process_agent_elem_rem,
+    #     add_import_date=False,
+    #     add_snapshot_id=False,
+    # )
     agent_info_carriere = create_file_etl_task(
         selecteur="agent_info_carriere",
         process_func=process.process_agent_info_carriere,
@@ -32,7 +32,7 @@ def source_files() -> None:
     )
 
     # ordre des tâches
-    chain([agent_elem_rem(), agent_info_carriere(), agent_contrat()])
+    chain([agent_info_carriere(), agent_contrat()])
 
 
 @task_group
