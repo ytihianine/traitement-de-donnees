@@ -18,7 +18,6 @@ def process_agent_contrat(df: pd.DataFrame) -> pd.DataFrame:
         "date_debut_contrat_actuel",
         "date_fin_contrat_previsionnelle_actuel",
         "date_cdisation",
-        "date_fin_contrat",
     ]
     df = convert_str_cols_to_date(
         df=df, columns=date_cols, str_date_format="%d/%m/%Y", errors="raise"
