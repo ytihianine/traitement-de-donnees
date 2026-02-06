@@ -46,6 +46,7 @@ def output_files() -> None:
         steps=[
             ETLStep(
                 fn=process.process_agent,
+                read_data=True,
             )
         ],
         add_import_date=False,
@@ -60,6 +61,7 @@ def output_files() -> None:
         steps=[
             ETLStep(
                 fn=process.process_agent_carriere,
+                read_data=True,
             )
         ],
         add_import_date=False,
