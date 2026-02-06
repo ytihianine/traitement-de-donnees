@@ -456,7 +456,7 @@ def get_list_source_fichier_key(
     source_fichiers = _get_source_fichier(
         context=context, nom_projet=nom_projet, selecteur=None
     )
-    return [source.filepath_source_s3 for source in source_fichiers]
+    return [f"'{source.filepath_source_s3}'" for source in source_fichiers]
 
 
 def get_source_fichier(
