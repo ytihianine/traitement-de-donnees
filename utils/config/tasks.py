@@ -453,10 +453,14 @@ def get_list_source_fichier_key(
     Returns:
         List of SourceFichier objects for all selecteurs in the project
     """
+    from urllib.parse import quote
+
     source_fichiers = _get_source_fichier(
         context=context, nom_projet=nom_projet, selecteur=None
     )
-    return [f"'{source.filepath_source_s3}'" for source in source_fichiers]
+    return [
+        quote(string=source.filepath_source_s3, safe="/") for source in source_fichiers
+    ]
 
 
 def get_source_fichier(
