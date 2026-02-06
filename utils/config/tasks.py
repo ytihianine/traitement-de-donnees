@@ -306,6 +306,7 @@ def _get_db_info(
             cppd.load_strategy
         FROM {CONF_SCHEMA}.projet_database_vw cppd
         WHERE cppd.projet = %s
+            AND cppd.tbl_name IS NOT NULL
     """
 
     params = [nom_projet]
