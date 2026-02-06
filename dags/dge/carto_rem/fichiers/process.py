@@ -7,7 +7,7 @@ from utils.control.text import convert_str_cols_to_date, normalize_whitespace_co
 #   Functions de processing des fichiers sources
 # ================================================
 def process_agent_info_carriere(df: pd.DataFrame) -> pd.DataFrame:
-    txt_cols = ["dge_perimetre", "nom_usuel", "prenom", "echelon"]
+    txt_cols = ["dge_perimetre", "nom_usuel", "prenom"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
     return df
 
