@@ -39,7 +39,6 @@ def process_agent(df: pd.DataFrame) -> pd.DataFrame:
         "prenom",
         "genre",
         "age",
-        "dge_perimetre",
     ]
     df = df.loc[:, cols_to_keep]
 
@@ -56,6 +55,7 @@ def process_agent_carriere(df: pd.DataFrame) -> pd.DataFrame:
         "grade",
         "echelon",
         "indice_majore",
+        "dge_perimetre",
     ]
     df = df.loc[:, cols_to_keep]
 
