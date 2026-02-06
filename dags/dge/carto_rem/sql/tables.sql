@@ -79,6 +79,7 @@ CREATE TABLE cartographie_remuneration."agent_carriere" (
   "grade" TEXT,
   "echelon" INTEGER,
   "indice_majore" INTEGER,
+  "dge_perimetre" TEXT,
   PRIMARY KEY ("matricule_agent"),
   FOREIGN KEY ("matricule_agent") REFERENCES cartographie_remuneration."agent" ("matricule_agent")
 );
@@ -97,8 +98,8 @@ CREATE TABLE cartographie_remuneration."agent_remuneration" (
 );
 
 
-DROP TABLE cartographie_remuneration."agent_remuneration_autres_elements" CASCADE;
-CREATE TABLE cartographie_remuneration."agent_remuneration_autres_elements" (
+DROP TABLE cartographie_remuneration."agent_remuneration_complement" CASCADE;
+CREATE TABLE cartographie_remuneration."agent_remuneration_complement" (
   "id" integer,
   "matricule_agent" BIGINT,
   "id_base_remuneration" INT,
@@ -106,7 +107,8 @@ CREATE TABLE cartographie_remuneration."agent_remuneration_autres_elements" (
   "plafond_part_variable_collective" FLOAT,
   "present_cartographie" BOOLEAN,
   "observations" TEXT,
-  PRIMARY KEY ("matricule_agent"),
+  PRIMARY KEY ("id"),
+  UNIQUE ("matricule_agent"),
   -- FOREIGN KEY ("matricule_agent") REFERENCES cartographie_remuneration."agent" ("matricule_agent"),
   FOREIGN KEY ("id_base_remuneration") REFERENCES cartographie_remuneration."ref_base_remuneration" ("id")
 );
@@ -116,31 +118,40 @@ DROP TABLE cartographie_remuneration."agent_contrat";
 CREATE TABLE cartographie_remuneration."agent_contrat" (
   "matricule_agent" int,
   "mois_analyse" text,
-  "date_premier_contrat_mef" date,
   "date_debut_contrat_actuel" date,
   "date_fin_contrat_previsionnelle_actuel" date,
+  "date_cdisation" date,
+  PRIMARY KEY ("matricule_agent")
+);
+
+
+DROP TABLE cartographie_remuneration."agent_contrat_complement";
+CREATE TABLE cartographie_remuneration."agent_contrat_complement" (
+  "id" int,
+  "matricule_agent" int,
+  "date_premier_contrat_mef" date,
+  "date_entree_dge" date,
   "duree_contrat_en_cours_dge" integer,
+  "duree_contrat_en_cours_auto_dge" integer,
   "duree_cumulee_contrats_tout_contrat_mef" text,
   "date_de_cdisation" date,
   "duree_en_jours_si_coupure_de_contrat" integer,
-  "date_entree_dge" date,
-  -- "duree_contrat_en_cours" integer,
   "id_fonction_dge" integer,
-  -- "fonction_dge_libelle_court" TEXT,
-  -- "fonction_dge_libelle_long" TEXT,
-  PRIMARY KEY ("matricule_agent"),
+  PRIMARY KEY ("id"),
+  UNIQUE ("matricule_agent"),
   FOREIGN KEY ("id_fonction_dge") REFERENCES cartographie_remuneration."ref_fonction_dge" ("id")
   -- FOREIGN KEY ("matricule_agent") REFERENCES cartographie_remuneration."agent" ("matricule_agent")
 );
 
 
 CREATE TABLE cartographie_remuneration."agent_diplome" (
+  "id" int,
   "matricule_agent" int,
   "annee_d_obtention" numeric,
   "id_libelle_diplome" int,
   "id_categorie_d_ecole" int,
   "id_niveau_diplome_associe" int,
-  PRIMARY KEY ("matricule_agent"),
+  PRIMARY KEY ("id"),
   -- FOREIGN KEY ("matricule_agent") REFERENCES cartographie_remuneration."agent" ("matricule_agent"),
   FOREIGN KEY ("id_libelle_diplome") REFERENCES cartographie_remuneration."ref_libelle_diplome" ("id"),
   FOREIGN KEY ("id_categorie_d_ecole") REFERENCES cartographie_remuneration."ref_categorie_ecole" ("id"),
@@ -151,13 +162,14 @@ CREATE TABLE cartographie_remuneration."agent_diplome" (
 
 
 CREATE TABLE cartographie_remuneration."agent_revalorisation" (
+  "id" int,
   "matricule_agent" int,
   "id_base_revalorisation" int,
   "date_derniere_revalorisation" date,
   "valorisation_validee" float,
   "historique" text,
   "date_dernier_renouvellement" date,
-  PRIMARY KEY ("matricule_agent"),
+  PRIMARY KEY ("id"),
   -- FOREIGN KEY ("matricule_agent") REFERENCES cartographie_remuneration."agent" ("matricule_agent"),
   FOREIGN KEY ("id_base_revalorisation") REFERENCES cartographie_remuneration."ref_base_revalorisation" ("id")
 );
