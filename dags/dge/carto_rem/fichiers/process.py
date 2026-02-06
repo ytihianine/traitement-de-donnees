@@ -44,23 +44,16 @@ def process_agent_info_carriere(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_agent_contrat(df: pd.DataFrame) -> pd.DataFrame:
-    # Convert columns
-    date_cols = ["date_debut_contrat_actuel", "date_fin_contrat_previsionnelle_actuel"]
+    # Convert date columns
+    date_cols = [
+        "date_debut_contrat_actuel",
+        "date_fin_contrat_previsionnelle_actuel",
+        "date_cdisation",
+        "date_fin_contrat",
+    ]
     df = convert_str_cols_to_date(
         df=df, columns=date_cols, str_date_format="%d/%m/%Y", errors="raise"
     )
-
-    # Init columns
-    cols_to_init = [
-        "date_premier_contrat_mef",
-        "duree_contrat_en_cours_dge",
-        "duree_cumulee_contrats_tout_contrat_mef",
-        "date_de_cdisation",
-        "duree_en_jours_si_coupure_de_contrat",
-        "date_entree_dge",
-        "id_fonction_dge",
-    ]
-    df[cols_to_init] = pd.NA
 
     return df
 
