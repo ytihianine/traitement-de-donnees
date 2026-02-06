@@ -28,7 +28,8 @@ def get_agent_db(context: Mapping[str, Any]) -> pd.DataFrame:
                 cra.prenom,
                 cra.genre,
                 cra.age,
-                cracr.qualite_statutaire
+                cracr.qualite_statutaire,
+                cracr.dge_perimetre
             from
                 {schema}.agent cra
             inner join {schema}.agent_carriere cracr
