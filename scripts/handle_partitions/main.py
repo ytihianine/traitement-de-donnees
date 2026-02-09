@@ -47,7 +47,7 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            print(
+            logging.info(
                 f"✗ Erreur lors de la suppression de partitions dans le schéma {config.schema}: {e}"
             )
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            print(
+            logging.info(
                 f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"
             )
 
@@ -91,7 +91,7 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            print(
+            logging.info(
                 f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"
             )
 
@@ -113,6 +113,6 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            print(
+            logging.info(
                 f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"
             )

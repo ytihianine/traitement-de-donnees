@@ -1,6 +1,7 @@
 """DataFrame utilities for file handling."""
 
 import io
+import logging
 from typing import Optional, Union
 from pathlib import Path
 import pandas as pd
@@ -58,9 +59,9 @@ def read_dataframe(
         read_options = {}
     # Read the file content
 
-    print(f"Read data from {file_path}")
-    print(f"File format: {file_format}")
-    print(f"read_options: \n{read_options}")
+    logging.info(msg=f"Read data from {file_path}")
+    logging.info(msg=f"File format: {file_format}")
+    logging.info(msg=f"read_options: \n{read_options}")
     with file_handler.read(file_path) as file_obj:
         # Different handling based on format
         if file_format == "parquet":

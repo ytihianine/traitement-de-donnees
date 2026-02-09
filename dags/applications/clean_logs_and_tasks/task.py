@@ -1,3 +1,4 @@
+import logging
 from airflow.sdk import task
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
@@ -14,7 +15,7 @@ def clean_s3() -> None:
     date_to_clean_before = datetime.now() - timedelta(days=days_to_keep)
 
     s3_keys = s3_handler.list_keys(to_datetime=date_to_clean_before)
-    print(s3_keys)
+    logging.info(msg=s3_keys)
 
 
 @task(task_id="clean_old_logs")
@@ -30,7 +31,7 @@ def clean_old_logs() -> None:
         f"airflow db clean --clean-before-timestamp '{date_to_clean_before}' --verbose"
     ]
 
-    print(command)
+    logging.info(msg=command)
 
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
@@ -38,7 +39,7 @@ def clean_old_logs() -> None:
     if result.returncode != 0:
         raise ValueError(f"Error occurred: {result.stderr}")
     else:
-        print("Command executed successfully. Metadatadb has been cleared")
+        logging.info(msg="Command executed successfully. Metadatadb has been cleared")
 
 
 @task(task_id="clean_skipped_logs")

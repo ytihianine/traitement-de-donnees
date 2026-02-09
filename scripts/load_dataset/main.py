@@ -37,7 +37,7 @@ pg_cur.execute(
 """
 )
 db_columns = [row[0] for row in pg_cur.fetchall()]
-print("Database columns sorted: ", db_columns)
+logging.info("Database columns sorted: ", db_columns)
 
 # read data
 df = pd.read_parquet(path=FILE_PATH)
@@ -51,7 +51,7 @@ df["snapshot_id"] = SNAPSHOT_ID
 df = df.drop(columns=[DB_ID_COLNAME], errors="ignore")
 df_columns = sorted(df.columns)
 df = df[df_columns]
-print("Dataframe columns sorted: ", df_columns)
+logging.info("Dataframe columns sorted: ", df_columns)
 
 # export file to csv using "\" as sep
 df.to_csv(path_or_buf=TSV_FILE_PATH, sep="\t", index=False)

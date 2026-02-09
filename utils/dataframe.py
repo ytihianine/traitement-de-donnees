@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import numpy as np
 
@@ -19,7 +20,7 @@ def df_info(
     col_names = list(df.columns)
     nb_none = len([x for x in col_names if x is None])
     if nb_none > 0:
-        print(f"Warning: {nb_none} None values are in df column names !!")
+        logging.info(msg=f"Warning: {nb_none} None values are in df column names !!")
     col_str_format = "\n".join(
         [
             ", ".join(str(col_name) for col_name in col_names[i : i + 5])
@@ -28,8 +29,8 @@ def df_info(
     )
 
     if full_logs:
-        print(
-            f"""
+        logging.info(
+            msg=f"""
             ### {df_name} ### \n
             Shape of DataFrame: {df.shape} \n
             Columns: {col_str_format} \n
@@ -41,8 +42,8 @@ def df_info(
             """
         )
     else:
-        print(
-            f"""
+        logging.info(
+            msg=f"""
             ### {df_name} ### \n
             Shape of DataFrame: {df.shape} \n
             Columns: {col_str_format} \n

@@ -1,3 +1,4 @@
+import logging
 from airflow.sdk import Variable
 from infra.http_client.adapters import RequestsClient
 from infra.http_client.config import ClientConfig
@@ -35,7 +36,7 @@ def load_new_sp(
         query="""SELECT DISTINCT centre_financier, centre_cout
             FROM donnee_comptable.service_prescripteur;"""
     )
-    print(f"Nombre de SP connus: {len(df_sp)}")
+    logging.info(msg=f"Nombre de SP connus: {len(df_sp)}")
 
     # Réaliser une jointure
     df = pd.merge(
@@ -55,13 +56,13 @@ def load_new_sp(
             "centre_financier": "Centre_financier",
         }
     ).to_dict(orient="records")
-    print(f"Nouveau couple CF-CC sans SP: {len(new_cf_cc)}")
+    logging.info(msg=f"Nouveau couple CF-CC sans SP: {len(new_cf_cc)}")
 
     if len(new_cf_cc) > 0:
-        print("Ajout des nouveaux couples CF-CC dans Grist")
+        logging.info(msg="Ajout des nouveaux couples CF-CC dans Grist")
         data = {"records": [{"fields": record} for record in new_cf_cc]}
 
-        print(f"Exemple: {data['records'][0]}")
+        logging.info(msg=f"Exemple: {data['records'][0]}")
 
         http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
         request_client = RequestsClient(config=http_config)
@@ -75,9 +76,11 @@ def load_new_sp(
         try:
             grist_client.post_records(tbl_name="Service_prescripteur", json=data)
         except Exception:
-            print("Les nouveaux couples à ajouter existent déjà dans Grist !!")
+            logging.info(
+                msg="Les nouveaux couples à ajouter existent déjà dans Grist !!"
+            )
     else:
-        print("Aucun nouveau couple CF-CC ... Skipping")
+        logging.info(msg="Aucun nouveau couple CF-CC ... Skipping")
 
 
 def get_sp() -> pd.DataFrame:

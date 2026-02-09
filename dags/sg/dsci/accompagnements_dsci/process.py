@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 
 from utils.config.vars import NO_PROCESS_MSG
@@ -15,22 +16,22 @@ from utils.control.text import normalize_whitespace_columns
 
 
 def process_ref_certification(df: pd.DataFrame) -> pd.DataFrame:
-    print(NO_PROCESS_MSG)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_competence_particuliere(df: pd.DataFrame) -> pd.DataFrame:
-    print(NO_PROCESS_MSG)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_bureau(df: pd.DataFrame) -> pd.DataFrame:
-    print(NO_PROCESS_MSG)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_direction(df: pd.DataFrame) -> pd.DataFrame:
-    print(NO_PROCESS_MSG)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
@@ -54,7 +55,7 @@ def process_ref_profil_correspondant(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_promotion_fac(df: pd.DataFrame) -> pd.DataFrame:
-    print(NO_PROCESS_MSG)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
@@ -65,17 +66,17 @@ def process_ref_semainier(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_qualite_service(df: pd.DataFrame) -> pd.DataFrame:
-    print(NO_PROCESS_MSG)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_date_debut_inactivite(df: pd.DataFrame) -> pd.DataFrame:
-    print(NO_PROCESS_MSG)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_region(df: pd.DataFrame) -> pd.DataFrame:
-    print(NO_PROCESS_MSG)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 

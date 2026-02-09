@@ -1,6 +1,7 @@
 """S3 implementation of file handler using Airflow's S3 hooks."""
 
 import io
+import logging
 import mimetypes
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Union
@@ -38,7 +39,7 @@ class S3FileHandler(BaseFileHandler):
         """Read file from S3 using Airflow's S3Hook."""
         key = str(file_path)
         try:
-            print(f"Reading file from {key}")
+            logging.info(msg=f"Reading file from {key}")
             if validate:
                 self.validate(key)
 
@@ -73,7 +74,7 @@ class S3FileHandler(BaseFileHandler):
         """
         key = str(file_path)
         try:
-            print(f"Writing file to {key}")
+            logging.info(msg=f"Writing file to {key}")
 
             # Infer content type if not provided
             if content_type is None:
@@ -108,7 +109,9 @@ class S3FileHandler(BaseFileHandler):
                 acl_policy=None,  # e.g., 'public-read' if needed
             )
 
-            print(f"Successfully wrote {key} with content type: {content_type}")
+            logging.info(
+                msg=f"Successfully wrote {key} with content type: {content_type}"
+            )
 
         except Exception as e:
             raise FileHandlerError(f"Error writing file to S3: {key}") from e

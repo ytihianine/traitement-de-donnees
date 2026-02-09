@@ -1,3 +1,4 @@
+import logging
 from airflow.sdk import Variable
 from infra.grist.client import GristAPI
 from infra.http_client.adapters import RequestsClient
@@ -82,13 +83,13 @@ def get_dictionnaire() -> pd.DataFrame:
 def load_catalogue(df: pd.DataFrame) -> None:
     # Intégrer ces lignes dans Grist
     new_rows = df.to_dict(orient="records")
-    print(f"Nombre de nouvelles lignes: {len(new_rows)}")
+    logging.info(msg=f"Nombre de nouvelles lignes: {len(new_rows)}")
 
     if len(new_rows) > 0:
-        print("Ajout des nouvelles lignes dans Grist")
+        logging.info(msg="Ajout des nouvelles lignes dans Grist")
         data = {"records": [{"fields": record} for record in new_rows]}
 
-        print(f"Exemple: {data['records'][0]}")
+        logging.info(msg=f"Exemple: {data['records'][0]}")
 
         http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
         request_client = RequestsClient(config=http_config)
@@ -102,19 +103,19 @@ def load_catalogue(df: pd.DataFrame) -> None:
 
         grist_client.post_records(tbl_name="Catalogue", json=data)
     else:
-        print("Aucune ligne à ajouter dans le catalogue ...")
+        logging.info(msg="Aucune ligne à ajouter dans le catalogue ...")
 
 
 def load_dictionnaire(df: pd.DataFrame) -> None:
     # Intégrer ces lignes dans Grist
     new_rows = df.to_dict(orient="records")
-    print(f"Nombre de nouvelles lignes: {len(new_rows)}")
+    logging.info(msg=f"Nombre de nouvelles lignes: {len(new_rows)}")
 
     if len(new_rows) > 0:
-        print("Ajout des nouvelles lignes dans Grist")
+        logging.info(msg="Ajout des nouvelles lignes dans Grist")
         data = {"records": [{"fields": record} for record in new_rows]}
 
-        print(f"Exemple: {data['records'][0]}")
+        logging.info(msg=f"Exemple: {data['records'][0]}")
 
         http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
         request_client = RequestsClient(config=http_config)
@@ -128,4 +129,4 @@ def load_dictionnaire(df: pd.DataFrame) -> None:
 
         grist_client.post_records(tbl_name="Dictionnaire", json=data)
     else:
-        print("Aucune ligne à ajouter dans le dictionnaire ...")
+        logging.info(msg="Aucune ligne à ajouter dans le dictionnaire ...")

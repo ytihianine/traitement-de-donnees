@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import numpy as np
 from typing import Any
@@ -216,11 +217,11 @@ def process_detail_conso(raw_data: list[dict[str, Any]]) -> pd.DataFrame:
     ]
 
     for col in cols_to_convert:
-        print(f"Colname: {col}")
-        print(f"Avant: {df[col].unique()}")
+        logging.info(msg=f"Colname: {col}")
+        logging.info(msg=f"Avant: {df[col].unique()}")
         df[col] = df[col].str.replace(",", ".")
         df[col] = df[col].replace("", np.nan)
-        print(f"Après: {df[col].unique()}")
+        logging.info(msg=f"Après: {df[col].unique()}")
         df[col] = pd.to_numeric(df[col], downcast="float", errors="ignore")  # type: ignore
 
     return df
@@ -268,7 +269,7 @@ def process_detail_conso_activite(raw_data: list[dict[str, Any]]) -> pd.DataFram
     }
 
     for elem in raw_data:
-        print("I am the elem: ", elem)
+        logging.info(msg=f"I am the elem: {elem}")
         nb_jours_occupes = elem.pop("nbJoursOccupes", default_value)
         elem = elem | nb_jours_occupes
 
