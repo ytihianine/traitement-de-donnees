@@ -5,6 +5,7 @@ from typing import Iterable, Sequence
 
 from infra.http_client.config import ClientConfig
 from infra.http_client.factory import create_http_client
+from utils.config.vars import custom_logger
 
 from enums.http import HttpHandlerType
 
@@ -48,11 +49,13 @@ if __name__ == "__main__":
         headers=headers,
     )
     tables = [table["id"] for table in response.json()["tables"]]
-    logging.info("Nombre de tables dans le document: ", len(tables))
-    logging.info(f"Liste des tables: {tables}")
+    custom_logger.info(msg=f"Nombre de tables dans le document: {len(tables)}")
+    custom_logger.info(msg=f"Liste des tables: {tables}")
     tables = filter_tables(tables=tables)
-    logging.info("Nombre de tables dans le document après filtrage: ", len(tables))
-    logging.info(f"Liste des tables: {tables}")
+    custom_logger.info(
+        msg=f"Nombre de tables dans le document après filtrage: {len(tables)}"
+    )
+    custom_logger.info(msg=f"Liste des tables: {tables}")
 
     # Créer les webhooks
     webhooks = []
@@ -70,7 +73,7 @@ if __name__ == "__main__":
         }
         webhooks.append(webhook_info)
 
-    logging.info("Exemple: \n", webhooks[0])
+    custom_logger.info(msg=f"Exemple: \n{webhooks[0]}")
 
     http_client.post(
         endpoint=config["GRIST"]["GRIST_HOST"]

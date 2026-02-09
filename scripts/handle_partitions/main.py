@@ -1,6 +1,7 @@
 import os
-
 import psycopg2
+
+from utils.config.vars import custom_logger
 
 from scripts.handle_partitions.commun import list_table_names, get_partitions, Actions
 from scripts.handle_partitions.partitions import (
@@ -47,8 +48,8 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            logging.info(
-                f"✗ Erreur lors de la suppression de partitions dans le schéma {config.schema}: {e}"
+            custom_logger.info(
+                msg=f"✗ Erreur lors de la suppression de partitions dans le schéma {config.schema}: {e}"  # noqa
             )
 
     if config.action == Actions.CREATE:
@@ -69,8 +70,8 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            logging.info(
-                f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"
+            custom_logger.info(
+                msg=f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"  # noqa
             )
 
     if config.action == Actions.UPDATE_TIMESTAMP:
@@ -91,8 +92,8 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            logging.info(
-                f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"
+            custom_logger.info(
+                msg=f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"  # noqa
             )
 
     if config.action == Actions.UPDATE_SNAPSHOT:
@@ -113,6 +114,6 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            logging.info(
-                f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"
+            custom_logger.info(
+                msg=f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"  # noqa
             )

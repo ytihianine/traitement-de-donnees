@@ -1,6 +1,11 @@
+from typing import Any
+
+
 import os
 import pandas as pd
 from pathlib import Path
+
+from utils.config.vars import custom_logger
 
 # Chemin du dossier contenant les fichiers
 DOSSIER_PARQUET = "/home/onyxia/work/traitement-des-donnees/scripts/generate_tables/tmp"
@@ -40,7 +45,7 @@ def generer_create_table(fichier_parquet, nom_table=None):
     """Génère le script CREATE TABLE à partir d'un fichier Parquet"""
     try:
         # Lire le fichier Parquet
-        df = pd.read_parquet(fichier_parquet)
+        df = pd.read_parquet(path=fichier_parquet)
 
         # Générer le nom de la table
         if nom_table is None:
@@ -57,7 +62,7 @@ def generer_create_table(fichier_parquet, nom_table=None):
         for col_name, col_type in df.dtypes.items():
             # Nettoyer le nom de colonne (remplacer espaces, caractères spéciaux)
             col_name_clean = str(col_name).strip().replace(" ", "_").replace("-", "_")
-            type_pg = mapper_type_postgres(col_type)
+            type_pg = mapper_type_postgres(type_pandas=col_type)
             colonnes.append(f"    {col_name_clean} {type_pg}")
 
         sql += ",\n".join(colonnes)
@@ -65,16 +70,18 @@ def generer_create_table(fichier_parquet, nom_table=None):
 
         # Ajouter des commentaires sur les colonnes
         sql += "-- Aperçu des données:\n"
-        sql += f"-- {df.head(3).to_string()}\n\n"
+        sql += f"-- {df.head(n=3).to_string()}\n\n"
 
         return sql, nom_table, len(df)
 
     except Exception as e:
-        logging.info(f"✗ Erreur avec {os.path.basename(fichier_parquet)}: {str(e)}")
+        custom_logger.info(
+            msg=f"✗ Erreur avec {os.path.basename(fichier_parquet)}: {str(e)}"
+        )
         return None, None, 0
 
 
-def lire_fichiers_parquet(dossier):
+def lire_fichiers_parquet(dossier) -> list[Any]:
     """Retourne la liste des fichiers .parquet dans le dossier"""
     fichiers = []
     for fichier in os.listdir(dossier):
@@ -83,47 +90,49 @@ def lire_fichiers_parquet(dossier):
     return fichiers
 
 
-def main():
+def main() -> None:
     """Fonction principale"""
-    logging.info("Génération des scripts SQL CREATE TABLE depuis fichiers Parquet\n")
+    custom_logger.info(
+        msg="Génération des scripts SQL CREATE TABLE depuis fichiers Parquet\n"
+    )
 
     # Trouver les fichiers Parquet
-    fichiers = lire_fichiers_parquet(DOSSIER_PARQUET)
+    fichiers = lire_fichiers_parquet(dossier=DOSSIER_PARQUET)
 
     if not fichiers:
-        logging.info(f"Aucun fichier .parquet trouvé dans {DOSSIER_PARQUET}")
+        custom_logger.info(msg=f"Aucun fichier .parquet trouvé dans {DOSSIER_PARQUET}")
         return
 
-    logging.info(f"Trouvé {len(fichiers)} fichier(s) Parquet\n")
+    custom_logger.info(msg=f"Trouvé {len(fichiers)} fichier(s) Parquet\n")
 
     # Générer les scripts SQL
     scripts_sql = []
     tables_info = []
 
     for fichier in fichiers:
-        sql, nom_table, nb_lignes = generer_create_table(fichier)
+        sql, nom_table, nb_lignes = generer_create_table(fichier_parquet=fichier)
         if sql:
             scripts_sql.append(sql)
             tables_info.append((nom_table, nb_lignes, os.path.basename(fichier)))
-            logging.info(
-                f"✓ Script généré pour table '{nom_table}' ({nb_lignes} lignes)"
+            custom_logger.info(
+                msg=f"✓ Script généré pour table '{nom_table}' ({nb_lignes} lignes)"
             )
 
     # Écrire dans le fichier SQL
     if scripts_sql:
-        with open(FICHIER_SQL, "w", encoding="utf-8") as f:
+        with open(file=FICHIER_SQL, mode="w", encoding="utf-8") as f:
             f.write("-- Scripts SQL générés automatiquement depuis fichiers Parquet\n")
             f.write(f"-- Date de génération: {pd.Timestamp.now()}\n")
             f.write("-- " + "=" * 70 + "\n\n")
             f.write("\n".join(scripts_sql))
 
-        logging.info(f"\n✓ Fichier SQL créé: {FICHIER_SQL}")
-        logging.info("\nRésumé des tables générées:")
-        logging.info("-" * 60)
+        custom_logger.info(msg=f"\n✓ Fichier SQL créé: {FICHIER_SQL}")
+        custom_logger.info(msg="\nRésumé des tables générées:")
+        custom_logger.info(msg="-" * 60)
         for nom, lignes, fichier in tables_info:
-            logging.info(f"  {nom:30} {lignes:>8} lignes  ({fichier})")
+            custom_logger.info(msg=f"  {nom:30} {lignes:>8} lignes  ({fichier})")
     else:
-        logging.info("Aucun script SQL généré")
+        custom_logger.info(msg="Aucun script SQL généré")
 
 
 if __name__ == "__main__":

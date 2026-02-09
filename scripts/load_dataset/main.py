@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import psycopg2
 
+from utils.config.vars import custom_logger
 from utils.control.structures import are_lists_egal
 
 # FIXED VARIABLES
@@ -37,7 +38,7 @@ pg_cur.execute(
 """
 )
 db_columns = [row[0] for row in pg_cur.fetchall()]
-logging.info("Database columns sorted: ", db_columns)
+custom_logger.info(msg=f"Database columns sorted: {db_columns}")
 
 # read data
 df = pd.read_parquet(path=FILE_PATH)
@@ -51,7 +52,7 @@ df["snapshot_id"] = SNAPSHOT_ID
 df = df.drop(columns=[DB_ID_COLNAME], errors="ignore")
 df_columns = sorted(df.columns)
 df = df[df_columns]
-logging.info("Dataframe columns sorted: ", df_columns)
+custom_logger.info(msg=f"Dataframe columns sorted: {df_columns}")
 
 # export file to csv using "\" as sep
 df.to_csv(path_or_buf=TSV_FILE_PATH, sep="\t", index=False)

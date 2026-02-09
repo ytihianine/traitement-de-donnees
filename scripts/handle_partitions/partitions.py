@@ -2,6 +2,8 @@ from typing import Any, Optional
 from datetime import datetime
 from psycopg2 import extensions, sql
 
+from utils.config.vars import custom_logger
+
 
 def drop_partitions(
     partitions: list[tuple[Any, ...]],
@@ -17,7 +19,7 @@ def drop_partitions(
         schema_name (str): Nom du schéma
         dry_run (bool): Si True, affiche les commandes sans les exécuter
     """
-    logging.info(f"{len(partitions)} partition(s) trouvée(s)")
+    custom_logger.info(msg=f"{len(partitions)} partition(s) trouvée(s)")
 
     if from_date is not None:
         partitions = [
@@ -37,18 +39,20 @@ def drop_partitions(
         )
 
         if dry_run:
-            logging.info(f"[DRY RUN] {drop_query.as_string(context=cursor)}")
+            custom_logger.info(msg=f"[DRY RUN] {drop_query.as_string(context=cursor)}")
         else:
             cursor.execute(query=drop_query)
-            logging.info(f"✓ Supprimée: {schema}.{partition_name}")
+            custom_logger.info(msg=f"✓ Supprimée: {schema}.{partition_name}")
             dropped_count += 1
 
     if not dry_run:
-        logging.info(
-            f"\n{dropped_count}/{len(partitions)} partition(s) supprimée(s) avec succès"
+        custom_logger.info(
+            msg=f"\n{dropped_count}/{len(partitions)} partition(s) supprimée(s) avec succès"
         )
     else:
-        logging.info(f"\n[DRY RUN] {len(partitions)} partition(s) seraient supprimées")
+        custom_logger.info(
+            msg=f"\n[DRY RUN] {len(partitions)} partition(s) seraient supprimées"
+        )
 
     cursor.close()
 
@@ -60,7 +64,7 @@ def create_partitions(
     cursor: extensions.cursor,
     dry_run: bool = True,
 ) -> None:
-    logging.info(f"{len(tbl_names)} table(s) trouvée(s)")
+    custom_logger.info(msg=f"{len(tbl_names)} table(s) trouvée(s)")
 
     created_count = 0
     for tbl_name, schema in tbl_names:
@@ -73,7 +77,7 @@ def create_partitions(
             ]
         )
 
-        logging.info(f"Creating partition {partition_name} for {tbl_name}.")
+        custom_logger.info(msg=f"Creating partition {partition_name} for {tbl_name}.")
         create_query = f"""
             CREATE TABLE IF NOT EXISTS {schema}.{partition_name}
             PARTITION OF {schema}.{tbl_name}
@@ -81,18 +85,22 @@ def create_partitions(
         """
 
         if dry_run:
-            logging.info(f"[DRY RUN] {create_query}")
+            custom_logger.info(msg=f"[DRY RUN] {create_query}")
         else:
             cursor.execute(query=create_query)
-            logging.info(f"✓ Partition {partition_name} created successfully.")
+            custom_logger.info(
+                msg=f"✓ Partition {partition_name} created successfully."
+            )
             created_count += 1
 
     if not dry_run:
-        logging.info(
-            f"\n{created_count}/{len(tbl_names)} partitions(s) créé(s) avec succès"
+        custom_logger.info(
+            msg=f"\n{created_count}/{len(tbl_names)} partitions(s) créé(s) avec succès"
         )
     else:
-        logging.info(f"\n[DRY RUN] {len(tbl_names)} partitions(s) seraient créées")
+        custom_logger.info(
+            msg=f"\n[DRY RUN] {len(tbl_names)} partitions(s) seraient créées"
+        )
 
 
 def update_import_timestamp(
@@ -102,11 +110,11 @@ def update_import_timestamp(
     cursor: extensions.cursor,
     dry_run: bool = True,
 ) -> None:
-    logging.info(f"{len(tbl_names)} table(s) trouvée(s)")
+    custom_logger.info(msg=f"{len(tbl_names)} table(s) trouvée(s)")
 
     updated_count = 0
     for tbl_name, schema in tbl_names:
-        logging.info(f"Updating table {tbl_name}.")
+        custom_logger.info(msg=f"Updating table {tbl_name}.")
         create_query = f"""
             UPDATE {schema}.{tbl_name}
             SET import_timestamp = '{new_import_timestamp}',
@@ -115,18 +123,20 @@ def update_import_timestamp(
         """
 
         if dry_run:
-            logging.info(f"[DRY RUN] {create_query}")
+            custom_logger.info(msg=f"[DRY RUN] {create_query}")
         else:
             cursor.execute(query=create_query)
-            logging.info(f"✓ Table {tbl_name} updated successfully.")
+            custom_logger.info(msg=f"✓ Table {tbl_name} updated successfully.")
             updated_count += 1
 
     if not dry_run:
-        logging.info(
-            f"\n{updated_count}/{len(tbl_names)} table(s) mise(s) à jour avec succès"
+        custom_logger.info(
+            msg=f"\n{updated_count}/{len(tbl_names)} table(s) mise(s) à jour avec succès"
         )
     else:
-        logging.info(f"\n[DRY RUN] {len(tbl_names)} table(s) seraient misees à jour")
+        custom_logger.info(
+            msg=f"\n[DRY RUN] {len(tbl_names)} table(s) seraient misees à jour"
+        )
 
 
 def update_snapshot_id(
@@ -136,11 +146,11 @@ def update_snapshot_id(
     cursor: extensions.cursor,
     dry_run: bool = True,
 ) -> None:
-    logging.info(f"{len(tbl_names)} table(s) trouvée(s)")
+    custom_logger.info(msg=f"{len(tbl_names)} table(s) trouvée(s)")
 
     updated_count = 0
     for tbl_name, schema in tbl_names:
-        logging.info(f"Updating table {tbl_name}.")
+        custom_logger.info(msg=f"Updating table {tbl_name}.")
         create_query = f"""
             UPDATE {schema}.{tbl_name}
             SET snapshot_id = '{new_snapshot_id}'
@@ -148,15 +158,17 @@ def update_snapshot_id(
         """
 
         if dry_run:
-            logging.info(f"[DRY RUN] {create_query}")
+            custom_logger.info(msg=f"[DRY RUN] {create_query}")
         else:
             cursor.execute(query=create_query)
-            logging.info(f"✓ Table {tbl_name} updated successfully.")
+            custom_logger.info(msg=f"✓ Table {tbl_name} updated successfully.")
             updated_count += 1
 
     if not dry_run:
-        logging.info(
-            f"\n{updated_count}/{len(tbl_names)} table(s) mise(s) à jour avec succès"
+        custom_logger.info(
+            msg=f"\n{updated_count}/{len(tbl_names)} table(s) mise(s) à jour avec succès"
         )
     else:
-        logging.info(f"\n[DRY RUN] {len(tbl_names)} table(s) seraient misees à jour")
+        custom_logger.info(
+            msg=f"\n[DRY RUN] {len(tbl_names)} table(s) seraient misees à jour"
+        )
