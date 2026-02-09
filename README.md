@@ -37,3 +37,7 @@ L'ensemble de la documentation se trouve dans le dossier `docs/`.
 ## Mise en place de l'infrastructure
 
 Pour déployer l'infrastructure, voir le repo [https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/deploiement-applications](https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/deploiement-applications)
+
+Ci-dessous un schéma à date
+
+![Schéma de l'infrastructure](test.drawio.svg)
