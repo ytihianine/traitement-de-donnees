@@ -3,6 +3,7 @@
 import os
 import pytz
 from functools import lru_cache
+import logging
 
 
 @lru_cache(maxsize=1)
@@ -13,6 +14,8 @@ def get_root_folder() -> str:
         return "/home/onyxia/work/airflow-demo"
     return os.path.join(base_folder, "dags", "repo")
 
+
+custom_logger = logging.Logger(name="custom_logger")
 
 NO_PROCESS_MSG = "No complementary actions needed ! Skipping ..."
 
@@ -48,7 +51,7 @@ FF_S3_DISABLED_MSG = "S3 feature flag is disabled ! Skipping S3 operations ..."
 FF_DB_DISABLED_MSG = (
     "Database feature flag is disabled ! Skipping database operations ..."
 )
-FF_CONVERT_DISABLED_MSG = "File conversion to parquet feature flag is disabled ! Skipping File conversion operations ..."
+FF_CONVERT_DISABLED_MSG = "File conversion to parquet feature flag is disabled ! Skipping File conversion operations ..."  # noqa
 FF_DOWNLOAD_GRIST_DOC_DISABLED_MSG = (
     "Download Grist Doc feature flag is disabled ! Skipping Grist document download ..."
 )
