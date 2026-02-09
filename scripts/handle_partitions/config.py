@@ -11,7 +11,12 @@ action = Actions.CREATE
 dry_run = True
 
 # Si Actions.DROP
-drop_from_date = None  # else [datetime.strptime("31/07/2025", "%d/%m/%Y"), ..., datetime.strptime("31/08/2025", "%d/%m/%Y")]
+drop_from_date = None
+# else [
+#   datetime.strptime("31/07/2025", "%d/%m/%Y"),
+#   ...,
+#   datetime.strptime("31/08/2025", "%d/%m/%Y")
+#   ]
 
 
 # Si Actions.CREATE
