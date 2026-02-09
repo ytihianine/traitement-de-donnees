@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 from typing import Union
 import datetime
@@ -8,12 +9,12 @@ def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:
     semester_values = {"S1": 6, "Total": 12}
 
     if year is None or semester is None:
-        print("Either year or semester value is None.")
+        logging.info(msg="Either year or semester value is None.")
         return None
 
     if semester not in semester_values.keys():
-        print(
-            f"Invalid semester value: {semester}. Must be one of {list(semester_values.keys())}"
+        logging.info(
+            msg=f"Invalid semester value: {semester}. Must be one of {list(semester_values.keys())}"
         )
         return None
 
@@ -23,10 +24,10 @@ def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:
         date = datetime.datetime(year, month, 1)
         return date
     except ValueError:
-        print(f"year cannot be converted to int. Current year value: {year}")
+        logging.info(msg=f"year cannot be converted to int. Current year value: {year}")
         return None
     except Exception as e:
-        print(f"An exception as occured: {e}")
+        logging.info(msg=f"An exception as occured: {e}")
         return None
 
     return None
@@ -43,9 +44,9 @@ def process_teletravail(df: pd.DataFrame) -> pd.DataFrame:
 def process_teletravail_frequence(df: pd.DataFrame) -> pd.DataFrame:
     # Exemple : remplacer 'ND' par ''
     df.replace("ND", None, inplace=True)
-    print(df.columns)
+    logging.info(msg=df.columns)
     # Conversion en epoch time not working
-    print("Traitement de la table teletravail_frequence effectué.")
+    logging.info(msg="Traitement de la table teletravail_frequence effectué.")
     return df
 
 
@@ -53,9 +54,9 @@ def process_teletravail_frequence(df: pd.DataFrame) -> pd.DataFrame:
 def process_teletravail_opinion(df: pd.DataFrame) -> pd.DataFrame:
     # Exemple : remplacer 'ND' par ''
     df.replace("ND", None, inplace=True)
-    print(df.columns)
+    logging.info(msg=df.columns)
     # Conversion en epoch time not working
-    print("Traitement de la table teletravail_opinion effectué.")
+    logging.info(msg="Traitement de la table teletravail_opinion effectué.")
     return df
 
 
@@ -63,7 +64,7 @@ def process_teletravail_opinion(df: pd.DataFrame) -> pd.DataFrame:
 def process_mef_par_direction(df: pd.DataFrame) -> pd.DataFrame:
     # Exemple : Suppression des colonnes vides et conversion de valeurs
 
-    print("Traitement de la table Effectifs_MEFR_par_direction effectué.")
+    logging.info(msg="Traitement de la table Effectifs_MEFR_par_direction effectué.")
     return df
 
 
@@ -74,7 +75,7 @@ def process_effectif_direction(df: pd.DataFrame) -> pd.DataFrame:
             "nombre_d_agent": "nombre_agents",
         }
     )
-    print("Traitement de la table Effectif_2022 effectué.")
+    logging.info(msg="Traitement de la table Effectif_2022 effectué.")
     return df
 
 
@@ -83,14 +84,14 @@ def process_effectifs_par_perimetre(df: pd.DataFrame) -> pd.DataFrame:
     # Renommer la colonne 'type' en 'type_budget'
     df = df.rename(columns={"type": "type_budget"})
 
-    print("Traitement de la table Effectifs_par_perimetre effectué.")
+    logging.info(msg="Traitement de la table Effectifs_par_perimetre effectué.")
     return df
 
 
 # Traitement spécifique pour Effectifs_par_d partements
 def process_effectif_par_departements(df: pd.DataFrame) -> pd.DataFrame:
 
-    print("Traitement de la table Effectifs_par_departements effectué.")
+    logging.info(msg="Traitement de la table Effectifs_par_departements effectué.")
     return df
 
 
@@ -107,13 +108,13 @@ def process_budget_total(df: pd.DataFrame) -> pd.DataFrame:
             "type_budget": "type_budget",
         }
     )
-    print("Traitement de la table Budget_Total effectué.")
+    logging.info(msg="Traitement de la table Budget_Total effectué.")
     return df
 
 
 def process_budget_pilotable(df: pd.DataFrame) -> pd.DataFrame:
     # Exemple : Remplacer les valeurs négatives par 0
-    print("Traitement de la table Budget_pilotable effectué.")
+    logging.info(msg="Traitement de la table Budget_pilotable effectué.")
     return df
 
 
@@ -137,7 +138,7 @@ def process_budget_general(df: pd.DataFrame) -> pd.DataFrame:
 # Fonction pour Evolution_budget_mef
 def process_evolution_budget_mef(df: pd.DataFrame) -> pd.DataFrame:
 
-    print("Traitement de la table Evolution_budget_mef effectué.")
+    logging.info(msg="Traitement de la table Evolution_budget_mef effectué.")
     return df
 
 
@@ -145,7 +146,7 @@ def process_evolution_budget_mef(df: pd.DataFrame) -> pd.DataFrame:
 # def process_montant_invest(df: pd.DataFrame) -> pd.DataFrame:
 #
 
-#     print("Traitement de la table Montant_intervention_invest effectué.")
+#     logging.info(msg="Traitement de la table Montant_intervention_invest effectué.")
 #     return df
 
 
@@ -165,21 +166,21 @@ def process_montant_invest(df: pd.DataFrame) -> pd.DataFrame:
     df["source_montant"] = df["source_montant_split"].str.get(0)
     df = df.drop(columns=["source_montant_split"])
 
-    print("Traitement de la table Montant_intervention_invest effectué.")
+    logging.info(msg="Traitement de la table Montant_intervention_invest effectué.")
     return df
 
 
 # Fonction pour Engagement_Agent
 def process_engagement_agent(df: pd.DataFrame) -> pd.DataFrame:
 
-    print("Traitement de la table Engagement_Agent effectué.")
+    logging.info(msg="Traitement de la table Engagement_Agent effectué.")
     return df
 
 
 # Fonction pour RESULTAT_ELECTIONS
 def process_resultat_elections(df: pd.DataFrame) -> pd.DataFrame:
 
-    print("Traitement de la table RESULTAT_ELECTIONS effectué.")
+    logging.info(msg="Traitement de la table RESULTAT_ELECTIONS effectué.")
     return df
 
 
@@ -198,7 +199,7 @@ def process_taux_participation(df: pd.DataFrame) -> pd.DataFrame:
     df_unpivoted = df_unpivoted.dropna(subset=["annee", "taux_participation"])
     df_unpivoted["annee"] = df_unpivoted["annee"].str.replace("c", "", regex=False)
 
-    print("Traitement de la table Taux_participation effectué.")
+    logging.info(msg="Traitement de la table Taux_participation effectué.")
     return df_unpivoted
 
 
@@ -214,7 +215,7 @@ def process_plafond_etpt(df: pd.DataFrame) -> pd.DataFrame:
     df["source"] = df["source"].str.split()
     df["annee"] = df["source"].str.get(1)
     df["source"] = df["source"].str.get(0)
-    print("Traitement de la table plafond_etpt effectué.")
+    logging.info(msg="Traitement de la table plafond_etpt effectué.")
     return df
 
 
@@ -233,7 +234,7 @@ def process_db_plafond_etpt(df: pd.DataFrame) -> pd.DataFrame:
             "Unite": "unite",
         }
     )
-    print("Traitement de la table db_plafond_etpt effectué.")
+    logging.info(msg="Traitement de la table db_plafond_etpt effectué.")
     return df
 
 

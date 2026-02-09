@@ -48,11 +48,11 @@ if __name__ == "__main__":
         headers=headers,
     )
     tables = [table["id"] for table in response.json()["tables"]]
-    print("Nombre de tables dans le document: ", len(tables))
-    print(f"Liste des tables: {tables}")
+    logging.info("Nombre de tables dans le document: ", len(tables))
+    logging.info(f"Liste des tables: {tables}")
     tables = filter_tables(tables=tables)
-    print("Nombre de tables dans le document après filtrage: ", len(tables))
-    print(f"Liste des tables: {tables}")
+    logging.info("Nombre de tables dans le document après filtrage: ", len(tables))
+    logging.info(f"Liste des tables: {tables}")
 
     # Créer les webhooks
     webhooks = []
@@ -70,7 +70,7 @@ if __name__ == "__main__":
         }
         webhooks.append(webhook_info)
 
-    print("Exemple: \n", webhooks[0])
+    logging.info("Exemple: \n", webhooks[0])
 
     http_client.post(
         endpoint=config["GRIST"]["GRIST_HOST"]

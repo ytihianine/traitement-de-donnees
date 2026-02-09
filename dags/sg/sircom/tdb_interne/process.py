@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import numpy as np
 import datetime
@@ -36,12 +37,12 @@ def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:
     semester_values = {"S1": 6, "Total": 12}
 
     if year is None or semester is None:
-        print("Either year or semester value is None.")
+        logging.info(msg="Either year or semester value is None.")
         return None
 
     if semester not in semester_values.keys():
-        print(
-            f"Invalid semester value: {semester}. Must be one of {list(semester_values.keys())}"
+        logging.info(
+            msg=f"Invalid semester value: {semester}. Must be one of {list(semester_values.keys())}"
         )
         return None
 
@@ -51,10 +52,10 @@ def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:
         date = datetime.datetime(year, month, 1)
         return date
     except ValueError:
-        print(f"year cannot be converted to int. Current year value: {year}")
+        logging.info(msg=f"year cannot be converted to int. Current year value: {year}")
         return None
     except Exception as e:
-        print(f"An exception as occured: {e}")
+        logging.info(msg=f"An exception as occured: {e}")
         return None
 
     return None

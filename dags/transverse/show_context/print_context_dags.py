@@ -1,3 +1,4 @@
+import logging
 from airflow.sdk import dag, task
 from airflow.sdk.bases.operator import chain
 from datetime import timedelta
@@ -50,8 +51,10 @@ def liste_contexte_var() -> None:
     @task
     def my_task(**context) -> None:
         execution_date = context["dag_run"].execution_date
-        print(execution_date)
-        print("avant timezone", execution_date.strftime("%Y-%m-%d %H:%M:%S"))
+        logging.info(msg=execution_date)
+        logging.info(
+            msg=f"avant timezone {execution_date.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
         # Convert to Paris Timezone
         paris_tz = pytz.timezone("Europe/Paris")
         execution_date_paris = execution_date.astimezone(paris_tz)
@@ -60,12 +63,12 @@ def liste_contexte_var() -> None:
         formatted_time = execution_date_paris.strftime(
             "%Y-%m-%d %H:%M:%S"
         )  # Ensures output like "14:00:00"
-        print("apres timezone", formatted_time)
+        logging.info(msg=f"apres timezone {formatted_time}")
 
     @task
     def print_conf_var(**context) -> None:
         send_mail = context.get("params", {}).get("send_mail")
-        print(f"send_mail value: {send_mail}")
+        logging.info(msg=f"send_mail value: {send_mail}")
 
     @task
     def mail_success(**context) -> None:

@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 import pandas as pd
 
@@ -53,7 +54,7 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
     api_results = []
     nb_rows = len(df_oad)
     for row in df_oad.itertuples():
-        print(f"{row.Index}/{nb_rows}")
+        logging.info(msg=f"{row.Index}/{nb_rows}")
         api_result = get_eligibilite_fcu(
             api_client=http_internet_client,
             url=url,
@@ -63,7 +64,7 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
         api_result["code_bat_ter"] = row.code_bat_ter
         api_result["import_timestamp_oad"] = row.import_timestamp_oad
         api_results.append(api_result)
-        print(api_result)
+        logging.info(msg=api_result)
 
     df_result = pd.DataFrame(data=api_results)
     df_info(df=df_result, df_name="Result API - After processing")

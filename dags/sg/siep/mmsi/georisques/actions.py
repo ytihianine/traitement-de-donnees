@@ -118,7 +118,7 @@ def get_georisques(df: pd.DataFrame) -> pd.DataFrame:
     risques_results = []
     nb_rows = len(df)
     for row in df.itertuples():
-        print(f"{row.Index + 1}/{nb_rows}")
+        logging.info(msg=f"{row.Index + 1}/{nb_rows}")
         query_param = format_query_param(
             adresse=row.adresse_normalisee,
             latitude=row.latitude,
@@ -134,7 +134,7 @@ def get_georisques(df: pd.DataFrame) -> pd.DataFrame:
         formated_risques = format_risque_results(
             code_bat_ter=row.code_bat_ter, api_response=api_response
         )
-        print(formated_risques)
+        logging.info(msg=formated_risques)
         risques_results.extend(formated_risques)
 
     df = pd.DataFrame(data=risques_results)

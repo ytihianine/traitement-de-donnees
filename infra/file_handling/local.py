@@ -1,5 +1,6 @@
 """Local filesystem implementation of file handler."""
 
+import logging
 import os
 import shutil
 import tempfile
@@ -67,10 +68,10 @@ class LocalFileHandler(BaseFileHandler):
         abs_path = self.get_absolute_path(file_path)
         try:
             if abs_path.exists():
-                print(f"Deleting file at : {abs_path}")
+                logging.info(msg=f"Deleting file at : {abs_path}")
                 os.remove(abs_path)
             else:
-                print(f"File does not exists at : {abs_path}")
+                logging.info(msg=f"File does not exists at : {abs_path}")
 
         except PermissionError as e:
             raise FilePermissionError(f"Permission denied: {abs_path}") from e

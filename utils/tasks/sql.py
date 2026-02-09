@@ -173,12 +173,12 @@ def create_projet_snapshot(
     dag_status = get_dag_status(context=context)
 
     if dag_status == DagStatus.DEV:
-        print(f"Pipeline start execution date: {execution_date}")
-        print("Dag status parameter is set to DEV -> skipping this task ...")
+        logging.info(msg=f"Pipeline start execution date: {execution_date}")
+        logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
         return
 
     if not db_enable:
-        print(FF_DB_DISABLED_MSG)
+        logging.info(msg=FF_DB_DISABLED_MSG)
         return
 
     # Hook
@@ -213,9 +213,9 @@ def get_projet_snapshot(
     db_handler = create_db_handler(connection_id=pg_conn_id)
 
     snapshot_id = _get_snapshot_id(nom_projet=nom_projet, db_handler=db_handler)
-    print(f"Adding snapshot_id {snapshot_id} to context")
+    logging.info(msg=f"Adding snapshot_id {snapshot_id} to context")
     context["ti"].xcom_push(key="snapshot_id", value=snapshot_id)
-    print("Snapshot_id added to context.")
+    logging.info(msg="Snapshot_id added to context.")
 
 
 @task
@@ -244,11 +244,11 @@ def ensure_partition(
     prod_schema = db_info.prod_schema
 
     if dag_status == DagStatus.DEV:
-        print("Dag status parameter is set to DEV -> skipping this task ...")
+        logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
         return
 
     if not db_enable:
-        print(FF_DB_DISABLED_MSG)
+        logging.info(msg=FF_DB_DISABLED_MSG)
         return
 
     # Récupérer les informations de la table parente
@@ -260,7 +260,7 @@ def ensure_partition(
         tbl_name = tbl.tbl_name
 
         if not tbl.is_partitionned:
-            print(f"{tbl_name} is not partitinned ... skipping")
+            logging.info(msg=f"{tbl_name} is not partitinned ... skipping")
             continue
 
         # Get partition period range
@@ -308,7 +308,7 @@ def create_tmp_tables(
     dag_status = get_dag_status(context=context)
 
     if dag_status == DagStatus.DEV:
-        print("Dag status parameter is set to DEV -> skipping this task ...")
+        logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
         return
 
     db_info = get_db_info(context=context)
@@ -397,11 +397,11 @@ def copy_tmp_table_to_real_table(
     db_enable = get_feature_flags(context=context).db
 
     if dag_status == DagStatus.DEV:
-        print("Dag status parameter is set to DEV -> skipping this task ...")
+        logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
         return
 
     if not db_enable:
-        print(FF_DB_DISABLED_MSG)
+        logging.info(msg=FF_DB_DISABLED_MSG)
         return
 
     db_info = get_db_info(context=context)
@@ -413,11 +413,11 @@ def copy_tmp_table_to_real_table(
 
     if projet_db_info is None:
         projet_db_info = get_list_database_info(nom_projet=nom_projet)
-    print(f"Nombre de tables à copier: {len(projet_db_info)}")
+    logging.info(msg=f"Nombre de tables à copier: {len(projet_db_info)}")
 
     try:
         db_handler.execute(query="SET session_replication_role = replica;")
-        print("Désactivation des triggers de réplication")
+        logging.info(msg="Désactivation des triggers de réplication")
         queries = []
         for db_info in projet_db_info:
             load_strategy = LoadStrategy(value=db_info.load_strategy.upper())
@@ -439,7 +439,7 @@ def copy_tmp_table_to_real_table(
                 pk_cols = _get_primary_keys(
                     schema=prod_schema, table=tbl_name, db_handler=db_handler
                 )
-                print(f"Table <{tbl_name}> primary key: {pk_cols}")
+                logging.info(msg=f"Table <{tbl_name}> primary key: {pk_cols}")
                 col_list = sort_db_colnames(
                     tbl_name=tbl_name,
                     pg_conn_id=pg_conn_id,
@@ -470,13 +470,13 @@ def copy_tmp_table_to_real_table(
             for q in queries:
                 db_handler.execute(query=q)
         else:
-            print("No query to execute")
+            logging.info(msg="No query to execute")
     except Exception as e:
         db_handler.execute(query="SET session_replication_role = DEFAULT;")
-        print("Réactivation des triggers de réplication")
+        logging.info(msg="Réactivation des triggers de réplication")
         raise e
     db_handler.execute(query="SET session_replication_role = DEFAULT;")
-    print("Réactivation des triggers de réplication")
+    logging.info(msg="Réactivation des triggers de réplication")
 
 
 def sort_db_colnames(
@@ -579,7 +579,9 @@ def import_file_to_db(
     tbl_name = selecteur_info.tbl_name
 
     if tbl_name is None or tbl_name == "":
-        print(f"tbl_name is None for selecteur <{selecteur}>. Nothing to import to db")
+        logging.info(
+            msg=f"tbl_name is None for selecteur <{selecteur}>. Nothing to import to db"
+        )
     else:
         # Variables
         local_filepath = "/tmp/" + selecteur_info.filename
@@ -594,13 +596,13 @@ def import_file_to_db(
         local_handler.delete(file_path=local_filepath)
 
         # Read data from s3, sort its columns and save it locally
-        print(f"Reading file from remote < {s3_filepath} >")
+        logging.info(msg=f"Reading file from remote < {s3_filepath} >")
         df = read_dataframe(file_handler=s3_handler, file_path=s3_filepath)
 
         sorted_df_cols = sorted(df.columns)
         df = df.reindex(labels=sorted_df_cols, axis=1).convert_dtypes()
-        print(f"DF : {sorted_df_cols}")
-        print(f"Saving file to local < {local_filepath} >")
+        logging.info(msg=f"DF : {sorted_df_cols}")
+        logging.info(msg=f"Saving file to local < {local_filepath} >")
         local_handler.write(
             file_path=local_filepath,
             content=df.to_csv(index=False, sep="\t", na_rep="NULL"),
@@ -681,7 +683,7 @@ def refresh_views(pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context) -> None:
     prod_schema = db_info.prod_schema
 
     if dag_status == DagStatus.DEV:
-        print("Dag status parameter is set to DEV -> skipping this task ...")
+        logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
         return
 
     db = create_db_handler(connection_id=pg_conn_id)
@@ -697,7 +699,9 @@ def refresh_views(pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context) -> None:
     ].tolist()
 
     if len(views) == 0:
-        print(f"No materialized views found for schema {prod_schema}. Skipping ...")
+        logging.info(
+            msg=f"No materialized views found for schema {prod_schema}. Skipping ..."
+        )
     else:
         sql_queries = [
             f"REFRESH MATERIALIZED VIEW {prod_schema}.{view_name};"

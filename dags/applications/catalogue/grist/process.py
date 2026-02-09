@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 
 from utils.config.vars import NO_PROCESS_MSG
@@ -95,7 +96,7 @@ def process_ref_contactpoint(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_catalogue(df: pd.DataFrame) -> pd.DataFrame:
-    print(NO_PROCESS_MSG)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 

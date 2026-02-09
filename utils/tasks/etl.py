@@ -1,5 +1,6 @@
 """Module for ETL task creation and execution."""
 
+import logging
 from pathlib import Path
 from typing import Callable, Optional, Any
 
@@ -104,8 +105,8 @@ def create_grist_etl_task(
         if normalisation_process_func is not None:
             df = normalisation_process_func(df)
         else:
-            print(
-                "No normalisation process function provided. Skipping the normalisation step ..."
+            logging.info(
+                msg="No normalisation process function provided. Skipping the normalisation step ..."
             )
 
         # Removing Grist internal colums
@@ -115,7 +116,9 @@ def create_grist_etl_task(
         if process_func is not None:
             df = process_func(df)
         else:
-            print("No process function provided. Skipping the processing step ...")
+            logging.info(
+                msg="No process function provided. Skipping the processing step ..."
+            )
         df_info(df=df, df_name=f"{selecteur} - After processing")
 
         # Export
@@ -172,13 +175,14 @@ def create_file_etl_task(
                 nom_projet=nom_projet, selecteur=selecteur
             )
             if cols_mapping.empty:
-                print(f"No column mapping found for selecteur {selecteur}")
+
+                logging.info(f"No column mapping found for selecteur {selecteur}")
             else:
-                print(
+                logging.info(
                     "apply_cols_mapping set to True. Renaming the dataframe labels ..."
                 )
                 cols_mapping = column_mapping_dict(df_cols_map=cols_mapping)
-                print(f"Columns mapping: \n{cols_mapping}")
+                logging.info(f"Columns mapping: \n{cols_mapping}")
                 df = df.set_axis(
                     labels=[" ".join(colname.split()) for colname in df.columns],
                     axis="columns",
@@ -187,7 +191,9 @@ def create_file_etl_task(
                 df = df.loc[:, list(cols_mapping.values())]
 
         if process_func is None:
-            print("No process function provided. Skipping the processing step ...")
+            logging.info(
+                "No process function provided. Skipping the processing step ..."
+            )
         else:
             df_info(df=df, df_name=f"{selecteur} - After column mapping")
             df = process_func(df)
@@ -242,7 +248,7 @@ def _execute_step(
             kwargs[key] = df
 
     # Execute function
-    print(f"Executing function: {fn.__name__} with kwargs: {kwargs.keys()}")
+    logging.info(msg=f"Executing function: {fn.__name__} with kwargs: {kwargs.keys()}")
     if step.use_previous_output:
         return fn(previous_output, **kwargs)
 
@@ -303,8 +309,8 @@ def create_task(
         # Execute steps
         result: Any = None
         for idx, step in enumerate(steps):
-            print(f"▶ Executing step: step_{idx}")
-            print(f"Step information: {step}")
+            logging.info(msg=f"▶ Executing step: step_{idx}")
+            logging.info(msg=f"Step information: {step}")
 
             result = _execute_step(
                 step=step,

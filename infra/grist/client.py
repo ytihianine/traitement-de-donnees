@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, Any
 import pandas as pd
 from infra.http_client.base import AbstractHTTPClient
@@ -184,7 +185,9 @@ class GristAPI:
         total = len(records)
         total_batches = (total + batch_size - 1) // batch_size
 
-        print(f"Starting upload of {total} records in {total_batches} batches...")
+        logging.info(
+            msg=f"Starting upload of {total} records in {total_batches} batches..."
+        )
 
         # Process in batches
         for batch_index in range(total_batches):
@@ -192,8 +195,8 @@ class GristAPI:
             end = start + batch_size
             batch = records[start:end]
 
-            print(
-                f"Sending batch {batch_index + 1}/{total_batches} "
+            logging.info(
+                msg=f"Sending batch {batch_index + 1}/{total_batches} "
                 f"({len(batch)} records, indexes {start}-{end-1})"
             )
 
@@ -205,10 +208,10 @@ class GristAPI:
                 json=batch_payload,
                 data=batch_payload if data is not None else None,
             )
-            print(response.status_code)
-            print(f"Batch {batch_index + 1}/{total_batches} completed.")
+            logging.info(msg=response.status_code)
+            logging.info(msg=f"Batch {batch_index + 1}/{total_batches} completed.")
 
-        print("All batches sent successfully.")
+        logging.info(msg="All batches sent successfully.")
 
     def put_records(
         self,
@@ -262,7 +265,7 @@ class GristAPI:
         url = self._build_url_records(
             base_url=base_url, doc_id=doc_id, tbl_name=tbl_name
         )
-        print(url)
+        logging.info(msg=url)
 
     def get_df_from_records(
         self,

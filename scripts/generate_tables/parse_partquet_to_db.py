@@ -70,7 +70,7 @@ def generer_create_table(fichier_parquet, nom_table=None):
         return sql, nom_table, len(df)
 
     except Exception as e:
-        print(f"✗ Erreur avec {os.path.basename(fichier_parquet)}: {str(e)}")
+        logging.info(f"✗ Erreur avec {os.path.basename(fichier_parquet)}: {str(e)}")
         return None, None, 0
 
 
@@ -85,16 +85,16 @@ def lire_fichiers_parquet(dossier):
 
 def main():
     """Fonction principale"""
-    print("Génération des scripts SQL CREATE TABLE depuis fichiers Parquet\n")
+    logging.info("Génération des scripts SQL CREATE TABLE depuis fichiers Parquet\n")
 
     # Trouver les fichiers Parquet
     fichiers = lire_fichiers_parquet(DOSSIER_PARQUET)
 
     if not fichiers:
-        print(f"Aucun fichier .parquet trouvé dans {DOSSIER_PARQUET}")
+        logging.info(f"Aucun fichier .parquet trouvé dans {DOSSIER_PARQUET}")
         return
 
-    print(f"Trouvé {len(fichiers)} fichier(s) Parquet\n")
+    logging.info(f"Trouvé {len(fichiers)} fichier(s) Parquet\n")
 
     # Générer les scripts SQL
     scripts_sql = []
@@ -105,7 +105,9 @@ def main():
         if sql:
             scripts_sql.append(sql)
             tables_info.append((nom_table, nb_lignes, os.path.basename(fichier)))
-            print(f"✓ Script généré pour table '{nom_table}' ({nb_lignes} lignes)")
+            logging.info(
+                f"✓ Script généré pour table '{nom_table}' ({nb_lignes} lignes)"
+            )
 
     # Écrire dans le fichier SQL
     if scripts_sql:
@@ -115,13 +117,13 @@ def main():
             f.write("-- " + "=" * 70 + "\n\n")
             f.write("\n".join(scripts_sql))
 
-        print(f"\n✓ Fichier SQL créé: {FICHIER_SQL}")
-        print("\nRésumé des tables générées:")
-        print("-" * 60)
+        logging.info(f"\n✓ Fichier SQL créé: {FICHIER_SQL}")
+        logging.info("\nRésumé des tables générées:")
+        logging.info("-" * 60)
         for nom, lignes, fichier in tables_info:
-            print(f"  {nom:30} {lignes:>8} lignes  ({fichier})")
+            logging.info(f"  {nom:30} {lignes:>8} lignes  ({fichier})")
     else:
-        print("Aucun script SQL généré")
+        logging.info("Aucun script SQL généré")
 
 
 if __name__ == "__main__":

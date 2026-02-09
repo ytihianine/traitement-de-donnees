@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 from airflow.sdk import task
 from typing import Any
@@ -14,7 +15,7 @@ from dags.sg.dsci.weather_api import process
 
 @task()
 def extract_data() -> dict[str, Any]:
-    print("Extraction des données météo depuis l'API")
+    logging.info(msg="Extraction des données météo depuis l'API")
     return actions.get_weather_from_api()
 
 
@@ -22,7 +23,7 @@ def extract_data() -> dict[str, Any]:
 @task()
 def transform_data(raw_data: dict[str, Any]) -> list[list[Any]]:
     if not raw_data:
-        print("Aucune donnée reçue !")
+        logging.info(msg="Aucune donnée reçue !")
         return []
     weather_info = raw_data.get("weather", {})
 
@@ -42,11 +43,11 @@ def transform_data(raw_data: dict[str, Any]) -> list[list[Any]]:
 def load_data(transformed_data: list[list[Any]]) -> pd.DataFrame | None:
     # verif que liste pas vide
     if not transformed_data:
-        print("Liste vide, rien à charger.")
+        logging.info(msg="Liste vide, rien à charger.")
         return
 
     # Appel 'process' : pour conversn
     loaded_data = process.convert_to_dataframe(transformed_data)
     loaded_data.columns = ["date", "city", "weather_temps", "weather_conditions"]
-    print(loaded_data)
+    logging.info(msg=loaded_data)
     return loaded_data
