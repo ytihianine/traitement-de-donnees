@@ -85,8 +85,9 @@ class PostgresDBHandler(BaseDBHandler):
                     cur.execute(query, parameters)
                     if cur.description is None:
                         raise DatabaseError("Query did not return a result set")
-
+                    print("Here")
                     for desc in cur.description:
+                        print("There")
                         print(desc)
                         print(f"Column: {desc[0]}, Type: {desc[1]}, Size: {desc[2]}")
                     columns = [str(desc[0]) for desc in cur.description]
