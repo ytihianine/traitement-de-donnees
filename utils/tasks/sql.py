@@ -536,11 +536,11 @@ def bulk_load_local_tsv_file_to_db(
         column_names: List of column names in order
         schema: Target schema
     """
-    logging.info(f"Bulk importing {local_filepath} to {schema}.tmp_{tbl_name}")
+    logging.info(msg=f"Bulk importing {local_filepath} to {schema}.tmp_{tbl_name}")
 
     copy_sql = sql.SQL(
-        """
-        COPY {schema}.tmp_{tbl_name} ({', '.join(column_names)})
+        string="""
+        COPY {schema}.tmp_{tbl_name} ({col_names})
         FROM STDIN WITH (
             FORMAT TEXT,
             DELIMITER E'\t',
@@ -551,6 +551,7 @@ def bulk_load_local_tsv_file_to_db(
     ).format(
         schema=sql.Identifier(schema),
         tbl_name=sql.Identifier(tbl_name),
+        col_names=sql.Identifier(", ".join(column_names)),
     )
 
     db_handler.copy_expert(sql=str(copy_sql), filepath=local_filepath)
