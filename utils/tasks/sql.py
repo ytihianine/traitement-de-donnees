@@ -314,6 +314,7 @@ def create_tmp_tables(
     db_info = get_db_info(context=context)
     prod_schema = db_info.prod_schema
     tmp_schema = db_info.tmp_schema
+    print(prod_schema, tmp_schema)
 
     # Hook
     db = create_db_handler(connection_id=pg_conn_id)
