@@ -1,6 +1,6 @@
 from datetime import timedelta
 from dataclasses import dataclass
-from typing import TypedDict, List, ParamSpec, TypeVar, Callable, Any
+from typing import ParamSpec, TypeVar, Callable, Any
 
 from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
 
