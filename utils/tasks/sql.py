@@ -325,7 +325,7 @@ def create_tmp_tables(
         query="""SELECT COUNT(*) as count_tmp_tables
             FROM information_schema.tables
             WHERE table_schema= %s
-                AND table_name LIKE 'tmp_%';
+                AND table_name LIKE 'tmp_%%';
         """,
         parameters=(tmp_schema,),
     )
