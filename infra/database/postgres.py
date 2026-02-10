@@ -82,6 +82,7 @@ class PostgresDBHandler(BaseDBHandler):
             start_time = time.time()
             with self.hook.get_conn() as conn:
                 with conn.cursor() as cur:
+                    print("Before query")
                     cur.execute(query, parameters)
                     if cur.description is None:
                         raise DatabaseError("Query did not return a result set")
