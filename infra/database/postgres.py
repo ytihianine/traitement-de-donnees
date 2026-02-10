@@ -82,17 +82,10 @@ class PostgresDBHandler(BaseDBHandler):
             start_time = time.time()
             with self.hook.get_conn() as conn:
                 with conn.cursor() as cur:
-                    print("Before query")
-                    print(query)
-                    print(parameters)
                     cur.execute(query, parameters)
                     if cur.description is None:
                         raise DatabaseError("Query did not return a result set")
-                    print("Here")
-                    for desc in cur.description:
-                        print("There")
-                        print(desc)
-                        print(f"Column: {desc[0]}, Type: {desc[1]}, Size: {desc[2]}")
+
                     columns = [str(desc[0]) for desc in cur.description]
                     results = cur.fetchall()
 
