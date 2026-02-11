@@ -540,7 +540,7 @@ def bulk_load_local_tsv_file_to_db(
 
     copy_sql = sql.SQL(
         string="""
-        COPY {schema}.tmp_{tbl_name} ({col_names})
+        COPY {schema}.{tbl_name} ({col_names})
         FROM STDIN WITH (
             FORMAT TEXT,
             DELIMITER E'\t',
@@ -550,7 +550,7 @@ def bulk_load_local_tsv_file_to_db(
     """
     ).format(
         schema=sql.Identifier(schema),
-        tbl_name=sql.Identifier(tbl_name),
+        tbl_name=sql.Identifier("tmp_" + tbl_name),
         col_names=sql.Identifier(", ".join(column_names)),
     )
 
