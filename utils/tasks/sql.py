@@ -551,7 +551,9 @@ def bulk_load_local_tsv_file_to_db(
     ).format(
         schema=sql.Identifier(schema),
         tbl_name=sql.Identifier("tmp_" + tbl_name),
-        col_names=sql.Identifier(", ".join(column_names)),
+        col_names=sql.SQL(string=",").join(
+            seq=[sql.Identifier(col) for col in column_names]
+        ),
     )
 
     db_handler.copy_expert(
