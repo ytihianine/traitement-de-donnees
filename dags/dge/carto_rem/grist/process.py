@@ -120,6 +120,20 @@ def process_agent_revalorisation(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def process_agent_revalorisation_proposition(df: pd.DataFrame) -> pd.DataFrame:
+    # Drop columns
+    cols_to_drop = ["agent", "diplome_niveau_grille", "im"]
+    df = df.drop(columns=cols_to_drop)
+
+    # Rename columns
+    df = df.rename(columns={"base_revalorisation": "id_base_revalorisation"})
+
+    # Handle ref
+    ref_cols = ["agent", "id_base_revalorisation"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+    return df
+
+
 def process_agent_contrat_complement(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(
         columns=[

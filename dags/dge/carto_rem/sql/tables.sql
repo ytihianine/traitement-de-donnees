@@ -175,6 +175,17 @@ CREATE TABLE cartographie_remuneration."agent_revalorisation" (
 );
 
 
+CREATE TABLE cartographie_remuneration."agent_revalorisation_proposition" (
+  "id" int,
+  "matricule_agent" int,
+  "id_base_revalorisation" int,
+  "taux_plafond" float,
+  PRIMARY KEY ("id"),
+  FOREIGN KEY ("id_base_revalorisation") REFERENCES cartographie_remuneration."ref_base_revalorisation" ("id")
+);
+
+
+
 CREATE TABLE cartographie_remuneration."agent_experience_pro" (
   "matricule_agent" int,
   "exp_pro_totale_annee" integer,
