@@ -39,6 +39,9 @@ class PostgresDBHandler(BaseDBHandler):
         """Get the database URI."""
         return self.hook.get_uri()
 
+    def get_conn(self) -> Any:
+        return self.hook.get_conn()
+
     def execute(
         self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
     ) -> None:

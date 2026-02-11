@@ -15,6 +15,9 @@ class BaseDBHandler(ABC):
         pass
 
     @abstractmethod
+    def get_conn(self) -> Any: ...
+
+    @abstractmethod
     def execute(
         self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
     ) -> None:

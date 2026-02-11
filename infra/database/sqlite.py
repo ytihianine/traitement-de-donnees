@@ -39,6 +39,9 @@ class SQLiteDBHandler(BaseDBHandler):
         """Return a SQLite URI."""
         return f"sqlite:///{self.db_path}"
 
+    def get_conn(self) -> Any:
+        return self.conn
+
     def execute(
         self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
     ) -> None:
