@@ -449,7 +449,7 @@ def copy_tmp_table_to_real_table(
                 )
 
                 merge_query = sql.SQL(
-                    """
+                    string="""
                     MERGE INTO {prod_table} tbl_target
                     USING {tmp_table} tbl_source ON ({' AND '.join([f'tbl_source.{col} = tbl_target.{col}' for col in pk_cols])})
                     WHEN MATCHED THEN
@@ -554,7 +554,9 @@ def bulk_load_local_tsv_file_to_db(
         col_names=sql.Identifier(", ".join(column_names)),
     )
 
-    db_handler.copy_expert(sql=str(copy_sql), filepath=local_filepath)
+    db_handler.copy_expert(
+        sql=copy_sql.as_string(context=db_handler.get_conn()), filepath=local_filepath
+    )
     logging.info(
         msg=f"Successfully loaded {local_filepath} into {schema}.tmp_{tbl_name}"
     )
