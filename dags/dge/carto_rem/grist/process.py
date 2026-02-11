@@ -129,7 +129,7 @@ def process_agent_revalorisation_proposition(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"base_revalorisation": "id_base_revalorisation"})
 
     # Handle ref
-    ref_cols = ["agent", "id_base_revalorisation"]
+    ref_cols = ["id_base_revalorisation"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     return df
 
