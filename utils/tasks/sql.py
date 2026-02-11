@@ -448,8 +448,7 @@ def copy_tmp_table_to_real_table(
                     schema=prod_schema,
                 )
 
-                merge_query = sql.SQL(
-                    string="""
+                merge_query = f"""
                     MERGE INTO {prod_table} tbl_target
                     USING {tmp_table} tbl_source ON ({' AND '.join([f'tbl_source.{col} = tbl_target.{col}' for col in pk_cols])})
                     WHEN MATCHED THEN
@@ -463,10 +462,6 @@ def copy_tmp_table_to_real_table(
                     */
                     ;
                 """
-                ).format(
-                    prod_table=sql.Identifier(prod_schema, tbl_name),
-                    tmp_table=sql.Identifier(tmp_schema, f"tmp_{tbl_name}"),
-                )
                 queries.append(merge_query)
 
         if queries:
