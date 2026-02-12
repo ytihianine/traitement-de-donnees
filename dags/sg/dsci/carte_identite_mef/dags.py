@@ -50,7 +50,7 @@ def carte_identite_mef_dag() -> None:
         ),
         [effectif(), budget(), taux_agent(), plafond()],
         create_tmp_tables(),
-        import_file_to_db.partial(keep_id_col=True).expand(
+        import_file_to_db.partial(keep_file_id_col=True).expand(
             selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
         copy_tmp_table_to_real_table(),
