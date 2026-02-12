@@ -198,6 +198,7 @@ def process_taux_participation(df: pd.DataFrame) -> pd.DataFrame:
     df_unpivoted = df_unpivoted.dropna(subset=["annee", "taux_participation"])
 
     # Ajouter un id
+    df_unpivoted["annee"] = df_unpivoted["annee"].str.replace("c", "", regex=False)
     df_unpivoted["id"] = (
         df_unpivoted.sort_values(by=["annee", "tri"]).reset_index(drop=True).index
     )
