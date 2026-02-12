@@ -36,7 +36,7 @@ nom_projet = "Carte_Identite_MEF"
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="dsci"),
         feature_flags=FeatureFlags(
-            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=True
         ),
     ),
 )
