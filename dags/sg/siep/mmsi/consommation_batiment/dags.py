@@ -52,7 +52,7 @@ nom_projet = "Consommation des bâtiments"
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="siep"),
         feature_flags=FeatureFlags(
-            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+            db=True, mail=False, s3=True, convert_files=True, download_grist_doc=False
         ),
     ),
     on_failure_callback=create_send_mail_callback(

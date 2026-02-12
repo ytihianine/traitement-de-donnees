@@ -11,7 +11,6 @@ from utils.config.dag_params import create_dag_params, create_default_args
 from utils.config.tasks import get_list_source_fichier_key, get_list_selector_info
 from enums.dags import DagStatus
 from utils.tasks.sql import (
-    LoadStrategy,
     create_tmp_tables,
     ensure_partition,
     copy_tmp_table_to_real_table,
@@ -58,7 +57,7 @@ nom_projet = "Outil aide diagnostic"
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="siep"),
         feature_flags=FeatureFlags(
-            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+            db=True, mail=False, s3=True, convert_files=True, download_grist_doc=False
         ),
     ),
     on_failure_callback=create_send_mail_callback(
