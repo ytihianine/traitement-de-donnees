@@ -185,7 +185,8 @@ def process_resultat_elections(df: pd.DataFrame) -> pd.DataFrame:
 
 # Fonction pour Taux_participation
 def process_taux_participation(df: pd.DataFrame) -> pd.DataFrame:
-    # Remplacer les valeurs NaN par None
+    # Supprimer les colonnes
+    df = df.drop(columns=["id"])
 
     # Unpivoter les colonnes d'années
     df_unpivoted = df.melt(
