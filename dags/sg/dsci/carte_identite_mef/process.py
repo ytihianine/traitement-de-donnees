@@ -196,7 +196,11 @@ def process_taux_participation(df: pd.DataFrame) -> pd.DataFrame:
 
     # Filtrer les lignes où 'valeur' est NaN
     df_unpivoted = df_unpivoted.dropna(subset=["annee", "taux_participation"])
-    df_unpivoted["annee"] = df_unpivoted["annee"].str.replace("c", "", regex=False)
+
+    # Ajouter un id
+    df_unpivoted["id"] = (
+        df_unpivoted.sort_values(by=["annee", "tri"]).reset_index(drop=True).index
+    )
 
     logging.info(msg="Traitement de la table Taux_participation effectué.")
     return df_unpivoted
