@@ -1,6 +1,7 @@
 """ Répertorie les variables communes à toutes les pipelines """
 
 import os
+import sys
 import pytz
 from functools import lru_cache
 import logging
@@ -15,7 +16,14 @@ def get_root_folder() -> str:
     return os.path.join(base_folder, "dags", "repo")
 
 
-custom_logger = logging.Logger(name="custom_logger")
+# It doesn't work
+custom_logger = logging.Logger(name=__name__, level=logging.DEBUG)
+handler = logging.StreamHandler(
+    stream=sys.stdout
+)  # Handler pour afficher les logs dans la console
+formatter = logging.Formatter(fmt="%(asctime)s - %(levelname)s - %(message)s")
+handler.setFormatter(fmt=formatter)
+custom_logger.addHandler(hdlr=handler)
 
 NO_PROCESS_MSG = "No complementary actions needed ! Skipping ..."
 
