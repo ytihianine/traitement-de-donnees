@@ -279,16 +279,16 @@ def ensure_partition(
                 """
                 CREATE TABLE IF NOT EXISTS {prod_schema}.{partition_name}
                 PARTITION OF {prod_schema}.{tbl_name}
-                FOR VALUES FROM ('{from_date}') TO ('{to_date}');
+                FOR VALUES FROM ({from_date}) TO ({to_date});
             """
             ).format(
                 prod_schema=sql.Identifier(prod_schema),
                 partition_name=sql.Identifier(partition_name),
                 tbl_name=sql.Identifier(tbl_name),
-                from_date=sql.Literal(from_date.strftime(format="%Y-%m-%d")),
-                to_date=sql.Literal(to_date.strftime(format="%Y-%m-%d")),
+                from_date=sql.Literal(wrapped=from_date.strftime(format="%Y-%m-%d")),
+                to_date=sql.Literal(wrapped=to_date.strftime(format="%Y-%m-%d")),
             )
-            db.execute(query=str(create_sql))
+            db.execute(query=create_sql.as_string(context=db.get_conn()))
             logging.info(msg=f"Partition {partition_name} created successfully.")
         except Exception as e:
             logging.error(msg=f"Error creating partition {partition_name}: {str(e)}")
