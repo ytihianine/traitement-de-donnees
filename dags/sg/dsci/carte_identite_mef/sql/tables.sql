@@ -104,15 +104,6 @@ CREATE TABLE IF NOT EXISTS dsci.evolution_budget_mef (
     rang INTEGER
 );
 
-DROP TABLE IF EXISTS dsci.evolution_budget_mef;
-CREATE TABLE  IF NOT EXISTS dsci.evolution_budget_mef (
-    entite TEXT,
-    annee INT,
-    type_budget TEXT,
-    montant_budget DECIMAL(10, 2),
-    rang INT
-);
-
 -- DROP TABLE IF EXISTS dsci.montant_intervention_invest;
 -- CREATE TABLE IF NOT EXISTS dsci.montant_intervention_invest (
 --     id SERIAL PRIMARY KEY,

@@ -2,7 +2,6 @@ import logging
 import pandas as pd
 from typing import Union
 import datetime
-import numpy as np
 
 
 def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:

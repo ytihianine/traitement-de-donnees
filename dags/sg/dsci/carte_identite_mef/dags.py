@@ -47,11 +47,10 @@ def carte_identite_mef_dag() -> None:
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci",
-            doc_id_key="grist_doc_id_tdb_carte_identite_mef",
         ),
         [effectif(), budget(), taux_agent(), plafond()],
         create_tmp_tables(),
-        import_file_to_db.expand(
+        import_file_to_db.partial(keep_id_col=True).expand(
             selecteur_info=get_list_selector_info(nom_projet=nom_projet)
         ),
         copy_tmp_table_to_real_table(),
