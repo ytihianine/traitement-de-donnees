@@ -64,3 +64,17 @@ CREATE TABLE IF NOT EXISTS sircom.ouverture_lettres_alize (
     taux_ouverture FLOAT,
     is_last_value BOOLEAN
 );
+CREATE TABLE IF NOT EXISTS sircom.impact_actions_com(
+    id BIGSERIAL PRIMARY KEY,
+    annee INTEGER,
+    nombre_article INTEGER,
+    nombre_vue INTEGER,
+    date DATE,
+    is_last_value BOOLEAN
+);
+CREATE TABLE IF NOT EXISTS sircom.impressions_reseaux_sociaux (
+    id BIGSERIAL PRIMARY KEY,
+    date DATE,
+    impressions INTEGER,
+    is_last_value BOOLEAN
+);
