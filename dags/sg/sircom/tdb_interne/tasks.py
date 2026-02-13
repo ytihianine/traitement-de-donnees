@@ -50,6 +50,17 @@ def abonnes_visites():
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_ouverture_lettre_alize,
     )
+    impressions_reseaux_sociaux = create_grist_etl_task(
+        selecteur="impressions_reseaux_sociaux",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_impressions_reseaux_sociaux,
+    )
+    impact_actions_com = create_grist_etl_task(
+        selecteur="impact_actions_com",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_impact_actions_com,
+    )
+
     chain(
         [
             reseaux_sociaux(),
@@ -60,6 +71,8 @@ def abonnes_visites():
             performances_lettres(),
             abonnes_aux_lettres(),
             ouverture_lettre_alize(),
+            impressions_reseaux_sociaux(),
+            impact_actions_com(),
         ]
     )
 
@@ -151,13 +164,31 @@ def metiers():
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_studio_graphique,
     )
+    notes_veilles = create_grist_etl_task(
+        selecteur="notes_veilles",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_notes_veilles,
+    )
+    recommandation_strat = create_grist_etl_task(
+        selecteur="recommandation_strat",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_recommandation_strat,
+    )
+    projets_graphiques = create_grist_etl_task(
+        selecteur="projets_graphiques",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_projets_graphiques,
+    )
     chain(
         [
             indicateurs_metiers(),
             enquete_satisfaction(),
             etudes(),
             communique_presse(),
-            studio_graphique(),
+            studio_graphique(),  # [OLD] ref projets_graphique
+            notes_veilles(),
+            recommandation_strat(),
+            projets_graphiques(),
         ]
     )
 

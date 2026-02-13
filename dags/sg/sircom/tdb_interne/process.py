@@ -503,3 +503,136 @@ def process_engagement_environnement(df: pd.DataFrame) -> pd.DataFrame:
     df = tag_last_value_rows(df=df, colname_max_value="annee")
 
     return df
+
+
+def process_notes_veilles(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
+    df = df.rename(
+        columns={
+            "nombre_de_notes": "nombre_note",
+            "nombre_de_signalements": "nombre_signalements",
+        }
+    )
+    # Conv de l'annee en string
+    df["annee"] = df["annee"].astype(str).str.strip()
+    df["semestre_temp"] = "Total"
+    df["date"] = list(map(generate_date, df["annee"], df["semestre_temp"]))
+
+    # Supp la col temporaire
+    df = df.drop(columns=["semestre_temp", "annee"])
+    df = df.dropna(subset=["date"])
+
+    cols_numeriques = ["nombre_note", "nombre_signalements"]
+
+    for col in cols_numeriques:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+        df[col] = df[col].fillna(0).astype(int)
+
+    if not is_upper(df=df, cols_to_check=cols_numeriques, seuil=0, inclusive=True):
+        raise ValueError("Erreur : Des nbres de notes ou signalements sont négatifs !")
+    df = tag_last_value_rows(df=df, colname_max_value="date")
+
+    return df
+
+
+def process_impressions_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
+    df["date"] = pd.to_datetime(df["mois"], unit="s")
+    df = df.drop(columns=["mois"])
+    df = df.rename(columns={"nombre_d_impression_globale": "impressions"})
+
+    # Clean
+    cols_with_values = ["impressions"]
+    df = df.replace("", None)
+    df = df.dropna(subset=cols_with_values)
+
+    # Data control
+    if not is_upper(df=df, cols_to_check=cols_with_values, seuil=0, inclusive=True):
+        """Inclusive=True : si pas de post par mois on peut avoir 0 impressions"""
+        raise ValueError("Certaines valeurs sont négatives !")
+    # Add additionnal info
+    df = tag_last_value_rows(df=df, colname_max_value="date")
+
+    return df
+
+
+def process_impact_actions_com(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
+    df = df.rename(
+        columns={
+            "nombre_d_articles": "nombre_article",
+            "nombre_de_vues": "nombre_vue",
+        }
+    )
+    # Conv de l'annee en string
+    df["annee"] = df["annee"].astype(str).str.strip()
+    df["date"] = pd.to_datetime(df["annee"], format="%Y", errors="coerce")
+    df = df.drop(columns=["annee"])
+    df = df.dropna(subset=["date"])  # lignes ou annee invalide
+    cols_numeriques = ["nombre_article", "nombre_vue"]
+    for col in cols_numeriques:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+        df[col] = df[col].fillna(0).astype(int)
+
+    if not is_upper(df=df, cols_to_check=cols_numeriques, seuil=0, inclusive=True):
+        raise ValueError("Erreur : Des nbres d'articles ou vues sont négatifs !")
+    df = tag_last_value_rows(df=df, colname_max_value="date")
+
+    return df
+
+
+def process_recommandation_strat(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
+    df = df.rename(
+        columns={
+            "nombre_de_recommandations": "nombre_recommandation",
+        }
+    )
+    df["annee"] = df["annee"].astype(str).str.strip()
+    df["date"] = pd.to_datetime(df["annee"], format="%Y", errors="coerce")
+    df = df.drop(columns=["annee"])
+    df = df.dropna(subset=["date"])  # del invalide date
+    cols_numeriques = ["nombre_recommandation"]
+    for col in cols_numeriques:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+        df[col] = df[col].fillna(0).astype(int)
+    if not is_upper(df=df, cols_to_check=cols_numeriques, seuil=0, inclusive=True):
+        raise ValueError(
+            "Erreur : Le nombre de recommandations ne peut pas être négatif !"
+        )
+    df = tag_last_value_rows(df=df, colname_max_value="date")
+
+    return df
+
+
+def process_projets_graphiques(df: pd.DataFrame) -> pd.DataFrame:
+    df = drop_additionals_columns(df=df)
+    df = df.rename(
+        columns={"nombre_de_projets_graphiques_realises": "nombre_graphique_realise"}
+    )
+    # Gestion date
+    df["date"] = pd.to_datetime(
+        df["annee"].astype(str).str.strip(), format="%Y", errors="coerce"
+    )
+    df = df.drop(columns=["annee"])
+    df = df.dropna(subset=["date"])
+    # Data clean
+    cols_numeriques = [
+        "nombre_graphique_realise",
+        "cabinets_ministeriels",
+        "directions",
+        "secretariat_general",
+        "part_de_la_dge",
+    ]
+    for col in cols_numeriques:
+        # force en nombre
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+        # replace les vides par 0
+        df[col] = df[col].fillna(0)
+
+    #  Control
+    if not is_upper(df=df, cols_to_check=cols_numeriques, seuil=0, inclusive=True):
+        raise ValueError("Erreur : Certaines valeurs de projets sont négatives !")
+
+    df = tag_last_value_rows(df=df, colname_max_value="date")
+    return df
