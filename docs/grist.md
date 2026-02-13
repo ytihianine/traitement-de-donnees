@@ -3,14 +3,22 @@
 Cette documentation décrit le processus d'un projet Grist, de la phase de cadrage du projet à l'exploitation des données avec ChartsGouv
 
 ## Table des matières
-- [Réaliser un projet avec Grist](#realiser-un-projet-avec-grist)
+- [Documentation Grist](#documentation-grist)
   - [Table des matières](#table-des-matières)
-  - [Glossaire](#glossaire)
-  - [Convention de nommage](#convention-de-nommage)
-  - [Réaliser un projet Grist](#réaliser-un-projet-grist)
+  - [Prendre en main Grist](#prendre-en-main-grist)
+    - [Glossaire et ressources](#glossaire-et-ressources)
+    - [Convention de nommage](#convention-de-nommage)
+    - [Widget custom](#widget-custom)
+  - [Accompagner un projet Grist](#accompagner-un-projet-grist)
+    - [Cadrer le besoin métier](#cadrer-le-besoin-métier)
+    - [Lister et structurer les données](#lister-et-structurer-les-données)
+    - [Création du document Grist](#création-du-document-grist)
+    - [Estimer le coût évité](#estimer-le-coût-évité)
+  - [Tableau de bord](#tableau-de-bord)
   - [Créer automatiquement un document Grist](#créer-automatiquement-un-document-grist)
 
-## Glossaire
+## Prendre en main Grist
+### Glossaire et ressources
 
 Le glossaire suivant permet de faire le lien entre le vocabulaire Grist et les tableurs classiques type Excel
 
@@ -23,28 +31,48 @@ Le glossaire suivant permet de faire le lien entre le vocabulaire Grist et les t
 
 Pour consulter le glossaire complet, voir la documentation officielle [https://support.getgrist.com/fr/glossary/](https://support.getgrist.com/fr/glossary/)
 
-## Convention de nommage
+Pour démarrer avec Grist, un certains nombre de ressources sont disponbles.  
+Pour une première prise en main, le lien suivant est une très bonne base qui comporte des exemples illustrés des principaux éléments qui composent Grist: [https://docs.numerique.gouv.fr/docs/ad3eb0ac-575c-44b0-88ff-fe05473057c6/](https://docs.numerique.gouv.fr/docs/ad3eb0ac-575c-44b0-88ff-fe05473057c6/).
 
-Voir la section Grist de la documentation [convention.md](./convention.md#grist)
+Conceptuellement, Grist s'organise de la manière suivante  
+![Organisation conceptuelle de Grist](./images/grist/organisation.drawio.svg)
 
-## Réaliser un projet Grist
+Ce fonctionnement est similaire à une organisation d'un réseau partagé par exemple.
+
+### Convention de nommage
+
+Voir la section Grist de la documentation [convention.md#grist](./convention.md#grist).  
+Cette convention de nommage vise à:
+- Harmoniser et faciliter la compréhension des différents documents Grist
+- Automatiser certaines tâches grâce à des préfixes/suffixes spécifiques (ex: préfixe "ref_" pour les tables de référentiels)
+
+### Widget custom
+
+Avant de se lancer dans la création d'un widget custom, il est important de regarder si quelqu'un ne l'a pas déjà créé !  
+Ce lien permet de consulter les widgets custom déjà créés: [https://forum.grist.libre.sh/t/gristup-un-catalogue-communautaire-de-widgets-pour-grist/2949](https://forum.grist.libre.sh/t/gristup-un-catalogue-communautaire-de-widgets-pour-grist/2949)
+
+**Créer des widgets custom et gérer la publication de widget custom**
+
+
+## Accompagner un projet Grist
 
 ### Cadrer le besoin métier
 
-Comme tout projet informatique, une première réunion de cadrage est nécessaire. Elle doit permettre de définir à minima:
+Une première réunion de cadrage doit permettre de définir à minima:
 - Les objectifs que le document Grist doit couvrir
 - Les fonctionnalités attendues et le processus dans lequel le document Grist s'intègre.
 
-Cette première réunion doit aussi permettre de savoir d'où proviennent les données dans le processus actuel et qui sont les acteurs impliqués.
+Ce premier échange doit aussi permettre de savoir d'où proviennent les données dans le processus actuel et qui sont les acteurs impliqués.
 
-### Lister l'ensemble des données nécessaires
+>**📣A noter📣**  
+Il est important d'avoir une vue d'ensemble sur la totalité du processus métier dans lequel le document Grist va s'intégrer. Cela permettra de construire un document Grist le plus modulaire possible et faciliter l'intégration de nouvelles fonctionnalités.
+
+### Lister et structurer les données
 
 Si les données proviennent de fichiers plats ou de fichiers issues de SI, lister les colonnes présentent dans chacun des fichiers.  
 Si c'est un nouveau projet, les agents métiers doivent fournir la liste selon les besoins & fonctionnalités exprimées. Un atelier peut être réalisé pour aider à la définition des données.  
 
 L'objectif de cette étape est d'être le plus exhaustif possible. Des ajouts/modifications/retraits pourront toujours être possible pendant la phase d'itération sur le document Grist.
-
-### Structurer les données
 
 A partir de la liste des données, celles-ci doivent être regroupées par entité logique/métier. Il faut respecter au mieux la 3ème normalisation des données.
 Cette étape est la plus importante et nécessite d'être itérée avec l'agent métier.
@@ -129,7 +157,11 @@ Ci-dessous un exemple
 >**📣A noter📣**  
 > Les onglets **Reporting & Saisie** peuvent être rassemblés dans une même et unique page "hybride" si le cas d'usage et l'ergonomie le permet.
 
+### Estimer le coût évité
 
+**Méthodologie à définir**
+
+## Tableau de bord
 ### Connecter le document Grist à l'outil de datavisualisation
 
 Une fois le document créé dans Grist, il peut être connecté à l'outil de datavisualisation.
