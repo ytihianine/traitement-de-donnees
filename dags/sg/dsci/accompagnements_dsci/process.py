@@ -274,11 +274,6 @@ def process_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
             "type_de_correspondant": "id_type_de_correspondant",
         }
     )
-    df["id"] = (
-        df.sort_values(by=["id_correspondant", "id_type_de_correspondant"])
-        .reset_index(drop=True)
-        .index
-    )
 
     # Gérer les références
     ref_cols = ["id_correspondant", "id_type_de_correspondant"]
@@ -287,6 +282,12 @@ def process_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
     # Convert str of list to python list
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_type_de_correspondant")
     df = df.explode(column="id_type_de_correspondant")
+
+    df["id"] = (
+        df.sort_values(by=["id_correspondant", "id_type_de_correspondant"])
+        .reset_index(drop=True)
+        .index
+    )
 
     return df
 
