@@ -248,8 +248,9 @@ def process_correspondant(df: pd.DataFrame) -> pd.DataFrame:
     df = convert_grist_date_to_date(df=df, columns=date_cols)
 
     # Cleaning
-    txt_cols = ["mail"]
+    txt_cols = ["mail", "entite", "direction_hors_mef", "prenom", "nom", "nom_complet"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    df["entite"] = df["entite"].replace('"', "", regex=False)
 
     # Filtrer les lignes
     # rows_to_drop = df.loc[(df["mail"] != "") | (df["mail"].isna())].index()

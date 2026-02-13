@@ -53,7 +53,6 @@ def accompagnements_dsci_dag() -> None:
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci",
-            doc_id_key="grist_doc_id_accompagnements_dsci",
         ),
         [referentiels(), bilaterales(), correspondant(), mission_innovation()],
         create_tmp_tables(reset_id_seq=False),
