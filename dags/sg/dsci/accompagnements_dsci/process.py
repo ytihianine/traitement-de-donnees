@@ -274,7 +274,11 @@ def process_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
             "type_de_correspondant": "id_type_de_correspondant",
         }
     )
-    df["id"] = df.reset_index(drop=True).index
+    df["id"] = (
+        df.sort_values(by=["id_correspondant", "id_type_de_correspondant"])
+        .reset_index(drop=True)
+        .index
+    )
 
     # Gérer les références
     ref_cols = ["id_correspondant", "id_type_de_correspondant"]
