@@ -116,14 +116,16 @@ CREATE TABLE activite_dsci."correspondant" (
 
 DROP TABLE activite_dsci."correspondant_profil" CASCADE;
 CREATE TABLE activite_dsci."correspondant_profil" (
+	"id" integer PRIMARY KEY,
 	"id_correspondant" integer,
 	"id_type_de_correspondant" int,
-    PRIMARY KEY ("id_correspondant", "id_type_de_correspondant"),
+	UNIQUE ("id_correspondant", "id_type_de_correspondant"),
 	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id"),
 	FOREIGN KEY ("id_type_de_correspondant") REFERENCES activite_dsci."ref_profil_correspondant" ("id")
 );
 
 CREATE TABLE activite_dsci."correspondant_competence_particuliere" (
+	"id" integer PRIMARY KEY,
 	"id_correspondant" integer PRIMARY KEY,
 	"id_competence_particuliere" int,
 	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id"),
@@ -131,6 +133,7 @@ CREATE TABLE activite_dsci."correspondant_competence_particuliere" (
 );
 
 CREATE TABLE activite_dsci."correspondant_connaissance_communaute" (
+	"id" integer PRIMARY KEY,
 	"id_correspondant" integer PRIMARY KEY,
 	"connaissance_communaute" text,
 	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id")
