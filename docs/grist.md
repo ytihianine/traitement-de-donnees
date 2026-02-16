@@ -58,7 +58,7 @@ Avant d'utiliser des widgets custom, il est bon de rappeler que:
 ⚠️Attention, les custom widgets peuvent contenir du code malveillant ou des failles de sécurité.  
 ⚠️**Ne donnez jamais votre clé API ou l’accès complet à votre document** si vous n’êtes pas certain de faire confiance au code et au développeur / si vous n’avez pas audité le code.
 
-Si vous souhaitez mettre des widgets custom à disposition de vos utilisateurs, le plus simple est de créer un repo github et définir une méthode pour que les utilisateurs puissent les facilement proposer des nouveaux widgets.  
+Si vous souhaitez mettre des widgets custom à disposition de vos utilisateurs, le plus simple est de créer un repo github et définir une méthode pour que les utilisateurs puissent facilement proposer des nouveaux widgets.  
 
 A date, les repo github sûrs sont les suivants:
 - DINUM => [https://github.com/betagouv/grist-custom-widgets-fr-admin](https://github.com/betagouv/grist-custom-widgets-fr-admin) (déjà intégré dans l'instance DINUM)
