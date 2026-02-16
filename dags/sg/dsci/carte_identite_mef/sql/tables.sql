@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS dsci.effectif_perimetre (
     annee INTEGER,
     type_budget TEXT,
     perimetre TEXT,
-    valeur FLOAT
+    valeur FLOAT,
+    source TEXT
 );
 
 DROP TABLE IF EXISTS dsci.effectif_direction;
