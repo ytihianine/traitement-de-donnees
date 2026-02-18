@@ -68,6 +68,17 @@ Recommandation: réaliser un fork du github de la DINUM et y ajouter vos propres
 
 ## Accompagner un projet Grist
 
+Les projets Grist peuvent être catégorisés en 2 grandes familles:
+- Les projets **autonomes**
+
+Les agents métiers s'emparent de l'outil et créént leur document Grist. L'enjeu pour les projets de ce type est de s'assurer de fournir les bonnes ressources pour que l'agent puisse se former sur son outil.  
+Il est également nécessaire de définir une méthodologie pour que le service numérique puisse être sollicité en cas de besoin (ex: difficulté à structurer les données, besoin d'un widget custom, ...)
+
+- Les projets **accompagnés**
+
+Le service numérique est sollicité pour accompagner accompagner les agents métiers dans la construction du document Grist.  
+La section ci-dessous décrit la méthodologie d'accompagnement pour ce type de projet.
+
 ### Cadrer le besoin métier
 
 Une première réunion de cadrage doit permettre de définir à minima:
