@@ -51,7 +51,6 @@ CREATE TABLE IF NOT EXISTS sircom.creation_graphique (
 
 CREATE TABLE IF NOT EXISTS sircom.notes_veilles (
     id BIGSERIAL PRIMARY KEY,
-    annee INTEGER,
     date DATE,
     nombre_note INTEGER,
     nombre_signalements INTEGER,
@@ -59,7 +58,6 @@ CREATE TABLE IF NOT EXISTS sircom.notes_veilles (
 );
 CREATE TABLE IF NOT EXISTS sircom.projets_graphiques(
     id BIGSERIAL PRIMARY KEY,
-    annee INTEGER,
     nombre_graphique_realise INTEGER,
     date DATE,
     cabinets_ministeriels INTEGER,
@@ -70,7 +68,6 @@ CREATE TABLE IF NOT EXISTS sircom.projets_graphiques(
 );
 CREATE TABLE IF NOT EXISTS sircom.recommandation_strat(
     id BIGSERIAL PRIMARY KEY,
-    annee INTEGER,
     nombre_recommandation INTEGER,
     date DATE,
     is_last_value BOOLEAN

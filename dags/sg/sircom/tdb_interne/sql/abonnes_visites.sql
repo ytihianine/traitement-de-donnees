@@ -66,7 +66,6 @@ CREATE TABLE IF NOT EXISTS sircom.ouverture_lettres_alize (
 );
 CREATE TABLE IF NOT EXISTS sircom.impact_actions_com(
     id BIGSERIAL PRIMARY KEY,
-    annee INTEGER,
     nombre_article INTEGER,
     nombre_vue INTEGER,
     date DATE,
