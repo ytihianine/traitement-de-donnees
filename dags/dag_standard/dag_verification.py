@@ -80,7 +80,9 @@ def dag_verification() -> None:
         import pyarrow as pa
         import pandas as pd
         from pyiceberg.catalog import load_catalog
+        import os
 
+        os.environ["SSL_CERT_FILE"] = "scripts/files/customCA.crt"
         pprint(object=ENV_VAR)
 
         properties = generate_catalog_properties(
