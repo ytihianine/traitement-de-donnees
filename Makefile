@@ -43,7 +43,7 @@ install-packages: ## Installer les packages python complémentaires
 
 install-pre-commit: ## Installer les pre-commits
 	@echo "Installation des pre-commits"
-	pre-commit install
+	$(ENV_NAME)/bin/pre-commit install
 
 setup-git:
 	@echo "Init git config"
