@@ -5,7 +5,36 @@ import pyarrow as pa
 
 from pyiceberg.catalog import Catalog, load_catalog
 from pyiceberg.table import Table
+from airflow.sdk import Variable
 import pandas as pd
+
+
+def generate_catalog_properties(
+    uri: str,
+    warehouse: str = "data_store",
+    client_id: str | None = None,
+    client_secret: str | None = None,
+) -> Mapping[str, Any]:
+    client_id = (
+        Variable.get(key="iceberg_client_id") if client_id is None else client_id
+    )
+    client_secret = (
+        Variable.get(key="iceberg_client_secret")
+        if client_secret is None
+        else client_secret
+    )
+
+    properties = (
+        {
+            "uri": uri,
+            "warehouse": warehouse,
+            "credential": f"{client_id}:{client_secret}",
+            "scope": "PRINCIPAL_ROLE:ALL",
+            "header.X-Iceberg-Access-Delegation": None,
+        },
+    )
+
+    return properties
 
 
 @dataclass
