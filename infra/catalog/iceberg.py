@@ -24,15 +24,13 @@ def generate_catalog_properties(
         else client_secret
     )
 
-    properties = (
-        {
-            "uri": uri,
-            "warehouse": warehouse,
-            "credential": f"{client_id}:{client_secret}",
-            "scope": "PRINCIPAL_ROLE:ALL",
-            "header.X-Iceberg-Access-Delegation": None,
-        },
-    )
+    properties = {
+        "uri": uri,
+        "warehouse": warehouse,
+        "credential": f"{client_id}:{client_secret}",
+        "scope": "PRINCIPAL_ROLE:ALL",
+        "header.X-Iceberg-Access-Delegation": None,
+    }
 
     return properties
 
