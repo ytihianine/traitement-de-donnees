@@ -17,7 +17,7 @@ from enums.dags import DagStatus
 from utils.tasks.sql import get_projet_snapshot
 from utils.tasks.projet import config_projet_group
 
-from utils.config.vars import DEFAULT_POLARIS_HOST
+from utils.config.vars import DEFAULT_POLARIS_HOST, ENV_VAR
 
 nom_projet = "Configuration des projets"
 
@@ -80,6 +80,8 @@ def dag_verification() -> None:
         import pyarrow as pa
         import pandas as pd
         from pyiceberg.catalog import load_catalog
+
+        pprint(object=ENV_VAR)
 
         properties = generate_catalog_properties(
             uri=DEFAULT_POLARIS_HOST,
