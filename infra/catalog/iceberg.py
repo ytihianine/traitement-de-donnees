@@ -25,7 +25,7 @@ def generate_catalog_properties(
     )
 
     properties = {
-        "uri": uri,
+        "uri": f"{uri}/api/catalog",
         "warehouse": warehouse,
         "credential": f"{client_id}:{client_secret}",
         "scope": "PRINCIPAL_ROLE:ALL",
