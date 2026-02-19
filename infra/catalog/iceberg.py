@@ -8,6 +8,8 @@ from pyiceberg.table import Table
 from airflow.sdk import Variable
 import pandas as pd
 
+from utils.config.vars import ENV_VAR
+
 
 def generate_catalog_properties(
     uri: str,
@@ -15,14 +17,13 @@ def generate_catalog_properties(
     client_id: str | None = None,
     client_secret: str | None = None,
 ) -> Mapping[str, Any]:
-    client_id = (
-        Variable.get(key="iceberg_client_id") if client_id is None else client_id
-    )
-    client_secret = (
-        Variable.get(key="iceberg_client_secret")
-        if client_secret is None
-        else client_secret
-    )
+    if client_id is None:
+        client_id = (
+            Variable.get(key="iceberg_client_id") if client_id is None else client_id
+        )
+
+    if client_secret is None:
+        client_secret = Variable.get(key="iceberg_client_secret")
 
     properties = {
         "uri": f"{uri}/api/catalog",
@@ -30,6 +31,7 @@ def generate_catalog_properties(
         "credential": f"{client_id}:{client_secret}",
         "scope": "PRINCIPAL_ROLE:ALL",
         "header.X-Iceberg-Access-Delegation": None,
+        "ssl": {"cabundle": ENV_VAR["SSL_CERT_FILE"]},
     }
 
     return properties
