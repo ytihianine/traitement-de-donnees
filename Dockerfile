@@ -9,7 +9,7 @@ FROM apache/airflow:${AIRFLOW_VERSION}
 USER root
 WORKDIR /app
 
-COPY customCA.crt /usr/local/share/ca-certificates/customCA.crt
+COPY scripts/files/customCA.crt /usr/local/share/ca-certificates/customCA.crt
 RUN update-ca-certificates
 
 ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
