@@ -533,9 +533,8 @@ def bulk_load_local_tsv_file_to_db(
     """
     logging.info(msg=f"Bulk importing {local_filepath} to {schema}.tmp_{tbl_name}")
 
-    copy_sql = sql.SQL(
-        string="""
-        COPY {schema}.{tbl_name} ({col_names})
+    copy_sql = f"""
+        COPY {schema}.{tbl_name} ({", ".join(column_names)})
         FROM STDIN WITH (
             FORMAT TEXT,
             DELIMITER E'\t',
@@ -543,16 +542,9 @@ def bulk_load_local_tsv_file_to_db(
             NULL 'NULL'
         )
     """
-    ).format(
-        schema=sql.Identifier(schema),
-        tbl_name=sql.Identifier("tmp_" + tbl_name),
-        col_names=sql.SQL(string=",").join(
-            seq=[sql.Identifier(col) for col in column_names]
-        ),
-    )
 
     db_handler.copy_expert(
-        sql=copy_sql.as_string(context=db_handler.get_conn().cursor()),
+        sql=copy_sql,
         filepath=local_filepath,
     )
     logging.info(
