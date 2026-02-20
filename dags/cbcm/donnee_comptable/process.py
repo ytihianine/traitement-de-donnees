@@ -372,6 +372,17 @@ def process_demande_paiement_complet(
     df_demande_paiement_journal_pieces: pd.DataFrame,
     df_demande_paiement_sfp: pd.DataFrame,
 ) -> pd.DataFrame:
+    # Suppression des doublons sur df_demande_paiement_flux & df_demande_paiement
+    # Pour les mêmes id_dp, on garde la première ligne (données identiques)
+    df_demande_paiement_flux = df_demande_paiement_flux.drop_duplicates(
+        subset=["id_dp"], keep="first"
+    )
+
+    # Pour les mêmes id_dp, on garde la ligne avec le montant_dp le plus élevé
+    df_demande_paiement = df_demande_paiement.sort_values(
+        by="montant_dp", ascending=False
+    ).drop_duplicates(subset=["id_dp"], keep="first")
+
     # Fusionner les datasets
     df = pd.merge(
         left=df_demande_paiement,
