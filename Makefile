@@ -37,9 +37,12 @@ install-airflow: ## Installer les packages liés à la version d'Airflow
 		--constraint "https://raw.githubusercontent.com/apache/airflow/constraints-$(AIRFLOW_VERSION)/constraints-$(PYTHON_VERSION).txt"
 
 install-packages: ## Installer les packages python complémentaires
-	$(ENV_NAME)/bin/pip install -e .
-	$(ENV_NAME)/bin/pip install -r requirements.txt
-	$(ENV_NAME)/bin/pip install -r requirements_dev.txt
+	pip install uv
+	@echo "Création d'un nouvel environnement python avec uv"
+	uv venv $(ENV_NAME)
+	uv pip install --python $(ENV_NAME)/bin/python -e .
+	uv pip install --python $(ENV_NAME)/bin/python -r requirements.txt --prerelease=allow
+	uv pip install --python $(ENV_NAME)/bin/python -r requirements_dev.txt --prerelease=allow
 
 install-pre-commit: ## Installer les pre-commits
 	@echo "Installation des pre-commits"
