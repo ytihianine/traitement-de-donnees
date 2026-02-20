@@ -53,7 +53,7 @@ setup-git:
 	@echo "Init git config"
 	git config --global credential.helper 'cache --timeout=360000'
 
-setup-dev-env: create-py-env upgrade-pip install-packages install-airflow install-pre-commit setup-git ## Installer tout l'environnement de développement
+setup-dev-env: install-packages install-airflow install-pre-commit setup-git ## Installer tout l'environnement de développement
 
 
 # Nettoyage
