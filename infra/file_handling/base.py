@@ -56,6 +56,11 @@ class BaseFileHandler(ABC):
         pass
 
     @abstractmethod
+    def delete_single(self, file_path: Union[str, Path]) -> None:
+        """Delete file."""
+        ...
+
+    @abstractmethod
     def exists(self, file_path: Union[str, Path]) -> bool:
         """Check if file exists."""
         pass

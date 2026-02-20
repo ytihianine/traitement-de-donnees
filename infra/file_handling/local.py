@@ -78,6 +78,10 @@ class LocalFileHandler(BaseFileHandler):
         except OSError as e:
             raise FileHandlerError(f"Error deleting file: {abs_path}") from e
 
+    def delete_single(self, file_path: Union[str, Path]) -> None:
+        """Delete file from local filesystem."""
+        self.delete(file_path=file_path)
+
     def exists(self, file_path: Union[str, Path]) -> bool:
         """Check if file exists in local filesystem."""
         return self.get_absolute_path(file_path).exists()
