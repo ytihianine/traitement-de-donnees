@@ -48,6 +48,7 @@ install-pre-commit: ## Installer les pre-commits
 install-extensions: ## Installer les extensions code-server & les settings
 	@echo "Installation des extensions"
 	$(ENV_NAME)/bin/python scripts/extensions/install-extensions.py
+	@echo "Rechargez votre page pour prendre en compte toutes les modifications"
 
 setup-git:
 	@echo "Init git config"

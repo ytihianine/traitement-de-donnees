@@ -88,6 +88,9 @@ def main() -> None:
 
     # Extension settings
     extension_settings = {
+        "security.workspace.trust.enabled": False,
+        "security.workspace.trust.startupPrompt": "never",
+        "terminal.integrated.inheritEnv": False,
         "workbench.colorTheme": "Default Dark Modern",
         "editor.minimap.enabled": False,
         "basedpyright.analysis.diagnosticMode": "workspace",
