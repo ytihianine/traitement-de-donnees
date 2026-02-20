@@ -149,7 +149,7 @@ def del_s3_files(
         try:
             logging.info(msg=f"Deleting {len(projet_sources)} source files")
             for source in projet_sources:
-                s3_handler.delete(file_path=source.filepath_source_s3)
+                s3_handler.delete_single(file_path=source.filepath_source_s3)
             logging.info(msg="Source files deleted successfully")
         except FileHandlerError as e:
             logging.error(msg=f"Failed to delete source files: {str(e)}")
@@ -160,7 +160,7 @@ def del_s3_files(
         try:
             logging.info(msg=f"Deleting {len(projet_selecteur_s3)} temporary files")
             for selecteur_s3 in projet_selecteur_s3:
-                s3_handler.delete(file_path=selecteur_s3.filepath_tmp_s3)
+                s3_handler.delete_single(file_path=selecteur_s3.filepath_tmp_s3)
             logging.info(msg="Temporary files deleted successfully")
         except FileHandlerError as e:
             logging.error(msg=f"Failed to delete temporary files: {str(e)}")
