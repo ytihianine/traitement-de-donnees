@@ -27,13 +27,9 @@ create-py-env: ## Créer un nouvel environnement python
 	@echo "Exécuter dans votre terminal: source $(ENV_NAME)/bin/activate"
 
 
-upgrade-pip: ## Mettre à jour pip
-	@echo Mise à jour de pip
-	$(ENV_NAME)/bin/pip install --upgrade pip
-
 install-airflow: ## Installer les packages liés à la version d'Airflow
 	@echo "Installation des packages Airflow python_version=$(PYTHON_VERSION) & airflow_version=$(AIRFLOW_VERSION)"
-	$(ENV_NAME)/bin/pip install "apache-airflow==$(AIRFLOW_VERSION)" \
+	uv pip install --python $(ENV_NAME)/bin/python "apache-airflow==$(AIRFLOW_VERSION)" \
 		--constraint "https://raw.githubusercontent.com/apache/airflow/constraints-$(AIRFLOW_VERSION)/constraints-$(PYTHON_VERSION).txt"
 
 install-packages: ## Installer les packages python complémentaires
