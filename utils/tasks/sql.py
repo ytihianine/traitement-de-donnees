@@ -534,7 +534,7 @@ def bulk_load_local_tsv_file_to_db(
     logging.info(msg=f"Bulk importing {local_filepath} to {schema}.tmp_{tbl_name}")
 
     copy_sql = f"""
-        COPY {schema}.{tbl_name} ({", ".join(column_names)})
+        COPY {schema}.tmp_{tbl_name} ({", ".join(column_names)})
         FROM STDIN WITH (
             FORMAT TEXT,
             DELIMITER E'\t',
