@@ -439,7 +439,7 @@ def process_demande_paiement_complet(
     ]
     choices = ["DP automatisées", "DP non automatisées"]
     df["flux_3_automatisation_compta"] = np.select(
-        condlist=conditions, choicelist=choices
+        condlist=conditions, choicelist=choices, default="Indéterminé"
     )
 
     return df
