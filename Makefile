@@ -45,6 +45,10 @@ install-pre-commit: ## Installer les pre-commits
 	@echo "Installation des pre-commits"
 	$(ENV_NAME)/bin/pre-commit install
 
+install-extensions: ## Installer les extensions code-server & les settings
+	@echo "Installation des extensions"
+	$(ENV_NAME)/bin/python scripts/extensions/install-extensions.py
+
 setup-git:
 	@echo "Init git config"
 	git config --global credential.helper 'cache --timeout=360000'
