@@ -13,12 +13,11 @@ WORKDIR /app
 COPY scripts/files/customCA.crt /usr/local/share/ca-certificates/customCA.crt
 RUN update-ca-certificates
 
-
-# Switch back to airflow user
-USER airflow
-
 # Install packages
 COPY requirements.txt .
 RUN pip install --no-cache-dir uv
 RUN uv pip install --system -r requirements.txt
 # RUN pip install --no-cache-dir -r requirements.txt
+
+# Switch back to airflow user
+USER airflow
