@@ -16,6 +16,7 @@ def generate_catalog_properties(
     warehouse: str = "data_store",
     client_id: str | None = None,
     client_secret: str | None = None,
+    ca_bundle_path: str | None = None,
 ) -> Mapping[str, Any]:
     if client_id is None:
         client_id = (
@@ -31,7 +32,12 @@ def generate_catalog_properties(
         "credential": f"{client_id}:{client_secret}",
         "scope": "PRINCIPAL_ROLE:ALL",
         "header.X-Iceberg-Access-Delegation": None,
-        "ssl": {"cabundle": ENV_VAR["SSL_CERT_FILE"]},
+        # "ssl": {"cabundle": ENV_VAR["SSL_CERT_FILE"]},
+        # "s3.endpoint": "https://your-s3-endpoint",  # if not AWS
+        # "s3.access-key-id": your_access_key,
+        # "s3.secret-access-key": your_secret_key,
+        # "s3.region": "your-region",
+        # "py-io-impl": "pyiceberg.io.fsspec.FsspecFileIO"
     }
 
     return properties
