@@ -9,13 +9,10 @@ FROM apache/airflow:${AIRFLOW_VERSION}
 USER root
 WORKDIR /app
 
+# Add Nubonyxia cert
 COPY scripts/files/customCA.crt /usr/local/share/ca-certificates/customCA.crt
 RUN update-ca-certificates
 
-ENV SSL_CERT_FILE=/usr/local/share/ca-certificates/customCA.crt
-ENV CURL_CA_BUNDLE=/usr/local/share/ca-certificates/customCA.crt
-ENV REQUESTS_CA_BUNDLE=/usr/local/share/ca-certificates/customCA.crt
-ENV AWS_CA_BUNDLE=/usr/local/share/ca-certificates/customCA.crt
 
 # Switch back to airflow user
 USER airflow
