@@ -41,3 +41,11 @@ Pour déployer l'infrastructure, voir le repo [https://forge.dgfip.finances.rie.
 Ci-dessous un schéma à date
 
 ![Schéma de l'infrastructure](test.drawio.svg)
+
+
+## Environnement de développement
+
+Pour installer l'ensemble des dépendances du projet
+```bash
+make setup-dev-env
+```

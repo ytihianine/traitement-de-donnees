@@ -6,7 +6,13 @@ ARG AIRFLOW_VERSION=3.1.7
 # ------------------------------------------
 FROM apache/airflow:${AIRFLOW_VERSION}
 
+USER root
 WORKDIR /app
+
+# Add Nubonyxia cert
+COPY scripts/files/customCA.crt /usr/local/share/ca-certificates/customCA.crt
+RUN update-ca-certificates
+
 
 # Switch back to airflow user
 USER airflow

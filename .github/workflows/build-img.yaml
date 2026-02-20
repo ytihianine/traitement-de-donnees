@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  AIRFLOW_VERSION: 3.1.6
+  AIRFLOW_VERSION: 3.1.7
   IMAGE_NAME: ghcr.io/${{ github.repository }}
 
 jobs:
