@@ -19,4 +19,6 @@ USER airflow
 
 # Install packages
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir uv
+RUN uv pip install --system -r requirements.txt
+# RUN pip install --no-cache-dir -r requirements.txt
