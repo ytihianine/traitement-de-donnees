@@ -91,7 +91,7 @@ def main() -> None:
         "workbench.colorTheme": "Default Dark Modern",
         "editor.minimap.enabled": False,
         "basedpyright.analysis.diagnosticMode": "workspace",
-        "basedpyright.analysis.typeCheckingMode": "basic",
+        "basedpyright.analysis.typeCheckingMode": "standard",
         "basedpyright.analysis.inlayHints.variableTypes": False,
         "flake8.args": ["--max-line-length=120"],
     }
