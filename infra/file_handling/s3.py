@@ -119,7 +119,7 @@ class S3FileHandler(BaseFileHandler):
     def delete_single(self, file_path: str | Path) -> None:
         key = str(file_path)
         s3 = self.hook.get_conn()
-        s3.delete_object(Bucket=self.bucket, Key=key)
+        s3.delete_object(Bucket=self.bucket, Key=key)  # type: ignore
 
     def delete(self, file_path: Union[str, Path]) -> None:
         """Delete file from S3 using Airflow's S3Hook."""
