@@ -161,24 +161,57 @@ def process_accompagnement_mi_satisfaction(df: pd.DataFrame) -> pd.DataFrame:
 """
 
 
-def process_accompagnement_dsci(df: pd.DataFrame) -> pd.DataFrame:
-    return df
+def process_animateur_interne(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.rename(
+        columns={
+            "accompagnement": "id_accompagnement",
+            "animateur": "id_animateur"
 
-
-def process_accompagnement_opportunite_cci(df: pd.DataFrame) -> pd.DataFrame:
+        }
+    )
+    ref_cols = ["id_accompagnement", "id_animateur"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
     return df
 
 
 def process_animateur_externe(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.rename(
+        columns={
+            "accompagnement": "id_accompagnement",
+            "animateur": "id_animateur"
+
+        }
+    )
+    ref_cols = ["id_accompagnement", "id_animateur"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
     return df
 
 
 def process_animateur_fac(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.rename(
+        columns={
+             "accompagnement": "id_accompagnement",
+             "animateur": "id_animateur"
+        }
+    )
+    ref_cols = ["id_accompagnement", "id_animateur"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
     return df
 
 
-def process_animateur_interne(df: pd.DataFrame) -> pd.DataFrame:
+def process_accompagnement_opportunite_cci(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.rename(columns={"accompagnement": "id_accompagnement"})
     return df
+
+
+def process_accompagnement_dsci(df: pd.DataFrame) -> pd.DataFrame:
+    return df
+
+
+
+
 
 
 """
