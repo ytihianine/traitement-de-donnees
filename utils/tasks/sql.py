@@ -552,7 +552,7 @@ def bulk_load_local_tsv_file_to_db(
     )
 
     db_handler.copy_expert(
-        sql=copy_sql.as_string(context=db_handler.get_conn()), filepath=local_filepath
+        sql=copy_sql.as_string(context=db_handler.get_cursor()), filepath=local_filepath
     )
     logging.info(
         msg=f"Successfully loaded {local_filepath} into {schema}.tmp_{tbl_name}"
