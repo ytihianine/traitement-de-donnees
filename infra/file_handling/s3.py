@@ -116,6 +116,11 @@ class S3FileHandler(BaseFileHandler):
         except Exception as e:
             raise FileHandlerError(f"Error writing file to S3: {key}") from e
 
+    def delete_single(self, file_path: str | Path) -> None:
+        key = str(file_path)
+        s3 = self.hook.get_conn()
+        s3.delete_object(Bucket=self.bucket, Key=key)
+
     def delete(self, file_path: Union[str, Path]) -> None:
         """Delete file from S3 using Airflow's S3Hook."""
         key = str(file_path)
