@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Mapping, Any
 import requests
 
 
@@ -6,6 +7,7 @@ import requests
 class PolarisCatalog:
     url: str
     realm: str
+    api_management_endpoint: str = "api/management/v1"
 
     def get_root_access_token(self, client_id: str, client_secret: str) -> str:
         token_endpoint = f"{self.url}/api/catalog/v1/oauth/tokens"
@@ -22,11 +24,31 @@ class PolarisCatalog:
             raise ValueError("Failed to obtain access token")
         return token
 
+    def get_catalog_info(self, token: str, catalog_name: str, realm: str | None = None):
+        import json
+
+        realm = realm if realm else self.realm
+        catalog_endpoint = (
+            f"{self.url}/{self.api_management_endpoint}/catalogs/{catalog_name}"
+        )
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Polaris-Realm": realm,
+        }
+        response = requests.get(url=catalog_endpoint, headers=headers, verify=False)
+        response.raise_for_status()
+        print(json.dumps(obj=response.json(), indent=2))
+        return response.json()
+
     def create_catalog(
-        self, token: str, catalog_name: str, realm: str | None = None
+        self,
+        token: str,
+        catalog_name: str,
+        storage_config: Mapping[str, Any],
+        realm: str | None = None,
     ) -> None:
         realm = realm if realm else self.realm
-        catalog_endpoint = f"{self.url}/api/management/v1/catalogs"
+        catalog_endpoint = f"{self.url}/{self.api_management_endpoint}/catalogs"
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
@@ -42,14 +64,16 @@ class PolarisCatalog:
                 "storageConfigInfo": {
                     "storageType": "S3",
                     "allowedLocations": ["s3://dsci/data_store"],
-                    # "s3AccessKeyId": S3_ACCESS_KEY_ID,
-                    # "s3SecretKey": S3_ACCESS_SECRET_KEY,
                     "endpoint": "https://minio.lab.incubateur.finances.rie.gouv.fr",
+                    "s3.access-key-id": None,
+                    "s3.secret-access-key": None,
                     "region": "us-east-1",
+                    "stsUnavailable": True,
                     "pathStyleAccess": True,  # Required for MinIO
                 },
             }
         }
+        print(payload)
 
         response = requests.post(
             url=catalog_endpoint, headers=headers, json=payload, verify=False
@@ -60,7 +84,7 @@ class PolarisCatalog:
         self, token: str, principal_name: str, realm: str | None = None
     ) -> tuple[str, str]:
         realm = realm if realm else self.realm
-        principal_endpoint = f"{self.url}/api/management/v1/principals"
+        principal_endpoint = f"{self.url}/{self.api_management_endpoint}/principals"
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
@@ -78,7 +102,7 @@ class PolarisCatalog:
         self, token: str, role_name: str, realm: str | None = None
     ) -> None:
         realm = realm if realm else self.realm
-        role_endpoint = f"{self.url}/api/management/v1/principal-roles"
+        role_endpoint = f"{self.url}/{self.api_management_endpoint}/principal-roles"
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
@@ -94,9 +118,7 @@ class PolarisCatalog:
         self, token: str, catalog_name: str, role_name: str, realm: str | None = None
     ):
         realm = realm if realm else self.realm
-        role_endpoint = (
-            f"{self.url}/api/management/v1/catalogs/{catalog_name}/catalog-roles"
-        )
+        role_endpoint = f"{self.url}/{self.api_management_endpoint}/catalogs/{catalog_name}/catalog-roles"
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
@@ -112,7 +134,7 @@ class PolarisCatalog:
         self, token: str, principal_name: str, role_name: str, realm: str | None = None
     ):
         realm = realm if realm else self.realm
-        assign_endpoint = f"{self.url}/api/management/v1/principals/{principal_name}/principal-roles"  # noqa
+        assign_endpoint = f"{self.url}/{self.api_management_endpoint}/principals/{principal_name}/principal-roles"  # noqa
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
@@ -133,7 +155,7 @@ class PolarisCatalog:
         realm: str | None = None,
     ):
         realm = realm if realm else self.realm
-        assign_endpoint = f"{self.url}/api/management/v1/principal-roles/{principal_role_name}/catalog-roles/{catalog_name}"  # noqa
+        assign_endpoint = f"{self.url}/{self.api_management_endpoint}/principal-roles/{principal_role_name}/catalog-roles/{catalog_name}"  # noqa
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
@@ -153,7 +175,7 @@ class PolarisCatalog:
         realm: str | None = None,
     ) -> None:
         realm = realm if realm else self.realm
-        grant_endpoint = f"{self.url}/api/management/v1/catalogs/{catalog_name}/catalog-roles/{catalog_role_name}/grants"  # noqa
+        grant_endpoint = f"{self.url}/{self.api_management_endpoint}/catalogs/{catalog_name}/catalog-roles/{catalog_role_name}/grants"  # noqa
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
@@ -164,3 +186,9 @@ class PolarisCatalog:
             url=grant_endpoint, headers=headers, json=payload, verify=False
         )
         response.raise_for_status()
+
+    def create_table(self) -> None:
+        pass
+
+    def write_to_table(self) -> None:
+        pass
