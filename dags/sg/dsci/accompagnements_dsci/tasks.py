@@ -134,6 +134,26 @@ def mission_innovation() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_accompagnement_mi_satisfaction,
     )
+    animateur_interne = create_grist_etl_task(
+        selecteur="animateur_interne",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process.animateur_interne,
+    )
+    animateur_externe = create_grist_etl_task(
+        selecteur="animateur_externe",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process.animateur_externe,
+    )
+    animateur_fac = create_grist_etl_task(
+        selecteur="animateur_fac",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_animateur_fac
+
+    )
+
 
     # Ordre des tâches
-    chain([accompagnement_mi(), accompagnement_mi_satisfaction()])
+    chain(
+        [accompagnement_mi(), accompagnement_mi_satisfaction(),
+         animateur_interne(), animateur_externe(), animateur_fac()]
+         )

@@ -610,29 +610,38 @@ def process_projets_graphiques(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(
         columns={"nombre_de_projets_graphiques_realises": "nombre_graphique_realise"}
     )
-    # Gestion date
     df["date"] = pd.to_datetime(
         df["annee"].astype(str).str.strip(), format="%Y", errors="coerce"
     )
     df = df.drop(columns=["annee"])
     df = df.dropna(subset=["date"])
-    # Data clean
-    cols_numeriques = [
-        "nombre_graphique_realise",
+
+    # Definitions variables
+    col_total = "nombre_graphique_realise"
+    cols_directions = [
         "cabinets_ministeriels",
         "directions",
         "secretariat_general",
         "part_de_la_dge",
     ]
+    cols_numeriques = [col_total] + cols_directions
+
+    # Data cleann
     for col in cols_numeriques:
-        # force en nombre
+        # On force en nombre, on remplace les vides par 0, et on force en intier
         df[col] = pd.to_numeric(df[col], errors="coerce")
-        # replace les vides par 0
-        df[col] = df[col].fillna(0)
-
-    #  Control
-    if not is_upper(df=df, cols_to_check=cols_numeriques, seuil=0, inclusive=True):
-        raise ValueError("Erreur : Certaines valeurs de projets sont négatives !")
-
+        df[col] = df[col].fillna(0).astype(int)
+    df = pd.melt(
+        df,
+        id_vars=["date", col_total],
+        value_vars=cols_directions,
+        var_name="commanditaire",
+        value_name="nombre_projets_graphique"
+    )
+    # Data control
+    cols_to_check = ["nombre_projets_graphique", col_total]
+    if not is_upper(df=df, cols_to_check=cols_to_check, seuil=0, inclusive=True):
+        raise ValueError("Erreur : Certaines valeurs de projet sont négatives !")
     df = tag_last_value_rows(df=df, colname_max_value="date")
+
     return df
