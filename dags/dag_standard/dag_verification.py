@@ -93,7 +93,7 @@ def dag_verification() -> None:
             df=df,
             table_status=IcebergTableStatus.PROD,
             namespace=namespace,
-            key="iceberg.test",
+            key="my_table_test",
         )
 
     # Ordre des tâches
