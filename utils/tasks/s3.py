@@ -182,7 +182,7 @@ def write_to_s3(
     catalog.create_namespace(namespace=namespace)
 
     # load data to table
-    tbl_name = namespace + "/" + key.replace("/", ".")
+    tbl_name = namespace + "." + key.replace("/", ".")
     catalog.write_table(table_name=tbl_name, df=df)
 
 
