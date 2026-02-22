@@ -59,8 +59,21 @@ class IcebergCatalog:
         return pa.Schema.from_pandas(df)
 
     def create_namespace(self, namespace: str) -> None:
-        logging.info(msg=f"Creating namespace with name: {namespace}")
-        self.catalog.create_namespace_if_not_exists(namespace=namespace)
+        """Create namespace and all parent namespaces if they don't exist"""
+        parts = namespace.split(".")
+
+        # Create each level of the namespace hierarchy
+        for i in range(1, len(parts) + 1):
+            parent_namespace = ".".join(parts[:i])
+            try:
+                logging.info(msg=f"Creating namespace: {parent_namespace}")
+                self.catalog.create_namespace_if_not_exists(namespace=parent_namespace)
+            except Exception as e:
+                # If it already exists, that's fine
+                logging.debug(
+                    msg=f"Namespace {parent_namespace} may already exist: {e}"
+                )
+                pass
 
     def create_table(
         self, table_name: str, df: pd.DataFrame, location: str | None = None
