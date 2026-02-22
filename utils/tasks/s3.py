@@ -2,14 +2,17 @@
 
 import logging
 from typing import Any, Mapping
-from _types.projet import ProjetS3
+from _types.projet import ProjetS3, SelecteurS3
 
 from airflow.sdk import task
+import pandas as pd
 
 from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
 from infra.file_handling.factory import create_file_handler
+from infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
 from utils.config.dag_params import (
     get_dag_status,
+    get_db_info,
     get_execution_date,
     get_feature_flags,
     get_project_name,
@@ -20,8 +23,9 @@ from utils.config.tasks import (
     get_list_source_fichier,
 )
 from enums.dags import DagStatus
-from enums.filesystem import FileHandlerType
+from enums.filesystem import FileHandlerType, IcebergTableStatus
 from utils.config.vars import (
+    DEFAULT_POLARIS_HOST,
     DEFAULT_S3_CONN_ID,
     FF_S3_DISABLED_MSG,
 )
@@ -165,3 +169,43 @@ def del_s3_files(
         except FileHandlerError as e:
             logging.error(msg=f"Failed to delete temporary files: {str(e)}")
             raise
+
+
+def write_to_s3(
+    catalog: IcebergCatalog,
+    df: pd.DataFrame,
+    table_status: IcebergTableStatus,
+    namespace: str,
+    key: str,
+) -> None:
+    # Create namespace
+    catalog.create_namespace(namespace=namespace)
+
+    # load data to table
+    tbl_name = namespace + "/" + key.replace("/", ".")
+    catalog.write_table(table_name=tbl_name, df=df)
+
+
+@task
+def copy_staging_to_prod(s3_info: SelecteurS3, **context) -> None:
+    """Copy Iceberg tables from staging key to prod key"""
+    # Dag info
+    namespace = get_db_info(context=context).prod_schema
+
+    # Get catalog
+    properties = generate_catalog_properties(
+        uri=DEFAULT_POLARIS_HOST,
+    )
+    catalog = IcebergCatalog(name="data_store", **properties)
+
+    # Read data
+    df = catalog.read_table(table_name=s3_info.filepath_s3)
+
+    # Copy table from staging to prod
+    write_to_s3(
+        catalog=catalog,
+        df=df,
+        table_status=IcebergTableStatus.PROD,
+        namespace=namespace,
+        key=s3_info.filepath_s3,
+    )
