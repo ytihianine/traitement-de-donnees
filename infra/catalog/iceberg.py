@@ -8,8 +8,6 @@ from pyiceberg.table import Table
 from airflow.sdk import Variable
 import pandas as pd
 
-from utils.config.vars import ENV_VAR
-
 
 def generate_catalog_properties(
     uri: str,
@@ -89,6 +87,7 @@ class IcebergCatalog:
         self, table_name: str, df: pd.DataFrame, overwrite: bool = False
     ) -> None:
         # Logic to write data to a table in the Iceberg catalog
+        self.create_table(table_name=table_name, df=df)
         table = self.update_table(table_name=table_name, df=df)
 
         logging.info(msg=f"Writing to table with name: {table_name}")
