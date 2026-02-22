@@ -88,12 +88,18 @@ def dag_verification() -> None:
         catalog = IcebergCatalog(name="data_store", properties=properties)
 
         df = pd.DataFrame(data={"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"]})
+
+        db_schema = get_db_info(context=context).prod_schema
+        key = "key/sub_key/my_table_test"
+        key_split = key.split("/")
+        tbl_name = key_split.pop(-1)
+        namespace = ".".join([db_schema] + key_split)
         write_to_s3(
             catalog=catalog,
             df=df,
             table_status=IcebergTableStatus.PROD,
             namespace=namespace,
-            key="my_table_test",
+            table_name=tbl_name,
         )
 
     # Ordre des tâches
