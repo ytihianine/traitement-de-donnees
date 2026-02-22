@@ -9,15 +9,17 @@ from infra.mails.default_smtp import (
     MailStatus,
     MailMessage,
 )
-from infra.catalog.iceberg import generate_catalog_properties
-from utils.config.dag_params import create_default_args, create_dag_params
+from infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
+from utils.config.dag_params import create_default_args, create_dag_params, get_db_info
 from _types.dags import DBParams, FeatureFlags
 from enums.dags import DagStatus
+from enums.filesystem import IcebergTableStatus
 
 from utils.tasks.sql import get_projet_snapshot
 from utils.tasks.projet import config_projet_group
+from utils.tasks.s3 import write_to_s3
 
-from utils.config.vars import DEFAULT_POLARIS_HOST, ENV_VAR
+from utils.config.vars import DEFAULT_POLARIS_HOST
 
 nom_projet = "Configuration des projets"
 
@@ -35,10 +37,10 @@ nom_projet = "Configuration des projets"
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        db_params=None,
+        db_params=DBParams(prod_schema="iceberg"),
         feature_flags=FeatureFlags(
             db=True,
-            mail=True,
+            mail=False,
             s3=True,
             convert_files=True,
             download_grist_doc=True,
@@ -77,36 +79,22 @@ def dag_verification() -> None:
 
     @task
     def iceberg_task(**context) -> None:
-        import pyarrow as pa
         import pandas as pd
-        from pyiceberg.catalog import load_catalog
-        import os
 
-        os.environ["SSL_CERT_FILE"] = "scripts/files/customCA.crt"
-        pprint(object=ENV_VAR)
-
+        namespace = get_db_info(context=context).prod_schema
         properties = generate_catalog_properties(
             uri=DEFAULT_POLARIS_HOST,
         )
-
-        catalog = load_catalog(name="data_store", **properties)
+        catalog = IcebergCatalog(name="data_store", properties=properties)
 
         df = pd.DataFrame(data={"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"]})
-
-        print("Creating namespace")
-        namespace = "testnamespace"
-        catalog.create_namespace_if_not_exists(namespace=namespace)
-        print("Namespace created")
-
-        print("Creating tbl_name")
-        tbl_name = "testnamespace.test_table"
-        tbl = catalog.create_table_if_not_exists(
-            identifier=tbl_name, schema=pa.Schema.from_pandas(df)
+        write_to_s3(
+            catalog=catalog,
+            df=df,
+            table_status=IcebergTableStatus.PROD,
+            namespace=namespace,
+            key="iceberg.test",
         )
-        print("tbl_name created")
-
-        print("Loading data to tbl")
-        tbl.append(df=pa.Table.from_pandas(df, preserve_index=False))
 
     # Ordre des tâches
     chain(
