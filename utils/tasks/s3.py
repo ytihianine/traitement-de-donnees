@@ -176,14 +176,16 @@ def write_to_s3(
     df: pd.DataFrame,
     table_status: IcebergTableStatus,
     namespace: str,
-    key: str,
+    table_name: str,
 ) -> None:
     # Create namespace
     catalog.create_namespace(namespace=namespace)
 
     # load data to table
-    tbl_name = namespace + "." + key.replace("/", ".")
-    catalog.write_table(table_name=tbl_name, df=df)
+    if table_status == IcebergTableStatus.STAGING:
+        table_name = table_name + "_staging"
+
+    catalog.write_table(table_name=table_name, df=df)
 
 
 @task
@@ -207,5 +209,5 @@ def copy_staging_to_prod(s3_info: SelecteurS3, **context) -> None:
         df=df,
         table_status=IcebergTableStatus.PROD,
         namespace=namespace,
-        key=s3_info.filepath_s3,
+        table_name=s3_info.filepath_s3,
     )
