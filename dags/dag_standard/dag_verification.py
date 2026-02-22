@@ -81,7 +81,6 @@ def dag_verification() -> None:
     def iceberg_task(**context) -> None:
         import pandas as pd
 
-        namespace = get_db_info(context=context).prod_schema
         properties = generate_catalog_properties(
             uri=DEFAULT_POLARIS_HOST,
         )
