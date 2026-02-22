@@ -185,6 +185,7 @@ def write_to_s3(
     if table_status == IcebergTableStatus.STAGING:
         table_name = table_name + "_staging"
 
+    table_name = namespace + "." + table_name
     catalog.write_table(table_name=table_name, df=df)
 
 
