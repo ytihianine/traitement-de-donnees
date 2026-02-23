@@ -204,7 +204,7 @@ def process_selecteur_s3(df: pd.DataFrame) -> pd.DataFrame:
     # Txt colonnes
     txt_cols = ["filename", "key"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    df["key"] = df["key"].fillna(pd.NA).astype(str)
+    df["key"] = df["key"].astype(str)
 
     return df
 
