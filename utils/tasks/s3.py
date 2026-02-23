@@ -201,7 +201,7 @@ def copy_staging_to_prod(selecteur_info: SelecteurS3, **context) -> None:
     properties = generate_catalog_properties(
         uri=DEFAULT_POLARIS_HOST,
     )
-    catalog = IcebergCatalog(name="data_store", **properties)
+    catalog = IcebergCatalog(name="data_store", properties=properties)
 
     # Read staging table
     df = catalog.read_table(table_name=namespace + "." + tbl_name)
