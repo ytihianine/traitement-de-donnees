@@ -118,6 +118,12 @@ class IcebergCatalog:
         df = table.scan().to_pandas()
         return df
 
-    def drop_table(self, table_name: str) -> None:
-        logging.info(msg=f"Dropping table {table_name}")
-        self.catalog.drop_table(identifier=table_name)
+    def drop_table(self, table_name: str, purge: bool = False) -> None:
+        if purge:
+            logging.info(msg=f"Purging table {table_name} - data will be removed")
+            self.catalog.purge_table(identifier=table_name)
+        else:
+            logging.info(
+                msg=f"Dropping table {table_name} - data will not be removed from s3. Set purge=True to delete data"
+            )
+            self.catalog.drop_table(identifier=table_name)
