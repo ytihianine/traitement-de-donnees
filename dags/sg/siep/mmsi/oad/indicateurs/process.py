@@ -258,7 +258,7 @@ def process_deet_energie(df: pd.DataFrame) -> pd.DataFrame:
         bat_assujettis_deet=df["bat_assujettis_deet"]
         .str.lower()
         .replace({"oui": True, "non": False}),
-        deet_commentaire=df["bat_assujettis_deet"].str.split().str.join(" "),
+        deet_commentaire=df["deet_commentaire"].str.split().str.join(" "),
     )
 
     return df
