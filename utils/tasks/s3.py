@@ -193,22 +193,24 @@ def write_to_s3(
 def copy_staging_to_prod(s3_info: SelecteurS3, **context) -> None:
     """Copy Iceberg tables from staging key to prod key"""
     # Dag info
-    namespace = get_db_info(context=context).prod_schema
-
+    db_schema = get_db_info(context=context).prod_schema
+    key_split = s3_info.filepath_s3.split(sep=".")[0].split(sep="/")
+    tbl_name = key_split.pop(-1)
+    namespace = ".".join([db_schema] + key_split)
     # Get catalog
     properties = generate_catalog_properties(
         uri=DEFAULT_POLARIS_HOST,
     )
     catalog = IcebergCatalog(name="data_store", **properties)
 
-    # Read data
-    df = catalog.read_table(table_name=s3_info.filepath_s3)
+    # Read staging table
+    df = catalog.read_table(table_name=namespace + "." + tbl_name)
 
-    # Copy table from staging to prod
+    # Write prod table
     write_to_s3(
         catalog=catalog,
         df=df,
         table_status=IcebergTableStatus.PROD,
         namespace=namespace,
-        table_name=s3_info.filepath_s3,
+        table_name=tbl_name,
     )
