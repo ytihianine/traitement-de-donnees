@@ -219,4 +219,4 @@ def copy_staging_to_prod(selecteur_info: SelecteurS3, **context) -> None:
         namespace=namespace,
         table_name=tbl_name,
     )
-    catalog.drop_table(table_name=namespace + "." + tbl_name + "_staging")
+    catalog.drop_table(table_name=namespace + "." + tbl_name + "_staging", purge=True)
