@@ -192,6 +192,11 @@ def write_to_s3(
 @task
 def copy_staging_to_prod(selecteur_info: SelecteurS3, **context) -> None:
     """Copy Iceberg tables from staging key to prod key"""
+
+    if selecteur_info.selecteur == "grist_doc":
+        logging.info(msg="Grist doc selecteur. Skipping ...")
+        return
+
     # Dag info
     db_schema = get_db_info(context=context).prod_schema
     key_split = selecteur_info.filepath_s3.split(sep=".")[0].split(sep="/")
