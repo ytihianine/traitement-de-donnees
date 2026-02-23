@@ -117,3 +117,7 @@ class IcebergCatalog:
         table = self.catalog.load_table(identifier=table_name)
         df = table.scan().to_pandas()
         return df
+
+    def drop_table(self, table_name: str) -> None:
+        logging.info(msg=f"Dropping table {table_name}")
+        self.catalog.drop_table(identifier=table_name)
