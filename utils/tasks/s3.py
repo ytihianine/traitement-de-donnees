@@ -190,11 +190,11 @@ def write_to_s3(
 
 
 @task
-def copy_staging_to_prod(s3_info: SelecteurS3, **context) -> None:
+def copy_staging_to_prod(selecteur_info: SelecteurS3, **context) -> None:
     """Copy Iceberg tables from staging key to prod key"""
     # Dag info
     db_schema = get_db_info(context=context).prod_schema
-    key_split = s3_info.filepath_s3.split(sep=".")[0].split(sep="/")
+    key_split = selecteur_info.filepath_s3.split(sep=".")[0].split(sep="/")
     tbl_name = key_split.pop(-1)
     namespace = ".".join([db_schema] + key_split)
     # Get catalog
