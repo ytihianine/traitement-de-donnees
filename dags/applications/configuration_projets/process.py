@@ -1,7 +1,6 @@
 from enums.dags import TypeDocumentation
 from enums.database import LoadStrategy, PartitionTimePeriod
 import pandas as pd
-import numpy as np
 from utils.control.dates import convert_grist_date_to_date
 from utils.control.structures import (
     handle_grist_boolean_columns,
@@ -205,6 +204,7 @@ def process_selecteur_s3(df: pd.DataFrame) -> pd.DataFrame:
     # Txt colonnes
     txt_cols = ["filename", "key"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    df["key"] = df["key"].fillna(pd.NA)
 
     return df
 
