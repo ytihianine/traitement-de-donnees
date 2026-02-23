@@ -204,7 +204,7 @@ def copy_staging_to_prod(selecteur_info: SelecteurS3, **context) -> None:
     catalog = IcebergCatalog(name="data_store", properties=properties)
 
     # Read staging table
-    df = catalog.read_table(table_name=namespace + "." + tbl_name)
+    df = catalog.read_table(table_name=namespace + "." + tbl_name + "_staging")
 
     # Write prod table
     write_to_s3(
