@@ -11,6 +11,9 @@ from airflow.sdk import task, XComArg
 from infra.file_handling.dataframe import read_dataframe
 from infra.file_handling.factory import create_default_s3_handler, create_local_handler
 from infra.database.factory import create_db_handler
+from infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
+from enums.filesystem import IcebergTableStatus
+from utils.tasks.s3 import write_to_s3
 from utils.control.structures import remove_grist_internal_cols
 from utils.dataframe import df_info
 from utils.config.tasks import (
@@ -20,9 +23,10 @@ from utils.config.tasks import (
     column_mapping_dict,
     get_source_fichier,
 )
-from utils.config.dag_params import get_execution_date, get_project_name
+from utils.config.dag_params import get_db_info, get_execution_date, get_project_name
 from _types.dags import ETLStep, TaskConfig
 from enums.database import DatabaseType
+from utils.config.vars import DEFAULT_POLARIS_HOST
 
 
 def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
@@ -52,6 +56,7 @@ def create_grist_etl_task(
     doc_selecteur: Optional[str] = None,
     normalisation_process_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
     process_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
+    version: str = "v1",
 ) -> Callable[..., XComArg]:
     """
     Create an ETL task for extracting, transforming and loading data from a Grist table that:
@@ -126,6 +131,24 @@ def create_grist_etl_task(
             file_path=str(task_config.filepath_tmp_s3),
             content=df.to_parquet(path=None, index=False),
         )
+
+        if version == "v2":
+            db_schema = get_db_info(context=context).prod_schema
+            properties = generate_catalog_properties(
+                uri=DEFAULT_POLARIS_HOST,
+            )
+            catalog = IcebergCatalog(name="data_store", properties=properties)
+
+            key_split = task_config.filepath_s3.split(sep="/")
+            tbl_name = key_split.pop(-1)
+            namespace = ".".join([db_schema] + key_split)
+            write_to_s3(
+                catalog=catalog,
+                df=df,
+                table_status=IcebergTableStatus.STAGING,
+                namespace=namespace,
+                table_name=tbl_name,
+            )
 
     return _task
 
