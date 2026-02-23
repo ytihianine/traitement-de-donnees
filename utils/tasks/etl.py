@@ -139,7 +139,7 @@ def create_grist_etl_task(
             )
             catalog = IcebergCatalog(name="data_store", properties=properties)
 
-            key_split = task_config.filepath_s3.split(sep="/")
+            key_split = task_config.filepath_s3.split(sep=".")[0].split(sep="/")
             tbl_name = key_split.pop(-1)
             namespace = ".".join([db_schema] + key_split)
             write_to_s3(
