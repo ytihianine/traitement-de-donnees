@@ -29,14 +29,26 @@ Tous les dags doivent êtres organisés de la façon suivante:
 ```
 
 ## S3
-Tous les fichiers stockés doivent respecter le format suivant:
+
+Les buckets S3 sont organisés par niveau. Il existe un total de 4 niveaux:
+- Niveau 1: FONCTION (ex: Finance, RH, Marketing)
+- Niveau 2: ACTIVITÉ (ex: Comptabilité, Paie, Recrutement)
+- Niveau 3: PROCESSUS/TRANSACTION (ex: Factures, Contrats)
+- Niveau 4: FONCTION DOSSIER/SÉRIE (ex: 2024, Client_X)
+
 ```
-bucket/specific/project/path/AAAAMMDD/HHhMM/file.ext
-# Exemple: dsci/sg/immobilier/consommation/20250801/13h30/conso.parquet
+bucket/niveau_1/niveau_2/niveau_3/niveau_4/file.ext
+# Exemple 1: bucket/immobilier/energie/consommation/20250801/13h30/conso.parquet
+# Exemple 2: bucket/finances/budget/ht2/20250801/13h30/achat.parquet
 ```
-l'ensemble des éléments doit être en lower case.
-Le bucket, le prefix specific/path et le nom du fichier sont définis au niveau de la configuration du projet. Les deux segments
-avec la date et l'heure sont ajoutés lors de la copie des fichiers via les tâches disponibles dans [utils/tasks/s3.py](../utils/tasks/s3.py).
+Dans les exemples, le niveau 4 est composé de la date et de l'heure au format `/AAAAMMDD/HHhMM`
+
+Avec Iceberg, le niveau 4 n'est pas nécessaire car il sera géré via les partitions si nécessaires.  
+Il rajoute une profondeur, automatiquement, entre le bucket et le niveau 1 qui correspond au nom du catalog
+```
+bucket/niveau_1/niveau_2/niveau_3/nom_table
+# Exemple 1: bucket/catalog/immobilier/energie/consommation/conso
+```
 
 ## SQL
 1. Les tables
