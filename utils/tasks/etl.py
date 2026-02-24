@@ -23,7 +23,7 @@ from utils.config.tasks import (
     column_mapping_dict,
     get_source_fichier,
 )
-from utils.config.dag_params import get_db_info, get_execution_date, get_project_name
+from utils.config.dag_params import get_execution_date, get_project_name
 from _types.dags import ETLStep, TaskConfig
 from enums.database import DatabaseType
 from utils.config.vars import DEFAULT_POLARIS_HOST
@@ -133,7 +133,6 @@ def create_grist_etl_task(
         )
 
         if version == "v2":
-            db_schema = get_db_info(context=context).prod_schema
             properties = generate_catalog_properties(
                 uri=DEFAULT_POLARIS_HOST,
             )
@@ -141,7 +140,7 @@ def create_grist_etl_task(
 
             key_split = task_config.filepath_s3.split(sep=".")[0].split(sep="/")
             tbl_name = key_split.pop(-1)
-            namespace = ".".join([db_schema] + key_split)
+            namespace = ".".join(key_split)
             write_to_s3(
                 catalog=catalog,
                 df=df,
