@@ -12,7 +12,6 @@ from infra.file_handling.factory import create_file_handler
 from infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
 from utils.config.dag_params import (
     get_dag_status,
-    get_db_info,
     get_execution_date,
     get_feature_flags,
     get_project_name,
@@ -198,10 +197,9 @@ def copy_staging_to_prod(selecteur_info: SelecteurS3, **context) -> None:
         return
 
     # Dag info
-    db_schema = get_db_info(context=context).prod_schema
     key_split = selecteur_info.filepath_s3.split(sep=".")[0].split(sep="/")
     tbl_name = key_split.pop(-1)
-    namespace = ".".join([db_schema] + key_split)
+    namespace = ".".join(key_split)
     # Get catalog
     properties = generate_catalog_properties(
         uri=DEFAULT_POLARIS_HOST,
