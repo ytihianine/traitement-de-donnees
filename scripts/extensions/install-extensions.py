@@ -82,12 +82,14 @@ def main() -> None:
         print(f"Installing {ext['name']}@{ext['version']}...")
         download_and_install_vsix(
             publisher=ext["publisher"], extension=ext["name"], version=ext["version"]
-        )  # noqa
+        )
 
     print("\nAll extensions installed successfully!")
 
     # Extension settings
     extension_settings = {
+        "workbench.sash.hoverDelay": 0,
+        "workbench.hover.delay": 0,
         "security.workspace.trust.enabled": False,
         "security.workspace.trust.startupPrompt": "never",
         "terminal.integrated.inheritEnv": False,
