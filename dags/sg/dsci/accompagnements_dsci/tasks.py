@@ -123,6 +123,21 @@ def correspondant() -> None:
 
 
 @task_group
+def dsci() -> None:
+    accompagnement_dsci = create_grist_etl_task(
+        selecteur="accompagnement_dsci",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_accompagnement_dsci,
+    )
+    effectif_dsci = create_grist_etl_task(
+        selecteur="effectif_dsci ",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_effectif_dsci)
+    # Ordre des tâches
+    chain([accompagnement_dsci(), effectif_dsci()])
+
+
+@task_group
 def mission_innovation() -> None:
     accompagnement_mi = create_grist_etl_task(
         selecteur="accompagnement_mi",
@@ -150,10 +165,85 @@ def mission_innovation() -> None:
         process_func=process.process_animateur_fac
 
     )
+    laboratoires_territoriaux = create_grist_etl_task(
+        selecteur="laboratoires_territoriaux",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_laboratoires_territoriaux
 
+    )
+    pleniere_quest_inscription = create_grist_etl_task(
+        selecteur="pleniere_quest_inscription",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_quest_inscription_pleniere
+
+    )
+    pleniere_quest_satisfaction = create_grist_etl_task(
+        selecteur="pleniere_quest_satisfaction",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_quest_satisfaction_pleniere
+
+    )
+    passinnov_quest_inscription = create_grist_etl_task(
+        selecteur="passinnov_quest_inscription",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_quest_inscription_passinnov
+
+    )
+    passinnov_quest_satisfaction = create_grist_etl_task(
+        selecteur="passinnov_quest_satisfaction",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_quest_satisfaction_passinnov
+
+    )
+    formation_codev_quest_inscription = create_grist_etl_task(
+        selecteur="formation_codev_quest_inscription",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_quest_inscription_formation_codev
+
+    )
+    formation_fac_quest_satisfaction = create_grist_etl_task(
+        selecteur="formation_fac_quest_satisfaction",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_quest_satisfaction_formation_fac
+
+    )
+    fac_hors_bercylab_quest_accompagnement = create_grist_etl_task(
+        selecteur="fac_hors_bercylab_quest_accompagnement",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_quest_accompagnement_fac_hors_bercylab
+
+    )
 
     # Ordre des tâches
     chain(
         [accompagnement_mi(), accompagnement_mi_satisfaction(),
-         animateur_interne(), animateur_externe(), animateur_fac()]
-         )
+         animateur_interne(), animateur_externe(), animateur_fac(),
+         laboratoires_territoriaux(), pleniere_quest_inscription(),
+         pleniere_quest_satisfaction(), passinnov_quest_inscription(),
+         passinnov_quest_satisfaction(), formation_codev_quest_inscription(),
+         formation_fac_quest_satisfaction(), fac_hors_bercylab_quest_accompagnement()])
+
+
+@task_group
+def conseil_interne() -> None:
+    accompagnement_cci_opportunite = create_grist_etl_task(
+        selecteur="accompagnement_cci_opportunite",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_accompagnement_opportunite_cci,
+    )
+    charge_agent_cci = create_grist_etl_task(
+        selecteur="charge_agent_cci",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_charge_agent_cci,
+    )
+    accompagnement_cci_quest_satisfaction = create_grist_etl_task(
+        selecteur="accompagnement_cci_quest_satisfaction",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process. process_quest_satisfaction_accompagnement_cci,
+    )
+
+    # Ordre des tâches
+    chain(
+        [accompagnement_cci_opportunite(),
+         charge_agent_cci(),
+         accompagnement_cci_quest_satisfaction()])
