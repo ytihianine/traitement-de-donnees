@@ -53,6 +53,10 @@ DEFAULT_S3_BUCKET = "dsci"
 # Catalog POLARIS
 DEFAULT_POLARIS_HOST = "https://polaris-catalog.lab.incubateur.finances.rie.gouv.fr"
 
+# S3
+DEFAULT_S3_ENDPOINT_URL = "https://minio.lab.incubateur.finances.rie.gouv.fr"
+
+
 # Grist
 DEFAULT_GRIST_HOST = "https://grist.numerique.gouv.fr"
 
