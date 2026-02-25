@@ -132,7 +132,8 @@ def dsci() -> None:
     effectif_dsci = create_grist_etl_task(
         selecteur="effectif_dsci ",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_effectif_dsci)
+        process_func=process.process_effectif_dsci,
+    )
     # Ordre des tâches
     chain([accompagnement_dsci(), effectif_dsci()])
 
@@ -152,76 +153,77 @@ def mission_innovation() -> None:
     animateur_interne = create_grist_etl_task(
         selecteur="animateur_interne",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process.animateur_interne,
+        process_func=process.process_animateur_interne,
     )
     animateur_externe = create_grist_etl_task(
         selecteur="animateur_externe",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process.animateur_externe,
+        process_func=process.process_animateur_externe,
     )
     animateur_fac = create_grist_etl_task(
         selecteur="animateur_fac",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_animateur_fac
-
+        process_func=process.process_animateur_fac,
     )
     laboratoires_territoriaux = create_grist_etl_task(
         selecteur="laboratoires_territoriaux",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_laboratoires_territoriaux
-
+        process_func=process.process_laboratoires_territoriaux,
     )
     pleniere_quest_inscription = create_grist_etl_task(
         selecteur="pleniere_quest_inscription",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_quest_inscription_pleniere
-
+        process_func=process.process_quest_inscription_pleniere,
     )
     pleniere_quest_satisfaction = create_grist_etl_task(
         selecteur="pleniere_quest_satisfaction",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_quest_satisfaction_pleniere
-
+        process_func=process.process_quest_satisfaction_pleniere,
     )
     passinnov_quest_inscription = create_grist_etl_task(
         selecteur="passinnov_quest_inscription",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_quest_inscription_passinnov
-
+        process_func=process.process_quest_inscription_passinnov,
     )
     passinnov_quest_satisfaction = create_grist_etl_task(
         selecteur="passinnov_quest_satisfaction",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_quest_satisfaction_passinnov
-
+        process_func=process.process_quest_satisfaction_passinnov,
     )
     formation_codev_quest_inscription = create_grist_etl_task(
         selecteur="formation_codev_quest_inscription",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_quest_inscription_formation_codev
-
+        process_func=process.process_quest_inscription_formation_codev,
     )
     formation_fac_quest_satisfaction = create_grist_etl_task(
         selecteur="formation_fac_quest_satisfaction",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_quest_satisfaction_formation_fac
-
+        process_func=process.process_quest_satisfaction_formation_fac,
     )
     fac_hors_bercylab_quest_accompagnement = create_grist_etl_task(
         selecteur="fac_hors_bercylab_quest_accompagnement",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_quest_accompagnement_fac_hors_bercylab
-
+        process_func=process.process_quest_accompagnement_fac_hors_bercylab,
     )
 
     # Ordre des tâches
     chain(
-        [accompagnement_mi(), accompagnement_mi_satisfaction(),
-         animateur_interne(), animateur_externe(), animateur_fac(),
-         laboratoires_territoriaux(), pleniere_quest_inscription(),
-         pleniere_quest_satisfaction(), passinnov_quest_inscription(),
-         passinnov_quest_satisfaction(), formation_codev_quest_inscription(),
-         formation_fac_quest_satisfaction(), fac_hors_bercylab_quest_accompagnement()])
+        [
+            accompagnement_mi(),
+            accompagnement_mi_satisfaction(),
+            animateur_interne(),
+            animateur_externe(),
+            animateur_fac(),
+            laboratoires_territoriaux(),
+            pleniere_quest_inscription(),
+            pleniere_quest_satisfaction(),
+            passinnov_quest_inscription(),
+            passinnov_quest_satisfaction(),
+            formation_codev_quest_inscription(),
+            formation_fac_quest_satisfaction(),
+            fac_hors_bercylab_quest_accompagnement(),
+        ]
+    )
 
 
 @task_group
@@ -239,11 +241,14 @@ def conseil_interne() -> None:
     accompagnement_cci_quest_satisfaction = create_grist_etl_task(
         selecteur="accompagnement_cci_quest_satisfaction",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process. process_quest_satisfaction_accompagnement_cci,
+        process_func=process.process_quest_satisfaction_accompagnement_cci,
     )
 
     # Ordre des tâches
     chain(
-        [accompagnement_cci_opportunite(),
-         charge_agent_cci(),
-         accompagnement_cci_quest_satisfaction()])
+        [
+            accompagnement_cci_opportunite(),
+            charge_agent_cci(),
+            accompagnement_cci_quest_satisfaction(),
+        ]
+    )
