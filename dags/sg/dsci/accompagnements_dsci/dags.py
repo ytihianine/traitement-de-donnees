@@ -21,7 +21,7 @@ from dags.sg.dsci.accompagnements_dsci.tasks import (
     correspondant,
     mission_innovation,
     dsci,
-    conseil_interne
+    conseil_interne,
 )
 
 # Variables
@@ -56,7 +56,10 @@ def accompagnements_dsci_dag() -> None:
             selecteur="grist_doc",
             workspace_id="dsci",
         ),
-        [referentiels(), bilaterales(), correspondant(), mission_innovation()],
+        [
+            referentiels(), bilaterales(), correspondant(), mission_innovation(),
+            dsci(), conseil_interne()
+            ],
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.partial(keep_file_id_col=True).expand(
             selecteur_info=get_list_selector_info(nom_projet=nom_projet)
