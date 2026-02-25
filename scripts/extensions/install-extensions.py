@@ -65,16 +65,16 @@ def main() -> None:
         {
             "publisher": "ms-python",
             "name": "debugpy",
-            "version": "2025.14.1",
+            "version": "2025.19.2026022301",
         },
         {
             "publisher": "ms-python",
             "name": "python",
-            "version": "2025.16.0",
+            "version": "2026.2.0",
         },
-        {"publisher": "detachhead", "name": "basedpyright", "version": "1.27.0"},
-        {"publisher": "GitHub", "name": "copilot", "version": "1.234.0"},
-        {"publisher": "GitHub", "name": "copilot-chat", "version": "0.20.0"},
+        {"publisher": "detachhead", "name": "basedpyright", "version": "1.38.1"},
+        {"publisher": "GitHub", "name": "copilot", "version": "1.388.0"},
+        {"publisher": "GitHub", "name": "copilot-chat", "version": "0.37.8"},
     ]
 
     print("Installing Python extensions...")
@@ -82,12 +82,14 @@ def main() -> None:
         print(f"Installing {ext['name']}@{ext['version']}...")
         download_and_install_vsix(
             publisher=ext["publisher"], extension=ext["name"], version=ext["version"]
-        )  # noqa
+        )
 
     print("\nAll extensions installed successfully!")
 
     # Extension settings
     extension_settings = {
+        "workbench.sash.hoverDelay": 0,
+        "workbench.hover.delay": 0,
         "security.workspace.trust.enabled": False,
         "security.workspace.trust.startupPrompt": "never",
         "terminal.integrated.inheritEnv": False,
