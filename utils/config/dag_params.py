@@ -1,6 +1,6 @@
 from dataclasses import asdict
 from datetime import datetime, timedelta
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping
 
 import pendulum
 from _types.dags import (
@@ -43,7 +43,13 @@ def get_execution_date(
         raise ValueError("Invalid execution date in Airflow context")
 
     if use_tz:
-        execution_date = execution_date.astimezone(tz=pytz.timezone(zone=tz_zone))
+        try:
+            tz = pytz.timezone(zone=tz_zone)
+            execution_date = execution_date.astimezone(tz=tz)
+        except pytz.UnknownTimeZoneError:
+            raise ValueError(
+                f"Invalid timezone: {tz_zone}. Must be a valid IANA timezone."
+            )
 
     return execution_date
 
@@ -75,7 +81,7 @@ def get_feature_flags(context: Mapping[str, Any]) -> FeatureFlags:
 
 
 def create_default_args(
-    retries: int = 0, retry_delay: Optional[timedelta] = None, **kwargs
+    retries: int = 0, retry_delay: timedelta | None = None, **kwargs
 ) -> dict:
     """Create standard default_args for DAGs."""
     args = {

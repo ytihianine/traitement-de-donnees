@@ -631,12 +631,13 @@ def process_projets_graphiques(df: pd.DataFrame) -> pd.DataFrame:
         # On force en nombre, on remplace les vides par 0, et on force en intier
         df[col] = pd.to_numeric(df[col], errors="coerce")
         df[col] = df[col].fillna(0).astype(int)
+
     df = pd.melt(
-        df,
+        frame=df,
         id_vars=["date", col_total],
         value_vars=cols_directions,
         var_name="commanditaire",
-        value_name="nombre_projets_graphique"
+        value_name="nombre_projets_graphique",
     )
     # Data control
     cols_to_check = ["nombre_projets_graphique", col_total]
