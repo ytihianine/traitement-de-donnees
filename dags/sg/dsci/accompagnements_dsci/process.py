@@ -251,7 +251,7 @@ def process_quest_inscription_passinnov(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_quest_satisfaction_passinnov(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={
-        "quest_passinov": "id_quest_passinnov",
+        "quest_passinnov": "id_quest_passinnov",
         "id_passinnov": "id_id_passinnov"
     })
     # Gestion
@@ -383,7 +383,7 @@ def process_quest_satisfaction_accompagnement_cci(df: pd.DataFrame) -> pd.DataFr
     })
     ref_cols = [
         "id_formulaire_accompagnement",
-        "id_etape_de_cadrage", 
+        "id_etape_de_cadrage",
         "id_aide_methodologique",
         "id_pilotage_et_suivi",
         "id_respect_calendrier",
@@ -394,6 +394,9 @@ def process_quest_satisfaction_accompagnement_cci(df: pd.DataFrame) -> pd.DataFr
         "id_atteinte_objectifs",
         "id_accompagnement"
         ]
+    for col in ref_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
     df = handle_grist_null_references(df=df, columns=ref_cols)
     return df
 

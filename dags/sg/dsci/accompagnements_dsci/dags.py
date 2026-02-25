@@ -20,6 +20,8 @@ from dags.sg.dsci.accompagnements_dsci.tasks import (
     bilaterales,
     correspondant,
     mission_innovation,
+    dsci,
+    conseil_interne
 )
 
 # Variables
