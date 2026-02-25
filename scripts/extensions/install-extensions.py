@@ -65,16 +65,16 @@ def main() -> None:
         {
             "publisher": "ms-python",
             "name": "debugpy",
-            "version": "2025.14.1",
+            "version": "2025.19.2026022301",
         },
         {
             "publisher": "ms-python",
             "name": "python",
-            "version": "2025.16.0",
+            "version": "2026.2.0",
         },
-        {"publisher": "detachhead", "name": "basedpyright", "version": "1.27.0"},
-        {"publisher": "GitHub", "name": "copilot", "version": "1.234.0"},
-        {"publisher": "GitHub", "name": "copilot-chat", "version": "0.20.0"},
+        {"publisher": "detachhead", "name": "basedpyright", "version": "1.38.1"},
+        {"publisher": "GitHub", "name": "copilot", "version": "1.388.0"},
+        {"publisher": "GitHub", "name": "copilot-chat", "version": "0.37.8"},
     ]
 
     print("Installing Python extensions...")
