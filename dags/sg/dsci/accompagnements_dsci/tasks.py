@@ -129,12 +129,15 @@ def dsci() -> None:
         process_func=process.process_accompagnement_dsci,
     )
     effectif_dsci = create_grist_etl_task(
-        selecteur="effectif_dsci ",
+        selecteur="effectif_dsci",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_effectif_dsci,
     )
     # Ordre des tâches
-    chain([accompagnement_dsci(), effectif_dsci()])
+    chain([
+        accompagnement_dsci(),
+        effectif_dsci()
+        ])
 
 
 @task_group

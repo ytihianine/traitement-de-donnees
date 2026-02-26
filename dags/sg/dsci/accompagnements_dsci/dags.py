@@ -57,7 +57,8 @@ def accompagnements_dsci_dag() -> None:
             workspace_id="dsci",
         ),
         [
-            referentiels(), bilaterales(), correspondant(), mission_innovation(),
+            referentiels(), bilaterales(),
+            correspondant(), mission_innovation(),
             dsci(), conseil_interne()
             ],
         create_tmp_tables(reset_id_seq=False),

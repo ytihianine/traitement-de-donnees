@@ -291,7 +291,6 @@ def process_quest_satisfaction_formation_fac(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des refs
     ref_cols = ["id_quest_formation", "id_promotion", "id_id_formation"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
-    
     return df
 
 
@@ -394,9 +393,7 @@ def process_quest_satisfaction_accompagnement_cci(df: pd.DataFrame) -> pd.DataFr
         "id_atteinte_objectifs",
         "id_accompagnement"
         ]
-    for col in ref_cols:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+    df[ref_cols] = df[ref_cols].apply(pd.to_numeric, errors="coerce").astype("Int64")
     df = handle_grist_null_references(df=df, columns=ref_cols)
     return df
 
