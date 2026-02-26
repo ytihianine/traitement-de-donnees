@@ -201,33 +201,6 @@ CREATE TABLE activite_dsci."correspondant_connaissance_communaute" (
 );
 
 
-CREATE TABLE activite_dsci."correspondant_maj" (
-	"id" integer PRIMARY KEY,
-	"id_region" int,
-	"id_type_de_correspondant" int[],
-	"prenom" text,
-	"nom" text,
-	"souhait_certification2" text,
-	"competence_autre2" grist_any,
-	"id_promotion" int[],
-	"id_direction" int,
-	"mail" text,
-	"nom_complet" text,
-	"id_competence_particuliere" int[],
-	"poste" text,
-	"cause_inactivite" text,
-	--"type_correspondant_text" text,
-	"connaissance_communaute" text[],
-	"actif" text,
-	"direction_hors_mef2" text,
-	"entite" text
-);
-ALTER TABLE "correspondant_maj" ADD FOREIGN KEY ("id_region") REFERENCES activite_dsci."ref_region" ("id");
-ALTER TABLE "correspondant_maj" ADD FOREIGN KEY ("id_type_de_correspondant") REFERENCES activite_dsci."ref_profil_correspondant" ("id");
-ALTER TABLE "correspondant_maj" ADD FOREIGN KEY ("id_promotion") REFERENCES activite_dsci."correspondant_maj" ("id");
-ALTER TABLE "correspondant_maj" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id");
-ALTER TABLE "correspondant_maj" ADD FOREIGN KEY ("id_competence_particuliere") REFERENCES activite_dsci."ref_competence_particuliere" ("id");
-
 
 /*
     Données : onglet Mission Innovation mi
@@ -324,7 +297,7 @@ ALTER TABLE "laboratoires_territoriaux" ADD FOREIGN KEY ("id_region") REFERENCES
 
 CREATE TABLE activite_dsci."pleniere_quest_inscription" (
 	"id" integer PRIMARY KEY,
-	"is_duplicate" grist_any,
+	"is_duplicate" int,
 	"id_direction" int,
 	"mail" text,
 	"id_pleniere" int,
@@ -337,8 +310,8 @@ ALTER TABLE "pleniere_quest_inscription" ADD FOREIGN KEY ("id_id_accompagnement"
 CREATE TABLE activite_dsci."pleniere_quest_satisfaction"(
 	"id" integer PRIMARY key,
 	"mail" text,
-	"ce_que_j_ai_apprecie" grist_any,
-	"ce_qui_peut_etre_ameliore" grist_any,
+	"ce_que_j_ai_apprecie" text,
+	"ce_qui_peut_etre_ameliore" text,
 	"note_globale" int
 )
 
@@ -361,7 +334,7 @@ ALTER TABLE "passinnov_quest_inscription" ADD FOREIGN KEY ("id_id_accompagnement
 
 CREATE TABLE activite_dsci."passinnov_quest_satisfaction" (
 	"id" integer PRIMARY KEY,
-	"is_duplicate" grist_any,
+	"is_duplicate" int,
 	"mail" text,
 	"id_id_passinnov" int,
 	"commentaires" text,
@@ -382,7 +355,7 @@ CREATE TABLE activite_dsci."formation_codev_quest_inscription"(
 	"difficultes" text,
 	"attentes" text,
 	"id_session_formation_codev" int,
-	"is_duplicate" grist_any
+	"is_duplicate" int,
 	"id_id_accompagnement" int 
 );
 ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id");
@@ -455,7 +428,7 @@ ALTER TABLE "charge_agent_cci" ADD FOREIGN KEY ("id_missions") REFERENCES activi
 ALTER TABLE "charge_agent_cci" ADD FOREIGN KEY ("id_semaine") REFERENCES activite_dsci."ref_semainier" ("id");
 ALTER TABLE "charge_agent_cci" ADD FOREIGN KEY ("id_agent_e_") REFERENCES activite_dsci."effectif_dsci" ("id");
 
-CREATE TABLE activite_dsci."accompagnement_opportunite_cci" (
+CREATE TABLE activite_dsci."accompagnement_cci_opportunite" (
 	"id" integer PRIMARY KEY,
 	"date_prise_de_decision" date,
 	"date_de_proposition_d_accompagnement" date,
@@ -470,7 +443,7 @@ CREATE TABLE activite_dsci."accompagnement_opportunite_cci" (
 	"precision_canal" text,
 	"proposition_d_accompagnement_transmise" boolean
 );
-ALTER TABLE "accompagnement_opportunite_cci" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id");
+ALTER TABLE "accompagnement_cci_opportunite" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id");
 
 ------------------------------------- questionnaires cci -------------------------------
 
