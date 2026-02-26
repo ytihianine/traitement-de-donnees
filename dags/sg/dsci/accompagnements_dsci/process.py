@@ -332,7 +332,7 @@ def process_quest_accompagnement_fac_hors_bercylab(df: pd.DataFrame) -> pd.DataF
 """
 
 
-def process_accompagnement_opportunite_cci(df: pd.DataFrame) -> pd.DataFrame:
+def process_accompagnement_cci_opportunite(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"accompagnement": "id_accompagnement"})
     # securité pour les saisies manuelles sans passer par la reference
     df["id_accompagnement"] = pd.to_numeric(df["id_accompagnement"], errors="coerce")

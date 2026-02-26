@@ -233,7 +233,7 @@ def conseil_interne() -> None:
     accompagnement_cci_opportunite = create_grist_etl_task(
         selecteur="accompagnement_cci_opportunite",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_accompagnement_opportunite_cci,
+        process_func=process.process_accompagnement_cci_opportunite,
     )
     charge_agent_cci = create_grist_etl_task(
         selecteur="charge_agent_cci",
