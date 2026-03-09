@@ -52,7 +52,10 @@ class IcebergCatalog:
 
     def _load_catalog(self) -> Catalog:
         # Logic to load the Iceberg catalog using the provided properties
-        return load_catalog(name=self.name, **self.properties)
+        print(f"Loading Iceberg catalog {self.name}...")
+        catalog = load_catalog(name=self.name, **self.properties)
+        print("Iceberg catalog loaded !")
+        return catalog
 
     def _get_schema_from_dataframe(self, df: pd.DataFrame) -> pa.Schema:
         # Convertir le DataFrame en schéma PyArrow
