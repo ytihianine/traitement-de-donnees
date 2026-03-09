@@ -9,74 +9,75 @@ from dags.applications.configuration_projets import process
 
 @task_group
 def process_data() -> None:
+    version = "v1"
     ref_direction = create_grist_etl_task(
         selecteur="direction",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_direction,
-        version="v2",
+        version=version,
     )
     ref_service = create_grist_etl_task(
         selecteur="service",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_service,
-        version="v2",
+        version=version,
     )
     # Projet
     projets = create_grist_etl_task(
         selecteur="projets",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_projet,
-        version="v2",
+        version=version,
     )
     projet_contact = create_grist_etl_task(
         selecteur="projet_contact",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_projet_contact,
-        version="v2",
+        version=version,
     )
     projet_documentation = create_grist_etl_task(
         selecteur="projet_documentation",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_projet_documentation,
-        version="v2",
+        version=version,
     )
     projet_s3 = create_grist_etl_task(
         selecteur="projet_s3",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_projet_s3,
-        version="v2",
+        version=version,
     )
     projet_selecteur = create_grist_etl_task(
         selecteur="projet_selecteur",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_selecteur,
-        version="v2",
+        version=version,
     )
     # Selecteur
     selecteur_source = create_grist_etl_task(
         selecteur="selecteur_source",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_source,
-        version="v2",
+        version=version,
     )
     selecteur_database = create_grist_etl_task(
         selecteur="selecteur_database",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_selecteur_database,
-        version="v2",
+        version=version,
     )
     selecteur_s3 = create_grist_etl_task(
         selecteur="selecteur_s3",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_selecteur_s3,
-        version="v2",
+        version=version,
     )
 
     selecteur_column_mapping = create_grist_etl_task(
         selecteur="selecteur_column_mapping",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_col_mapping,
-        version="v2",
+        version=version,
     )
 
     chain(
