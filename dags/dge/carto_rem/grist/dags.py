@@ -58,7 +58,7 @@ def cartographie_remuneration_grist() -> None:
         validate_dag_parameters(),
         download_grist_doc_to_s3(
             selecteur="grist_doc",
-            workspace_id="dsci",
+            workspace_id="dsci-dge",
             doc_id_key="grist_doc_id_carto_rem",
         ),
         [referentiels(), source_grist()],
