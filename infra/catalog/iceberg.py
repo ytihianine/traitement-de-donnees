@@ -38,6 +38,17 @@ def generate_catalog_properties(
         # "py-io-impl": "pyiceberg.io.fsspec.FsspecFileIO"
     }
 
+    if ca_bundle_path:
+        properties["ssl"] = {"cabundle": ca_bundle_path}
+
+    else:
+        # Use OS CA store — proven to work (trusts your self-signed CA)
+        import ssl
+
+        os_ca = ssl.get_default_verify_paths().cafile
+        if os_ca:
+            properties["ssl"] = {"cabundle": os_ca}
+
     return properties
 
 
