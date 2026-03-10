@@ -1,3 +1,4 @@
+from pyexpat import ErrorString
 import pandas as pd
 
 from utils.control.text import convert_str_cols_to_date, normalize_whitespace_columns
@@ -60,6 +61,6 @@ def process_agent_carriere(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[:, cols_to_keep]
 
     # Convert column
-    df["echelon"] = pd.to_numeric(arg=df["echelon"])
+    df["echelon"] = pd.to_numeric(arg=df["echelon"], errors="coerce")
 
     return df
