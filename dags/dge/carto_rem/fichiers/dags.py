@@ -45,12 +45,12 @@ nom_projet = "Cartographie rémunération"
     default_args=create_default_args(retries=0),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.DEV,
+        dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="cartographie_remuneration"),
         feature_flags=FeatureFlags(
-            db=False,
-            mail=False,
-            s3=False,
+            db=True,
+            mail=True,
+            s3=True,
             convert_files=False,
             download_grist_doc=False,
         ),
