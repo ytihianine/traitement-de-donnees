@@ -64,7 +64,7 @@ def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:
 def process_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
     # Processing des données
     df = drop_additionals_columns(df=df)
-    df["date"] = pd.to_datetime(df["mois"], unit="s")
+    df["date"] = pd.to_datetime(df["mois"], unit="s").astype("datetime64[s]")
     df = pd.melt(
         df,
         id_vars=["date"],
@@ -105,7 +105,7 @@ def process_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_abonnes_aux_lettres(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
-    df["date"] = pd.to_datetime(df["mois"], unit="s")
+    df["date"] = pd.to_datetime(df["mois"], unit="s").astype("datetime64[s]")
     df = df.drop(columns=["mois"])
 
     # Clean
@@ -135,7 +135,7 @@ def process_abonnes_aux_lettres(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_visites_portail(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
-    df["date"] = pd.to_datetime(df["mois"], unit="s")
+    df["date"] = pd.to_datetime(df["mois"], unit="s").astype("datetime64[s]")
     df = df.drop(columns=["mois"])
 
     # Clean
@@ -154,7 +154,7 @@ def process_visites_portail(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_visites_bercyinfo(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
-    df["date"] = pd.to_datetime(df["mois"], unit="s")
+    df["date"] = pd.to_datetime(df["mois"], unit="s").astype("datetime64[s]")
     df = df.drop(columns=["mois"])
 
     # Clean
@@ -173,7 +173,7 @@ def process_visites_bercyinfo(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_performances_lettres(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
-    df["date"] = pd.to_datetime(df["mois"], unit="s")
+    df["date"] = pd.to_datetime(df["mois"], unit="s").astype("datetime64[s]")
     df = df.drop(columns=["mois"])
 
     # Pivot df
@@ -208,7 +208,7 @@ def process_performances_lettres(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_visites_alize(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
-    df["date"] = pd.to_datetime(df["mois"], unit="s")
+    df["date"] = pd.to_datetime(df["mois"], unit="s").astype("datetime64[s]")
     df = df.drop(columns=["mois"])
 
     # Clean
@@ -227,7 +227,7 @@ def process_visites_alize(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_visites_intranet_sg(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
-    df["date"] = pd.to_datetime(df["mois"], unit="s")
+    df["date"] = pd.to_datetime(df["mois"], unit="s").astype("datetime64[s]")
     df = df.drop(columns=["mois"])
 
     # Clean
@@ -537,7 +537,7 @@ def process_notes_veilles(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_impressions_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
-    df["date"] = pd.to_datetime(df["mois"], unit="s")
+    df["date"] = pd.to_datetime(df["mois"], unit="s").astype("datetime64[s]")
     df = df.drop(columns=["mois"])
     df = df.rename(columns={"nombre_d_impression_globale": "impressions"})
 
@@ -566,7 +566,9 @@ def process_impact_actions_com(df: pd.DataFrame) -> pd.DataFrame:
     )
     # Conv de l'annee en string
     df["annee"] = df["annee"].astype(str).str.strip()
-    df["date"] = pd.to_datetime(df["annee"], format="%Y", errors="coerce")
+    df["date"] = pd.to_datetime(df["annee"], format="%Y", errors="coerce").astype(
+        "datetime64[s]"
+    )
     df = df.drop(columns=["annee"])
     df = df.dropna(subset=["date"])  # lignes ou annee invalide
     cols_numeriques = ["nombre_article", "nombre_vue"]
@@ -589,7 +591,9 @@ def process_recommandation_strat(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     df["annee"] = df["annee"].astype(str).str.strip()
-    df["date"] = pd.to_datetime(df["annee"], format="%Y", errors="coerce")
+    df["date"] = pd.to_datetime(df["annee"], format="%Y", errors="coerce").astype(
+        "datetime64[s]"
+    )
     df = df.drop(columns=["annee"])
     df = df.dropna(subset=["date"])  # del invalide date
     cols_numeriques = ["nombre_recommandation"]
@@ -612,7 +616,7 @@ def process_projets_graphiques(df: pd.DataFrame) -> pd.DataFrame:
     )
     df["date"] = pd.to_datetime(
         df["annee"].astype(str).str.strip(), format="%Y", errors="coerce"
-    )
+    ).astype("datetime64[s]")
     df = df.drop(columns=["annee"])
     df = df.dropna(subset=["date"])
 
