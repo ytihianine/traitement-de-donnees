@@ -15,6 +15,9 @@ from utils.config.dag_params import create_default_args, create_dag_params
 
 from utils.tasks.validation import validate_dag_parameters
 from utils.tasks.grist import download_grist_doc_to_s3
+from utils.tasks.s3 import (
+    copy_staging_to_prod,
+)
 from dags.sg.sircom.tdb_interne.tasks import (
     abonnes_visites,
     budget,
@@ -67,6 +70,9 @@ def tdb_sircom() -> None:
         ),
         copy_tmp_table_to_real_table(),
         delete_tmp_tables(),
+        copy_staging_to_prod.expand(
+            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        ),
     )
 
 
