@@ -55,6 +55,11 @@ setup-git:
 
 setup-dev-env: install-packages install-airflow install-pre-commit setup-git ## Installer tout l'environnement de développement
 
+init-env-files: ## Initialiser les fichiers d'environnement des scripts
+	@echo "Initialisation des fichiers d'environnement"
+	@chmod +x ./scripts/init_env.bash
+	@./scripts/init_env.bash
+	@echo "Tous les fichiers .env créés à partir de example.env. Veuillez les personnaliser avec vos propres valeurs."
 
 # Nettoyage
 clean: ## Nettoie les fichiers temporaires Python
