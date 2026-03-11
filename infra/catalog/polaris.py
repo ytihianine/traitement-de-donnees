@@ -80,6 +80,21 @@ class PolarisCatalog:
         )
         response.raise_for_status()
 
+    def delete_catalog(
+        self, token: str, catalog_name: str, realm: str | None = None
+    ) -> None:
+        realm = realm if realm else self.realm
+        delete_endpoint = (
+            f"{self.url}/{self.api_management_endpoint}/catalogs/{catalog_name}"
+        )
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Polaris-Realm": realm,
+        }
+        response = requests.delete(url=delete_endpoint, headers=headers, verify=False)
+        print(response.status_code, response.text)
+        response.raise_for_status()
+
     def create_principal(
         self, token: str, principal_name: str, realm: str | None = None
     ) -> tuple[str, str]:
