@@ -1,3 +1,4 @@
+import ssl
 import logging
 from dataclasses import dataclass, field
 from typing import Any, Mapping
@@ -17,9 +18,7 @@ def generate_catalog_properties(
     ca_bundle_path: str | None = None,
 ) -> Mapping[str, Any]:
     if client_id is None:
-        client_id = (
-            Variable.get(key="iceberg_client_id") if client_id is None else client_id
-        )
+        client_id = Variable.get(key="iceberg_client_id")
 
     if client_secret is None:
         client_secret = Variable.get(key="iceberg_client_secret")
@@ -40,11 +39,8 @@ def generate_catalog_properties(
 
     if ca_bundle_path:
         properties["ssl"] = {"cabundle": ca_bundle_path}
-
     else:
         # Use OS CA store — proven to work (trusts your self-signed CA)
-        import ssl
-
         os_ca = ssl.get_default_verify_paths().cafile
         if os_ca:
             properties["ssl"] = {"cabundle": os_ca}
@@ -63,9 +59,9 @@ class IcebergCatalog:
 
     def _load_catalog(self) -> Catalog:
         # Logic to load the Iceberg catalog using the provided properties
-        print(f"Loading Iceberg catalog {self.name}...")
+        logging.info(msg=f"Loading Iceberg catalog {self.name}...")
         catalog = load_catalog(name=self.name, **self.properties)
-        print("Iceberg catalog loaded !")
+        logging.info(msg="Iceberg catalog loaded !")
         return catalog
 
     def _get_schema_from_dataframe(self, df: pd.DataFrame) -> pa.Schema:
@@ -74,20 +70,13 @@ class IcebergCatalog:
 
     def create_namespace(self, namespace: str) -> None:
         """Create namespace and all parent namespaces if they don't exist"""
-        parts = namespace.split(".")
+        parts = namespace.split(sep=".")
 
         # Create each level of the namespace hierarchy
         for i in range(1, len(parts) + 1):
             parent_namespace = ".".join(parts[:i])
-            try:
-                logging.info(msg=f"Creating namespace: {parent_namespace}")
-                self.catalog.create_namespace_if_not_exists(namespace=parent_namespace)
-            except Exception as e:
-                # If it already exists, that's fine
-                logging.debug(
-                    msg=f"Namespace {parent_namespace} may already exist: {e}"
-                )
-                pass
+            logging.info(msg=f"Creating namespace: {parent_namespace}")
+            self.catalog.create_namespace_if_not_exists(namespace=parent_namespace)
 
     def create_table(
         self, table_name: str, df: pd.DataFrame, location: str | None = None
@@ -123,7 +112,6 @@ class IcebergCatalog:
             table.overwrite(df=pa_data)
         else:
             table.append(df=pa_data)
-        return
 
     def read_table(self, table_name: str) -> pd.DataFrame:
         # Logic to read data from a table in the Iceberg catalog
