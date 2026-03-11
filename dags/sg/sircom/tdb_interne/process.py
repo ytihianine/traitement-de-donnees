@@ -23,16 +23,6 @@ def generic_convert_to_float(value: str | None) -> float | None:
     return None
 
 
-def convert_bytes_to_string(df: pd.DataFrame) -> pd.DataFrame:
-    for colname, dtype in df.dtypes.items():
-        if dtype == object:  # Only process byte object columns.
-            try:
-                df[colname] = df[colname].str.decode("utf-8").fillna(df[colname])
-            except Exception:
-                df[colname] = df[colname].str.decode("latin-1").fillna(df[colname])
-    return df
-
-
 def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:
     semester_values = {"S1": 6, "Total": 12}
 
@@ -253,6 +243,7 @@ def process_budget_depense(df: pd.DataFrame) -> pd.DataFrame:
         df[colname] = df[colname].str.strip()
 
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
+    df["date"] = df["date"].astype("datetime64[s]")
     df = tag_last_value_rows(df=df, colname_max_value="date")
 
     return df
@@ -318,6 +309,7 @@ def process_indicateurs_metiers(df: pd.DataFrame) -> pd.DataFrame:
     df["unite"] = df["unite"].str.strip()
 
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
+    df["date"] = df["date"].astype("datetime64[s]")
     df = tag_last_value_rows(df=df, colname_max_value="date")
     return df
 
@@ -328,6 +320,7 @@ def process_enquete_satisfaction(df: pd.DataFrame) -> pd.DataFrame:
     df["unite"] = df["unite"].str.strip()
 
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
+    df["date"] = df["date"].astype("datetime64[s]")
     df = tag_last_value_rows(df=df, colname_max_value="date")
     return df
 
@@ -337,6 +330,7 @@ def process_etudes(df: pd.DataFrame) -> pd.DataFrame:
     df["demandeurs"] = df["demandeurs"].str.strip()
 
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
+    df["date"] = df["date"].astype("datetime64[s]")
     df = tag_last_value_rows(df=df, colname_max_value="date")
     return df
 
@@ -344,6 +338,7 @@ def process_etudes(df: pd.DataFrame) -> pd.DataFrame:
 def process_communique_presse(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
+    df["date"] = df["date"].astype("datetime64[s]")
     df = tag_last_value_rows(df=df, colname_max_value="date")
     return df
 
@@ -354,6 +349,7 @@ def process_studio_graphique(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["semestre", "creation_graphique"])
 
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
+    df["date"] = df["date"].astype("datetime64[s]")
     df = tag_last_value_rows(df=df, colname_max_value="date")
     return df
 
@@ -364,6 +360,7 @@ def process_rh_formation(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=["precision"])
 
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
+    df["date"] = df["date"].astype("datetime64[s]")
     df = tag_last_value_rows(df=df, colname_max_value="date")
     return df
 
@@ -372,6 +369,7 @@ def process_rh_turnover(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     # Ajout de la date
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
+    df["date"] = df["date"].astype("datetime64[s]")
 
     # Clean
     cols_with_values = ["valeur"]
@@ -392,6 +390,7 @@ def process_rh_contractuel(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     # Generate date
     df["date"] = list(map(generate_date, df["annee"], df["semestre"]))
+    df["date"] = df["date"].astype("datetime64[s]")
 
     # Clean
     df = df.rename(columns={"taux_d_agents_contractuel": "taux_agents_contractuels"})
@@ -488,7 +487,7 @@ def process_engagement_environnement(df: pd.DataFrame) -> pd.DataFrame:
 
     # Apply conditions to create new column
     df["indicateurs_regroupement"] = np.select(
-        conditions, choices, default=df["indicateurs"]
+        condlist=conditions, choicelist=choices, default=df["indicateurs"]
     )
 
     df.replace(values_to_replace, inplace=True)
@@ -517,6 +516,7 @@ def process_notes_veilles(df: pd.DataFrame) -> pd.DataFrame:
     df["annee"] = df["annee"].astype(str).str.strip()
     df["semestre_temp"] = "Total"
     df["date"] = list(map(generate_date, df["annee"], df["semestre_temp"]))
+    df["date"] = df["date"].astype("datetime64[s]")
 
     # Supp la col temporaire
     df = df.drop(columns=["semestre_temp", "annee"])
