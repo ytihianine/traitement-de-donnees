@@ -150,15 +150,15 @@ CREATE TABLE activite_dsci."accompagnement_dsci_equipe" (
   FOREIGN KEY ("id_equipe_s_dsci") REFERENCES activite_dsci."ref_bureau" ("id")
 );
 
--- Table  liaison pour les porteurs DSCI
+-- Table de liaison pour les porteurs DSCI
 DROP TABLE IF EXISTS activite_dsci."accompagnement_dsci_porteur" CASCADE;
 CREATE TABLE activite_dsci."accompagnement_dsci_porteur" (
   "id" integer PRIMARY KEY,
   "id_accompagnement" integer,
-  "id_Porteur_dsci" integer,
-  UNIQUE ("id_accompagnement", "id_Porteur_dsci"),
+  "id_porteur_dsci" integer, 
+  UNIQUE ("id_accompagnement", "id_porteur_dsci"), 
   FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id"),
-  FOREIGN KEY ("id_Porteur_dsci") REFERENCES activite_dsci."effectif_dsci" ("id")
+  FOREIGN KEY ("id_porteur_dsci") REFERENCES activite_dsci."effectif_dsci" ("id")
 );
 
 
