@@ -244,7 +244,7 @@ def mission_innovation() -> None:
         process_func=process.process_quest_accompagnement_fac_hors_bercylab_type
     )
     fac_hors_bercylab_quest_accompagnement_partiicipants = create_grist_etl_task(
-        selecteur="fac_hors_bercylab_quest_accompagnement_partiicipants",
+        selecteur="fac_hors_bercylab_quest_accompagnement_participants",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_quest_accompagnement_fac_hors_bercylab_participants,
     )
