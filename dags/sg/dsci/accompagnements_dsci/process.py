@@ -492,7 +492,7 @@ def process_quest_inscription_formation_codev(df: pd.DataFrame) -> pd.DataFrame:
 def process_quest_satisfaction_formation_fac(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_keep = [
         "id",
-        "quest_Formation",
+        "quest_formation",
         "mail",
         "promotion",
         "note_module_1",
