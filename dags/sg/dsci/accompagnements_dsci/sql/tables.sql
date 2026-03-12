@@ -91,7 +91,7 @@ CREATE TABLE activite_dsci."effectif_dsci" (
   "nom_complet" text,
   "agent_present" boolean,
   "fonction" text,
-  "absent_depuis" date,
+  "absent_depuis" date
   --"created_at" date,
   --"updated_at" date,
   -- "created_by" text,
@@ -271,12 +271,11 @@ CREATE TABLE activite_dsci."accompagnement_mi" (
 	"statut" text,
 	"id_pole" int,
 	"id_type_d_accompagnement" int,
-	"informations_complementaires" text
-);
---ALTER TABLE "accompagnement_mi" ADD FOREIGN KEY ("id_certifications_possibles") REFERENCES activite_dsci."ref_certification" ("id");
+	"informations_complementaires" text,
 	FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id"),
 	FOREIGN KEY ("id_pole") REFERENCES activite_dsci."ref_pole" ("id"),
 	FOREIGN KEY ("id_type_d_accompagnement") REFERENCES activite_dsci."ref_type_accompagnement" ("id")
+);
 
 
 CREATE TABLE activite_dsci."accompagnement_mi_satisfaction" (
@@ -441,7 +440,7 @@ ALTER TABLE "formation_fac_quest_satisfaction" ADD FOREIGN KEY ("id_id_formation
 DROP TABLE IF EXISTS activite_dsci."formation_fac_envie_suite_quest_satisfaction" CASCADE;
 CREATE TABLE activite_dsci."formation_fac_envie_suite_quest_satisfaction"(
     "id" integer PRIMARY KEY,
-    "id_quest_satisfaction" integer,
+	"id_formation_fac" integer,
     "envies_pour_la_suite" text,
     UNIQUE ("id_formation_fac", "envies_pour_la_suite"),
     FOREIGN KEY ("id_formation_fac") REFERENCES activite_dsci."formation_fac_quest_satisfaction" ("id")
