@@ -14,7 +14,7 @@ CLIENT_SECRET = env_var.get("CLIENT_SECRET", "")
 POLARIS_URL = "https://polaris-catalog.lab.incubateur.finances.rie.gouv.fr"
 REALM = "POLARIS"
 CATALOG_NAME = "data_store"
-PRINCIPAL_NAME = "data_store_user"
+PRINCIPAL_NAME = "data_store_trino"
 PRINCIPAL_ROLE_NAME = "data_store_user_role"
 CATALOG_ROLE_NAME = "data_store_catalog_role"
 ca_bundle = "/home/onyxia/work/bercyCA.crt"
@@ -38,21 +38,41 @@ except Exception as e:
     print(f"✓ No existing catalog to delete: {e}")
 
 # Create catalog with credentials
-polaris_client.create_catalog(token=token, catalog_name=CATALOG_NAME, storage_config={})
-print("✓ Catalog created")
+try:
+    polaris_client.create_catalog(
+        token=token, catalog_name=CATALOG_NAME, storage_config={}
+    )
+    print("✓ Catalog created")
+except Exception as e:
+    print(f"✗ Catalog creation failed - might already exists: {e}")
+
 
 # Create principal
 client_id, client_secret = polaris_client.create_principal(
     token, principal_name=PRINCIPAL_NAME
 )
-print(f"✓ Principal created: {client_id} / {client_secret}")
+# Export credentials to .env file
+credentials_file = (
+    "/home/onyxia/work/traitement-des-donnees/scripts/catalogs/.env.polaris"
+)
+with open(file=credentials_file, mode="w") as f:
+    f.write(f"POLARIS_CLIENT_ID={client_id}\n")
+    f.write(f"POLARIS_CLIENT_SECRET={client_secret}\n")
+print(f"✓ Principal created, credentials saved to {credentials_file}")
 
 # Create roles
-polaris_client.create_principal_role(token, role_name=PRINCIPAL_ROLE_NAME)
-polaris_client.create_catalog_role(
-    token, catalog_name=CATALOG_NAME, role_name=CATALOG_ROLE_NAME
-)
-print("✓ Roles created")
+try:
+    polaris_client.create_principal_role(token, role_name=PRINCIPAL_ROLE_NAME)
+except Exception:
+    print("✓ Principal role already exists")
+
+try:
+    polaris_client.create_catalog_role(
+        token, catalog_name=CATALOG_NAME, role_name=CATALOG_ROLE_NAME
+    )
+    print("✓ Roles created")
+except Exception:
+    print("✓ Catalog role already exists")
 
 # Assign roles
 polaris_client.assign_principal_role(
