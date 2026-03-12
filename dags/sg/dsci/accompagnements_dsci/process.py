@@ -235,7 +235,7 @@ def process_accompagnement_dsci_porteur(df: pd.DataFrame) -> pd.DataFrame:
         "porteur_dsci": "id_porteur_dsci"
         })
     # Gestion des refs
-    ref_cols = ["id_accompagnement", "id_Porteur_dsci"]
+    ref_cols = ["id_accompagnement", "id_porteur_dsci"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_porteur_dsci")
