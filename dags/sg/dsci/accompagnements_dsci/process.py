@@ -146,7 +146,8 @@ def process_accompagnement_dsci(df: pd.DataFrame) -> pd.DataFrame:
         "debut_previsionnel_de_l_accompagnement",
         "fin_previsionnelle_de_l_accompagnement",
         "autres_participants",
-        "date_de_cloture_questionnaire"
+        "date_de_cloture_questionnaire",
+        "porteur_metier"
     ]
     cols_to_drop = list(set(df.columns) - set(cols_to_keep))
     df = df.drop(columns=cols_to_drop)
@@ -165,7 +166,8 @@ def process_accompagnement_dsci(df: pd.DataFrame) -> pd.DataFrame:
         "intitule_de_l_accompagnement",
         "ressources_documentaires",
         "service_bureau",
-        "sous_dir_bureau_"
+        "sous_dir_bureau_",
+        "porteur_metier"
         ]
     df = normalize_whitespace_columns(df=df, columns=col_text)
     # Gestion référence simple
@@ -224,24 +226,24 @@ def process_accompagnement_dsci_equipe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_accompagnement_dsci_porteur(df: pd.DataFrame) -> pd.DataFrame:
-    cols_to_keep = ["id", "Porteur_dsci"]
+    cols_to_keep = ["id", "porteur_dsci"]
     # Filtrage
     df = df[cols_to_keep]
     # Renommage
     df = df.rename(columns={
         "id": "id_accompagnement",
-        "Porteur_dsci": "id_Porteur_dsci"
+        "porteur_dsci": "id_porteur_dsci"
         })
     # Gestion des refs
-    ref_cols = ["id_accompagnement", "id_Porteur_dsci"]
+    ref_cols = ["id_accompagnement", "id_porteur_dsci"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
-    df = convert_str_of_list_to_list(df=df, col_to_convert="id_Porteur_dsci")
-    df = df.explode(column="id_Porteur_dsci")
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_porteur_dsci")
+    df = df.explode(column="id_porteur_dsci")
     # Nettoyage de ligne vide
-    df = df.dropna(subset=["id_Porteur_dsci"])
+    df = df.dropna(subset=["id_porteur_dsci"])
     df["id"] = (
-        df.sort_values(by=["id_accompagnement", "id_Porteur_dsci"])
+        df.sort_values(by=["id_accompagnement", "id_porteur_dsci"])
         .reset_index(drop=True)
         .index
     )
