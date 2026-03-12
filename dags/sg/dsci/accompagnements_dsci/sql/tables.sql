@@ -88,21 +88,27 @@ CREATE TABLE activite_dsci."effectif_dsci" (
   "mail" text,
   "id_bureau" int,
   "id_pole" int,
-  "bureau_texte" text,
   "nom_complet" text,
   "agent_present" boolean,
   "fonction" text,
-  "absent_depuis" date
+  "absent_depuis" date,
+  --"created_at" date,
+  --"updated_at" date,
+  -- "created_by" text,
+  --"updated_by text",
+  --"bureau_texte" text,
+
 );
 ALTER TABLE "effectif_dsci" ADD FOREIGN KEY ("id_bureau") REFERENCES activite_dsci."ref_bureau" ("id");
 ALTER TABLE "effectif_dsci" ADD FOREIGN KEY ("id_pole") REFERENCES activite_dsci."ref_pole" ("id");
 
 
+
+DROP TABLE IF EXISTS activite_dsci."accompagnement_dsci" CASCADE;
 CREATE TABLE activite_dsci."accompagnement_dsci" (
   "id" integer PRIMARY KEY,
   "annee" numeric,
   "statut" text,
-  "id_typologie" int[],
   "recours_prestataire" text,
   "commentaires_complements" text,
   "ressources_documentaires" text,
@@ -113,18 +119,49 @@ CREATE TABLE activite_dsci."accompagnement_dsci" (
   "id_direction" int,
   "service_bureau" text,
   "sous_dir_bureau_" text,
-  "id_equipe_s_dsci" int[],
-  "id_porteur_dsci" int[],
   "nom_du_prestataire" text,
   -- "equipe_dsci_txt" text,
   "formulaire_cci" text,
-  "date_de_cloture_questionnaire" date
-  -- "porteur_metier" text,
+  "date_de_cloture_questionnaire" date,
+  "porteur_metier" text
 );
 ALTER TABLE "accompagnement_dsci" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id");
---ALTER TABLE "accompagnement_dsci" ADD FOREIGN KEY ("id_typologie") REFERENCES activite_dsci."ref_typologie_accompagnement" ("id");
---ALTER TABLE "accompagnement_dsci" ADD FOREIGN KEY ("id_equipe_s_dsci") REFERENCES activite_dsci."ref_bureau" ("id");
---ALTER TABLE "accompagnement_dsci" ADD FOREIGN KEY ("id_porteur_dsci") REFERENCES activite_dsci."effectif_dsci" ("id");
+
+
+
+DROP TABLE IF EXISTS activite_dsci."accompagnement_dsci_typologie" CASCADE;
+CREATE TABLE activite_dsci."accompagnement_dsci_typologie" (
+  "id" integer PRIMARY KEY,
+  "id_accompagnement" integer,
+  "id_typologie" integer,
+  UNIQUE ("id_accompagnement", "id_typologie"),
+  FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id"),
+  FOREIGN KEY ("id_typologie") REFERENCES activite_dsci."ref_typologie_accompagnement" ("id")
+);
+
+-- Table liaison pour les équipes DSCI
+DROP TABLE IF EXISTS activite_dsci."accompagnement_dsci_equipe" CASCADE;
+CREATE TABLE activite_dsci."accompagnement_dsci_equipe" (
+  "id" integer PRIMARY KEY,
+  "id_accompagnement" integer,
+  "id_equipe_s_dsci" integer,
+  UNIQUE ("id_accompagnement", "id_equipe_s_dsci"),
+  FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id"),
+  FOREIGN KEY ("id_equipe_s_dsci") REFERENCES activite_dsci."ref_bureau" ("id")
+);
+
+-- Table  liaison pour les porteurs DSCI
+DROP TABLE IF EXISTS activite_dsci."accompagnement_dsci_porteur" CASCADE;
+CREATE TABLE activite_dsci."accompagnement_dsci_porteur" (
+  "id" integer PRIMARY KEY,
+  "id_accompagnement" integer,
+  "id_Porteur_dsci" integer,
+  UNIQUE ("id_accompagnement", "id_Porteur_dsci"),
+  FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id"),
+  FOREIGN KEY ("id_Porteur_dsci") REFERENCES activite_dsci."effectif_dsci" ("id")
+);
+
+
 
 CREATE TABLE activite_dsci."bilaterale" (
   "id" integer PRIMARY KEY,
@@ -187,16 +224,18 @@ CREATE TABLE activite_dsci."correspondant_profil" (
 
 CREATE TABLE activite_dsci."correspondant_competence_particuliere" (
 	"id" integer PRIMARY KEY,
-	"id_correspondant" integer PRIMARY KEY,
+	"id_correspondant" integer,
 	"id_competence_particuliere" int,
+	UNIQUE ("id_correspondant", "id_competence_particuliere"),
 	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id"),
 	FOREIGN KEY ("id_competence_particuliere") REFERENCES activite_dsci."ref_competence_particuliere" ("id")
 );
 
 CREATE TABLE activite_dsci."correspondant_connaissance_communaute" (
 	"id" integer PRIMARY KEY,
-	"id_correspondant" integer PRIMARY KEY,
+	"id_correspondant" integer,
 	"connaissance_communaute" text,
+	UNIQUE ("id_correspondant", "connaissance_communaute")
 	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id")
 );
 
@@ -272,17 +311,33 @@ ALTER TABLE "animateur_externe" ADD FOREIGN KEY ("id_accompagnement") REFERENCES
 CREATE TABLE activite_dsci."animateur_fac" (
   "id" integer PRIMARY KEY,
   "id_accompagnement" int,
-  "id_certifications_validees" int[],
-  "cert_possibles_txt" text,
-  "cert_validees_txt" text,
-  "cert_souhaitees_txt" text,
-  "id_certifications_souhaitees" int[],
   "id_animateur" int
 );
 ALTER TABLE "animateur_fac" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id");
 ALTER TABLE "animateur_fac" ADD FOREIGN KEY ("id_animateur") REFERENCES activite_dsci."correspondant" ("id");
---ALTER TABLE "animateur_fac" ADD FOREIGN KEY ("id_certifications_validees") REFERENCES activite_dsci."ref_certification" ("id");
---ALTER TABLE "animateur_fac" ADD FOREIGN KEY ("id_certifications_souhaitees") REFERENCES activite_dsci."ref_certification" ("id");
+
+-- Table de liaison pour les certifications_souhaitées
+DROP TABLE IF EXISTS activite_dsci."animateur_fac_certification" CASCADE;
+CREATE TABLE activite_dsci."animateur_fac_certification" (
+  "id" integer PRIMARY KEY,
+  "id_animateur_fac" integer,
+  "id_certifications_souhaitees" integer,
+  UNIQUE ("id_animateur_fac", "id_certifications_souhaitees"),
+  FOREIGN KEY ("id_animateur_fac") REFERENCES activite_dsci."animateur_fac" ("id"),
+  FOREIGN KEY ("id_certifications_souhaitees") REFERENCES activite_dsci."ref_certification" ("id")
+);
+
+-- Table de liaison pour les certifications_validées
+DROP TABLE IF EXISTS activite_dsci."animateur_fac_certification_valide" CASCADE;
+CREATE TABLE activite_dsci."animateur_fac_certification_valide" (
+  "id" integer PRIMARY KEY,
+  "id_animateur_fac" integer,
+  "id_certifications_validees" integer,
+  UNIQUE ("id_animateur_fac", "id_certifications_validees"),
+  FOREIGN KEY ("id_animateur_fac") REFERENCES activite_dsci."animateur_fac" ("id"),
+  FOREIGN KEY ("id_certifications_validees") REFERENCES activite_dsci."ref_certification" ("id")
+);
+
 
 CREATE TABLE activite_dsci."laboratoires_territoriaux" (
 	"id" integer PRIMARY KEY,
@@ -355,13 +410,14 @@ CREATE TABLE activite_dsci."formation_codev_quest_inscription"(
 	"difficultes" text,
 	"attentes" text,
 	"id_session_formation_codev" int,
-	"is_duplicate" int,
+	--"is_duplicate" int,
 	"id_id_accompagnement" int 
 );
 ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id");
 ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id");
 ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_session_formation_codev") REFERENCES activite_dsci."accompagnement_mi" ("id");
 
+DROP TABLE IF EXISTS activite_dsci."formation_fac_quest_satisfaction" CASCADE;
 CREATE TABLE activite_dsci."formation_fac_quest_satisfaction"(
 	"id" integer PRIMARY KEY,
 	"id_quest_formation" int,
@@ -375,7 +431,6 @@ CREATE TABLE activite_dsci."formation_fac_quest_satisfaction"(
 	"commentaire_m3" text,
 	"nps" int,
 	"utilite" text,
-	"envies_pour_la_suite" text[],
 	"besoin" text,
 	"id_id_formation" int
 );
@@ -383,21 +438,28 @@ ALTER TABLE "formation_fac_quest_satisfaction" ADD FOREIGN KEY ("id_promotion") 
 ALTER TABLE "formation_fac_quest_satisfaction" ADD FOREIGN KEY ("id_quest_formation") REFERENCES activite_dsci."accompagnement_mi" ("id");
 ALTER TABLE "formation_fac_quest_satisfaction" ADD FOREIGN KEY ("id_id_formation") REFERENCES activite_dsci."accompagnement_mi" ("id");
 
+-- Nouvelle table de liaison pour les envies_pour_la_suite
+DROP TABLE IF EXISTS activite_dsci."formation_fac_envie_suite_quest_satisfaction" CASCADE;
+CREATE TABLE activite_dsci."formation_fac_envie_suite_quest_satisfaction"(
+    "id" integer PRIMARY KEY,
+    "id_quest_satisfaction" integer,
+    "envies_pour_la_suite" text,
+    UNIQUE ("id_formation_fac", "envies_pour_la_suite"),
+    FOREIGN KEY ("id_formation_fac") REFERENCES activite_dsci."formation_fac_quest_satisfaction" ("id")
+);
 
+DROP TABLE IF EXISTS activite_dsci."fac_hors_bercylab_quest_accompagnement" CASCADE;
 CREATE TABLE activite_dsci."fac_hors_bercylab_quest_accompagnement" (
 	"id" integer PRIMARY KEY,
 	"id_facilitateur_1" int,
 	"id_facilitateur_2" int,
 	"id_facilitateur_3" int,
-	"id_facilitateurs" int[],
 	"id_direction" int,
 	"synthese_de_l_accompagnement" text,
 	"id_region" int,
 	"date_de_realisation" date,
-	"type_d_accompagnement" text[],
 	"intitule_de_l_accompagnement" text,
 	"statut" text,
-	"participants" text[]
 );
 ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateur_1") REFERENCES activite_dsci."correspondant" ("id");
 ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateur_2") REFERENCES activite_dsci."correspondant" ("id");
@@ -405,6 +467,40 @@ ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facili
 --ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateurs") REFERENCES activite_dsci."correspondant" ("id");
 ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id");
 ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_region") REFERENCES activite_dsci."ref_region" ("id");
+
+
+-- Table de liaison pour les facilitateurs
+DROP TABLE IF EXISTS activite_dsci."fac_hors_bercylab_quest_accompagnement_facilitateurs" CASCADE;
+CREATE TABLE activite_dsci."fac_hors_bercylab_quest_accompagnement_facilitateurs" (
+    "id" integer PRIMARY KEY,
+    "id_formation_fac_hors_bercylab" integer,
+    "id_facilitateurs" integer,
+    UNIQUE ("id_formation_fac_hors_bercylab", "id_facilitateurs"),
+    FOREIGN KEY ("id_formation_fac_hors_bercylab") REFERENCES activite_dsci."fac_hors_bercylab_quest_accompagnement" ("id"),
+    FOREIGN KEY ("id_facilitateurs") REFERENCES activite_dsci."correspondant" ("id")
+);
+
+-- Table de liaison pour le type d'accompagnement
+DROP TABLE IF EXISTS activite_dsci."fac_hors_bercylab_quest_type_accompagnement" CASCADE;
+CREATE TABLE activite_dsci."fac_hors_bercylab_quest_type_accompagnement" (
+    "id" integer PRIMARY KEY,
+    "id_formation_fac_hors_bercylab" integer,
+    "type_d_accompagnement" text,
+    UNIQUE ("id_formation_fac_hors_bercylab", "type_d_accompagnement"),
+    FOREIGN KEY ("id_formation_fac_hors_bercylab") REFERENCES activite_dsci."fac_hors_bercylab_quest_accompagnement" ("id")
+);
+
+-- 4. Table de liaison pour les participants
+DROP TABLE IF EXISTS activite_dsci."fac_hors_bercylab_quest_accompagnement_participants" CASCADE;
+CREATE TABLE activite_dsci."fac_hors_bercylab_quest_accompagnement_participants" (
+    "id" integer PRIMARY KEY,
+    "id_formation_fac_hors_bercylab" integer,
+    "participants" text,
+    UNIQUE ("id_formation_fac_hors_bercylab", "participants"),
+    FOREIGN KEY ("id_formation_fac_hors_bercylab") REFERENCES activite_dsci."fac_hors_bercylab_quest_accompagnement" ("id")
+);
+
+
 
 /*
     Données : onglet Cellule Conseil Interne cci

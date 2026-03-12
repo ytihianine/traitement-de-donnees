@@ -112,13 +112,29 @@ def correspondant() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_correspondant_profil,
     )
+    correspondant_competence_particuliere = create_grist_etl_task(
+        selecteur="correspondant_competence_particuliere",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_correspondant_competence_particuliere,
+    )
+    correspondant_connaissance_communaute = create_grist_etl_task(
+        selecteur="correspondant_connaissance_communaute",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_correspondant_connaissance_communaute,
+    )
     # correspondant_certification = create_grist_etl_task(
     #     selecteur="correspondant_certification",
     #     process_func=process.process_correspondant_certification,
     # )
 
     # Ordre des tâches
-    chain([correspondant(), correspondant_profil()])
+    chain(
+        [correspondant(),
+         correspondant_profil(),
+         correspondant_competence_particuliere(),
+         correspondant_connaissance_communaute(),
+         ]
+    )
 
 
 @task_group
@@ -167,6 +183,16 @@ def mission_innovation() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_animateur_fac,
     )
+    animateur_fac_certification = create_grist_etl_task(
+        selecteur="animateur_fac_certification",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_animateur_fac_certification,
+    )
+    animateur_fac_certification_valide = create_grist_etl_task(
+        selecteur="animateur_fac_certification_valide",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_animateur_fac_certification_valide,
+    )
     laboratoires_territoriaux = create_grist_etl_task(
         selecteur="laboratoires_territoriaux",
         normalisation_process_func=normalize_grist_dataframe,
@@ -202,10 +228,30 @@ def mission_innovation() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_quest_satisfaction_formation_fac,
     )
+    formation_fac_envie_suite_quest_satisfaction = create_grist_etl_task(
+        selecteur="formation_fac_envie_suite_quest_satisfaction",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_quest_satisfaction_formation_fac_envies,
+    )
     fac_hors_bercylab_quest_accompagnement = create_grist_etl_task(
         selecteur="fac_hors_bercylab_quest_accompagnement",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_quest_accompagnement_fac_hors_bercylab,
+    )
+    fac_hors_bercylab_quest_type_accompagnement = create_grist_etl_task(
+        selecteur="fac_hors_bercylab_quest_type_accompagnement",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_quest_accompagnement_fac_hors_bercylab_type
+    )
+    fac_hors_bercylab_quest_accompagnement_partiicipants = create_grist_etl_task(
+        selecteur="fac_hors_bercylab_quest_accompagnement_partiicipants",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_quest_accompagnement_fac_hors_bercylab_participants,
+    )
+    fac_hors_bercylab_quest_accompagnement_facilitateurs = create_grist_etl_task(
+        selecteur="fac_hors_bercylab_quest_accompagnement_facilitateurs",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_quest_accompagnement_fac_hors_bercylab_facilitateurs,
     )
 
     # Ordre des tâches
@@ -216,6 +262,8 @@ def mission_innovation() -> None:
             animateur_interne(),
             animateur_externe(),
             animateur_fac(),
+            animateur_fac_certification(),
+            animateur_fac_certification_valide(),
             laboratoires_territoriaux(),
             pleniere_quest_inscription(),
             pleniere_quest_satisfaction(),
@@ -223,7 +271,12 @@ def mission_innovation() -> None:
             passinnov_quest_satisfaction(),
             formation_codev_quest_inscription(),
             formation_fac_quest_satisfaction(),
+            formation_fac_envie_suite_quest_satisfaction(),
             fac_hors_bercylab_quest_accompagnement(),
+            fac_hors_bercylab_quest_type_accompagnement(),
+            fac_hors_bercylab_quest_accompagnement_partiicipants(),
+            fac_hors_bercylab_quest_accompagnement_facilitateurs()
+
         ]
     )
 
