@@ -813,7 +813,7 @@ def process_correspondant(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[(df["mail"] != "") & (~df["mail"].isna())]
 
     # Gérer les références
-    ref_cols = ["id_region", "id_direction"]
+    ref_cols = ["id_region", "id_direction", "id_promotion_fac"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
 
     return df
@@ -897,19 +897,4 @@ def process_correspondant_connaissance_communaute(df: pd.DataFrame) -> pd.DataFr
         .index
     )
 
-    return df
-
-
-def process_correspondant_certification(df: pd.DataFrame) -> pd.DataFrame:
-    cols_to_keep = ["mail", "type_de_correspondant"]
-    cols_to_drop = list(set(df.columns) - set(cols_to_keep))
-    df = df.drop(columns=cols_to_drop)
-    df = df.rename(
-        columns={
-            "direction": "id_direction",
-            "region": "id_region",
-            "promotion_fac": "id_promotion_fac",
-        }
-    )
-    df = df.drop_duplicates(subset=["mail"], keep="last")
     return df

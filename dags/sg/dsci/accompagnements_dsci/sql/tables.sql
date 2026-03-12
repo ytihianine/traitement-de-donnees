@@ -239,14 +239,6 @@ CREATE TABLE activite_dsci."correspondant_connaissance_communaute" (
 	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id")
 );
 
-CREATE TABLE activite_dsci."correspondant_certification" (
-    "id" integer PRIMARY KEY,
-    "id_correspondant" integer,
-    "id_type_de_correspondant" integer,
-    UNIQUE ("id_correspondant", "id_type_de_correspondant"),
-    FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id"),
-    FOREIGN KEY ("id_type_de_correspondant") REFERENCES activite_dsci."ref_profil_correspondant" ("id")
-);
 
 /*
     Données : onglet Mission Innovation mi
@@ -375,7 +367,7 @@ CREATE TABLE activite_dsci."pleniere_quest_satisfaction"(
 	"ce_que_j_ai_apprecie" text,
 	"ce_qui_peut_etre_ameliore" text,
 	"note_globale" int
-)
+);
 
 
 CREATE TABLE activite_dsci."passinnov_quest_inscription" (
@@ -466,7 +458,7 @@ CREATE TABLE activite_dsci."fac_hors_bercylab_quest_accompagnement" (
 	"id_region" int,
 	"date_de_realisation" date,
 	"intitule_de_l_accompagnement" text,
-	"statut" text,
+	"statut" text
 );
 ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateur_1") REFERENCES activite_dsci."correspondant" ("id");
 ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateur_2") REFERENCES activite_dsci."correspondant" ("id");
