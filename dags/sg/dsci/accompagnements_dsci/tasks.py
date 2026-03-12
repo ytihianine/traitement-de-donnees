@@ -149,10 +149,29 @@ def dsci() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_effectif_dsci,
     )
+    accompagnement_dsci_equipe = create_grist_etl_task(
+        selecteur="accompagnement_dsci_equipe",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_accompagnement_dsci_equipe,
+    )
+    accompagnement_dsci_porteur = create_grist_etl_task(
+        selecteur="accompagnement_dsci_porteur",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_accompagnement_dsci_porteur,
+    )
+    accompagnement_dsci_typologie = create_grist_etl_task(
+        selecteur="accompagnement_dsci_typologie",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_accompagnement_dsci_typologie,
+    )
     # Ordre des tâches
     chain([
         accompagnement_dsci(),
-        effectif_dsci()
+        effectif_dsci(),
+        accompagnement_dsci_equipe(),
+        accompagnement_dsci_porteur(),
+        accompagnement_dsci_typologie(),
+
         ])
 
 

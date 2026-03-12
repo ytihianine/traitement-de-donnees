@@ -121,7 +121,7 @@ CREATE TABLE activite_dsci."accompagnement_dsci" (
   "sous_dir_bureau_" text,
   "nom_du_prestataire" text,
   -- "equipe_dsci_txt" text,
-  "formulaire_cci" text,
+  -- "formulaire_cci" text,
   "date_de_cloture_questionnaire" date,
   "porteur_metier" text
 );
