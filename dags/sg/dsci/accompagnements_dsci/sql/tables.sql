@@ -239,7 +239,14 @@ CREATE TABLE activite_dsci."correspondant_connaissance_communaute" (
 	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id")
 );
 
-
+CREATE TABLE activite_dsci."correspondant_certification" (
+    "id" integer PRIMARY KEY,
+    "id_correspondant" integer,
+    "id_type_de_correspondant" integer,
+    UNIQUE ("id_correspondant", "id_type_de_correspondant"),
+    FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id"),
+    FOREIGN KEY ("id_type_de_correspondant") REFERENCES activite_dsci."ref_profil_correspondant" ("id")
+);
 
 /*
     Données : onglet Mission Innovation mi
