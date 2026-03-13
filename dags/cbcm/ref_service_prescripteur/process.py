@@ -99,10 +99,9 @@ def process_service_prescripteur(df: pd.DataFrame) -> pd.DataFrame:
         "designation_bop",
         "designation_uo",
         "designation_cc",
-        "doublon",
     ]
-    df = convert_to_numeric(df=df, columns=num_cols, errors="coerce")
-    df[num_cols] = df[num_cols].replace({0: pd.NA})
+    df = handle_grist_null_references(df=df, columns=num_cols, keep_zero=True)
+    df["doublon"] = df["doublon"].replace({0: False, 1: True})
 
     return df
 
