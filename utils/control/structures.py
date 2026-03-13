@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 import pandas as pd
 import ast
@@ -27,7 +28,14 @@ def normalize_grist_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def handle_grist_null_references(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
+def handle_grist_null_references(
+    df: pd.DataFrame, columns: list[str], keep_zero: bool = False
+) -> pd.DataFrame:
+    if keep_zero:
+        logging.info(
+            msg="keep_zero is set to True -> keeping 0 values in the dataframe ..."
+        )
+        return df
     for col in columns:
         df[col] = df[col].replace({0: pd.NA})
     return df
