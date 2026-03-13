@@ -105,7 +105,7 @@ def process_service_prescripteur(df: pd.DataFrame) -> pd.DataFrame:
         "designation_cc",
     ]
     df = convert_to_numeric(df=df, columns=num_cols, errors="coerce")
-    df = handle_grist_null_references(df=df, columns=num_cols, keep_zero=True)
+    df = handle_grist_null_references(df=df, columns=num_cols)
     df["doublon"] = df["doublon"].replace({0: False, 1: True})
 
     return df
@@ -121,7 +121,7 @@ def process_delai_global_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
 
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
-    df = handle_grist_null_references(df=df, columns=ref_cols, keep_zero=True)
+    df = handle_grist_null_references(df=df, columns=ref_cols)
 
     # Drop columns
     cols_to_drop = [
@@ -143,7 +143,7 @@ def process_demande_achat_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
 
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
-    df = handle_grist_null_references(df=df, columns=ref_cols, keep_zero=True)
+    df = handle_grist_null_references(df=df, columns=ref_cols)
 
     # Drop columns
     cols_to_drop = [
@@ -162,7 +162,7 @@ def process_demande_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
 
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
-    df = handle_grist_null_references(df=df, columns=ref_cols, keep_zero=True)
+    df = handle_grist_null_references(df=df, columns=ref_cols)
 
     # Drop columns
     cols_to_drop = [
@@ -183,7 +183,7 @@ def process_engagement_juridique_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
 
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
-    df = handle_grist_null_references(df=df, columns=ref_cols, keep_zero=True)
+    df = handle_grist_null_references(df=df, columns=ref_cols)
 
     # Drop columns
     cols_to_drop = [
