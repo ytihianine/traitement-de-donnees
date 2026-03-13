@@ -1,7 +1,7 @@
 """Module for ETL task creation and execution."""
 
 import logging
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Callable, Optional, Any
 
 import pandas as pd
@@ -26,7 +26,7 @@ from utils.config.tasks import (
 from utils.config.dag_params import get_execution_date, get_project_name
 from _types.dags import ETLStep, TaskConfig
 from enums.database import DatabaseType
-from utils.config.vars import DEFAULT_POLARIS_HOST
+from utils.config.vars import DEFAULT_POLARIS_HOST, DEFAULT_POLARIS_CATALOG
 
 
 def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
@@ -49,6 +49,31 @@ def _add_snapshot_id_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
 
     df["snapshot_id"] = snapshot_id
     return df
+
+
+def _write_to_iceberg_catalog(
+    df: pd.DataFrame,
+    filepath_s3: str,
+    catalog_name: str = DEFAULT_POLARIS_CATALOG,
+    table_status: IcebergTableStatus = IcebergTableStatus.STAGING,
+) -> None:
+    """Write DataFrame to Iceberg catalog."""
+    properties = generate_catalog_properties(uri=DEFAULT_POLARIS_HOST)
+    catalog = IcebergCatalog(name=catalog_name, properties=properties)
+
+    filepath = PurePosixPath(filepath_s3)
+    tbl_name = filepath.stem
+    if len(filepath.parts) < 1:
+        raise ValueError(f"Invalid filepath_s3 format: {filepath_s3}")
+    namespace = ".".join(filepath.parts[:-1])
+
+    write_to_s3(
+        catalog=catalog,
+        df=df,
+        table_status=table_status,
+        namespace=namespace,
+        table_name=tbl_name,
+    )
 
 
 def create_grist_etl_task(
@@ -133,20 +158,11 @@ def create_grist_etl_task(
         )
 
         if version == "v2":
-            properties = generate_catalog_properties(
-                uri=DEFAULT_POLARIS_HOST,
-            )
-            catalog = IcebergCatalog(name="data_store", properties=properties)
-
-            key_split = task_config.filepath_s3.split(sep=".")[0].split(sep="/")
-            tbl_name = key_split.pop(-1)
-            namespace = ".".join(key_split)
-            write_to_s3(
-                catalog=catalog,
+            _write_to_iceberg_catalog(
                 df=df,
+                filepath_s3=str(task_config.filepath_tmp_s3),
+                catalog_name=DEFAULT_POLARIS_CATALOG,
                 table_status=IcebergTableStatus.STAGING,
-                namespace=namespace,
-                table_name=tbl_name,
             )
 
     return _task
