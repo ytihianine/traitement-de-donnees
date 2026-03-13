@@ -1,6 +1,3 @@
-from typing import Any
-
-
 from enum import Enum, auto
 
 
