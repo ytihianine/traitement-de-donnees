@@ -9,6 +9,8 @@ from utils.tasks.sql import (
     import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
+    create_projet_snapshot,
+    get_projet_snapshot,
 )
 from utils.config.tasks import get_list_selector_info
 from utils.config.dag_params import create_default_args, create_dag_params
@@ -63,6 +65,8 @@ def tdb_sircom() -> None:
             workspace_id="dsci",
             doc_id_key="grist_doc_id_tdb_sircom",
         ),
+        create_projet_snapshot(),
+        get_projet_snapshot(),
         [abonnes_visites(), budget(), enquetes(), metiers(), ressources_humaines()],
         create_tmp_tables(),
         import_file_to_db.expand(
