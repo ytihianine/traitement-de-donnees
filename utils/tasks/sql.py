@@ -5,7 +5,6 @@ import textwrap
 from typing import Optional
 from datetime import datetime, timedelta
 
-from psycopg2 import sql
 from airflow.sdk import task
 from airflow.sdk import get_current_context
 
@@ -275,20 +274,12 @@ def ensure_partition(
         try:
             logging.info(msg=f"Creating partition {partition_name} for {tbl_name}.")
             # Créer la partition
-            create_sql = sql.SQL(
-                """
+            create_sql = f"""
                 CREATE TABLE IF NOT EXISTS {prod_schema}.{partition_name}
                 PARTITION OF {prod_schema}.{tbl_name}
-                FOR VALUES FROM ({from_date}) TO ({to_date});
+                FOR VALUES FROM ('{from_date.strftime(format="%Y-%m-%d")}') TO ('{to_date.strftime(format="%Y-%m-%d")}');
             """
-            ).format(
-                prod_schema=sql.Identifier(prod_schema),
-                partition_name=sql.Identifier(partition_name),
-                tbl_name=sql.Identifier(tbl_name),
-                from_date=sql.Literal(wrapped=from_date.strftime(format="%Y-%m-%d")),
-                to_date=sql.Literal(wrapped=to_date.strftime(format="%Y-%m-%d")),
-            )
-            db.execute(query=create_sql.as_string(context=db.get_conn()))
+            db.execute(query=create_sql)
             logging.info(msg=f"Partition {partition_name} created successfully.")
         except Exception as e:
             logging.error(msg=f"Error creating partition {partition_name}: {str(e)}")
