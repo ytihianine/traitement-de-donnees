@@ -13,6 +13,7 @@ from utils.tasks.sql import (
     import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
+    get_projet_snapshot,
     # set_dataset_last_update_date,
 )
 from utils.tasks.s3 import (
@@ -63,6 +64,7 @@ def chorus_service_prescripteur() -> None:
         download_grist_doc_to_s3(
             selecteur="grist_doc", workspace_id="dsci", doc_id_key="grist_doc_id_cbcm"
         ),
+        get_projet_snapshot(),
         grist_source(),
         fetch_from_db(),
         load_to_grist(),
