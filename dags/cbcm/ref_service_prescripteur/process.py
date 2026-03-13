@@ -1,5 +1,6 @@
 import pandas as pd
 
+from utils.control.dates import convert_grist_date_to_date
 from utils.control.text import normalize_whitespace_columns
 from utils.control.structures import handle_grist_null_references
 from utils.control.number import convert_to_numeric
@@ -87,8 +88,7 @@ def process_service_prescripteur(df: pd.DataFrame) -> pd.DataFrame:
 
     # Convertir les colonnes date
     date_cols = ["date_creation", "date_derniere_maj"]
-    for date_col in date_cols:
-        df[date_col] = pd.to_datetime(df[date_col], unit="s")
+    df = convert_grist_date_to_date(df=df, columns=date_cols)
 
     # Gestion des références vides
     num_cols = [
@@ -117,7 +117,7 @@ def process_delai_global_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
 
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
+    df = handle_grist_null_references(df=df, columns=ref_cols, keep_zero=True)
 
     # Drop columns
     cols_to_drop = [
@@ -139,7 +139,7 @@ def process_demande_achat_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
 
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
+    df = handle_grist_null_references(df=df, columns=ref_cols, keep_zero=True)
 
     # Drop columns
     cols_to_drop = [
@@ -158,7 +158,7 @@ def process_demande_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
 
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
+    df = handle_grist_null_references(df=df, columns=ref_cols, keep_zero=True)
 
     # Drop columns
     cols_to_drop = [
@@ -179,7 +179,7 @@ def process_engagement_juridique_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
 
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
+    df = handle_grist_null_references(df=df, columns=ref_cols, keep_zero=True)
 
     # Drop columns
     cols_to_drop = [
