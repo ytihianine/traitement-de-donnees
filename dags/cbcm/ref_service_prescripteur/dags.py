@@ -18,6 +18,7 @@ from utils.tasks.sql import (
 )
 from utils.tasks.s3 import (
     copy_s3_files,
+    copy_staging_to_prod,
     del_s3_files,
 )
 
@@ -76,6 +77,9 @@ def chorus_service_prescripteur() -> None:
         copy_s3_files(),
         del_s3_files(),
         delete_tmp_tables(),
+        copy_staging_to_prod.expand(
+            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        ),
         # set_dataset_last_update_date(
         #     dataset_ids=[49, 50, 51, 52, 53, 54],
         # ),
