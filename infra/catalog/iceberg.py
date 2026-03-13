@@ -66,6 +66,26 @@ class IcebergCatalog:
 
     def _get_schema_from_dataframe(self, df: pd.DataFrame) -> pa.Schema:
         # Convertir le DataFrame en schéma PyArrow
+        # Pour les DataFrames vides, on doit inférer le schéma à partir des dtypes pandas
+        # car pa.Schema.from_pandas(df) retourne des types "null" pour les colonnes vides
+        if df.empty:
+            fields = []
+            for col in df.columns:
+                dtype = df[col].dtype
+                # Mapper les dtypes pandas vers PyArrow
+                if pd.api.types.is_integer_dtype(dtype):
+                    pa_type = pa.int64()
+                elif pd.api.types.is_float_dtype(dtype):
+                    pa_type = pa.float64()
+                elif pd.api.types.is_bool_dtype(dtype):
+                    pa_type = pa.bool_()
+                elif pd.api.types.is_datetime64_any_dtype(dtype):
+                    pa_type = pa.timestamp("us")
+                else:
+                    # Default to string for object/unknown types
+                    pa_type = pa.string()
+                fields.append(pa.field(col, pa_type))
+            return pa.schema(fields)
         return pa.Schema.from_pandas(df)
 
     def create_namespace(self, namespace: str) -> None:
@@ -103,6 +123,12 @@ class IcebergCatalog:
         self, table_name: str, df: pd.DataFrame, overwrite: bool = False
     ) -> None:
         # Logic to write data to a table in the Iceberg catalog
+        if df.empty:
+            logging.warning(
+                msg=f"Empty DataFrame provided for table {table_name}. Skipping write."
+            )
+            return
+
         self.create_table(table_name=table_name, df=df)
         table = self.update_table(table_name=table_name, df=df)
 
