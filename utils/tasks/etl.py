@@ -175,6 +175,7 @@ def create_file_etl_task(
     apply_cols_mapping: bool = True,
     add_import_date: bool = True,
     add_snapshot_id: bool = True,
+    version: str = "v1",
 ) -> Callable[..., XComArg]:
     """Create an ETL task for extracting, transforming and loading data from a file.
 
@@ -230,7 +231,7 @@ def create_file_etl_task(
 
         if process_func is None:
             logging.info(
-                "No process function provided. Skipping the processing step ..."
+                msg="No process function provided. Skipping the processing step ..."
             )
         else:
             df_info(df=df, df_name=f"{selecteur} - After column mapping")
@@ -249,6 +250,14 @@ def create_file_etl_task(
             file_path=str(task_config.filepath_tmp_s3),
             content=df.to_parquet(path=None, index=False),
         )
+
+        if version == "v2":
+            _write_to_iceberg_catalog(
+                df=df,
+                filepath_s3=str(task_config.filepath_s3),
+                catalog_name=DEFAULT_POLARIS_CATALOG,
+                table_status=IcebergTableStatus.STAGING,
+            )
 
     return _task
 
@@ -301,6 +310,7 @@ def create_task(
     add_import_date: bool = True,
     add_snapshot_id: bool = True,
     export_output: bool = True,
+    version: str = "v1",
 ) -> Callable[..., XComArg]:
     """
     Create a generic Airflow task based on the provided TaskConfig.
@@ -388,5 +398,13 @@ def create_task(
             file_path=str(output_config.filepath_tmp_s3),
             content=result.to_parquet(path=None, index=False),
         )
+
+        if version == "v2":
+            _write_to_iceberg_catalog(
+                df=result,
+                filepath_s3=str(output_config.filepath_s3),
+                catalog_name=DEFAULT_POLARIS_CATALOG,
+                table_status=IcebergTableStatus.STAGING,
+            )
 
     return _task
