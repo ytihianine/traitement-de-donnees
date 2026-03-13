@@ -10,6 +10,8 @@ from utils.tasks.sql import (
     import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
+    create_projet_snapshot,
+    get_projet_snapshot,
 )
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
@@ -60,6 +62,8 @@ def configuration_projets() -> None:
             selecteur="grist_doc",
             workspace_id="dsci",
         ),
+        create_projet_snapshot(),
+        get_projet_snapshot(),
         process_data(),
         delete_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
         create_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, reset_id_seq=False),
