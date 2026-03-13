@@ -8,6 +8,8 @@ from dags.cbcm.ref_service_prescripteur import process
 from dags.cbcm.ref_service_prescripteur import actions
 from utils.control.structures import normalize_grist_dataframe
 
+version = "v2"
+
 
 @task_group(group_id="grist_source")
 def grist_source() -> None:
@@ -15,62 +17,74 @@ def grist_source() -> None:
         selecteur="ref_prog",
         process_func=process.process_ref_prog,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
     ref_bop = create_grist_etl_task(
         selecteur="ref_bop",
         process_func=process.process_ref_bop,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
     ref_uo = create_grist_etl_task(
         selecteur="ref_uo",
         process_func=process.process_ref_uo,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
     ref_cc = create_grist_etl_task(
         selecteur="ref_cc",
         process_func=process.process_ref_cc,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
     ref_sdep = create_grist_etl_task(
         selecteur="ref_sdep",
         process_func=process.process_ref_sdep,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
     ref_sp_choisi = create_grist_etl_task(
         selecteur="ref_sp_choisi",
         process_func=process.process_ref_sp_choisi,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
     ref_sp_pilotage = create_grist_etl_task(
         selecteur="ref_sp_pilotage",
         process_func=process.process_ref_sp_pilotage,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
     sp = create_grist_etl_task(
         selecteur="sp",
         process_func=process.process_service_prescripteur,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
     # Services prescripteurs renseignés manuellement
     delai_global_paiement_sp_manuel = create_grist_etl_task(
         selecteur="delai_global_paiement_sp_manuel",
         process_func=process.process_delai_global_paiement_sp_manuel,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
     demande_achat_sp_manuel = create_grist_etl_task(
         selecteur="demande_achat_sp_manuel",
         process_func=process.process_demande_achat_sp_manuel,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
     demande_paiement_sp_manuel = create_grist_etl_task(
         selecteur="demande_paiement_sp_manuel",
         process_func=process.process_demande_paiement_sp_manuel,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
     engagement_juridique_sp_manuel = create_grist_etl_task(
         selecteur="engagement_juridique_sp_manuel",
         process_func=process.process_engagement_juridique_sp_manuel,
         normalisation_process_func=normalize_grist_dataframe,
+        version=version,
     )
 
     chain(
