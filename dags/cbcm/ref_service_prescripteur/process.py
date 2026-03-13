@@ -64,6 +64,10 @@ def process_ref_sp_choisi(df: pd.DataFrame) -> pd.DataFrame:
     # Nettoyage des données textuelles
     txt_cols = ["service_prescripteur", "mail"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Fill null values
+    df["mail"] = df["mail"].fillna("Indéfini")
+
     return df
 
 
