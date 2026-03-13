@@ -64,7 +64,7 @@ def chorus_service_prescripteur() -> None:
         download_grist_doc_to_s3(
             selecteur="grist_doc", workspace_id="dsci", doc_id_key="grist_doc_id_cbcm"
         ),
-        get_projet_snapshot(),
+        get_projet_snapshot(nom_projet="Données comptable"),
         grist_source(),
         fetch_from_db(),
         load_to_grist(),
