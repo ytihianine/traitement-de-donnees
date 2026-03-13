@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from enums.database import LoadStrategy, PartitionTimePeriod
+
 
 @dataclass(frozen=True)
 class DbInfo:
@@ -107,3 +109,34 @@ class Contact:
     projet: str
     contact_mail: str
     is_mail_generic: bool
+
+
+# ==================
+# Selecteur
+# ==================
+@dataclass(frozen=True, kw_only=True)
+class SelecteurOptions:
+    # S3
+    write_to_s3: bool = True
+    write_to_s3_with_iceberg: bool = True
+    # Database
+    write_to_db: bool = True
+    tbl_order: int = 0
+    is_partitioned: bool = False
+    partition_period: PartitionTimePeriod = PartitionTimePeriod.DAY
+    load_strategy: LoadStrategy = LoadStrategy.INCREMENTAL
+
+
+@dataclass(frozen=True)
+class SelecteurConfig:
+    selecteur_info: SelecteurInfo
+    options: SelecteurOptions
+
+    @classmethod
+    def load(
+        cls, selecteur_info: SelecteurInfo, options: SelecteurOptions
+    ) -> "SelecteurConfig":
+        return cls(
+            selecteur_info=selecteur_info,
+            options=options,
+        )
