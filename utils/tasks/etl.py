@@ -160,7 +160,7 @@ def create_grist_etl_task(
         if version == "v2":
             _write_to_iceberg_catalog(
                 df=df,
-                filepath_s3=str(task_config.filepath_tmp_s3),
+                filepath_s3=str(task_config.filepath_s3),
                 catalog_name=DEFAULT_POLARIS_CATALOG,
                 table_status=IcebergTableStatus.STAGING,
             )
