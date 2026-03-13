@@ -51,6 +51,20 @@ def _add_snapshot_id_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
     return df
 
 
+def _add_metadata(
+    df: pd.DataFrame,
+    context: dict,
+    add_import_date: bool = True,
+    add_snapshot_id: bool = True,
+) -> pd.DataFrame:
+    """Add import timestamp, date and snapshot_id columns."""
+    if add_import_date:
+        df = _add_import_metadata(df=df, context=context)
+    if add_snapshot_id:
+        df = _add_snapshot_id_metadata(df=df, context=context)
+    return df
+
+
 def _write_to_iceberg_catalog(
     df: pd.DataFrame,
     filepath_s3: str,
@@ -158,6 +172,7 @@ def create_grist_etl_task(
         )
 
         if version == "v2":
+            _add_metadata(df=df, context=context)
             _write_to_iceberg_catalog(
                 df=df,
                 filepath_s3=str(task_config.filepath_s3),
