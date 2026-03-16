@@ -115,8 +115,13 @@ class IcebergCatalog:
         logging.info(msg=f"Update table with name: {table_name}")
         table = self.catalog.load_table(identifier=table_name)
         new_schema = self._get_schema_from_dataframe(df=df)
-        with table.update_schema() as update:
-            update.union_by_name(new_schema)
+        # Only union truly new columns to avoid ValidationError when an existing
+        # column's type in the new data differs from the stored type (e.g. long vs double).
+        existing_field_names = {f.name for f in table.schema().fields}
+        new_fields = [f for f in new_schema if f.name not in existing_field_names]
+        if new_fields:
+            with table.update_schema() as update:
+                update.union_by_name(pa.schema(new_fields))
         return table
 
     def write_table(
@@ -134,6 +139,18 @@ class IcebergCatalog:
 
         logging.info(msg=f"Writing to table with name: {table_name}")
         pa_data = pa.Table.from_pandas(df, preserve_index=False)
+        # Cast each column to the type stored in the table schema so that, for example,
+        # an integer column (long) is written as double when the table expects double.
+        table_arrow_schema = table.schema().as_arrow()
+        cast_fields = [
+            (
+                table_arrow_schema.field(f.name)
+                if f.name in table_arrow_schema.names
+                else f
+            )
+            for f in pa_data.schema
+        ]
+        pa_data = pa_data.cast(pa.schema(cast_fields))
         if overwrite:
             table.overwrite(df=pa_data)
         else:
