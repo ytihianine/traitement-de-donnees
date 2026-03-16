@@ -114,8 +114,21 @@ class Contact:
 # ==================
 # Selecteur
 # ==================
+@dataclass(frozen=True)
+class SelecteurStorageInfo:
+    projet: str
+    selecteur: str
+    # s3 info
+    bucket: str
+    s3_key: str
+    filename: str
+    local_path: str
+    # db info
+    tbl_name: str
+
+
 @dataclass(frozen=True, kw_only=True)
-class SelecteurOptions:
+class SelecteurStorageOptions:
     # S3
     write_to_s3: bool = True
     write_to_s3_with_iceberg: bool = True
@@ -129,12 +142,12 @@ class SelecteurOptions:
 
 @dataclass(frozen=True)
 class SelecteurConfig:
-    selecteur_info: SelecteurInfo
-    options: SelecteurOptions
+    selecteur_info: SelecteurStorageInfo
+    options: SelecteurStorageOptions
 
     @classmethod
     def load(
-        cls, selecteur_info: SelecteurInfo, options: SelecteurOptions
+        cls, selecteur_info: SelecteurStorageInfo, options: SelecteurStorageOptions
     ) -> "SelecteurConfig":
         return cls(
             selecteur_info=selecteur_info,

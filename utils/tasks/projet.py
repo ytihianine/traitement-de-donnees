@@ -5,21 +5,18 @@ from airflow.sdk import chain, task, task_group
 from dataclasses import asdict
 
 from _types.projet import (
-    Contact,
-    DbInfo,
-    ProjetS3,
-    SelecteurInfo,
-    SelecteurS3,
-    SourceFichier,
+    SelecteurStorageOptions,
 )
 from utils.config.tasks import (
     get_list_documentation,
     get_list_contact,
+    get_list_selecteur_storage_info,
     get_list_selector_info,
     get_list_source_fichier,
     get_list_database_info,
     get_projet_s3_info,
     get_projet_selecteur_s3,
+    merge_selecteur_config,
 )
 
 
@@ -86,8 +83,30 @@ def get_config_selecteur_info(
     return [asdict(s3_db_conf) for s3_db_conf in s3_db_configs]
 
 
+@task()
+def get_selecteur_config(
+    nom_projet: str | None = None,
+    selecteur_mapping: Mapping[str, SelecteurStorageOptions] | None = None,
+    **context
+) -> list[Mapping[str, Any]]:
+    """Task to fetch selecteur S3 configurations at runtime."""
+    if selecteur_mapping is None:
+        selecteur_mapping = {}
+    selecteur_info = get_list_selecteur_storage_info(
+        nom_projet=nom_projet, context=context
+    )
+    selecteur_config = merge_selecteur_config(
+        selecteur_info=selecteur_info, options_map=selecteur_mapping
+    )
+    return [asdict(obj=s3_db_conf) for s3_db_conf in selecteur_config]
+
+
 @task_group()
-def config_projet_group(nom_projet: str | None = None, **context) -> None:
+def config_projet_group(
+    nom_projet: str | None = None,
+    selecteur_mapping: Mapping[str, SelecteurStorageOptions] | None = None,
+    **context
+) -> None:
     """
     Groupe de tâches pour récupérer la configuration du projet
 
@@ -105,5 +124,10 @@ def config_projet_group(nom_projet: str | None = None, **context) -> None:
             get_db_info_task(nom_projet=nom_projet, context=context),
             get_projet_s3_info_task(nom_projet=nom_projet, context=context),
             get_selecteur_s3_task(nom_projet=nom_projet, context=context),
+            get_selecteur_config(
+                nom_projet=nom_projet,
+                selecteur_mapping=selecteur_mapping,
+                context=context,
+            ),
         ]
     )
