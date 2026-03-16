@@ -1,5 +1,6 @@
 """Functions for retrieving and managing project configurations."""
 
+from pathlib import Path
 from typing import Any, Mapping, Optional
 import logging
 
@@ -20,8 +21,11 @@ from _types.projet import (
     ProjetS3,
     SelecteurInfo,
     SelecteurS3,
+    SelecteurStorageInfo,
+    SelecteurStorageOptions,
     SourceFichier,
     SourceGrist,
+    SelecteurConfig,
 )
 from utils.exceptions import ConfigError
 from infra.database.factory import create_db_handler
@@ -741,3 +745,149 @@ def get_selector_info(
         )
 
     return s3_configs[0]
+
+
+def merge_selecteur_config(
+    selecteur_info: list[SelecteurStorageInfo],
+    options_map: Mapping[str, SelecteurStorageOptions] | None = None,
+) -> list[SelecteurConfig]:
+    """Merge SelecteurStorageInfo from DB with local SelecteurStorageOptions config.
+
+    Items like S3 paths and table names come from the DB (via ``selecteur_info``).
+    Per-selecteur behavioural options (write flags, load strategy, partition
+    period …) are supplied locally as a plain Python dict so that callers can
+    use Enum values directly.  Any selecteur that is not present in
+    ``options_map`` falls back to the ``SelecteurStorageOptions`` defaults.
+
+    Args:
+        selecteur_info: List of SelecteurStorageInfo objects retrieved from the DB.
+        options_map: Optional mapping of selecteur name → SelecteurStorageOptions.
+                     Selecteurs absent from the map receive default options.
+
+    Returns:
+        List of SelecteurConfig objects combining DB info with local options.
+    """
+    if options_map is None:
+        options_map = {}
+
+    return [
+        SelecteurConfig.load(
+            selecteur_info=info,
+            options=options_map.get(info.selecteur, SelecteurStorageOptions()),
+        )
+        for info in selecteur_info
+    ]
+
+
+@db_retry
+def _get_selecteur_storage_info(
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+    selecteur: str | None = None,
+    local_dir: str = "/tmp",
+) -> list[SelecteurStorageInfo]:
+    """Get SelecteurStorageInfo for a project and optionally a specific selecteur.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+        selecteur: Optional selecteur filter
+        local_dir: Local directory used to build local_path (default: /tmp)
+
+    Returns:
+        List of SelecteurStorageInfo objects
+    """
+    if nom_projet is None and context is None:
+        raise ValueError("nom_projet or context must be provided")
+
+    if nom_projet is None and context is not None:
+        nom_projet = get_project_name(context=context)
+
+    if nom_projet is None:
+        raise ValueError("Could not determine project name from context")
+
+    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+
+    query = f"""
+        SELECT cpss3db.projet, cpss3db.selecteur,
+            cpss3db.bucket, cpss3db.s3_key, cpss3db.filename,
+            cpss3db.tbl_name
+        FROM {CONF_SCHEMA}.selecteur_s3_db_vw cpss3db
+        WHERE cpss3db.projet = %s
+    """
+
+    params: list[str] = [nom_projet]
+
+    if selecteur is not None:
+        query += " AND cpss3db.selecteur = %s"
+        params.append(selecteur)
+
+    query += " ORDER BY cpss3db.projet, cpss3db.tbl_order;"
+
+    df = db.fetch_df(query, parameters=tuple(params))
+
+    if df.empty:
+        return []
+
+    records = df.to_dict("records")
+    return [
+        SelecteurStorageInfo(
+            **{str(k): v for k, v in record.items()},
+            local_path=str(Path(local_dir) / record["filename"]),
+        )
+        for record in records
+    ]
+
+
+def get_list_selecteur_storage_info(
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+    local_dir: str = "/tmp",
+) -> list[SelecteurStorageInfo]:
+    """Get SelecteurStorageInfo for all selecteurs in a project.
+
+    Args:
+        context: Airflow task context
+        nom_projet: Project name
+        local_dir: Local directory used to build local_path (default: /tmp)
+
+    Returns:
+        List of SelecteurStorageInfo objects for all selecteurs
+    """
+    return _get_selecteur_storage_info(
+        context=context, nom_projet=nom_projet, selecteur=None, local_dir=local_dir
+    )
+
+
+def get_selecteur_storage_info(
+    selecteur: str,
+    context: Mapping[str, Any] | None = None,
+    nom_projet: str | None = None,
+    local_dir: str = "/tmp",
+) -> SelecteurStorageInfo:
+    """Get SelecteurStorageInfo for a specific selecteur.
+
+    Args:
+        selecteur: Selecteur name
+        context: Optional Airflow task context
+        nom_projet: Project name
+        local_dir: Local directory used to build local_path (default: /tmp)
+
+    Returns:
+        SelecteurStorageInfo object
+
+    Raises:
+        ConfigError: If no configuration is found
+    """
+    storage_infos = _get_selecteur_storage_info(
+        context=context, nom_projet=nom_projet, selecteur=selecteur, local_dir=local_dir
+    )
+
+    if not storage_infos:
+        raise ConfigError(
+            message=f"No storage info found for project {nom_projet} and selecteur {selecteur}",
+            nom_projet=nom_projet,
+            selecteur=selecteur,
+        )
+
+    return storage_infos[0]

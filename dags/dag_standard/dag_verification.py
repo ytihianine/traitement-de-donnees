@@ -20,6 +20,7 @@ from utils.tasks.projet import config_projet_group
 from utils.tasks.s3 import write_to_s3
 
 from utils.config.vars import DEFAULT_POLARIS_HOST
+from dags.dag_standard.config import selecteur_mapping
 
 nom_projet = "Configuration des projets"
 
@@ -109,7 +110,9 @@ def dag_verification() -> None:
             send_simple_mail(),
             send_error_mail(),
             send_success_mail(),
-            config_projet_group(nom_projet=nom_projet),
+            config_projet_group(
+                nom_projet=nom_projet, selecteur_mapping=selecteur_mapping
+            ),
             iceberg_task(),
         ],
     )
