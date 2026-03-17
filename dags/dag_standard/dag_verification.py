@@ -15,7 +15,7 @@ from _types.dags import DBParams, FeatureFlags
 from enums.dags import DagStatus
 from enums.filesystem import IcebergTableStatus
 
-from utils.tasks.sql import get_projet_snapshot
+from utils.tasks.sql import get_projet_snapshot, import_files_to_db
 from utils.tasks.projet import config_projet_group
 from utils.tasks.s3 import write_to_s3
 
@@ -113,6 +113,7 @@ def dag_verification() -> None:
             config_projet_group(
                 nom_projet=nom_projet, selecteur_mapping=selecteur_mapping
             ),
+            import_files_to_db(selecteur_options=selecteur_mapping),
             iceberg_task(),
         ],
     )
