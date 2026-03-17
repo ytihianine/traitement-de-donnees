@@ -1,5 +1,6 @@
 """SQL task utilities using infrastructure handlers."""
 
+from calendar import c
 import logging
 import textwrap
 from typing import Mapping, Optional
@@ -23,9 +24,7 @@ from utils.config.dag_params import (
     get_project_name,
 )
 from utils.config.tasks import (
-    get_list_database_info,
     get_list_selecteur_storage_info,
-    get_list_table_name,
     merge_selecteur_config,
 )
 from enums.database import (
@@ -34,9 +33,7 @@ from enums.database import (
 )
 from _types.dags import DagStatus
 from _types.projet import (
-    DbInfo,
     SelecteurConfig,
-    SelecteurInfo,
     SelecteurStorageOptions,
 )
 from utils.control.structures import are_lists_egal
@@ -231,6 +228,7 @@ def get_projet_snapshot(
 @task
 def ensure_partition(
     nom_projet: str | None = None,
+    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     **context,
 ) -> None:
@@ -262,20 +260,28 @@ def ensure_partition(
         return
 
     # Récupérer les informations de la table parente
-    tbl_info = get_list_database_info(nom_projet=nom_projet)
+    # Get selecteur config
+    selecteur_info = get_list_selecteur_storage_info(
+        nom_projet=nom_projet, context=context
+    )
+    selecteur_config = merge_selecteur_config(
+        selecteur_info=selecteur_info, options_map=selecteur_options
+    )
 
     db = create_db_handler(connection_id=pg_conn_id)
 
-    for tbl in tbl_info:
-        tbl_name = tbl.tbl_name
+    for config in selecteur_config:
+        tbl_name = config.selecteur_info.filename
+        is_partitioned = config.options.is_partitioned
+        partition_period = config.options.partition_period
 
-        if not tbl.is_partitionned:
-            logging.info(msg=f"{tbl_name} is not partitinned ... skipping")
+        if not is_partitioned:
+            logging.info(msg=f"{tbl_name} is not partitioned ... skipping")
             continue
 
         # Get partition period range
         from_date, to_date = determine_partition_period(
-            time_period=PartitionTimePeriod(value=tbl.partition_period.upper()),
+            time_period=partition_period,
             execution_date=execution_date,
         )
 
@@ -301,6 +307,7 @@ def ensure_partition(
 @task(task_id="create_tmp_tables")
 def create_tmp_tables(
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
     reset_id_seq: bool = True,
     **context,
 ) -> None:
@@ -322,7 +329,13 @@ def create_tmp_tables(
     # Hook
     db = create_db_handler(connection_id=pg_conn_id)
 
-    tbl_names = get_list_table_name(nom_projet=nom_projet)
+    # Get selecteur config
+    selecteur_info = get_list_selecteur_storage_info(
+        nom_projet=nom_projet, context=context
+    )
+    selecteur_config = merge_selecteur_config(
+        selecteur_info=selecteur_info, options_map=selecteur_options
+    )
 
     rows_result = db.fetch_all(
         query="""SELECT COUNT(*) as count_tmp_tables
@@ -337,16 +350,23 @@ def create_tmp_tables(
     create_queries = []
     alter_queries = []
 
-    for table in tbl_names:
-        drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{table};")
+    for config in selecteur_config:
+        if config.options.write_to_db is False:
+            logging.info(
+                msg=f"write_to_db option is set to False for selecteur <{config.selecteur_info.selecteur}>. Skipping creation of tmp table ..."  # noqa
+            )
+            continue
+
+        tbl_name = config.selecteur_info.filename
+        drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
         create_queries.append(
             f"""CREATE TABLE
-                IF NOT EXISTS {tmp_schema}.tmp_{table}
-                ( LIKE {prod_schema}.{table} INCLUDING ALL);
+                IF NOT EXISTS {tmp_schema}.tmp_{tbl_name}
+                ( LIKE {prod_schema}.{tbl_name} INCLUDING ALL);
             """
         )
         alter_queries.append(
-            f"ALTER SEQUENCE {prod_schema}.{table}_id_seq RESTART WITH 1;"
+            f"ALTER SEQUENCE {prod_schema}.{tbl_name}_id_seq RESTART WITH 1;"
         )
 
     if rows_result[0]["count_tmp_tables"] != 0:
@@ -363,6 +383,7 @@ def create_tmp_tables(
 @task(task_id="delete_tmp_tables")
 def delete_tmp_tables(
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
     **context,
 ) -> None:
     """
@@ -373,12 +394,25 @@ def delete_tmp_tables(
     db_info = get_db_info(context=context)
     tmp_schema = db_info.tmp_schema
 
-    tbl_info = get_list_database_info(nom_projet=nom_projet)
+    # Get selecteur config
+    selecteur_info = get_list_selecteur_storage_info(
+        nom_projet=nom_projet, context=context
+    )
+    selecteur_config = merge_selecteur_config(
+        selecteur_info=selecteur_info, options_map=selecteur_options
+    )
+
     # Hook
     db = create_db_handler(connection_id=pg_conn_id)
 
-    for tbl in tbl_info:
-        tbl_name = tbl.tbl_name
+    for config in selecteur_config:
+        if config.options.write_to_db is False:
+            logging.info(
+                msg=f"write_to_db option is set to False for selecteur <{config.selecteur_info.selecteur}>. Skipping deletion of tmp table ..."  # noqa
+            )
+            continue
+
+        tbl_name = config.selecteur_info.filename
         db.execute(query=f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
 
 
@@ -612,8 +646,10 @@ def import_file_to_db(
         )
     else:
         # Variables
-        local_filepath = selecteur_config.get_local_path()
-        s3_filepath = selecteur_config.get_full_s3_key(with_tmp_segment=True)
+        local_filepath = selecteur_config.selecteur_info.get_local_path()
+        s3_filepath = selecteur_config.selecteur_info.get_full_s3_key(
+            with_tmp_segment=True
+        )
 
         # Check if old file exists
         local_handler.delete(file_path=local_filepath)
