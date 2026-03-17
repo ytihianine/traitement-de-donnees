@@ -15,7 +15,6 @@ import pandas as pd
 from utils.config.dag_params import get_project_name
 from _types.projet import (
     Contact,
-    DbInfo,
     Documentation,
     ProjetS3,
     SelecteurStorageInfo,
@@ -78,150 +77,6 @@ def column_mapping_dict(
         cols_map[record["colname_source"]] = record["colname_dest"]
 
     return cols_map
-
-
-@db_retry
-def _get_db_info_tbl_names(
-    context: Mapping[str, Any] | None = None,
-    nom_projet: str | None = None,
-    selecteur: str | None = None,
-) -> list[DbInfo]:
-    """Get database info for a project and optionally a specific selecteur.
-
-    Args:
-        context: Airflow task context
-        nom_projet: Project name
-        selecteur: Optional selecteur filter
-
-    Returns:
-        List of DbInfo objects ordered by tbl_order
-    """
-    if nom_projet is None and context is None:
-        raise ValueError("nom_projet or context must be provided")
-
-    if nom_projet is None and context is not None:
-        nom_projet = get_project_name(context=context)
-
-    if nom_projet is None:
-        raise ValueError("Could not determine project name from context")
-
-    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
-
-    query = f"""
-        SELECT cppd.projet, cppd.selecteur, cppd.tbl_name, cppd.tbl_order,
-               cppd.is_partitionned, cppd.partition_period, cppd.load_strategy
-        FROM {CONF_SCHEMA}.projet_database_vw cppd
-        WHERE cppd.tbl_name IS NOT NULL
-            AND cppd.tbl_name <> ''
-            AND cppd.projet = %s
-    """
-
-    params = [nom_projet]
-
-    if selecteur is not None:
-        query += " AND cppd.selecteur = %s"
-        params.append(selecteur)
-
-    query += " ORDER BY cppd.tbl_order;"
-
-    df = db.fetch_df(query, parameters=tuple(params))
-
-    if df.empty:
-        return []
-
-    records = df.to_dict("records")
-    records = [{str(k): v for k, v in record.items()} for record in records]
-    return [DbInfo(**record) for record in records]
-
-
-def get_list_table_name(
-    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
-) -> list[str]:
-    """Get all table names for a project.
-
-    Used for temporary table creation.
-
-    Args:
-        context: Airflow task context
-        nom_projet: Project name
-
-    Returns:
-        List of table names ordered by tbl_order
-    """
-    db_infos = _get_db_info_tbl_names(
-        context=context, nom_projet=nom_projet, selecteur=None
-    )
-    return [db_info.tbl_name for db_info in db_infos]
-
-
-def get_table_name(
-    nom_projet: str, selecteur: str, context: Mapping[str, Any] | None = None
-) -> str:
-    """Get table name for a specific selecteur.
-
-    Args:
-        nom_projet: Project name
-        selecteur: Selecteur name
-        context: Optional Airflow task context
-
-    Returns:
-        Table name for the specified selecteur
-
-    Raises:
-        ConfigError: If no table name is found
-    """
-    db_infos = _get_db_info_tbl_names(
-        context=context, nom_projet=nom_projet, selecteur=selecteur
-    )
-
-    if not db_infos:
-        raise ConfigError(
-            message=f"No table name found for project {nom_projet} and selecteur {selecteur}",
-            nom_projet=nom_projet,
-            selecteur=selecteur,
-        )
-
-    return db_infos[0].tbl_name
-
-
-@db_retry
-def get_source_grist(
-    context: Mapping[str, Any] | None = None,
-    nom_projet: str | None = None,
-    selecteur: str | None = None,
-) -> SourceGrist:
-    if nom_projet is None and context is None:
-        raise ValueError("nom_projet or context must be provided")
-
-    if selecteur is None:
-        raise ValueError("selecteur must be provided in the args")
-
-    if nom_projet is None and context:
-        nom_projet = get_project_name(context=context)
-
-    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
-
-    query = f"""
-        SELECT cpssg.projet, cpssg.selecteur, cpssg.type_source, cpssg.id_source,
-            cpssg.filename,
-            cpssg.s3_key,
-            cpssg.bucket,
-            cpssg.projet_s3_key,
-            cpssg.projet_s3_key_tmp,
-            cpssg.filepath_s3,
-            cpssg.filepath_tmp_s3
-        FROM {CONF_SCHEMA}.selecteur_source_grist_vw cpssg
-        WHERE cpssg.projet = %s AND cpssg.selecteur = %s;
-    """
-
-    df = db.fetch_df(query, parameters=(nom_projet, selecteur))
-    if df.empty:
-        raise ConfigError(
-            message=f"No configuration found for projet <{nom_projet}> and selector <{selecteur}>"
-        )  # noqa
-
-    records = df.to_dict("records")
-    return SourceGrist(**{str(k): v for k, v in records[0].items()})
 
 
 @db_retry
@@ -354,11 +209,14 @@ def merge_selecteur_config(
 
 
 @db_retry
-def _get_selecteur_storage_info(
+def _get_selecteur_config(
     context: Mapping[str, Any] | None = None,
     nom_projet: str | None = None,
     selecteur: str | None = None,
     local_dir: str = "/tmp",
+    only_source: bool = False,
+    only_grist: bool = False,
+    only_fichier: bool = False,
 ) -> list[SelecteurStorageInfo]:
     """Get SelecteurStorageInfo for a project and optionally a specific selecteur.
 
@@ -387,8 +245,17 @@ def _get_selecteur_storage_info(
             cpss3db.bucket, cpss3db.s3_key, COALESCE(cpss3db.filename, 'filename_undefined') AS filename,
             COALESCE(cpss3db.tbl_name, 'tbl_name_undefined') AS tbl_name
         FROM {CONF_SCHEMA}.selecteur_s3_db_vw cpss3db
-        WHERE cpss3db.projet = %s
+        WHERE 1=1 AND cpss3db.projet = %s
     """
+
+    if only_source:
+        query += " AND cpss3db.is_source = true"
+
+    if only_grist:
+        query += " AND cpss3db.type_source = 'grist'"
+
+    if only_fichier:
+        query += " AND cpss3db.type_source = 'file'"
 
     params: list[str] = [nom_projet]
 
@@ -412,7 +279,7 @@ def _get_selecteur_storage_info(
     ]
 
 
-def get_list_selecteur_storage_info(
+def get_list_selecteur_config(
     context: Mapping[str, Any] | None = None,
     nom_projet: str | None = None,
     local_dir: str = "/tmp",
@@ -427,12 +294,12 @@ def get_list_selecteur_storage_info(
     Returns:
         List of SelecteurStorageInfo objects for all selecteurs
     """
-    return _get_selecteur_storage_info(
+    return _get_selecteur_config(
         context=context, nom_projet=nom_projet, selecteur=None, local_dir=local_dir
     )
 
 
-def get_selecteur_storage_info(
+def get_selecteur_config(
     selecteur: str,
     context: Mapping[str, Any] | None = None,
     nom_projet: str | None = None,
@@ -452,15 +319,25 @@ def get_selecteur_storage_info(
     Raises:
         ConfigError: If no configuration is found
     """
-    storage_infos = _get_selecteur_storage_info(
+    configs = _get_selecteur_config(
         context=context, nom_projet=nom_projet, selecteur=selecteur, local_dir=local_dir
     )
 
-    if not storage_infos:
+    if not configs:
         raise ConfigError(
             message=f"No storage info found for project {nom_projet} and selecteur {selecteur}",
             nom_projet=nom_projet,
             selecteur=selecteur,
         )
 
-    return storage_infos[0]
+    return configs[0]
+
+
+def get_source_grist() -> list[SelecteurStorageInfo]:
+    """Get SelecteurStorageInfo for all selecteurs with grist source."""
+    return _get_selecteur_config(only_source=True, only_grist=True)
+
+
+def get_source_fichier() -> list[SelecteurStorageInfo]:
+    """Get SelecteurStorageInfo for all selecteurs with file source."""
+    return _get_selecteur_config(only_source=True, only_fichier=True)
