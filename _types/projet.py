@@ -159,13 +159,14 @@ class SelecteurConfig:
             options=options,
         )
 
-    def get_full_s3_key(self, with_bucket: bool = False) -> str:
+    def get_full_s3_key(
+        self, with_bucket: bool = False, with_tmp_segment: bool = False
+    ) -> str:
+        segments = [self.selecteur_info.s3_key]
         if with_bucket:
-            return "/".join(
-                [
-                    self.selecteur_info.bucket,
-                    self.selecteur_info.s3_key,
-                    self.selecteur_info.filename,
-                ]
-            )
-        return "/".join([self.selecteur_info.s3_key, self.selecteur_info.filename])
+            segments.insert(0, self.selecteur_info.bucket)
+        if with_tmp_segment:
+            segments.append("tmp")
+
+        segments.append(self.selecteur_info.filename)
+        return "/".join(segments)
