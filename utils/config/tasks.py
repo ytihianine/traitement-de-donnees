@@ -279,7 +279,7 @@ def _get_selecteur_storage_info(
     ]
 
 
-def get_list_selecteur_config(
+def get_list_selecteur_storage_info(
     context: Mapping[str, Any] | None = None,
     nom_projet: str | None = None,
     local_dir: str = "/tmp",
@@ -299,7 +299,7 @@ def get_list_selecteur_config(
     )
 
 
-def get_selecteur_config(
+def get_selecteur_storage_info(
     selecteur: str,
     context: Mapping[str, Any] | None = None,
     nom_projet: str | None = None,
