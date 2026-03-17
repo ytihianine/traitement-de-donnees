@@ -127,13 +127,6 @@ class IcebergCatalog:
     def write_table(
         self, table_name: str, df: pd.DataFrame, overwrite: bool = False
     ) -> None:
-        # Logic to write data to a table in the Iceberg catalog
-        if df.empty:
-            logging.warning(
-                msg=f"Empty DataFrame provided for table {table_name}. Skipping write."
-            )
-            return
-
         self.create_table(table_name=table_name, df=df)
         table = self.update_table(table_name=table_name, df=df)
 
@@ -151,6 +144,14 @@ class IcebergCatalog:
             for f in pa_data.schema
         ]
         pa_data = pa_data.cast(pa.schema(cast_fields))
+
+        # Logic to write data to a table in the Iceberg catalog
+        if df.empty:
+            logging.warning(
+                msg=f"Empty DataFrame provided for table {table_name}. Skipping write."
+            )
+            return
+
         if overwrite:
             table.overwrite(df=pa_data)
         else:
