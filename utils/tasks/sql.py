@@ -481,23 +481,24 @@ def copy_tmp_table_to_real_table(
 
 
 def sort_db_colnames(
-    tbl_name: str,
-    keep_file_id_col: bool = False,
-    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    db_handler: BaseDBHandler,
+    selecteur_config: SelecteurConfig,
     schema: str = DEFAULT_TMP_SCHEMA,
 ) -> list[str]:
     """Get sorted column names from a table.
 
     Args:
-        tbl_name: Table name
-        keep_file_id_col: Whether to include id column
+        selecteur_config: Selecteur configuration
         schema: Schema name
 
     Returns:
         Sorted list of column names
     """
-    db = create_db_handler(connection_id=pg_conn_id)
-    df = db.fetch_df(
+    tbl_name = selecteur_config.selecteur_info.tbl_name
+    keep_file_id_col = selecteur_config.options.keep_file_id_col
+    pg_conn_id = selecteur_config.options.db_conn_id
+
+    df = db_handler.fetch_df(
         query="""SELECT isc.table_catalog, isc.table_schema, isc.table_name, isc.column_name
             FROM information_schema.columns isc
             WHERE
@@ -622,9 +623,8 @@ def import_file_to_db(
 
         # Check if columns are the same between df and db table
         sorted_db_colnames = sort_db_colnames(
-            tbl_name=tbl_name,
-            keep_file_id_col=selecteur_config.options.keep_file_id_col,
-            pg_conn_id=selecteur_config.options.db_conn_id,
+            db_handler=db_handler,
+            selecteur_config=selecteur_config,
             schema=schema,
         )
         if not are_lists_egal(list_A=sorted_df_cols, list_B=sorted_db_colnames):
