@@ -9,7 +9,6 @@ from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from enums.dags import DagStatus
 
 from _types.dags import FeatureFlags
-from utils.config.tasks import get_list_source_fichier_key
 from utils.config.dag_params import create_default_args, create_dag_params
 
 from utils.tasks.validation import validate_dag_parameters
@@ -18,6 +17,9 @@ from utils.tasks.s3 import copy_s3_files, del_s3_files
 from dags.sg.srh.mentorat_merci.tasks import (
     agent_inscrit,
     generer_binomes,
+)
+from dags.sg.srh.mentorat_merci.config import (
+    selecteur_options,
 )
 
 
@@ -70,8 +72,12 @@ def mentorat_merci() -> None:
         looking_for_files,
         agent_inscrit(),
         generer_binomes(),
-        copy_s3_files(),
-        del_s3_files(),
+        copy_s3_files(
+            selecteur_options=selecteur_options,
+        ),
+        del_s3_files(
+            selecteur_options=selecteur_options,
+        ),
     )
 
 

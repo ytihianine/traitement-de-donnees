@@ -66,20 +66,31 @@ def configuration_projets() -> None:
         create_projet_snapshot(),
         get_projet_snapshot(),
         process_data(),
-        delete_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
-        create_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, reset_id_seq=False),
-        # import_file_to_db.partial(
-        #     pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, keep_file_id_col=True
-        # ).expand(selecteur_info=get_list_selector_info(nom_projet=nom_projet)),
+        delete_tmp_tables(
+            selecteur_options=selecteur_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
+        ),
+        create_tmp_tables(
+            selecteur_options=selecteur_options,
+            pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID,
+            reset_id_seq=False,
+        ),
         import_files_to_db(
             nom_projet=nom_projet,
             selecteur_options=selecteur_options,
             pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID,
         ),
-        copy_tmp_table_to_real_table(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
-        copy_s3_files(),
-        del_s3_files(),
-        delete_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
+        copy_tmp_table_to_real_table(
+            selecteur_options=selecteur_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
+        ),
+        copy_s3_files(
+            selecteur_options=selecteur_options,
+        ),
+        del_s3_files(
+            selecteur_options=selecteur_options,
+        ),
+        delete_tmp_tables(
+            selecteur_options=selecteur_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
+        ),
         iceberg_copy_staging_to_prod(
             nom_projet=nom_projet,
             selecteur_options=selecteur_options,

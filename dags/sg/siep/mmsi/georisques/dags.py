@@ -12,8 +12,8 @@ from utils.tasks.sql import (
     ensure_partition,
     get_projet_snapshot,
     import_file_to_db,
+    import_files_to_db,
 )
-from utils.config.tasks import get_list_selector_info
 
 from utils.tasks.validation import validate_dag_parameters
 from utils.tasks.s3 import (
@@ -21,6 +21,8 @@ from utils.tasks.s3 import (
     del_s3_files,
 )
 from dags.sg.siep.mmsi.georisques.task import georisques_group
+from dags.sg.siep.mmsi.georisques.config import selecteur_options
+
 
 # Mails
 nom_projet = "Géorisques"
@@ -55,14 +57,15 @@ def bien_georisques() -> None:
         validate_dag_parameters(),
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         georisques_group(),
-        create_tmp_tables(reset_id_seq=False),
-        import_file_to_db.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        import_files_to_db(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
-        ensure_partition(),
-        copy_tmp_table_to_real_table(),
-        copy_s3_files(),
-        del_s3_files(),
+        ensure_partition(selecteur_options=selecteur_options),
+        copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
+        copy_s3_files(selecteur_options=selecteur_options),
+        del_s3_files(selecteur_options=selecteur_options),
     )
 
 

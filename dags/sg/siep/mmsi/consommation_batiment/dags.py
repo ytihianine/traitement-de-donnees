@@ -11,19 +11,17 @@ from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
-    import_file_to_db,
+    import_files_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     ensure_partition,
     get_projet_snapshot,
     refresh_views,
-    # set_dataset_last_update_date,
 )
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from utils.config.tasks import get_list_source_fichier_key, get_list_selector_info
 
 from utils.tasks.validation import validate_dag_parameters
 from dags.sg.siep.mmsi.consommation_batiment.tasks import (
@@ -31,6 +29,7 @@ from dags.sg.siep.mmsi.consommation_batiment.tasks import (
     source_files,
     additionnal_files,
 )
+from dags.sg.siep.mmsi.consommation_batiment.config import selecteur_options
 
 
 # Mails
@@ -82,16 +81,17 @@ def consommation_des_batiments() -> None:
         conso_mens_parquet(),
         source_files(),
         additionnal_files(),
-        create_tmp_tables(reset_id_seq=False),
-        import_file_to_db.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        import_files_to_db(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
-        ensure_partition(),
-        copy_tmp_table_to_real_table(),
+        ensure_partition(selecteur_options=selecteur_options),
+        copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
         refresh_views(),
-        copy_s3_files(),
-        del_s3_files(),
-        delete_tmp_tables(),
+        copy_s3_files(selecteur_options=selecteur_options),
+        del_s3_files(selecteur_options=selecteur_options),
+        delete_tmp_tables(selecteur_options=selecteur_options),
         # set_dataset_last_update_date(
         #     dataset_ids=[49, 50, 51, 52, 53, 54],
         # ),
