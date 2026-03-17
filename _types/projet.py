@@ -138,6 +138,7 @@ class SelecteurStorageOptions:
     db_conn_id: str = DEFAULT_PG_DATA_CONN_ID
     write_to_db: bool = True
     tbl_order: int = 0
+    keep_file_id_col: bool = False
     is_partitioned: bool = False
     partition_period: PartitionTimePeriod = PartitionTimePeriod.DAY
     load_strategy: LoadStrategy = LoadStrategy.INCREMENTAL
