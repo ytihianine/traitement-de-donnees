@@ -5,7 +5,6 @@ from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
 from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_default_args, create_dag_params
-from utils.config.tasks import get_list_selector_info
 from enums.dags import DagStatus
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.tasks.sql import (
@@ -19,7 +18,7 @@ from utils.tasks.sql import (
 )
 from utils.tasks.s3 import (
     copy_s3_files,
-    copy_staging_to_prod,
+    iceberg_copy_staging_to_prod,
     del_s3_files,
 )
 
@@ -83,8 +82,9 @@ def chorus_service_prescripteur() -> None:
         copy_s3_files(),
         del_s3_files(),
         delete_tmp_tables(),
-        copy_staging_to_prod.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        iceberg_copy_staging_to_prod(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
         # set_dataset_last_update_date(
         #     dataset_ids=[49, 50, 51, 52, 53, 54],
