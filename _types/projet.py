@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from enums.dags import TypeSource
 from enums.database import LoadStrategy, PartitionTimePeriod
 from utils.config.vars import DEFAULT_S3_CONN_ID, DEFAULT_PG_DATA_CONN_ID
 
@@ -17,78 +18,11 @@ class DbInfo:
 
 
 @dataclass(frozen=True)
-class SourceGrist:
-    projet: str
-    selecteur: str
-    type_source: str
-    id_source: str
-    # s3
-    filename: str
-    s3_key: str
-    bucket: str
-    projet_s3_key: str
-    projet_s3_key_tmp: str
-    filepath_s3: str
-    filepath_tmp_s3: str
-
-
-@dataclass(frozen=True)
-class SourceFichier:
-    projet: str
-    selecteur: str
-    bucket: str
-    s3_key: str
-    # Source
-    type_source: str
-    id_source: str
-    filepath_source_s3: str
-    # Destination
-    filename: str
-    projet_s3_key: str
-    projet_s3_key_tmp: str
-    filepath_s3: str
-    filepath_tmp_s3: str
-
-
-@dataclass(frozen=True)
 class ProjetS3:
     projet: str
     bucket: str
     key: str
     key_tmp: str
-
-
-@dataclass(frozen=True)
-class SelecteurInfo:
-    projet: str
-    selecteur: str
-    # s3 info
-    filename: str
-    s3_key: str
-    bucket: str
-    projet_s3_key: str
-    projet_s3_key_tmp: str
-    filepath_s3: str
-    filepath_tmp_s3: str
-    # db info
-    tbl_name: str
-    tbl_order: int
-    is_partitionned: bool
-    partition_period: str
-    load_strategy: str
-
-
-@dataclass(frozen=True)
-class SelecteurS3:
-    projet: str
-    selecteur: str
-    filename: str
-    s3_key: str
-    bucket: str
-    projet_s3_key: str
-    projet_s3_key_tmp: str
-    filepath_s3: str
-    filepath_tmp_s3: str
 
 
 @dataclass(frozen=True)
@@ -120,6 +54,7 @@ class Contact:
 class SelecteurStorageInfo:
     projet: str
     selecteur: str
+    type_source: TypeSource
     # s3 info
     bucket: str
     s3_key: str

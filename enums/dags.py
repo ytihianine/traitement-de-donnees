@@ -13,3 +13,10 @@ class TypeDocumentation(Enum):
 
     PIPELINE = "pipeline"
     DATA = "data"
+
+
+class TypeSource(Enum):
+    """Type de source de données"""
+
+    GRIST = "grist"
+    FILE = "file"
