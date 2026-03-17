@@ -17,12 +17,10 @@ from utils.tasks.sql import (
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
 
-from utils.config.tasks import get_list_selector_info
-
 from utils.tasks.validation import validate_dag_parameters
 from utils.tasks.s3 import (
     copy_s3_files,
-    copy_staging_to_prod,
+    iceberg_copy_staging_to_prod,
     del_s3_files,
 )
 from dags.applications.configuration_projets.tasks import (
@@ -82,8 +80,9 @@ def configuration_projets() -> None:
         copy_s3_files(),
         del_s3_files(),
         delete_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
-        copy_staging_to_prod.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        iceberg_copy_staging_to_prod(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
     )
 
