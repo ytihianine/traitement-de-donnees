@@ -338,9 +338,11 @@ def get_source_grist() -> list[SelecteurStorageInfo]:
     return _get_selecteur_storage_info(only_source=True, only_grist=True)
 
 
-def get_list_source_fichier() -> list[str]:
+def get_list_source_fichier(
+    context: Mapping, nom_projet: str | None = None
+) -> list[str]:
     """Get SelecteurStorageInfo for all selecteurs with file source."""
     selecteur_storage_info = _get_selecteur_storage_info(
-        only_source=True, only_fichier=True
+        context=context, nom_projet=nom_projet, only_source=True, only_fichier=True
     )
     return [info.get_full_s3_key(use_id_source=True) for info in selecteur_storage_info]
