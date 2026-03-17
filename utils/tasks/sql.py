@@ -288,7 +288,8 @@ def ensure_partition(
             create_sql = f"""
                 CREATE TABLE IF NOT EXISTS {prod_schema}.{partition_name}
                 PARTITION OF {prod_schema}.{tbl_name}
-                FOR VALUES FROM ('{from_date.strftime(format="%Y-%m-%d")}') TO ('{to_date.strftime(format="%Y-%m-%d")}');
+                FOR VALUES FROM
+                    ('{from_date.strftime(format="%Y-%m-%d")}') TO ('{to_date.strftime(format="%Y-%m-%d")}');
             """
             db.execute(query=create_sql)
             logging.info(msg=f"Partition {partition_name} created successfully.")
