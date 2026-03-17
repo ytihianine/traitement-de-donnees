@@ -17,11 +17,9 @@ from utils.tasks.s3 import write_to_s3
 from utils.control.structures import remove_grist_internal_cols
 from utils.dataframe import df_info
 from utils.config.tasks import (
-    get_selecteur_config,
-    get_source_grist,
+    get_selecteur_storage_info,
     column_mapping_dataframe,
     column_mapping_dict,
-    get_source_fichier,
 )
 from utils.config.dag_params import get_execution_date, get_project_name
 from _types.dags import ETLStep, TaskConfig
@@ -125,8 +123,10 @@ def create_grist_etl_task(
         nom_projet = get_project_name(context=context)
 
         # Get config values related to the task
-        task_config = get_selecteur_config(nom_projet=nom_projet, selecteur=selecteur)
-        doc_config = get_selecteur_config(
+        task_config = get_selecteur_storage_info(
+            nom_projet=nom_projet, selecteur=selecteur
+        )
+        doc_config = get_selecteur_storage_info(
             nom_projet=nom_projet, selecteur=doc_selecteur
         )
         doc_local_path = Path("/tmp") / doc_config.filename
@@ -217,7 +217,9 @@ def create_file_etl_task(
         s3_handler = create_default_s3_handler()
 
         # Get config values related to the task
-        task_config = get_selecteur_config(nom_projet=nom_projet, selecteur=selecteur)
+        task_config = get_selecteur_storage_info(
+            nom_projet=nom_projet, selecteur=selecteur
+        )
 
         # Get data of table
         df = read_dataframe(
@@ -303,7 +305,7 @@ def _execute_step(
     # Read data if required
     if step.read_data and input_selecteurs:
         for sel in input_selecteurs:
-            cfg = get_selecteur_config(nom_projet=nom_projet, selecteur=sel)
+            cfg = get_selecteur_storage_info(nom_projet=nom_projet, selecteur=sel)
             df = read_dataframe(
                 file_handler=s3_handler,
                 file_path=cfg.get_full_s3_key(with_tmp_segment=True),
@@ -401,7 +403,7 @@ def create_task(
             )
 
         # Resolve configs
-        output_config = get_selecteur_config(
+        output_config = get_selecteur_storage_info(
             nom_projet=nom_projet, selecteur=output_selecteur
         )
 
