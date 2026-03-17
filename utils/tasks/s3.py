@@ -202,6 +202,12 @@ def copy_staging_to_prod(selecteur_config: SelecteurConfig) -> None:
         logging.info(msg="Grist doc selecteur. Skipping ...")
         return
 
+    if selecteur_config.options.write_to_s3_with_iceberg is False:
+        logging.info(
+            msg=f"write_to_s3_with_iceberg option is set to False for selecteur <{selecteur_config.selecteur_info.selecteur}>. Skipping import to S3 ..."  # noqa
+        )
+        return
+
     # Dag info
     namespace = selecteur_config.get_iceberg_namespace(with_bucket=False)
     tbl_name = Path(selecteur_config.selecteur_info.filename).stem
