@@ -158,3 +158,14 @@ class SelecteurConfig:
             selecteur_info=selecteur_info,
             options=options,
         )
+
+    def get_full_s3_key(self, with_bucket: bool = False) -> str:
+        if with_bucket:
+            return "/".join(
+                [
+                    self.selecteur_info.bucket,
+                    self.selecteur_info.s3_key,
+                    self.selecteur_info.filename,
+                ]
+            )
+        return "/".join([self.selecteur_info.s3_key, self.selecteur_info.filename])
