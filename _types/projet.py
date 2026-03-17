@@ -43,8 +43,6 @@ class Contact:
 class SelecteurStorageInfo:
     projet: str
     selecteur: str
-    type_source: TypeSource
-    id_source: str
     # s3 info
     bucket: str
     s3_key: str
@@ -52,6 +50,9 @@ class SelecteurStorageInfo:
     local_dir: str
     # db info
     tbl_name: str
+    # Source info
+    type_source: TypeSource | None = None
+    id_source: str | None = None
 
     def get_full_s3_key(
         self, with_bucket: bool = False, with_tmp_segment: bool = False
