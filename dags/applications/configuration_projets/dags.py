@@ -73,7 +73,11 @@ def configuration_projets() -> None:
         # import_file_to_db.partial(
         #     pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, keep_file_id_col=True
         # ).expand(selecteur_info=get_list_selector_info(nom_projet=nom_projet)),
-        import_files_to_db(nom_projet=nom_projet, selecteur_options=selecteur_options),
+        import_files_to_db(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
+            pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID,
+        ),
         copy_tmp_table_to_real_table(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
         copy_s3_files(),
         del_s3_files(),
