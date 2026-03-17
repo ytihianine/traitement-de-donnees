@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from enums.database import LoadStrategy, PartitionTimePeriod
+from utils.config.vars import DEFAULT_S3_CONN_ID, DEFAULT_PG_DATA_CONN_ID
 
 
 @dataclass(frozen=True)
@@ -130,9 +131,11 @@ class SelecteurStorageInfo:
 @dataclass(frozen=True, kw_only=True)
 class SelecteurStorageOptions:
     # S3
+    s3_conn_id: str = DEFAULT_S3_CONN_ID
     write_to_s3: bool = True
     write_to_s3_with_iceberg: bool = True
     # Database
+    db_conn_id: str = DEFAULT_PG_DATA_CONN_ID
     write_to_db: bool = True
     tbl_order: int = 0
     is_partitioned: bool = False
