@@ -53,6 +53,28 @@ class SelecteurStorageInfo:
     # db info
     tbl_name: str
 
+    def get_full_s3_key(
+        self, with_bucket: bool = False, with_tmp_segment: bool = False
+    ) -> str:
+        segments = [self.s3_key]
+        if with_bucket:
+            segments.insert(0, self.bucket)
+        if with_tmp_segment:
+            segments.append("tmp")
+
+        segments.append(self.filename)
+        return "/".join(segments)
+
+    def get_local_path(self) -> str:
+        if self.filename is None:
+            return str(Path(self.local_dir) / "filename_undefined")  # noqa
+        return str(Path(self.local_dir) / self.filename)
+
+    def get_iceberg_namespace(self, with_bucket: bool = False) -> str:
+        s3_key = self.get_full_s3_key(with_bucket=with_bucket)
+        namespace_split = s3_key.split(sep=".")[0].split(sep="/")[:-1]
+        return ".".join(namespace_split)
+
 
 @dataclass(frozen=True, kw_only=True)
 class SelecteurStorageOptions:
@@ -84,27 +106,3 @@ class SelecteurConfig:
             selecteur_info=selecteur_info,
             options=options,
         )
-
-    def get_full_s3_key(
-        self, with_bucket: bool = False, with_tmp_segment: bool = False
-    ) -> str:
-        segments = [self.selecteur_info.s3_key]
-        if with_bucket:
-            segments.insert(0, self.selecteur_info.bucket)
-        if with_tmp_segment:
-            segments.append("tmp")
-
-        segments.append(self.selecteur_info.filename)
-        return "/".join(segments)
-
-    def get_local_path(self) -> str:
-        if self.selecteur_info.filename is None:
-            return str(
-                Path(self.selecteur_info.local_dir) / "filename_undefined"
-            )  # noqa
-        return str(Path(self.selecteur_info.local_dir) / self.selecteur_info.filename)
-
-    def get_iceberg_namespace(self, with_bucket: bool = False) -> str:
-        s3_key = self.get_full_s3_key(with_bucket=with_bucket)
-        namespace_split = s3_key.split(sep=".")[0].split(sep="/")[:-1]
-        return ".".join(namespace_split)
