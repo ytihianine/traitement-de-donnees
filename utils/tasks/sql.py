@@ -384,7 +384,7 @@ def delete_tmp_tables(
 
 @task(task_id="copy_tmp_table_to_real_table")
 def copy_tmp_table_to_real_table(
-    projet_db_info: list[DbInfo] | None = None,
+    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     **context,
 ) -> None:
@@ -415,17 +415,28 @@ def copy_tmp_table_to_real_table(
     # Hook
     db_handler = create_db_handler(connection_id=pg_conn_id)
 
-    if projet_db_info is None:
-        projet_db_info = get_list_database_info(nom_projet=nom_projet)
-    logging.info(msg=f"Nombre de tables à copier: {len(projet_db_info)}")
+    # Get selecteur config
+    selecteur_info = get_list_selecteur_storage_info(
+        nom_projet=nom_projet, context=context
+    )
+    selecteur_config = merge_selecteur_config(
+        selecteur_info=selecteur_info, options_map=selecteur_options
+    )
+    logging.info(msg=f"Nombre de tables à copier: {len(selecteur_config)}")
 
     try:
         db_handler.execute(query="SET session_replication_role = replica;")
         logging.info(msg="Désactivation des triggers de réplication")
         queries = []
-        for db_info in projet_db_info:
-            load_strategy = LoadStrategy(value=db_info.load_strategy.upper())
-            tbl_name = db_info.tbl_name
+        for config in selecteur_config:
+            if config.options.write_to_db is False:
+                logging.info(
+                    msg=f"write_to_db option is set to False for selecteur <{config.selecteur_info.selecteur}>. Skipping copy to real table ..."  # noqa
+                )
+                continue
+
+            load_strategy = config.options.load_strategy
+            tbl_name = config.selecteur_info.tbl_name
             prod_table = f"{prod_schema}.{tbl_name}"
             tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
 
@@ -445,9 +456,8 @@ def copy_tmp_table_to_real_table(
                 )
                 logging.info(msg=f"Table <{tbl_name}> primary key: {pk_cols}")
                 col_list = sort_db_colnames(
-                    tbl_name=tbl_name,
-                    pg_conn_id=pg_conn_id,
-                    keep_file_id_col=True,
+                    db_handler=db_handler,
+                    selecteur_config=config,
                     schema=prod_schema,
                 )
 
