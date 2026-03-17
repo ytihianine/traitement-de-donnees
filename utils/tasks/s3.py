@@ -3,13 +3,13 @@
 import logging
 from pathlib import Path
 from typing import Any, Mapping
-from _types.projet import ProjetS3, SelecteurConfig, SelecteurStorageOptions
 
 from airflow.sdk import chain, get_current_context, task, task_group
 import pandas as pd
 
+from _types.projet import ProjetS3, SelecteurConfig, SelecteurStorageOptions
 from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
-from infra.file_handling.factory import create_file_handler
+from infra.file_handling.factory import create_default_s3_handler
 from infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
 from utils.config.dag_params import (
     get_dag_status,
@@ -20,11 +20,9 @@ from utils.config.dag_params import (
 from utils.config.tasks import (
     get_list_selecteur_storage_info,
     get_projet_s3_info,
-    get_projet_selecteur_s3,
-    get_list_source_fichier,
     merge_selecteur_config,
 )
-from enums.dags import DagStatus
+from enums.dags import DagStatus, TypeSource
 from enums.filesystem import FileHandlerType, IcebergTableStatus
 from utils.config.vars import (
     DEFAULT_POLARIS_HOST,
@@ -37,6 +35,7 @@ from utils.config.vars import (
 def copy_s3_files(
     projet_s3: ProjetS3 | None = None,
     connection_id: str = DEFAULT_S3_CONN_ID,
+    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
     **context: Mapping[str, Any],
 ) -> None:
     """Copy files to S3 storage.
@@ -69,22 +68,29 @@ def copy_s3_files(
         print(FF_S3_DISABLED_MSG)
         return
 
-    # Créer les variables
-    s3_handler = create_file_handler(
-        handler_type=FileHandlerType.S3,
+    # Créer les hooks
+    s3_handler = create_default_s3_handler(
         connection_id=connection_id,
-        bucket=projet_s3.bucket,
     )
 
-    # Récupérer la liste des key s3 pour tous les sélecteurs
-    projet_selecteur_s3 = get_projet_selecteur_s3(nom_projet=nom_projet)
+    # Get selecteur config
+    selecteur_info = get_list_selecteur_storage_info(
+        nom_projet=nom_projet, context=context
+    )
+    selecteur_config = merge_selecteur_config(
+        selecteur_info=selecteur_info, options_map=selecteur_options
+    )
 
     # Copier la liste des sources dans le dossier final
-    for selecteur_s3 in projet_selecteur_s3:
-        target_key = (
-            f"{selecteur_s3.s3_key}/{curr_day}/{curr_time}/{selecteur_s3.filename}"
-        )
-        src_key = selecteur_s3.filepath_tmp_s3
+    for config in selecteur_config:
+        if config.options.write_to_s3 is False:
+            logging.info(
+                msg=f"write_to_s3 option is set to False for selecteur <{config.selecteur_info.selecteur}>. Skipping copy to S3 ..."  # noqa
+            )
+            continue
+
+        target_key = f"{config.selecteur_info.s3_key}/{curr_day}/{curr_time}/{config.selecteur_info.filename}"
+        src_key = config.selecteur_info.get_full_s3_key()
 
         try:
             # Copy file
@@ -104,16 +110,14 @@ def copy_s3_files(
 
 @task
 def del_s3_files(
-    projet_s3: ProjetS3 | None = None,
-    keys_to_delete: list[str] | None = None,
-    connection_id: str = DEFAULT_S3_CONN_ID,
+    selecteur_options: Mapping[str, SelecteurStorageOptions],
+    s3_conn_id: str = DEFAULT_S3_CONN_ID,
     **context: Mapping[str, Any],
 ) -> None:
     """Delete files from MinIO/S3 storage.
 
     Args:
-        bucket: Target S3/MinIO bucket
-        keys_to_delete: Optional list of keys to delete
+        selecteur_options: Mapping of selecteur options
         connection_id: S3 connection ID
         context: Airflow context
 
@@ -126,9 +130,6 @@ def del_s3_files(
     s3_enable = get_feature_flags(context=context).s3
     nom_projet = get_project_name(context=context)
 
-    if projet_s3 is None:
-        projet_s3 = get_projet_s3_info(nom_projet=nom_projet)
-
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
         return
@@ -137,40 +138,41 @@ def del_s3_files(
         print(FF_S3_DISABLED_MSG)
         return
 
-    # Créer les variables
-    s3_handler = create_file_handler(
-        handler_type=FileHandlerType.S3,
-        connection_id=connection_id,
-        bucket=projet_s3.bucket,
+    # Créer les hooks
+    s3_handler = create_default_s3_handler(
+        connection_id=s3_conn_id,
     )
 
-    # Récupérer les sources
-    projet_sources = get_list_source_fichier(nom_projet=nom_projet)
+    # Get selecteur config
+    selecteur_info = get_list_selecteur_storage_info(
+        nom_projet=nom_projet, context=context
+    )
+    selecteur_config = merge_selecteur_config(
+        selecteur_info=selecteur_info, options_map=selecteur_options
+    )
 
-    # Récupérer les key s3 des sélecteurs
-    projet_selecteur_s3 = get_projet_selecteur_s3(nom_projet=nom_projet)
+    for config in selecteur_config:
+        if config.selecteur_info.type_source == TypeSource.FILE:
+            s3_key_source = config.selecteur_info.get_full_s3_key()
+            try:
+                logging.info(msg=f"Deleting source file {s3_key_source}")
+                s3_handler.delete_single(file_path=s3_key_source)
+                logging.info(msg="Source file deleted successfully")
+            except FileHandlerError as e:
+                logging.error(
+                    msg=f"Failed to delete source file {s3_key_source}: {str(e)}"
+                )
+                raise
 
-    # Supprimer les sources
-    if projet_sources:
-        try:
-            logging.info(msg=f"Deleting {len(projet_sources)} source files")
-            for source in projet_sources:
-                s3_handler.delete_single(file_path=source.filepath_source_s3)
-            logging.info(msg="Source files deleted successfully")
-        except FileHandlerError as e:
-            logging.error(msg=f"Failed to delete source files: {str(e)}")
-            raise
-
-    # Supprimer les key S3
-    if projet_selecteur_s3:
-        try:
-            logging.info(msg=f"Deleting {len(projet_selecteur_s3)} temporary files")
-            for selecteur_s3 in projet_selecteur_s3:
-                s3_handler.delete_single(file_path=selecteur_s3.filepath_tmp_s3)
-            logging.info(msg="Temporary files deleted successfully")
-        except FileHandlerError as e:
-            logging.error(msg=f"Failed to delete temporary files: {str(e)}")
-            raise
+        if config.options.write_to_s3 is True:
+            s3_key = config.selecteur_info.get_full_s3_key(with_tmp_segment=True)
+            try:
+                logging.info(msg=f"Deleting {s3_key} source files")
+                s3_handler.delete_single(file_path=s3_key)
+                logging.info(msg="Source files deleted successfully")
+            except FileHandlerError as e:
+                logging.error(msg=f"Failed to delete source files: {str(e)}")
+                raise
 
 
 def write_to_s3(
@@ -209,7 +211,7 @@ def copy_staging_to_prod(selecteur_config: SelecteurConfig) -> None:
         return
 
     # Dag info
-    namespace = selecteur_config.get_iceberg_namespace(with_bucket=False)
+    namespace = selecteur_config.selecteur_info.get_iceberg_namespace(with_bucket=False)
     tbl_name = Path(selecteur_config.selecteur_info.filename).stem
 
     # Get catalog
