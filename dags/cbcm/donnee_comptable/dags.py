@@ -10,25 +10,26 @@ from enums.dags import DagStatus
 from _types.dags import DBParams, FeatureFlags
 from utils.tasks.sql import (
     create_tmp_tables,
-    import_file_to_db,
+    import_files_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     ensure_partition,
     create_projet_snapshot,
     get_projet_snapshot,
-    # set_dataset_last_update_date,
 )
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from utils.config.tasks import get_list_source_fichier_key, get_list_selector_info
 from utils.config.dag_params import create_default_args, create_dag_params
 
 from utils.tasks.validation import validate_dag_parameters
 from dags.cbcm.donnee_comptable.tasks import (
     source_files,
     datasets_additionnels,
+)
+from dags.cbcm.donnee_comptable.config import (
+    selecteur_options,
 )
 
 
@@ -85,18 +86,24 @@ def chorus_donnees_comptables() -> None:
         get_projet_snapshot(nom_projet=nom_projet),
         source_files(),
         datasets_additionnels(),
-        create_tmp_tables(reset_id_seq=False),
-        import_file_to_db.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        import_files_to_db(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
-        ensure_partition(),
-        copy_tmp_table_to_real_table(),
-        copy_s3_files(),
-        del_s3_files(),
+        ensure_partition(
+            selecteur_options=selecteur_options,
+        ),
+        copy_tmp_table_to_real_table(
+            selecteur_options=selecteur_options,
+        ),
+        copy_s3_files(
+            selecteur_options=selecteur_options,
+        ),
+        del_s3_files(
+            selecteur_options=selecteur_options,
+        ),
         delete_tmp_tables(),
-        # set_dataset_last_update_date(
-        #     dataset_ids=[49, 50, 51, 52, 53, 54],
-        # ),
     )
 
 

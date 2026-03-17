@@ -17,11 +17,9 @@ from utils.tasks.s3 import write_to_s3
 from utils.control.structures import remove_grist_internal_cols
 from utils.dataframe import df_info
 from utils.config.tasks import (
-    get_source_grist,
-    get_selector_info,
+    get_selecteur_storage_info,
     column_mapping_dataframe,
     column_mapping_dict,
-    get_source_fichier,
 )
 from utils.config.dag_params import get_execution_date, get_project_name
 from _types.dags import ETLStep, TaskConfig
@@ -125,8 +123,12 @@ def create_grist_etl_task(
         nom_projet = get_project_name(context=context)
 
         # Get config values related to the task
-        task_config = get_source_grist(nom_projet=nom_projet, selecteur=selecteur)
-        doc_config = get_source_grist(nom_projet=nom_projet, selecteur=doc_selecteur)
+        task_config = get_selecteur_storage_info(
+            nom_projet=nom_projet, selecteur=selecteur
+        )
+        doc_config = get_selecteur_storage_info(
+            nom_projet=nom_projet, selecteur=doc_selecteur
+        )
         doc_local_path = Path("/tmp") / doc_config.filename
 
         if task_config.id_source is None:
@@ -140,7 +142,9 @@ def create_grist_etl_task(
         )
 
         # Download Grist doc from S3 to local temp file
-        grist_doc = s3_handler.read(file_path=doc_config.filepath_tmp_s3)
+        grist_doc = s3_handler.read(
+            file_path=doc_config.get_full_s3_key(with_tmp_segment=True)
+        )
         local_handler.write(file_path=str(doc_local_path), content=grist_doc)
 
         # Get data of table
@@ -167,7 +171,7 @@ def create_grist_etl_task(
 
         # Export
         s3_handler.write(
-            file_path=str(task_config.filepath_tmp_s3),
+            file_path=str(task_config.get_full_s3_key(with_tmp_segment=True)),
             content=df.to_parquet(path=None, index=False),
         )
 
@@ -175,7 +179,7 @@ def create_grist_etl_task(
             _add_metadata(df=df, context=context)
             _write_to_iceberg_catalog(
                 df=df,
-                filepath_s3=str(task_config.filepath_s3),
+                filepath_s3=str(task_config.get_full_s3_key()),
                 catalog_name=DEFAULT_POLARIS_CATALOG,
                 table_status=IcebergTableStatus.STAGING,
             )
@@ -213,12 +217,14 @@ def create_file_etl_task(
         s3_handler = create_default_s3_handler()
 
         # Get config values related to the task
-        task_config = get_source_fichier(nom_projet=nom_projet, selecteur=selecteur)
+        task_config = get_selecteur_storage_info(
+            nom_projet=nom_projet, selecteur=selecteur
+        )
 
         # Get data of table
         df = read_dataframe(
             file_handler=s3_handler,
-            file_path=task_config.filepath_source_s3,
+            file_path=task_config.get_full_s3_key(),
             read_options=read_options,
         )
 
@@ -262,14 +268,14 @@ def create_file_etl_task(
 
         # Export
         s3_handler.write(
-            file_path=str(task_config.filepath_tmp_s3),
+            file_path=str(task_config.get_full_s3_key(with_tmp_segment=True)),
             content=df.to_parquet(path=None, index=False),
         )
 
         if version == "v2":
             _write_to_iceberg_catalog(
                 df=df,
-                filepath_s3=str(task_config.filepath_s3),
+                filepath_s3=str(task_config.get_full_s3_key()),
                 catalog_name=DEFAULT_POLARIS_CATALOG,
                 table_status=IcebergTableStatus.STAGING,
             )
@@ -299,10 +305,10 @@ def _execute_step(
     # Read data if required
     if step.read_data and input_selecteurs:
         for sel in input_selecteurs:
-            cfg = get_selector_info(nom_projet=nom_projet, selecteur=sel)
+            cfg = get_selecteur_storage_info(nom_projet=nom_projet, selecteur=sel)
             df = read_dataframe(
                 file_handler=s3_handler,
-                file_path=cfg.filepath_tmp_s3,
+                file_path=cfg.get_full_s3_key(with_tmp_segment=True),
             )
             df_info(df=df, df_name=f"{sel} - Input dataframe")
             # Use "df" as key if only one input, otherwise "df_{selecteur}"
@@ -397,7 +403,7 @@ def create_task(
             )
 
         # Resolve configs
-        output_config = get_selector_info(
+        output_config = get_selecteur_storage_info(
             nom_projet=nom_projet, selecteur=output_selecteur
         )
 
@@ -410,14 +416,14 @@ def create_task(
         df_info(df=result, df_name=f"{output_selecteur} - df to export")
 
         s3_handler.write(
-            file_path=str(output_config.filepath_tmp_s3),
+            file_path=str(output_config.get_full_s3_key(with_tmp_segment=True)),
             content=result.to_parquet(path=None, index=False),
         )
 
         if version == "v2":
             _write_to_iceberg_catalog(
                 df=result,
-                filepath_s3=str(output_config.filepath_s3),
+                filepath_s3=str(output_config.get_full_s3_key()),
                 catalog_name=DEFAULT_POLARIS_CATALOG,
                 table_status=IcebergTableStatus.STAGING,
             )

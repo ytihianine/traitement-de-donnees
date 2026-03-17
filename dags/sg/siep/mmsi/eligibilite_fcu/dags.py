@@ -4,7 +4,6 @@ from airflow.sdk.bases.operator import chain
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
-from utils.config.tasks import get_list_selector_info
 from enums.dags import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
@@ -12,7 +11,7 @@ from utils.tasks.sql import (
     delete_tmp_tables,
     ensure_partition,
     get_projet_snapshot,
-    import_file_to_db,
+    import_files_to_db,
 )
 
 from utils.tasks.validation import validate_dag_parameters
@@ -25,6 +24,7 @@ from dags.sg.siep.mmsi.eligibilite_fcu.task import (
     get_eligibilite_fcu,
     process_fcu_result,
 )
+from dags.sg.siep.mmsi.eligibilite_fcu.config import selecteur_options
 
 
 nom_projet = "France Chaleur Urbaine (FCU)"
@@ -60,15 +60,16 @@ def eligibilite_fcu_dag() -> None:
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         get_eligibilite_fcu(),
         process_fcu_result(),
-        create_tmp_tables(reset_id_seq=False),
-        import_file_to_db.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        import_files_to_db(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
-        ensure_partition(),
-        copy_tmp_table_to_real_table(),
-        copy_s3_files(),
-        del_s3_files(),
-        delete_tmp_tables(),
+        ensure_partition(selecteur_options=selecteur_options),
+        copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
+        copy_s3_files(selecteur_options=selecteur_options),
+        del_s3_files(selecteur_options=selecteur_options),
+        delete_tmp_tables(selecteur_options=selecteur_options),
     )
 
 

@@ -18,6 +18,7 @@ from utils.tasks.sql import (
     delete_tmp_tables,
     create_projet_snapshot,
     get_projet_snapshot,
+    import_files_to_db,
     refresh_views,
     # set_dataset_last_update_date,
 )
@@ -36,7 +37,7 @@ from dags.sg.siep.mmsi.oad.indicateurs.tasks import (
     oad_indic_to_parquet,
     tasks_oad_indicateurs,
 )
-
+from dags.sg.siep.mmsi.oad.config import selecteur_options
 
 # Mails
 nom_projet = "Outil aide diagnostic"
@@ -103,16 +104,17 @@ def oad() -> None:
         convert_file_to_parquet(),
         tasks_oad_caracteristiques(),
         tasks_oad_indicateurs(),
-        create_tmp_tables(),
-        import_file_to_db.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        create_tmp_tables(selecteur_options=selecteur_options),
+        import_files_to_db(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
-        ensure_partition(),
-        copy_tmp_table_to_real_table(),
+        ensure_partition(selecteur_options=selecteur_options),
+        copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
         refresh_views(),
-        copy_s3_files(),
-        del_s3_files(),
-        delete_tmp_tables(),
+        copy_s3_files(selecteur_options=selecteur_options),
+        del_s3_files(selecteur_options=selecteur_options),
+        delete_tmp_tables(selecteur_options=selecteur_options),
         end_task,
     )
 

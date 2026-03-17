@@ -5,11 +5,10 @@ from enums.dags import DagStatus
 from _types.dags import DBParams, FeatureFlags
 from utils.tasks.sql import (
     create_tmp_tables,
-    import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
+    import_files_to_db,
 )
-from utils.config.tasks import get_list_selector_info
 from utils.config.dag_params import create_dag_params, create_default_args
 
 from utils.tasks.grist import download_grist_doc_to_s3
@@ -19,6 +18,9 @@ from dags.sg.dsci.carte_identite_mef.tasks import (
     budget,
     taux_agent,
     plafond,
+)
+from dags.sg.dsci.carte_identite_mef.config import (
+    selecteur_options,
 )
 
 
@@ -49,12 +51,17 @@ def carte_identite_mef_dag() -> None:
             workspace_id="dsci",
         ),
         [effectif(), budget(), taux_agent(), plafond()],
-        create_tmp_tables(),
-        import_file_to_db.partial(keep_file_id_col=True).expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        import_files_to_db(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
-        copy_tmp_table_to_real_table(),
-        delete_tmp_tables(),
+        copy_tmp_table_to_real_table(
+            selecteur_options=selecteur_options,
+        ),
+        delete_tmp_tables(
+            selecteur_options=selecteur_options,
+        ),
     )
 
 
