@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Mapping
 from _types.projet import ProjetS3, SelecteurConfig, SelecteurStorageOptions
 
-from airflow.sdk import chain, task, task_group
+from airflow.sdk import chain, get_current_context, task, task_group
 import pandas as pd
 
 from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
@@ -191,9 +191,12 @@ def write_to_s3(
     catalog.write_table(table_name=table_name, df=df)
 
 
-@task
+@task(map_index_template="{{ task_name }}")
 def copy_staging_to_prod(selecteur_config: SelecteurConfig) -> None:
     """Copy Iceberg tables from staging key to prod key"""
+
+    context = get_current_context()
+    context["task_name"] = selecteur_config.selecteur_info.selecteur  # type: ignore
 
     if selecteur_config.selecteur_info.selecteur == "grist_doc":
         logging.info(msg="Grist doc selecteur. Skipping ...")
