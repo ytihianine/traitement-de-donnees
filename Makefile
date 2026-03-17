@@ -1,7 +1,7 @@
 
 # Variables
 PYTHON_VERSION=3.12
-AIRFLOW_VERSION=3.1.7
+AIRFLOW_VERSION=3.1.8
 ENV_NAME = env
 
 install-sys-packages: ## Installer les packages système nécessaires (libxml2-dev, libxmlsec1-dev, pkg-config)
@@ -29,16 +29,16 @@ create-py-env: ## Créer un nouvel environnement python
 
 install-airflow: ## Installer les packages liés à la version d'Airflow
 	@echo "Installation des packages Airflow python_version=$(PYTHON_VERSION) & airflow_version=$(AIRFLOW_VERSION)"
-	uv pip install --python $(ENV_NAME)/bin/python "apache-airflow==$(AIRFLOW_VERSION)" \
+	$(ENV_NAME)/bin/uv pip install --python $(ENV_NAME)/bin/python "apache-airflow==$(AIRFLOW_VERSION)" \
 		--constraint "https://raw.githubusercontent.com/apache/airflow/constraints-$(AIRFLOW_VERSION)/constraints-$(PYTHON_VERSION).txt"
 
 install-packages: ## Installer les packages python complémentaires
-	pip install uv
+	/usr/bin/python3 -m venv $(ENV_NAME)
 	@echo "Création d'un nouvel environnement python avec uv"
-	uv venv $(ENV_NAME)
-	uv pip install --python $(ENV_NAME)/bin/python -e .
-	uv pip install --python $(ENV_NAME)/bin/python -r requirements.txt --prerelease=allow
-	uv pip install --python $(ENV_NAME)/bin/python -r requirements_dev.txt --prerelease=allow
+	$(ENV_NAME)/bin/python -m pip install uv
+	$(ENV_NAME)/bin/uv pip install --python $(ENV_NAME)/bin/python -e .
+	$(ENV_NAME)/bin/uv pip install --python $(ENV_NAME)/bin/python -r requirements.txt --prerelease=allow
+	$(ENV_NAME)/bin/uv pip install --python $(ENV_NAME)/bin/python -r requirements_dev.txt --prerelease=allow
 
 install-pre-commit: ## Installer les pre-commits
 	@echo "Installation des pre-commits"
