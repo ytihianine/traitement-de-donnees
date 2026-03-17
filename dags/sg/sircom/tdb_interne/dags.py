@@ -6,19 +6,18 @@ from enums.dags import DagStatus
 from _types.dags import DBParams, FeatureFlags
 from utils.tasks.sql import (
     create_tmp_tables,
-    import_file_to_db,
+    import_files_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     create_projet_snapshot,
     get_projet_snapshot,
 )
-from utils.config.tasks import get_list_selector_info
 from utils.config.dag_params import create_default_args, create_dag_params
 
 from utils.tasks.validation import validate_dag_parameters
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.tasks.s3 import (
-    copy_staging_to_prod,
+    iceberg_copy_staging_to_prod,
 )
 from dags.sg.sircom.tdb_interne.tasks import (
     abonnes_visites,
@@ -27,7 +26,9 @@ from dags.sg.sircom.tdb_interne.tasks import (
     metiers,
     ressources_humaines,
 )
-
+from dags.sg.sircom.tdb_interne.config import (
+    selecteur_options,
+)
 
 # Mails
 nom_projet = "TdB interne - SIRCOM"
@@ -69,13 +70,15 @@ def tdb_sircom() -> None:
         get_projet_snapshot(),
         [abonnes_visites(), budget(), enquetes(), metiers(), ressources_humaines()],
         create_tmp_tables(),
-        import_file_to_db.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        import_files_to_db(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
         copy_tmp_table_to_real_table(),
         delete_tmp_tables(),
-        copy_staging_to_prod.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        iceberg_copy_staging_to_prod(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
     )
 
