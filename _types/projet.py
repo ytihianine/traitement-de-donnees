@@ -137,6 +137,7 @@ class SelecteurStorageOptions:
     # Database
     db_conn_id: str = DEFAULT_PG_DATA_CONN_ID
     write_to_db: bool = True
+    use_prod_schema: bool = True
     tbl_order: int = 0
     keep_file_id_col: bool = False
     is_partitioned: bool = False
