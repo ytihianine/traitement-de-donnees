@@ -693,7 +693,7 @@ def import_file_to_db_v2(
         )
     else:
         # Variables
-        local_filepath = "/tmp/" + selecteur_config.selecteur_info.filename
+        local_filepath = selecteur_config.get_local_path()
         s3_filepath = selecteur_config.get_full_s3_key(with_tmp_segment=True)
 
         # Check if old file exists
