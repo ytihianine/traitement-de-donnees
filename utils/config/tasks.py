@@ -209,7 +209,7 @@ def merge_selecteur_config(
 
 
 @db_retry
-def _get_selecteur_config(
+def _get_selecteur_storage_info(
     context: Mapping[str, Any] | None = None,
     nom_projet: str | None = None,
     selecteur: str | None = None,
@@ -294,7 +294,7 @@ def get_list_selecteur_config(
     Returns:
         List of SelecteurStorageInfo objects for all selecteurs
     """
-    return _get_selecteur_config(
+    return _get_selecteur_storage_info(
         context=context, nom_projet=nom_projet, selecteur=None, local_dir=local_dir
     )
 
@@ -319,7 +319,7 @@ def get_selecteur_config(
     Raises:
         ConfigError: If no configuration is found
     """
-    configs = _get_selecteur_config(
+    configs = _get_selecteur_storage_info(
         context=context, nom_projet=nom_projet, selecteur=selecteur, local_dir=local_dir
     )
 
@@ -335,9 +335,9 @@ def get_selecteur_config(
 
 def get_source_grist() -> list[SelecteurStorageInfo]:
     """Get SelecteurStorageInfo for all selecteurs with grist source."""
-    return _get_selecteur_config(only_source=True, only_grist=True)
+    return _get_selecteur_storage_info(only_source=True, only_grist=True)
 
 
 def get_source_fichier() -> list[SelecteurStorageInfo]:
     """Get SelecteurStorageInfo for all selecteurs with file source."""
-    return _get_selecteur_config(only_source=True, only_fichier=True)
+    return _get_selecteur_storage_info(only_source=True, only_fichier=True)
