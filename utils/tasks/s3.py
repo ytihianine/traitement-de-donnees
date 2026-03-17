@@ -33,15 +33,15 @@ from utils.config.vars import (
 
 @task
 def copy_s3_files(
-    projet_s3: ProjetS3 | None = None,
+    selecteur_options: Mapping[str, SelecteurStorageOptions],
     connection_id: str = DEFAULT_S3_CONN_ID,
-    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
     **context: Mapping[str, Any],
 ) -> None:
     """Copy files to S3 storage.
 
     Args:
-        bucket: Target S3 bucket
+        selecteur_options: Mapping of selecteur options
+        projet_s3: Project S3 information
         connection_id: S3 connection ID
         context: Airflow context
 
@@ -56,9 +56,6 @@ def copy_s3_files(
     execution_date = get_execution_date(context=context, use_tz=False)
     curr_day = execution_date.strftime(format="%Y%m%d")
     curr_time = execution_date.strftime(format="%Hh%M")
-
-    if projet_s3 is None:
-        projet_s3 = get_projet_s3_info(nom_projet=nom_projet)
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
@@ -118,7 +115,7 @@ def del_s3_files(
 
     Args:
         selecteur_options: Mapping of selecteur options
-        connection_id: S3 connection ID
+        s3_conn_id: S3 connection ID
         context: Airflow context
 
     Raises:
