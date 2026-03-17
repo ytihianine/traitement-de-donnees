@@ -1,6 +1,5 @@
 """Functions for retrieving and managing project configurations."""
 
-from pathlib import Path
 from typing import Any, Mapping, Optional
 import logging
 
@@ -831,10 +830,7 @@ def _get_selecteur_storage_info(
 
     records = df.to_dict("records")
     return [
-        SelecteurStorageInfo(
-            **{str(k): v for k, v in record.items()},
-            local_path=str(Path(local_dir) / record["filename"]),
-        )
+        SelecteurStorageInfo(**{str(k): v for k, v in record.items()}, local_dir="/tmp")
         for record in records
     ]
 
