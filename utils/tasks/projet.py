@@ -101,9 +101,25 @@ def get_selecteur_config(
     return [asdict(obj=s3_db_conf) for s3_db_conf in selecteur_config]
 
 
+@task()
+def show_selecteur_config(config: Mapping[str, Any]) -> None:
+    """Task to display selecteur configuration."""
+    print(config)
+
+
+@task_group()
+def selecteur_tasks(nom_projet: str, **context) -> None:
+    """Group of tasks to fetch selecteur configurations."""
+    selecteur_info = get_list_selecteur_storage_info(
+        nom_projet=nom_projet, context=context
+    )
+
+    chain(show_selecteur_config.expand(config=selecteur_info))
+
+
 @task_group()
 def config_projet_group(
-    nom_projet: str | None = None,
+    nom_projet: str,
     selecteur_mapping: Mapping[str, SelecteurStorageOptions] | None = None,
     **context
 ) -> None:
@@ -129,5 +145,6 @@ def config_projet_group(
                 selecteur_mapping=selecteur_mapping,
                 context=context,
             ),
+            selecteur_tasks(nom_projet=nom_projet, context=context),
         ]
     )
