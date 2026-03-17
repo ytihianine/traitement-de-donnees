@@ -108,13 +108,20 @@ def show_selecteur_config(config: Mapping[str, Any]) -> None:
 
 
 @task_group()
-def selecteur_tasks(nom_projet: str, **context) -> None:
+def selecteur_tasks(
+    nom_projet: str,
+    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
+    **context
+) -> None:
     """Group of tasks to fetch selecteur configurations."""
     selecteur_info = get_list_selecteur_storage_info(
         nom_projet=nom_projet, context=context
     )
+    selecteur_config = merge_selecteur_config(
+        selecteur_info=selecteur_info, options_map=selecteur_options
+    )
 
-    chain(show_selecteur_config.expand(config=selecteur_info))
+    chain(show_selecteur_config.expand(config=selecteur_config))
 
 
 @task_group()
