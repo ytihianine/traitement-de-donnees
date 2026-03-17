@@ -2,15 +2,16 @@
 
 import logging
 import textwrap
-from typing import Optional
+from typing import Mapping, Optional
 from datetime import datetime, timedelta
 
-from airflow.sdk import task
+from airflow.sdk import chain, task, task_group
 from airflow.sdk import get_current_context
 
 from infra.database.base import BaseDBHandler
 from infra.database.factory import create_db_handler
 
+from infra.file_handling.base import BaseFileHandler
 from infra.file_handling.dataframe import read_dataframe
 from infra.file_handling.factory import create_default_s3_handler, create_local_handler
 
@@ -21,13 +22,23 @@ from utils.config.dag_params import (
     get_feature_flags,
     get_project_name,
 )
-from utils.config.tasks import get_list_database_info, get_list_table_name
+from utils.config.tasks import (
+    get_list_database_info,
+    get_list_selecteur_storage_info,
+    get_list_table_name,
+    merge_selecteur_config,
+)
 from enums.database import (
     LoadStrategy,
     PartitionTimePeriod,
 )
 from _types.dags import DagStatus
-from _types.projet import DbInfo, SelecteurInfo
+from _types.projet import (
+    DbInfo,
+    SelecteurConfig,
+    SelecteurInfo,
+    SelecteurStorageOptions,
+)
 from utils.control.structures import are_lists_egal
 from utils.config.vars import (
     DEFAULT_TMP_SCHEMA,
@@ -633,6 +644,134 @@ def import_file_to_db(
 
         # Clean up local file
         local_handler.delete(file_path=local_filepath)
+
+
+@task(map_index_template="{{ import_task_name }}")
+def import_file_to_db_v2(
+    selecteur_config: SelecteurConfig,
+    s3_handler: BaseFileHandler,
+    local_handler: BaseFileHandler,
+    db_handler: BaseDBHandler,
+    **context,
+) -> None:
+    selecteur = selecteur_config.selecteur_info.selecteur
+    db_info = get_db_info(context=context)
+    context = get_current_context()
+    context["import_task_name"] = selecteur  # type: ignore
+
+    dag_status = get_dag_status(context=context)
+    db_enable = get_feature_flags(context=context).db
+
+    if dag_status == DagStatus.DEV:
+        print("Dag status parameter is set to DEV -> skipping this task ...")
+        return
+
+    if not db_enable:
+        print(FF_DB_DISABLED_MSG)
+        return
+
+    if selecteur_config.options.write_to_db is False:
+        logging.info(
+            msg=f"write_to_db option is set to False for selecteur <{selecteur}>. Skipping import to db ..."
+        )
+        return
+
+    if selecteur_config.options.use_prod_schema:
+        schema = db_info.prod_schema
+    else:
+        schema = db_info.tmp_schema
+
+    # Variables
+    tbl_name = selecteur_config.selecteur_info.tbl_name
+
+    if tbl_name is None or tbl_name == "":
+        logging.info(
+            msg=f"tbl_name is None for selecteur <{selecteur}>. Nothing to import to db"
+        )
+    else:
+        # Variables
+        local_filepath = "/tmp/" + selecteur_config.selecteur_info.filename
+        s3_filepath = selecteur_config.get_full_s3_key()
+
+        # Check if old file exists
+        local_handler.delete(file_path=local_filepath)
+
+        # Read data from s3, sort its columns and save it locally
+        logging.info(msg=f"Reading file from remote < {s3_filepath} >")
+        df = read_dataframe(file_handler=s3_handler, file_path=s3_filepath)
+
+        sorted_df_cols = sorted(df.columns)
+        df = df.reindex(labels=sorted_df_cols, axis=1).convert_dtypes()
+        logging.info(msg=f"DF : {sorted_df_cols}")
+        logging.info(msg=f"Saving file to local < {local_filepath} >")
+        local_handler.write(
+            file_path=local_filepath,
+            content=df.to_csv(index=False, sep="\t", na_rep="NULL"),
+        )
+
+        # Check if columns are the same between df and db table
+        sorted_db_colnames = sort_db_colnames(
+            tbl_name=tbl_name,
+            keep_file_id_col=selecteur_config.options.keep_file_id_col,
+            pg_conn_id=selecteur_config.options.db_conn_id,
+            schema=schema,
+        )
+        if not are_lists_egal(list_A=sorted_df_cols, list_B=sorted_db_colnames):
+            raise ValueError(
+                textwrap.dedent(
+                    text="""
+                Il y a des différences entre les colonnes du DataFrame et de la Table.
+                Impossible d'importer les données.
+            """
+                )
+            )
+
+        # Bulk load file to db
+        bulk_load_local_tsv_file_to_db(
+            local_filepath=local_filepath,
+            tbl_name=tbl_name,
+            column_names=sorted_db_colnames,
+            db_handler=db_handler,
+        )
+
+        # Clean up local file
+        local_handler.delete(file_path=local_filepath)
+
+
+@task_group()
+def import_files_to_db(
+    nom_projet: str | None = None,
+    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
+    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    s3_conn_id: str = DEFAULT_S3_CONN_ID,
+    **context,
+) -> None:
+    """Group of tasks to import files to db."""
+    if nom_projet is None:
+        nom_projet = get_project_name(context=context)
+
+    # Get selecteur config
+    selecteur_info = get_list_selecteur_storage_info(
+        nom_projet=nom_projet, context=context
+    )
+    selecteur_config = merge_selecteur_config(
+        selecteur_info=selecteur_info, options_map=selecteur_options
+    )
+
+    # Define hooks
+    db_handler = create_db_handler(connection_id=pg_conn_id)
+    s3_handler = create_default_s3_handler(connection_id=s3_conn_id)
+    local_handler = create_local_handler(base_path=None)
+
+    chain(
+        import_file_to_db_v2.partial(
+            db_handler=db_handler,
+            s3_handler=s3_handler,
+            local_handler=local_handler,
+        ).expand(
+            selecteur_config=selecteur_config,
+        ),
+    )
 
 
 @task(task_id="set_dataset_last_update")
