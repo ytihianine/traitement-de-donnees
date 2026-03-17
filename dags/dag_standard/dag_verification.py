@@ -113,7 +113,9 @@ def dag_verification() -> None:
             config_projet_group(
                 nom_projet=nom_projet, selecteur_mapping=selecteur_mapping
             ),
-            import_files_to_db(selecteur_options=selecteur_mapping),
+            import_files_to_db(
+                nom_projet=nom_projet, selecteur_options=selecteur_mapping
+            ),
             iceberg_task(),
         ],
     )
