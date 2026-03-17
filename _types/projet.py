@@ -44,6 +44,7 @@ class SelecteurStorageInfo:
     projet: str
     selecteur: str
     type_source: TypeSource
+    id_source: str
     # s3 info
     bucket: str
     s3_key: str
