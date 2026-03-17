@@ -55,7 +55,10 @@ class SelecteurStorageInfo:
     id_source: str | None = None
 
     def get_full_s3_key(
-        self, with_bucket: bool = False, with_tmp_segment: bool = False
+        self,
+        with_bucket: bool = False,
+        with_tmp_segment: bool = False,
+        use_id_source: bool = False,
     ) -> str:
         segments = [self.s3_key]
         if with_bucket:
@@ -63,7 +66,11 @@ class SelecteurStorageInfo:
         if with_tmp_segment:
             segments.append("tmp")
 
-        segments.append(self.filename)
+        if use_id_source and self.id_source is not None:
+            segments.append(self.id_source)
+        else:
+            segments.append(self.filename)
+
         return "/".join(segments)
 
     def get_local_path(self) -> str:
