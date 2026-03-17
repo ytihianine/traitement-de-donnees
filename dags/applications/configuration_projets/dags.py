@@ -7,11 +7,12 @@ from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
-    import_file_to_db,
+    # import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     create_projet_snapshot,
     get_projet_snapshot,
+    import_files_to_db,
 )
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
@@ -27,7 +28,9 @@ from utils.tasks.s3 import (
 from dags.applications.configuration_projets.tasks import (
     process_data,
 )
-
+from dags.applications.configuration_projets.config import (
+    selecteur_options,
+)
 
 nom_projet = "Configuration des projets"
 
@@ -67,9 +70,10 @@ def configuration_projets() -> None:
         process_data(),
         delete_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
         create_tmp_tables(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, reset_id_seq=False),
-        import_file_to_db.partial(
-            pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, keep_file_id_col=True
-        ).expand(selecteur_info=get_list_selector_info(nom_projet=nom_projet)),
+        # import_file_to_db.partial(
+        #     pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID, keep_file_id_col=True
+        # ).expand(selecteur_info=get_list_selector_info(nom_projet=nom_projet)),
+        import_files_to_db(nom_projet=nom_projet, selecteur_options=selecteur_options),
         copy_tmp_table_to_real_table(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID),
         copy_s3_files(),
         del_s3_files(),
