@@ -515,7 +515,9 @@ def sort_db_colnames(
         cols = df.loc[df["column_name"] != "id", "column_name"].tolist()
 
     sorted_cols = sorted(cols)
-    logging.info(msg=f"Sorted columns for table {tbl_name}: {sorted_cols}")
+    logging.info(
+        msg=f"Sorted columns for > {pg_conn_id} - {schema}.{tbl_name}: {sorted_cols}"
+    )
     return sorted_cols
 
 
