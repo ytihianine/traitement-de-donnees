@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 
 from enums.database import LoadStrategy, PartitionTimePeriod
 from utils.config.vars import DEFAULT_S3_CONN_ID, DEFAULT_PG_DATA_CONN_ID
@@ -123,7 +124,7 @@ class SelecteurStorageInfo:
     bucket: str
     s3_key: str
     filename: str
-    local_path: str
+    local_dir: str
     # db info
     tbl_name: str
 
@@ -170,3 +171,10 @@ class SelecteurConfig:
 
         segments.append(self.selecteur_info.filename)
         return "/".join(segments)
+
+    def get_local_path(self) -> str:
+        if self.selecteur_info.filename is None:
+            return str(
+                Path(self.selecteur_info.local_dir) / "filename_undefined"
+            )  # noqa
+        return str(Path(self.selecteur_info.local_dir) / self.selecteur_info.filename)
