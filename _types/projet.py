@@ -7,17 +7,6 @@ from utils.config.vars import DEFAULT_S3_CONN_ID, DEFAULT_PG_DATA_CONN_ID
 
 
 @dataclass(frozen=True)
-class DbInfo:
-    projet: str
-    selecteur: str
-    tbl_name: str
-    tbl_order: int
-    is_partitionned: bool
-    partition_period: str
-    load_strategy: str
-
-
-@dataclass(frozen=True)
 class ProjetS3:
     projet: str
     bucket: str
