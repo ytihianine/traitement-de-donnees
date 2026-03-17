@@ -178,3 +178,8 @@ class SelecteurConfig:
                 Path(self.selecteur_info.local_dir) / "filename_undefined"
             )  # noqa
         return str(Path(self.selecteur_info.local_dir) / self.selecteur_info.filename)
+
+    def get_iceberg_namespace(self, with_bucket: bool = False) -> str:
+        s3_key = self.get_full_s3_key(with_bucket=with_bucket)
+        namespace_split = s3_key.split(sep=".")[0].split(sep="/")[:-1]
+        return ".".join(namespace_split)
