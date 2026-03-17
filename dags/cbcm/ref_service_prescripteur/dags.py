@@ -10,7 +10,8 @@ from enums.dags import DagStatus
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.tasks.sql import (
     create_tmp_tables,
-    import_file_to_db,
+    # import_file_to_db,
+    import_files_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     get_projet_snapshot,
@@ -28,6 +29,7 @@ from dags.cbcm.ref_service_prescripteur.tasks import (
     fetch_from_db,
     load_to_grist,
 )
+from dags.cbcm.ref_service_prescripteur.config import selecteur_options
 
 
 # Variables
@@ -70,8 +72,12 @@ def chorus_service_prescripteur() -> None:
         fetch_from_db(),
         load_to_grist(),
         create_tmp_tables(reset_id_seq=False),
-        import_file_to_db.partial(keep_file_id_col=True).expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        # import_file_to_db.partial(keep_file_id_col=True).expand(
+        #     selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        # ),
+        import_files_to_db(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
         copy_tmp_table_to_real_table(),
         copy_s3_files(),
