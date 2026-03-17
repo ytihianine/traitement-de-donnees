@@ -139,8 +139,8 @@ class SelecteurStorageOptions:
     write_to_db: bool = True
     use_prod_schema: bool = True
     tbl_order: int = 0
-    keep_file_id_col: bool = False
-    is_partitioned: bool = False
+    keep_file_id_col: bool = True
+    is_partitioned: bool = True
     partition_period: PartitionTimePeriod = PartitionTimePeriod.DAY
     load_strategy: LoadStrategy = LoadStrategy.INCREMENTAL
 
