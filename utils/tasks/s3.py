@@ -1,10 +1,11 @@
 """MinIO/S3 task utilities using infrastructure handlers."""
 
 import logging
+from pathlib import Path
 from typing import Any, Mapping
-from _types.projet import ProjetS3, SelecteurS3
+from _types.projet import ProjetS3, SelecteurConfig, SelecteurStorageOptions
 
-from airflow.sdk import task
+from airflow.sdk import chain, task, task_group
 import pandas as pd
 
 from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
@@ -17,9 +18,11 @@ from utils.config.dag_params import (
     get_project_name,
 )
 from utils.config.tasks import (
+    get_list_selecteur_storage_info,
     get_projet_s3_info,
     get_projet_selecteur_s3,
     get_list_source_fichier,
+    merge_selecteur_config,
 )
 from enums.dags import DagStatus
 from enums.filesystem import FileHandlerType, IcebergTableStatus
@@ -189,17 +192,17 @@ def write_to_s3(
 
 
 @task
-def copy_staging_to_prod(selecteur_info: SelecteurS3, **context) -> None:
+def copy_staging_to_prod(selecteur_config: SelecteurConfig) -> None:
     """Copy Iceberg tables from staging key to prod key"""
 
-    if selecteur_info.selecteur == "grist_doc":
+    if selecteur_config.selecteur_info.selecteur == "grist_doc":
         logging.info(msg="Grist doc selecteur. Skipping ...")
         return
 
     # Dag info
-    key_split = selecteur_info.filepath_s3.split(sep=".")[0].split(sep="/")
-    tbl_name = key_split.pop(-1)
-    namespace = ".".join(key_split)
+    namespace = selecteur_config.get_iceberg_namespace(with_bucket=False)
+    tbl_name = Path(selecteur_config.selecteur_info.filename).stem
+
     # Get catalog
     properties = generate_catalog_properties(
         uri=DEFAULT_POLARIS_HOST,
@@ -218,3 +221,28 @@ def copy_staging_to_prod(selecteur_info: SelecteurS3, **context) -> None:
         table_name=tbl_name,
     )
     catalog.drop_table(table_name=namespace + "." + tbl_name + "_staging", purge=True)
+
+
+@task_group()
+def iceberg_copy_staging_to_prod(
+    nom_projet: str | None = None,
+    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
+    **context,
+) -> None:
+    """Copy Iceberg tables from staging key to prod key in parallel"""
+    if nom_projet is None:
+        nom_projet = get_project_name(context=context)
+
+    # Get selecteur config
+    selecteur_info = get_list_selecteur_storage_info(
+        nom_projet=nom_projet, context=context
+    )
+    selecteur_config = merge_selecteur_config(
+        selecteur_info=selecteur_info, options_map=selecteur_options
+    )
+
+    chain(
+        copy_staging_to_prod.expand(
+            selecteur_config=selecteur_config,
+        ),
+    )
