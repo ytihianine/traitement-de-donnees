@@ -13,19 +13,19 @@ from utils.tasks.sql import (
     delete_tmp_tables,
     create_projet_snapshot,
     get_projet_snapshot,
-    import_file_to_db,
+    import_files_to_db,
     ensure_partition,
-    # set_dataset_last_update_date,
 )
 
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from utils.config.tasks import get_list_source_fichier_key, get_list_selector_info
+from utils.config.tasks import get_list_source_fichier
 
 from utils.tasks.validation import validate_dag_parameters
 from dags.sg.snum.certificats_igc.tasks import source_files, output_files
+from dags.sg.snum.certificats_igc.config import selecteur_options
 
 
 nom_projet = "Certificat IGC"
@@ -57,7 +57,7 @@ def certificats_igc() -> None:
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
         bucket_name="dsci",
-        bucket_key=get_list_source_fichier_key(nom_projet=nom_projet),
+        bucket_key=get_list_source_fichier(nom_projet=nom_projet),
         mode="reschedule",
         poke_interval=timedelta(seconds=30),
         timeout=timedelta(minutes=13),
@@ -74,15 +74,16 @@ def certificats_igc() -> None:
         get_projet_snapshot(),
         source_files(),
         output_files(),
-        ensure_partition(),
-        create_tmp_tables(),
-        import_file_to_db.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
+        ensure_partition(selecteur_options=selecteur_options),
+        create_tmp_tables(selecteur_options=selecteur_options),
+        import_files_to_db(
+            nom_projet=nom_projet,
+            selecteur_options=selecteur_options,
         ),
-        copy_tmp_table_to_real_table(),
-        copy_s3_files(),
-        del_s3_files(),
-        delete_tmp_tables(),
+        copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
+        copy_s3_files(selecteur_options=selecteur_options),
+        del_s3_files(selecteur_options=selecteur_options),
+        delete_tmp_tables(selecteur_options=selecteur_options),
     )
 
 

@@ -22,6 +22,7 @@ from utils.tasks.s3 import (
     del_s3_files,
 )
 from utils.config.dag_params import create_default_args, create_dag_params
+from utils.config.tasks import get_list_source_fichier
 
 from utils.tasks.validation import validate_dag_parameters
 from dags.cbcm.donnee_comptable.tasks import (
@@ -69,7 +70,7 @@ def chorus_donnees_comptables() -> None:
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
         bucket_name="dsci",
-        bucket_key=get_list_source_fichier_key(nom_projet=nom_projet),
+        bucket_key=get_list_source_fichier(nom_projet=nom_projet),
         mode="reschedule",
         poke_interval=timedelta(seconds=30),
         timeout=timedelta(minutes=13),

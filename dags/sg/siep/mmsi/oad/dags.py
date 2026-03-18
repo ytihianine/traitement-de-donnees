@@ -8,19 +8,17 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from infra.mails.default_smtp import MailStatus, create_send_mail_callback
 from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
-from utils.config.tasks import get_list_source_fichier_key, get_list_selector_info
+from utils.config.tasks import get_list_source_fichier
 from enums.dags import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
     ensure_partition,
     copy_tmp_table_to_real_table,
-    import_file_to_db,
     delete_tmp_tables,
     create_projet_snapshot,
     get_projet_snapshot,
     import_files_to_db,
     refresh_views,
-    # set_dataset_last_update_date,
 )
 
 from utils.tasks.s3 import (
@@ -70,7 +68,7 @@ def oad() -> None:
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
         bucket_name="dsci",
-        bucket_key=get_list_source_fichier_key(nom_projet=nom_projet),
+        bucket_key=get_list_source_fichier(nom_projet=nom_projet),
         mode="reschedule",
         poke_interval=timedelta(seconds=30),
         timeout=timedelta(minutes=13),

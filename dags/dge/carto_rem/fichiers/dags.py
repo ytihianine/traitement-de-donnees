@@ -19,7 +19,7 @@ from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-
+from utils.config.tasks import get_list_source_fichier
 from utils.tasks.validation import validate_dag_parameters
 from dags.dge.carto_rem.fichiers.tasks import (
     source_files,
@@ -62,7 +62,7 @@ def cartographie_remuneration() -> None:
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
         bucket_name="dsci",
-        bucket_key=get_list_source_fichier_key(nom_projet=nom_projet),
+        bucket_key=get_list_source_fichier(nom_projet=nom_projet),
         mode="reschedule",
         poke_interval=timedelta(seconds=30),
         timeout=timedelta(minutes=13),
