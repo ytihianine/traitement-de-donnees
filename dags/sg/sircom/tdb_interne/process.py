@@ -90,6 +90,9 @@ def process_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
     # Add additionnal info
     df = tag_last_value_rows(df=df, colname_max_value="date")
 
+    df = df.sort_values(by=["date", "reseaux_sociaux"]).reset_index(drop=True)
+    df["id"] = df.index
+
     return df
 
 
@@ -192,6 +195,9 @@ def process_performances_lettres(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("Certaines valeurs ne sont pas entre 0 et 1 !")
 
     df = df.convert_dtypes()
+
+    df = df.sort_values(by=["date", "indicateurs"]).reset_index(drop=True)
+    df["id"] = df.index
 
     return df
 
@@ -501,6 +507,9 @@ def process_engagement_environnement(df: pd.DataFrame) -> pd.DataFrame:
     # Add additionnal info
     df = tag_last_value_rows(df=df, colname_max_value="annee")
 
+    df = df.sort_values(by=["date", "indicateurs"]).reset_index(drop=True)
+    df["id"] = df.index
+
     return df
 
 
@@ -648,5 +657,8 @@ def process_projets_graphiques(df: pd.DataFrame) -> pd.DataFrame:
     if not is_upper(df=df, cols_to_check=cols_to_check, seuil=0, inclusive=True):
         raise ValueError("Erreur : Certaines valeurs de projet sont négatives !")
     df = tag_last_value_rows(df=df, colname_max_value="date")
+
+    df = df.sort_values(by=["date", "commanditaire"]).reset_index(drop=True)
+    df["id"] = df.index
 
     return df
