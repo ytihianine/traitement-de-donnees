@@ -82,8 +82,6 @@ def copy_s3_files(
             )
             continue
 
-        print(config.selecteur_info.type_source)
-        print(type(config.selecteur_info.type_source))
         if config.selecteur_info.type_source == TypeSource.FILE:
             target_key = f"{config.selecteur_info.s3_key}/{curr_day}/{curr_time}/{config.selecteur_info.id_source}"
             try:
