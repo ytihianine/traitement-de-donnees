@@ -22,7 +22,9 @@ def get_documentation_task(
     nom_projet: str | None = None, **context
 ) -> list[Mapping[str, Any]]:
     """Task to fetch project documentation at runtime."""
-    docs = get_list_documentation(nom_projet=nom_projet, context=context)
+    if nom_projet is None:
+        nom_projet = get_project_name(context=context)
+    docs = get_list_documentation(nom_projet=nom_projet)
     return [asdict(obj=doc) for doc in docs]
 
 
@@ -31,7 +33,9 @@ def get_contact_task(
     nom_projet: str | None = None, **context
 ) -> list[Mapping[str, Any]]:
     """Task to fetch project contacts at runtime."""
-    contacts = get_list_contact(nom_projet=nom_projet, context=context)
+    if nom_projet is None:
+        nom_projet = get_project_name(context=context)
+    contacts = get_list_contact(nom_projet=nom_projet)
     return [asdict(obj=contact) for contact in contacts]
 
 
@@ -54,12 +58,9 @@ def show_selecteur_config(config: Mapping[str, Any]) -> None:
 def get_selecteur_config(
     nom_projet: str,
     selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
-    **context
 ) -> None:
     """Group of tasks to fetch selecteur configurations."""
-    selecteur_info = get_list_selecteur_storage_info(
-        nom_projet=nom_projet, context=context
-    )
+    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
         selecteur_info=selecteur_info, options_map=selecteur_options
     )
@@ -90,7 +91,6 @@ def config_projet_group(
             get_selecteur_config(
                 nom_projet=nom_projet,
                 selecteur_options=selecteur_mapping,
-                context=context,
             ),
         ]
     )

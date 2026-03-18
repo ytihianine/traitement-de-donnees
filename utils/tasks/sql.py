@@ -1,6 +1,5 @@
 """SQL task utilities using infrastructure handlers."""
 
-from calendar import c
 import logging
 import textwrap
 from typing import Mapping, Optional
@@ -261,9 +260,7 @@ def ensure_partition(
 
     # Récupérer les informations de la table parente
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(
-        nom_projet=nom_projet, context=context
-    )
+    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
         selecteur_info=selecteur_info, options_map=selecteur_options
     )
@@ -330,9 +327,7 @@ def create_tmp_tables(
     db = create_db_handler(connection_id=pg_conn_id)
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(
-        nom_projet=nom_projet, context=context
-    )
+    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
         selecteur_info=selecteur_info, options_map=selecteur_options
     )
@@ -395,9 +390,7 @@ def delete_tmp_tables(
     tmp_schema = db_info.tmp_schema
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(
-        nom_projet=nom_projet, context=context
-    )
+    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
         selecteur_info=selecteur_info, options_map=selecteur_options
     )
@@ -450,9 +443,7 @@ def copy_tmp_table_to_real_table(
     db_handler = create_db_handler(connection_id=pg_conn_id)
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(
-        nom_projet=nom_projet, context=context
-    )
+    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
         selecteur_info=selecteur_info, options_map=selecteur_options
     )
@@ -708,9 +699,7 @@ def import_files_to_db(
         nom_projet = get_project_name(context=context)
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(
-        nom_projet=nom_projet, context=context
-    )
+    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
         selecteur_info=selecteur_info, options_map=selecteur_options
     )

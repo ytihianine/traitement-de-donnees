@@ -70,9 +70,7 @@ def copy_s3_files(
     )
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(
-        nom_projet=nom_projet, context=context
-    )
+    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
         selecteur_info=selecteur_info, options_map=selecteur_options
     )
@@ -140,9 +138,7 @@ def del_s3_files(
     )
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(
-        nom_projet=nom_projet, context=context
-    )
+    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
         selecteur_info=selecteur_info, options_map=selecteur_options
     )
@@ -241,9 +237,7 @@ def iceberg_copy_staging_to_prod(
         nom_projet = get_project_name(context=context)
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(
-        nom_projet=nom_projet, context=context
-    )
+    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
         selecteur_info=selecteur_info, options_map=selecteur_options
     )
