@@ -7,7 +7,7 @@ from typing import Any, Mapping
 from airflow.sdk import chain, get_current_context, task, task_group
 import pandas as pd
 
-from _types.projet import ProjetS3, SelecteurConfig, SelecteurStorageOptions
+from _types.projet import SelecteurConfig, SelecteurStorageOptions
 from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
 from infra.file_handling.factory import create_default_s3_handler
 from infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
@@ -19,11 +19,10 @@ from utils.config.dag_params import (
 )
 from utils.config.tasks import (
     get_list_selecteur_storage_info,
-    get_projet_s3_info,
     merge_selecteur_config,
 )
 from enums.dags import DagStatus, TypeSource
-from enums.filesystem import FileHandlerType, IcebergTableStatus
+from enums.filesystem import IcebergTableStatus
 from utils.config.vars import (
     DEFAULT_POLARIS_HOST,
     DEFAULT_S3_CONN_ID,
