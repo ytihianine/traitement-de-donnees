@@ -328,7 +328,10 @@ DROP VIEW conf_projets.selecteur_s3_db_vw;
 CREATE OR REPLACE VIEW conf_projets.selecteur_s3_db_vw AS
 SELECT
     cpp.projet,
+    cpps.type_selecteur,
     cpps.selecteur,
+    cpss.type_source,
+    cpss.id_source,
     cpss3.filename,
     COALESCE(cpss3.key, cpps3.key) as s3_key,
     cpps3.bucket,
@@ -344,6 +347,9 @@ SELECT
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_selecteur cpps
   ON cpp.id = cpps.id_projet
+LEFT JOIN conf_projets.selecteur_source cpss
+  ON cpps.id = cpss.id_selecteur
+    AND cpps.id_projet = cpss.id_projet
 INNER JOIN conf_projets.projet_s3 cpps3
   ON cpp.id = cpps3.id_projet
 LEFT JOIN conf_projets.selecteur_s3 cpss3
