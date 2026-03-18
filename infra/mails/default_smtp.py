@@ -9,6 +9,7 @@ from utils.config.dag_params import (
     get_dag_status,
     get_execution_date,
     get_feature_flags,
+    get_project_name,
 )
 from _types.dags import DagStatus
 from enums.mail import MailPriority, MailStatus
@@ -140,6 +141,7 @@ def _callback(context: dict[str, Any], mail_status: MailStatus) -> None:
     # If debug mode is ON, we don't want to send any mail
     mail_enable = get_feature_flags(context=context).mail
     dag_status = get_dag_status(context=context)
+    nom_projet = get_project_name(context=context)
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
@@ -149,7 +151,7 @@ def _callback(context: dict[str, Any], mail_status: MailStatus) -> None:
         print(FF_MAIL_DISABLED_MSG)
         return
 
-    projet_contact = get_list_contact(context=context)
+    projet_contact = get_list_contact(nom_projet=nom_projet)
     mail_to = [
         contact.contact_mail for contact in projet_contact if contact.is_mail_generic
     ]
@@ -159,7 +161,7 @@ def _callback(context: dict[str, Any], mail_status: MailStatus) -> None:
         if not contact.is_mail_generic
     ]
 
-    projet_docs = get_list_documentation(context=context)
+    projet_docs = get_list_documentation(nom_projet=nom_projet)
     doc_pipeline = [
         doc.lien for doc in projet_docs if doc.type_documentation == "pipeline"
     ]
