@@ -18,5 +18,5 @@ class TypeDocumentation(Enum):
 class TypeSource(Enum):
     """Type de source de données"""
 
-    GRIST = "grist"
-    FILE = "file"
+    GRIST = "Grist"
+    FILE = "Fichier"
