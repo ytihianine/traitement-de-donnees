@@ -15,8 +15,7 @@ from utils.dataframe import df_info
 from utils.config.tasks import (
     column_mapping_dataframe,
     column_mapping_dict,
-    get_selecteur_s3,
-    get_source_fichier,
+    get_selecteur_storage_info,
 )
 
 TaskParams = Dict[str, Any]
@@ -65,14 +64,19 @@ def create_parquet_converter_task(
         logging.info(
             msg=f"Getting configuration for project {nom_projet} and selector {selecteur}"
         )
-        source = get_source_fichier(nom_projet=nom_projet, selecteur=selecteur)
-        output = get_selecteur_s3(nom_projet=nom_projet, selecteur=selecteur)
+        selecteur_config = get_selecteur_storage_info(
+            nom_projet=nom_projet, selecteur=selecteur
+        )
+        source_key = selecteur_config.get_full_s3_key(use_id_source=True)
+        dest_tmp_key = selecteur_config.get_full_s3_key(
+            with_tmp_segment=True, use_id_source=False
+        )
 
         # Read input file based on extension
-        logging.info(msg=f"Reading file from {source.filepath_source_s3}")
+        logging.info(msg=f"Reading file from {source_key}")
         df = read_dataframe(
             file_handler=s3_handler,
-            file_path=source.filepath_source_s3,
+            file_path=source_key,
             read_options=read_options,
         )
 
@@ -101,8 +105,8 @@ def create_parquet_converter_task(
 
         # Convert to parquet and save
         parquet_data = df.to_parquet(path=None, index=False)
-        logging.info(msg=f"Saving to {output.filepath_tmp_s3}")
-        s3_handler.write(file_path=output.filepath_tmp_s3, content=parquet_data)
-        logging.info(msg=f"Successfully saved parquet file to {output.filepath_tmp_s3}")
+        logging.info(msg=f"Saving to {dest_tmp_key}")
+        s3_handler.write(file_path=dest_tmp_key, content=parquet_data)
+        logging.info(msg=f"Successfully saved parquet file to {dest_tmp_key}")
 
     return convert_to_parquet
