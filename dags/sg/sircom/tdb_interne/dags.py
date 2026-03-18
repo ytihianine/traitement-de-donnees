@@ -68,7 +68,11 @@ def tdb_sircom() -> None:
         ),
         create_projet_snapshot(),
         get_projet_snapshot(),
-        [abonnes_visites(), budget(), enquetes(), metiers(), ressources_humaines()],
+        abonnes_visites(),
+        budget(),
+        enquetes(),
+        metiers(),
+        ressources_humaines(),
         create_tmp_tables(),
         import_files_to_db(
             nom_projet=nom_projet,
