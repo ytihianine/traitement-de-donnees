@@ -51,8 +51,8 @@ class SelecteurStorageInfo:
     # db info
     tbl_name: str
     # Source info
-    type_source: TypeSource | None = None
-    id_source: str | None = None
+    type_source: TypeSource
+    id_source: str | None
 
     def get_full_s3_key(
         self,
