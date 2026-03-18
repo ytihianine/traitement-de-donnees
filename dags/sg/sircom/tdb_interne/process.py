@@ -10,7 +10,7 @@ from utils.dataframe import tag_last_value_rows
 
 
 def drop_additionals_columns(
-    df: pd.DataFrame, columns: list[str] = ["commentaire_archive", "id"]
+    df: pd.DataFrame, columns: list[str] = ["commentaire_archive"]
 ) -> pd.DataFrame:
     df = df.drop(columns=columns, errors="ignore")
     return df
