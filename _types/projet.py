@@ -49,7 +49,7 @@ class SelecteurStorageInfo:
     filename: str
     local_dir: str
     # db info
-    tbl_name: str
+    tbl_name: str | None
     # Source info
     type_source: TypeSource
     id_source: str | None
