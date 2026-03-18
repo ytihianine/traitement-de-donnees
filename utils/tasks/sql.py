@@ -352,7 +352,7 @@ def create_tmp_tables(
             )
             continue
 
-        tbl_name = config.selecteur_info.filename
+        tbl_name = config.selecteur_info.tbl_name
         drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
         create_queries.append(
             f"""CREATE TABLE
