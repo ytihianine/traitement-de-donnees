@@ -55,7 +55,10 @@ class SelecteurStorageInfo:
     id_source: str | None
 
     def __post_init__(self) -> None:
-        if not isinstance(self.type_source, TypeSource):
+        if (
+            not isinstance(self.type_source, TypeSource)
+            and self.type_source is not None
+        ):
             object.__setattr__(self, "type_source", TypeSource(value=self.type_source))
 
     def get_full_s3_key(
