@@ -234,13 +234,13 @@ def _get_selecteur_storage_info(
     """
 
     if only_source:
-        query += " AND cpss3db.is_source = true"
+        query += " AND cpss3db.type_source = 'Source'"
 
     if only_grist:
-        query += " AND cpss3db.type_source = 'grist'"
+        query += " AND cpss3db.type_source = 'Grist'"
 
     if only_fichier:
-        query += " AND cpss3db.type_source = 'file'"
+        query += " AND cpss3db.type_source = 'Fichier'"
 
     params: list[str] = [nom_projet]
 
