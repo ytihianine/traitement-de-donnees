@@ -7,7 +7,7 @@ from airflow.sdk import Variable
 from infra.database.factory import create_db_handler
 from infra.file_handling.factory import create_file_handler
 from utils.config.dag_params import get_project_name
-from utils.config.tasks import get_list_source_fichier
+from utils.config.tasks import get_list_selecteur_storage_info
 from enums.filesystem import FileHandlerType
 from utils.config.vars import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
 
@@ -18,7 +18,7 @@ def create_dump_files(context: dict) -> None:
     """
     # config
     nom_projet = get_project_name(context=context)
-    source_configs = get_list_source_fichier(nom_projet=nom_projet)
+    selecteur_storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
 
     # Variables
     db_handler = create_db_handler(connection_id="db_data_store")
@@ -32,20 +32,22 @@ def create_dump_files(context: dict) -> None:
     local_handler = create_file_handler(handler_type=FileHandlerType.LOCAL)
     conn = db_handler.get_uri()
 
-    split_conn_dsn = conn.split("://")[1].split("/")[0].split("@")
+    split_conn_dsn = conn.split(sep="://")[1].split(sep="/")[0].split(sep="@")
     print(split_conn_dsn)
-    credentials = split_conn_dsn[0].split(":")
+    credentials = split_conn_dsn[0].split(sep=":")
     username = credentials[0]
-    connexion = split_conn_dsn[1].split(":")
+    connexion = split_conn_dsn[1].split(sep=":")
     host = connexion[0]
     port = connexion[1]
 
     # Environment variable for password - to avoid password prompt
     env = os.environ.copy()
-    env["PGPASSWORD"] = Variable.get("db_main_password")
+    env["PGPASSWORD"] = Variable.get(key="db_main_password")
 
-    for config in source_configs:
+    for config in selecteur_storage_info:
         local_path = Path("/tmp") / config.filename
+        db_name = config.id_source
+        dest_tmp_key = config.get_full_s3_key(with_tmp_segment=True)
 
         # Construct pg_dump command (without file output)
         command = [
@@ -56,10 +58,10 @@ def create_dump_files(context: dict) -> None:
             "-Fc",  # Custom format
             "--no-owner",
             "-d",
-            config.id_source,
+            db_name,
         ]
 
-        print(f"Executing dump for database: {config.id_source}")
+        print(f"Executing dump for database: {db_name}")
 
         # Local + S3 dump
         with subprocess.Popen(
@@ -70,18 +72,18 @@ def create_dump_files(context: dict) -> None:
 
             if proc.returncode != 0:
                 raise ValueError(
-                    f"Error dumping {config.id_source}: {stderr.decode().strip() or 'Unknown error'}"
+                    f"Error dumping {db_name}: {stderr.decode().strip() or 'Unknown error'}"
                 )
 
             # --- 1. Write dump locally (atomic write via file_handler) ---
             local_handler.write(file_path=local_path, content=stdout)
 
             # --- 2. Upload local dump to S3 ---
-            with open(local_path, "rb") as f:
-                s3_handler.write(file_path=config.filepath_tmp_s3, content=f)
+            with open(file=local_path, mode="rb") as f:
+                s3_handler.write(file_path=dest_tmp_key, content=f)
 
             print(
-                f"Successfully dumped {config.id_source} to local: {local_path}, and uploaded to S3: {config.filepath_tmp_s3}"  # noqa
+                f"Successfully dumped {db_name} to local: {local_path}, and uploaded to S3: {dest_tmp_key}"  # noqa
             )
 
             local_handler.delete(file_path=local_path)

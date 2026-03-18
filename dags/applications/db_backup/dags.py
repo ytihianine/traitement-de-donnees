@@ -14,6 +14,7 @@ from utils.tasks.s3 import (
 
 from utils.tasks.validation import validate_dag_parameters
 from dags.applications.db_backup.tasks import dump_databases
+from dags.applications.db_backup.config import selecteur_options
 
 
 nom_projet = "Sauvegarde databases"
@@ -46,8 +47,8 @@ def sauvegarde_database() -> None:
     chain(
         validate_dag_parameters(),
         dump_databases(),
-        copy_s3_files(),
-        del_s3_files(),
+        copy_s3_files(selecteur_options=selecteur_options),
+        del_s3_files(selecteur_options=selecteur_options),
     )
 
 
