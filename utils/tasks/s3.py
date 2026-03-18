@@ -92,7 +92,9 @@ def copy_s3_files(
                     s3_handler.copy(source=key, destination=target_key)
                     logging.info(msg="Copy successful")
             except Exception as e:
-                logging.error(msg=f"Unexpected error copying to {target_key}: {str(e)}")
+                logging.error(
+                    msg=f"Unexpected error copying id_source to {target_key}: {str(e)}"
+                )
                 raise
 
         target_key = f"{config.selecteur_info.s3_key}/{curr_day}/{curr_time}/{config.selecteur_info.filename}"
@@ -106,7 +108,9 @@ def copy_s3_files(
             logging.info(msg="Copy successful")
 
         except Exception as e:
-            logging.error(msg=f"Unexpected error copying to {target_key}: {str(e)}")
+            logging.error(
+                msg=f"Unexpected error copying tmp file to {target_key}: {str(e)}"
+            )
             raise
 
 
