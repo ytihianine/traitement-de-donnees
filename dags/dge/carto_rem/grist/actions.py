@@ -10,7 +10,7 @@ from utils.config.vars import AGENT, DEFAULT_GRIST_HOST, DEFAULT_PG_DATA_CONN_ID
 
 from infra.database.factory import create_db_handler
 from utils.config.dag_params import get_db_info, get_project_name
-from utils.config.tasks import get_source_grist
+from utils.config.tasks import get_selecteur_storage_info
 
 
 def get_agent_db(context: Mapping[str, Any]) -> pd.DataFrame:
@@ -49,7 +49,7 @@ def load_agent(
 ) -> None:
     # Get Grist doc_id
     nom_projet = get_project_name(context=context)
-    grist_doc_info = get_source_grist(
+    grist_doc_info = get_selecteur_storage_info(
         nom_projet=nom_projet, selecteur=grist_doc_selecteur
     )
 
