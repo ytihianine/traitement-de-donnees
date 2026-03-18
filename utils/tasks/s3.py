@@ -85,20 +85,6 @@ def copy_s3_files(
         logging.info(
             msg=f"Processing copy to S3 for selecteur <{config.selecteur_info.selecteur}> with type source <{config.selecteur_info.type_source}> ..."  # noqa
         )
-        if config.selecteur_info.type_source == TypeSource.FILE:
-            target_key = f"{config.selecteur_info.s3_key}/{curr_day}/{curr_time}/{config.selecteur_info.id_source}"
-            try:
-                # Copy source file if exists
-                key = config.selecteur_info.get_full_s3_key(use_id_source=True)
-                if config.selecteur_info.id_source:
-                    logging.info(msg=f"Copying source file {key} to {target_key}")
-                    s3_handler.copy(source=key, destination=target_key)
-                    logging.info(msg="Copy successful")
-            except Exception as e:
-                logging.error(
-                    msg=f"Unexpected error copying id_source to {target_key}: {str(e)}"
-                )
-                raise
 
         target_key = f"{config.selecteur_info.s3_key}/{curr_day}/{curr_time}/{config.selecteur_info.filename}"
         try:
