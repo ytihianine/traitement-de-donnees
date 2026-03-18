@@ -353,6 +353,13 @@ def create_tmp_tables(
             continue
 
         tbl_name = config.selecteur_info.tbl_name
+
+        if not tbl_name:
+            logging.info(
+                msg=f"tbl_name is not defined for selecteur <{config.selecteur_info.selecteur}>. Skipping creation of tmp table ..."  # noqa
+            )
+            continue
+
         drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
         create_queries.append(
             f"""CREATE TABLE
@@ -406,6 +413,13 @@ def delete_tmp_tables(
             continue
 
         tbl_name = config.selecteur_info.tbl_name
+
+        if not tbl_name:
+            logging.info(
+                msg=f"tbl_name is not defined for selecteur <{config.selecteur_info.selecteur}>. Skipping deletion of tmp table ..."  # noqa
+            )
+            continue
+
         db.execute(query=f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
 
 
@@ -464,6 +478,12 @@ def copy_tmp_table_to_real_table(
             tbl_name = config.selecteur_info.tbl_name
             prod_table = f"{prod_schema}.{tbl_name}"
             tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
+
+            if not tbl_name:
+                logging.info(
+                    msg=f"tbl_name is not defined for selecteur <{config.selecteur_info.selecteur}>. Skipping copy to real table ..."  # noqa
+                )
+                continue
 
             if load_strategy == LoadStrategy.APPEND:
                 query = f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
