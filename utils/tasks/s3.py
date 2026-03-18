@@ -8,7 +8,7 @@ from airflow.sdk import chain, get_current_context, task, task_group
 import pandas as pd
 
 from _types.projet import SelecteurConfig, SelecteurStorageOptions
-from infra.file_handling.exceptions import FileHandlerError, FileNotFoundError
+from infra.file_handling.exceptions import FileHandlerError
 from infra.file_handling.factory import create_default_s3_handler
 from infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
 from utils.config.dag_params import (
@@ -36,11 +36,10 @@ def copy_s3_files(
     connection_id: str = DEFAULT_S3_CONN_ID,
     **context: Mapping[str, Any],
 ) -> None:
-    """Copy files to S3 storage.
+    """Copy files from one place to another in S3 storage.
 
     Args:
         selecteur_options: Mapping of selecteur options
-        projet_s3: Project S3 information
         connection_id: S3 connection ID
         context: Airflow context
 
@@ -83,22 +82,33 @@ def copy_s3_files(
             )
             continue
 
-        target_key = f"{config.selecteur_info.s3_key}/{curr_day}/{curr_time}/{config.selecteur_info.filename}"
-        src_key = config.selecteur_info.get_full_s3_key()
+        print(config.selecteur_info.type_source)
+        print(type(config.selecteur_info.type_source))
+        if config.selecteur_info.type_source == TypeSource.FILE:
+            target_key = f"{config.selecteur_info.s3_key}/{curr_day}/{curr_time}/{config.selecteur_info.id_source}"
+            try:
+                # Copy source file if exists
+                key = config.selecteur_info.get_full_s3_key(use_id_source=True)
+                if config.selecteur_info.id_source:
+                    logging.info(msg=f"Copying source file {key} to {target_key}")
+                    s3_handler.copy(source=key, destination=target_key)
+                    logging.info(msg="Copy successful")
+            except Exception as e:
+                logging.error(msg=f"Unexpected error copying to {target_key}: {str(e)}")
+                raise
 
+        target_key = f"{config.selecteur_info.s3_key}/{curr_day}/{curr_time}/{config.selecteur_info.filename}"
         try:
-            # Copy file
-            logging.info(msg=f"Copying {src_key} to {target_key}")
-            s3_handler.copy(source=src_key, destination=target_key)
+            # Copy tmp file if exists
+            key = config.selecteur_info.get_full_s3_key(
+                with_tmp_segment=True, use_id_source=False
+            )
+            logging.info(msg=f"Copying {key} to {target_key}")
+            s3_handler.copy(source=key, destination=target_key)
             logging.info(msg="Copy successful")
 
-        except (FileHandlerError, FileNotFoundError) as e:
-            logging.error(msg=f"Failed to copy {src_key} to {target_key}: {str(e)}")
-            raise FileHandlerError(f"Failed to copy file: {e}") from e
         except Exception as e:
-            logging.error(
-                msg=f"Unexpected error copying {src_key} to {target_key}: {str(e)}"
-            )
+            logging.error(msg=f"Unexpected error copying to {target_key}: {str(e)}")
             raise
 
 
