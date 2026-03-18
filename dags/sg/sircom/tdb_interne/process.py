@@ -507,7 +507,7 @@ def process_engagement_environnement(df: pd.DataFrame) -> pd.DataFrame:
     # Add additionnal info
     df = tag_last_value_rows(df=df, colname_max_value="annee")
 
-    df = df.sort_values(by=["date", "indicateurs"]).reset_index(drop=True)
+    df = df.sort_values(by=["annee", "niveau"]).reset_index(drop=True)
     df["id"] = df.index
 
     return df
