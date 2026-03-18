@@ -227,8 +227,8 @@ def _get_selecteur_storage_info(
 
     query = f"""
         SELECT cpss3db.projet, cpss3db.selecteur, cpss3db.type_source, cpss3db.id_source,
-            cpss3db.bucket, cpss3db.s3_key, COALESCE(cpss3db.filename, 'filename_undefined') AS filename,
-            COALESCE(cpss3db.tbl_name, 'tbl_name_undefined') AS tbl_name
+            cpss3db.bucket, cpss3db.s3_key, cpss3db.filename,
+            cpss3db.tbl_name
         FROM {CONF_SCHEMA}.selecteur_s3_db_vw cpss3db
         WHERE 1=1 AND cpss3db.projet = %s
     """
