@@ -268,7 +268,7 @@ def ensure_partition(
     db = create_db_handler(connection_id=pg_conn_id)
 
     for config in selecteur_config:
-        tbl_name = config.selecteur_info.filename
+        tbl_name = config.selecteur_info.tbl_name
         is_partitioned = config.options.is_partitioned
         partition_period = config.options.partition_period
 
@@ -405,7 +405,7 @@ def delete_tmp_tables(
             )
             continue
 
-        tbl_name = config.selecteur_info.filename
+        tbl_name = config.selecteur_info.tbl_name
         db.execute(query=f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
 
 
