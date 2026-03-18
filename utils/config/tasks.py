@@ -1,6 +1,6 @@
 """Functions for retrieving and managing project configurations."""
 
-from typing import Any, Mapping, Optional
+from typing import Mapping, Optional
 import logging
 
 from tenacity import (
@@ -12,7 +12,6 @@ from tenacity import (
 )
 import pandas as pd
 
-from utils.config.dag_params import get_project_name
 from _types.projet import (
     Contact,
     Documentation,
@@ -80,14 +79,11 @@ def column_mapping_dict(
 
 
 @db_retry
-def get_list_contact(
-    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
-) -> list[Contact]:
-    if nom_projet is None and context is None:
-        raise ValueError("nom_projet or context must be provided")
-
-    if nom_projet is None and context:
-        nom_projet = get_project_name(context=context)
+def get_list_contact(nom_projet: str) -> list[Contact]:
+    if not nom_projet:
+        raise ValueError(
+            "Variable nom_projet is required to fetch contact information. Current value is None or empty."
+        )
 
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
@@ -105,13 +101,12 @@ def get_list_contact(
 
 @db_retry
 def get_list_documentation(
-    context: Mapping[str, Any] | None = None, nom_projet: str | None = None
+    nom_projet: str,
 ) -> list[Documentation]:
-    if nom_projet is None and context is None:
-        raise ValueError("nom_projet or context must be provided")
-
-    if nom_projet is None and context:
-        nom_projet = get_project_name(context=context)
+    if not nom_projet:
+        raise ValueError(
+            "Variable nom_projet is required to fetch contact information. Current value is None or empty."
+        )
 
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
@@ -129,7 +124,6 @@ def get_list_documentation(
 
 @db_retry
 def get_projet_s3_info(
-    context: Mapping[str, Any] | None = None,
     nom_projet: str | None = None,
 ) -> ProjetS3:
     """Get S3 configuration for a specific selecteur.
@@ -144,14 +138,10 @@ def get_projet_s3_info(
     Raises:
         ConfigError: If no S3 configuration is found
     """
-    if nom_projet is None and context is None:
-        raise ValueError("nom_projet or context must be provided")
-
-    if nom_projet is None and context is not None:
-        nom_projet = get_project_name(context=context)
-
-    if nom_projet is None:
-        raise ValueError("Could not determine project name from context")
+    if not nom_projet:
+        raise ValueError(
+            "Variable nom_projet is required to fetch contact information. Current value is None or empty."
+        )
 
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
@@ -210,8 +200,7 @@ def merge_selecteur_config(
 
 @db_retry
 def _get_selecteur_storage_info(
-    context: Mapping[str, Any] | None = None,
-    nom_projet: str | None = None,
+    nom_projet: str,
     selecteur: str | None = None,
     local_dir: str = "/tmp",
     only_source: bool = False,
@@ -229,14 +218,10 @@ def _get_selecteur_storage_info(
     Returns:
         List of SelecteurStorageInfo objects
     """
-    if nom_projet is None and context is None:
-        raise ValueError("nom_projet or context must be provided")
-
-    if nom_projet is None and context is not None:
-        nom_projet = get_project_name(context=context)
-
-    if nom_projet is None:
-        raise ValueError("Could not determine project name from context")
+    if not nom_projet:
+        raise ValueError(
+            "Variable nom_projet is required to fetch contact information. Current value is None or empty."
+        )
 
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
@@ -280,8 +265,7 @@ def _get_selecteur_storage_info(
 
 
 def get_list_selecteur_storage_info(
-    context: Mapping[str, Any] | None = None,
-    nom_projet: str | None = None,
+    nom_projet: str,
     local_dir: str = "/tmp",
 ) -> list[SelecteurStorageInfo]:
     """Get SelecteurStorageInfo for all selecteurs in a project.
@@ -295,14 +279,13 @@ def get_list_selecteur_storage_info(
         List of SelecteurStorageInfo objects for all selecteurs
     """
     return _get_selecteur_storage_info(
-        context=context, nom_projet=nom_projet, selecteur=None, local_dir=local_dir
+        nom_projet=nom_projet, selecteur=None, local_dir=local_dir
     )
 
 
 def get_selecteur_storage_info(
+    nom_projet: str,
     selecteur: str,
-    context: Mapping[str, Any] | None = None,
-    nom_projet: str | None = None,
     local_dir: str = "/tmp",
 ) -> SelecteurStorageInfo:
     """Get SelecteurStorageInfo for a specific selecteur.
@@ -320,7 +303,7 @@ def get_selecteur_storage_info(
         ConfigError: If no configuration is found
     """
     configs = _get_selecteur_storage_info(
-        context=context, nom_projet=nom_projet, selecteur=selecteur, local_dir=local_dir
+        nom_projet=nom_projet, selecteur=selecteur, local_dir=local_dir
     )
 
     if not configs:
@@ -331,11 +314,6 @@ def get_selecteur_storage_info(
         )
 
     return configs[0]
-
-
-def get_source_grist() -> list[SelecteurStorageInfo]:
-    """Get SelecteurStorageInfo for all selecteurs with grist source."""
-    return _get_selecteur_storage_info(only_source=True, only_grist=True)
 
 
 def get_list_source_fichier(nom_projet: str) -> list[str]:
