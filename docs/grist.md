@@ -115,23 +115,36 @@ R: Oui, le bureau X saisit le montant du projet et qui est le porteur
 
 A partir de ces premiers éléments de réponses, nous pouvons déjà faire une première ébauche de la structuration des données et l'implémenter dans Grist.
 
-| Nom de la table | Nom de la colonne | Type de la colonne |
-| :--------------- |:---------------|:---------------|
-| projet  | nom | Texte |
-|   | description | Texte |
-|   | date de début | Date |
-|   | date de fin | Date |
-|   | bureau associé | Référence |
-|   | état d'avancement | Référence |
-| projet_complement_bureau_X  | nom du projet | Référence |
-|   | montant | Numérique |
-|   | porteur | Référence |
-| bureau  | nom | Texte |
-|   | sigle | Texte |
-|   | poles | Texte |
-| agents  | mail | Texte |
-|   | bureau | Référence |
-|   | poles | Référence |
+Entité: **projet**
+|Nom de la colonne | Type de la colonne | Issue SI | Saisie par |
+|:---------------|:---------------|:---------------|:---------------|
+| nom | Texte | Non | Chef de projet |
+| description | Texte | Non | Chef de projet |
+| date de début | Date | Non | Chef de projet |
+| date de fin | Date | Non | Chef de projet |
+| bureau associé | Référence | Non | Chef de projet |
+| état d'avancement | Référence | Non | Chef de projet |
+
+Entité: **projet_complement_bureau_X**
+|Nom de la colonne | Type de la colonne | Issue SI | Saisie par |
+|:---------------|:---------------|:---------------|:---------------|
+| Nom du projet  | Référence | Non | Automatique |
+| montant | Numérique | Non | Responsable du bureau |
+| porteur | Référence | Non | Responsable du bureau |
+
+Entité: **bureau**
+|Nom de la colonne | Type de la colonne | Issue SI | Saisie par |
+|:---------------|:---------------|:---------------|:---------------|
+| bureau  | Texte | Oui - SI RH | Automatique |
+| sigle | Texte | Oui - SI RH | Automatique |
+| poles | Texte | Non | Chef de projet |
+
+Entité: **poles**
+|Nom de la colonne | Type de la colonne | Issue SI | Saisie par |
+|:---------------|:---------------|:---------------|:---------------|
+| agents  | Référence | Oui - SI RH | Automatique|
+| bureau | Référence | Oui - SI RH | Automatique |
+| poles | Référence | Oui - SI RH | Automatique |
 
 > Il est important de questionner le lien entre les différentes entités pour privilégier des données en type "référence" plutôt que de laisser l'utilisateur re-saisir des données à chaque fois. Le type "référence" permet d'obtenir une liste déroulante lors de la saisie de l'information.
 
