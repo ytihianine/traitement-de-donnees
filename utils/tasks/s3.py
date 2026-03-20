@@ -27,6 +27,7 @@ from enums.dags import DagStatus, TypeSource
 from enums.filesystem import IcebergTableStatus
 from utils.config.vars import (
     DEFAULT_POLARIS_HOST,
+    DEFAULT_POLARIS_CATALOG,
     DEFAULT_S3_CONN_ID,
     FF_S3_DISABLED_MSG,
 )
@@ -300,7 +301,7 @@ def import_files_to_iceberg(
     nom_projet: str | None = None,
     selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
     s3_conn_id: str = DEFAULT_S3_CONN_ID,
-    catalog_name: str = "data_store",
+    catalog_name: str = DEFAULT_POLARIS_CATALOG,
     **context,
 ) -> None:
     """Import file to iceberg table"""
