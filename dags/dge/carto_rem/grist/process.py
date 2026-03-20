@@ -72,7 +72,10 @@ def process_ref_niveau_diplome(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_valeur_point_indice(df: pd.DataFrame) -> pd.DataFrame:
-    df["date_d_application"] = pd.to_datetime(df["date_d_application"], unit="s")
+    # Convertir les colonnes de date
+    date_cols = ["date_d_application"]
+    df = convert_grist_date_to_date(df=df, columns=date_cols)
+
     return df
 
 
