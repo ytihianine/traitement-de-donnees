@@ -4,7 +4,6 @@ import re
 import unicodedata
 import logging
 from typing import List
-from numpy import isin
 from pandas._typing import DateTimeErrorChoices
 
 import pandas as pd
@@ -23,6 +22,7 @@ def convert_str_cols_to_date(
         df[date_col] = pd.to_datetime(
             df.loc[:, date_col], format=str_date_format, errors=errors
         )
+        df[date_col] = df[date_col].astype("datetime64[s]")
 
     return df
 
