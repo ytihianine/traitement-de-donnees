@@ -11,11 +11,12 @@ from infra.mails.default_smtp import (
 )
 from infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
 from utils.config.dag_params import create_default_args, create_dag_params, get_db_info
+from utils.config.tasks import get_list_source_fichier
 from _types.dags import DBParams, FeatureFlags
 from enums.dags import DagStatus
 from enums.filesystem import IcebergTableStatus
 
-from utils.tasks.sql import get_projet_snapshot, import_files_to_db
+from utils.tasks.sql import get_projet_snapshot  # , import_files_to_db
 from utils.tasks.projet import config_projet_group
 from utils.tasks.s3 import write_to_s3
 
@@ -102,6 +103,11 @@ def dag_verification() -> None:
             table_name=tbl_name,
         )
 
+    @task
+    def check_liste_source_fichier() -> None:
+        lst_fichiers = get_list_source_fichier(nom_projet="Cartographie rémunération")
+        print(lst_fichiers)
+
     # Ordre des tâches
     chain(
         [
@@ -113,10 +119,11 @@ def dag_verification() -> None:
             config_projet_group(
                 nom_projet=nom_projet, selecteur_mapping=selecteur_mapping
             ),
-            import_files_to_db(
-                nom_projet=nom_projet, selecteur_options=selecteur_mapping
-            ),
+            # import_files_to_db(
+            #     nom_projet=nom_projet, selecteur_options=selecteur_mapping
+            # ),
             iceberg_task(),
+            check_liste_source_fichier(),
         ],
     )
 
