@@ -224,7 +224,7 @@ def create_file_etl_task(
         # Get data of table
         df = read_dataframe(
             file_handler=s3_handler,
-            file_path=task_config.get_full_s3_key(),
+            file_path=task_config.get_full_s3_key(use_id_source=True),
             read_options=read_options,
         )
 
