@@ -8,6 +8,8 @@ from airflow.sdk import chain, get_current_context, task, task_group
 import pandas as pd
 
 from _types.projet import SelecteurConfig, SelecteurStorageOptions
+from infra.file_handling.base import BaseFileHandler
+from infra.file_handling.dataframe import read_dataframe
 from infra.file_handling.exceptions import FileHandlerError
 from infra.file_handling.factory import create_default_s3_handler
 from infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
@@ -246,5 +248,85 @@ def iceberg_copy_staging_to_prod(
     chain(
         copy_staging_to_prod.expand(
             selecteur_config=selecteur_config,
+        ),
+    )
+
+
+@task(map_index_template="{{ task_name }}")
+def import_file_to_iceberg(
+    selecteur_config: SelecteurConfig,
+    s3_handler: BaseFileHandler,
+    catalog: IcebergCatalog,
+) -> None:
+    """Copy Iceberg tables from staging key to prod key"""
+
+    context = get_current_context()
+    context["task_name"] = selecteur_config.selecteur_info.selecteur  # type: ignore
+
+    if selecteur_config.selecteur_info.selecteur == "grist_doc":
+        logging.info(msg="Grist doc selecteur. Skipping ...")
+        return
+
+    if selecteur_config.options.write_to_s3_with_iceberg is False:
+        logging.info(
+            msg=f"write_to_s3_with_iceberg option is set to False for selecteur <{selecteur_config.selecteur_info.selecteur}>. Skipping import to S3 ..."  # noqa
+        )
+        return
+
+    # Dag info
+    namespace = selecteur_config.selecteur_info.get_iceberg_namespace(with_bucket=False)
+    tbl_name = Path(selecteur_config.selecteur_info.filename).stem
+
+    # Read tmp data
+    df = read_dataframe(
+        file_handler=s3_handler,
+        file_path=selecteur_config.selecteur_info.get_full_s3_key(
+            with_tmp_segment=True
+        ),
+    )
+
+    # Write prod table
+    write_to_s3(
+        catalog=catalog,
+        df=df,
+        table_status=IcebergTableStatus.STAGING,
+        namespace=namespace,
+        table_name=tbl_name,
+    )
+
+
+@task_group()
+def import_files_to_iceberg(
+    nom_projet: str | None = None,
+    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
+    s3_conn_id: str = DEFAULT_S3_CONN_ID,
+    catalog_name: str = "data_store",
+    **context,
+) -> None:
+    """Import file to iceberg table"""
+    """Copy Iceberg tables from staging key to prod key in parallel"""
+    if nom_projet is None:
+        nom_projet = get_project_name(context=context)
+
+    # Get selecteur configs
+    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
+    selecteur_configs = merge_selecteur_config(
+        selecteur_info=selecteur_info, options_map=selecteur_options
+    )
+
+    # Get catalog
+    properties = generate_catalog_properties(
+        uri=DEFAULT_POLARIS_HOST,
+    )
+    catalog = IcebergCatalog(name=catalog_name, properties=properties)
+
+    # Get hooks
+    s3_handler = create_default_s3_handler(
+        connection_id=s3_conn_id,
+    )
+
+    chain(
+        import_file_to_iceberg.partial(s3_handler=s3_handler, catalog=catalog).expand(
+            selecteur_config=selecteur_configs,
         ),
     )
