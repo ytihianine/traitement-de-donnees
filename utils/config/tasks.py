@@ -234,7 +234,7 @@ def _get_selecteur_storage_info(
     """
 
     if only_source:
-        query += " AND cpss3db.type_source = 'Source'"
+        query += " AND cpss3db.type_selecteur = 'Source'"
 
     if only_grist:
         query += " AND cpss3db.type_source = 'Grist'"
