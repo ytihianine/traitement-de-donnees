@@ -181,6 +181,7 @@ def process_agent_remuneration_complement(df: pd.DataFrame) -> pd.DataFrame:
     # Process txt columns
     txt_cols = ["observations"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    df["observations"] = df["observations"].astype(str)
 
     # Handle references columns
     ref_cols = ["id_base_remuneration"]
