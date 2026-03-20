@@ -58,9 +58,11 @@ def cartographie_remuneration_grist() -> None:
         [referentiels(), source_grist()],
         # load_to_grist(),
         import_files_to_iceberg(
+            nom_projet=nom_projet,
             selecteur_options=selecteur_options,
         ),
         iceberg_copy_staging_to_prod(
+            nom_projet=nom_projet,
             selecteur_options=selecteur_options,
         ),
         copy_s3_files(
