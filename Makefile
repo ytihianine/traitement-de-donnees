@@ -4,6 +4,15 @@ PYTHON_VERSION=3.12
 AIRFLOW_VERSION=3.1.8
 ENV_NAME = env
 
+# OS detection
+ifeq ($(OS),Windows_NT)
+    PYTHON := python
+    VENV_BIN := $(ENV_NAME)/Scripts
+else
+    PYTHON := python3
+    VENV_BIN := $(ENV_NAME)/bin
+endif
+
 install-sys-packages: ## Installer les packages système nécessaires (libxml2-dev, libxmlsec1-dev, pkg-config)
 	@echo "Ce script va mettre à jour votre système et installer les packages nécessaires."
 	@echo "Packages à installer: libxml2-dev libxmlsec1-dev pkg-config"
@@ -21,7 +30,7 @@ install-sys-packages: ## Installer les packages système nécessaires (libxml2-d
 
 create-py-env: ## Créer un nouvel environnement python
 	@echo "Création d'un environnement"
-	python -m venv $(ENV_NAME)
+	$(PYTHON) -m venv $(ENV_NAME)
 	@echo "L'environnement a été créé"
 	@echo "Activation du nouvel environnement"
 	@echo "Exécuter dans votre terminal: source $(ENV_NAME)/bin/activate"
@@ -29,24 +38,24 @@ create-py-env: ## Créer un nouvel environnement python
 
 install-airflow: ## Installer les packages liés à la version d'Airflow
 	@echo "Installation des packages Airflow python_version=$(PYTHON_VERSION) & airflow_version=$(AIRFLOW_VERSION)"
-	$(ENV_NAME)/bin/uv pip install --python $(ENV_NAME)/bin/python "apache-airflow==$(AIRFLOW_VERSION)" \
+	$(VENV_BIN)/uv pip install --python $(VENV_BIN)/python "apache-airflow==$(AIRFLOW_VERSION)" \
 		--constraint "https://raw.githubusercontent.com/apache/airflow/constraints-$(AIRFLOW_VERSION)/constraints-$(PYTHON_VERSION).txt"
 
 install-packages: ## Installer les packages python complémentaires
-	/usr/bin/python3 -m venv $(ENV_NAME)
+	$(PYTHON) -m venv $(ENV_NAME)
 	@echo "Création d'un nouvel environnement python avec uv"
-	$(ENV_NAME)/bin/python -m pip install uv
-	$(ENV_NAME)/bin/uv pip install --python $(ENV_NAME)/bin/python -e .
-	$(ENV_NAME)/bin/uv pip install --python $(ENV_NAME)/bin/python -r requirements.txt --prerelease=allow
-	$(ENV_NAME)/bin/uv pip install --python $(ENV_NAME)/bin/python -r requirements_dev.txt --prerelease=allow
+	$(VENV_BIN)/python -m pip install uv
+	$(VENV_BIN)/uv pip install --python $(VENV_BIN)/python -e .
+	$(VENV_BIN)/uv pip install --python $(VENV_BIN)/python -r requirements.txt --prerelease=allow
+	$(VENV_BIN)/uv pip install --python $(VENV_BIN)/python -r requirements_dev.txt --prerelease=allow
 
 install-pre-commit: ## Installer les pre-commits
 	@echo "Installation des pre-commits"
-	$(ENV_NAME)/bin/pre-commit install
+	$(VENV_BIN)/pre-commit install
 
 install-extensions: ## Installer les extensions code-server & les settings
 	@echo "Installation des extensions"
-	$(ENV_NAME)/bin/python scripts/extensions/install-extensions.py
+	$(VENV_BIN)/python scripts/extensions/install-extensions.py
 	@echo "Rechargez votre page pour prendre en compte toutes les modifications"
 
 setup-git:
