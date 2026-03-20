@@ -71,8 +71,12 @@ def cartographie_remuneration() -> None:
         validate_dag_parameters(),
         looking_for_files,
         source_files(),
-        import_files_to_iceberg(nom_projet=nom_projet),
-        iceberg_copy_staging_to_prod(nom_projet=nom_projet),
+        import_files_to_iceberg(
+            nom_projet=nom_projet, selecteur_options=selecteur_options
+        ),
+        iceberg_copy_staging_to_prod(
+            nom_projet=nom_projet, selecteur_options=selecteur_options
+        ),
         copy_s3_files(
             selecteur_options=selecteur_options,
         ),
