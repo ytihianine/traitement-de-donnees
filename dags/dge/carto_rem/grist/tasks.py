@@ -17,11 +17,13 @@ def referentiels() -> None:
         selecteur="ref_base_remuneration",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_ref_base_remuneration,
+        add_import_date=True,
     )
     ref_base_revalorisation = create_grist_etl_task(
         selecteur="ref_base_revalorisation",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_ref_base_revalorisation,
+        add_import_date=True,
     )
     # ref_experience_pro = create_grist_etl_task(
     #     selecteur="ref_experience_pro",
@@ -32,31 +34,37 @@ def referentiels() -> None:
         selecteur="ref_niveau_diplome",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_ref_niveau_diplome,
+        add_import_date=True,
     )
     ref_valeur_point_indice = create_grist_etl_task(
         selecteur="ref_valeur_point_indice",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_ref_valeur_point_indice,
+        add_import_date=True,
     )
     ref_categorie_ecole = create_grist_etl_task(
         selecteur="ref_categorie_ecole",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_ref_categorie_ecole,
+        add_import_date=True,
     )
     ref_libelle_diplome = create_grist_etl_task(
         selecteur="ref_libelle_diplome",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_ref_libelle_diplome,
+        add_import_date=True,
     )
     ref_position = create_grist_etl_task(
         selecteur="ref_position",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_ref_position,
+        add_import_date=True,
     )
     ref_fonction_dge = create_grist_etl_task(
         selecteur="ref_fonction_dge",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_ref_fonction_dge,
+        add_import_date=True,
     )
 
     # ordre des tâches
@@ -81,36 +89,43 @@ def source_grist() -> None:
         selecteur="agent",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_agent,
+        add_import_date=True,
     )
     agent_diplome = create_grist_etl_task(
         selecteur="agent_diplome",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_agent_diplome,
+        add_import_date=True,
     )
     agent_revalorisation = create_grist_etl_task(
         selecteur="agent_revalorisation",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_agent_revalorisation,
+        add_import_date=True,
     )
     agent_revalorisation_proposition = create_grist_etl_task(
         selecteur="agent_revalorisation_proposition",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_agent_revalorisation_proposition,
+        add_import_date=True,
     )
     agent_contrat_complement = create_grist_etl_task(
         selecteur="agent_contrat_complement",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_agent_contrat_complement,
+        add_import_date=True,
     )
     agent_remuneration_complement = create_grist_etl_task(
         selecteur="agent_remuneration_complement",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_agent_remuneration_complement,
+        add_import_date=True,
     )
     agent_experience_pro = create_grist_etl_task(
         selecteur="agent_experience_pro",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_agent_experience_pro,
+        add_import_date=True,
     )
 
     # ordre des tâches

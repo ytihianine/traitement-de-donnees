@@ -6,23 +6,19 @@ from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.grist import download_grist_doc_to_s3
-from utils.tasks.sql import (
-    create_tmp_tables,
-    copy_tmp_table_to_real_table,
-    import_files_to_db,
-    delete_tmp_tables,
-)
 
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
+    iceberg_copy_staging_to_prod,
+    import_files_to_iceberg,
 )
 
 from utils.tasks.validation import validate_dag_parameters
 from dags.dge.carto_rem.grist.tasks import (
     referentiels,
     source_grist,
-    load_to_grist,
+    # load_to_grist,
 )
 from dags.dge.carto_rem.grist.config import selecteur_options
 
@@ -60,22 +56,17 @@ def cartographie_remuneration_grist() -> None:
             doc_id_key="grist_doc_id_carto_rem",
         ),
         [referentiels(), source_grist()],
-        load_to_grist(),
-        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
-        import_files_to_db(
-            nom_projet=nom_projet,
+        # load_to_grist(),
+        import_files_to_iceberg(
             selecteur_options=selecteur_options,
         ),
-        copy_tmp_table_to_real_table(
+        iceberg_copy_staging_to_prod(
             selecteur_options=selecteur_options,
         ),
         copy_s3_files(
             selecteur_options=selecteur_options,
         ),
         del_s3_files(
-            selecteur_options=selecteur_options,
-        ),
-        delete_tmp_tables(
             selecteur_options=selecteur_options,
         ),
     )
