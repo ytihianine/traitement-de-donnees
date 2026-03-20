@@ -148,6 +148,7 @@ def del_s3_files(
     )
 
     for config in selecteur_config:
+        logging.info(msg=f"{config}")
         if config.selecteur_info.type_source == TypeSource.FILE:
             s3_key_source = config.selecteur_info.get_full_s3_key()
             try:
