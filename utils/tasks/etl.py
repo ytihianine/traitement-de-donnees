@@ -93,6 +93,8 @@ def create_grist_etl_task(
     doc_selecteur: Optional[str] = None,
     normalisation_process_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
     process_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
+    add_import_date: bool = False,
+    add_snapshot_id: bool = False,
     version: str = "v1",
 ) -> Callable[..., XComArg]:
     """
@@ -167,6 +169,14 @@ def create_grist_etl_task(
             logging.info(
                 msg="No process function provided. Skipping the processing step ..."
             )
+
+        _add_metadata(
+            df=df,
+            context=context,
+            add_import_date=add_import_date,
+            add_snapshot_id=add_snapshot_id,
+        )
+
         df_info(df=df, df_name=f"{selecteur} - After processing")
 
         # Export
@@ -176,7 +186,6 @@ def create_grist_etl_task(
         )
 
         if version == "v2":
-            _add_metadata(df=df, context=context)
             _write_to_iceberg_catalog(
                 df=df,
                 filepath_s3=str(task_config.get_full_s3_key()),
