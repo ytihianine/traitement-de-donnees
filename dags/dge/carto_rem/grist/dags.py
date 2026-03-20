@@ -7,6 +7,7 @@ from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.grist import download_grist_doc_to_s3
 
+from utils.tasks.sql import get_projet_snapshot
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -50,6 +51,7 @@ def cartographie_remuneration_grist() -> None:
     """Task order"""
     chain(
         validate_dag_parameters(),
+        get_projet_snapshot(),
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci-dge",

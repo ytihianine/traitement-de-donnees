@@ -8,7 +8,7 @@ from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 
-
+from utils.tasks.sql import create_projet_snapshot, get_projet_snapshot
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -70,6 +70,8 @@ def cartographie_remuneration() -> None:
     chain(
         validate_dag_parameters(),
         looking_for_files,
+        create_projet_snapshot(),
+        get_projet_snapshot(),
         source_files(),
         import_files_to_iceberg(
             nom_projet=nom_projet, selecteur_options=selecteur_options
