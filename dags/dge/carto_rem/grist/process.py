@@ -98,25 +98,35 @@ def process_agent_diplome(df: pd.DataFrame) -> pd.DataFrame:
             "libelle_diplome": "id_libelle_diplome",
         }
     )
-    df["id_libelle_diplome"] = df["id_libelle_diplome"].replace({0: None})
-    df["id_niveau_diplome_associe"] = df["id_niveau_diplome_associe"].replace({0: None})
-    df["id_categorie_d_ecole"] = df["id_categorie_d_ecole"].replace({0: None})
-    # df = df.reset_index(drop=True)
-    # df["id"] = df.index
+    # Handle ref cols
+    ref_cols = [
+        "id_libelle_diplome",
+        "id_niveau_diplome_associe",
+        "id_categorie_d_ecole",
+    ]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
     return df
 
 
 def process_agent_revalorisation(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=["agent"])
     df = df.rename(columns={"base_revalorisation": "id_base_revalorisation"})
-    df["historique"] = df["historique"].str.strip().str.split().str.join(" ")
+
+    # Process txt columns
+    txt_cols = ["historique"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Convertir les dates
     date_cols = ["date_dernier_renouvellement", "date_derniere_revalorisation"]
-    for date_col in date_cols:
-        df[date_col] = pd.to_datetime(df[date_col], unit="s", errors="coerce")
-    df["id_base_revalorisation"] = df["id_base_revalorisation"].replace({0: None})
+    df = convert_grist_date_to_date(df=df, columns=date_cols)
+
+    # Handle ref cols
+    ref_cols = ["id_base_revalorisation"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
     df = df.loc[df["matricule_agent"] != 0]
-    # df = df.reset_index(drop=True)
-    # df["id"] = df.index
+
     return df
 
 
@@ -131,6 +141,7 @@ def process_agent_revalorisation_proposition(df: pd.DataFrame) -> pd.DataFrame:
     # Handle ref
     ref_cols = ["id_base_revalorisation"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
+
     return df
 
 
@@ -215,6 +226,5 @@ def process_agent_experience_pro(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.loc[df["matricule_agent"] != 0]
     df["id_position_grille"].replace(0, np.nan, inplace=True)
-    # df = df.reset_index(drop=True)
-    # df["id"] = df.index
+
     return df
