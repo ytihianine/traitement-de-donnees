@@ -1,4 +1,3 @@
-from pyexpat import ErrorString
 import pandas as pd
 
 from utils.control.text import convert_str_cols_to_date, normalize_whitespace_columns
@@ -8,7 +7,7 @@ from utils.control.text import convert_str_cols_to_date, normalize_whitespace_co
 #   Functions de processing des fichiers sources
 # ================================================
 def process_agent_info_carriere(df: pd.DataFrame) -> pd.DataFrame:
-    txt_cols = ["dge_perimetre", "nom_usuel", "prenom"]
+    txt_cols = ["dge_perimetre", "nom_usuel", "prenom", "affectation_operationnelle"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
     return df
 
@@ -27,40 +26,15 @@ def process_agent_contrat(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-"""
-    Functions de processing des fichiers finaux
-"""
+def process_agent_r4(df: pd.DataFrame) -> pd.DataFrame:
+    txt_cols = ["fonction_dge", "qualite_statutaire"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
+    # Keep only titulaires rows
+    df = df.loc[df["qualite_statutaire"] == "T", :]
 
-def process_agent(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only needed columns
-    cols_to_keep = [
-        "matricule_agent",
-        "nom_usuel",
-        "prenom",
-        "genre",
-        "age",
-    ]
+    cols_to_keep = ["matricule_agent", "fonction_dge"]
     df = df.loc[:, cols_to_keep]
-
-    return df
-
-
-def process_agent_carriere(df: pd.DataFrame) -> pd.DataFrame:
-    # Keep only needed columns
-    cols_to_keep = [
-        "matricule_agent",
-        "categorie",
-        "qualite_statutaire",
-        "corps",
-        "grade",
-        "echelon",
-        "indice_majore",
-        "dge_perimetre",
-    ]
-    df = df.loc[:, cols_to_keep]
-
-    # Convert column
-    df["echelon"] = pd.to_numeric(arg=df["echelon"], errors="coerce")
 
     return df

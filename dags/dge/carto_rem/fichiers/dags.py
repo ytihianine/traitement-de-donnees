@@ -7,23 +7,18 @@ from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
-from utils.tasks.sql import (
-    create_tmp_tables,
-    copy_tmp_table_to_real_table,
-    import_files_to_db,
-    delete_tmp_tables,
-    refresh_views,
-)
+
 
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
+    import_files_to_iceberg,
+    iceberg_copy_staging_to_prod,
 )
 from utils.config.tasks import get_list_source_fichier
 from utils.tasks.validation import validate_dag_parameters
 from dags.dge.carto_rem.fichiers.tasks import (
     source_files,
-    output_files,
 )
 from dags.dge.carto_rem.fichiers.config import selecteur_options
 
@@ -76,23 +71,12 @@ def cartographie_remuneration() -> None:
         validate_dag_parameters(),
         looking_for_files,
         source_files(),
-        output_files(),
-        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
-        import_files_to_db(
-            nom_projet=nom_projet,
-            selecteur_options=selecteur_options,
-        ),
-        copy_tmp_table_to_real_table(
-            selecteur_options=selecteur_options,
-        ),
-        refresh_views(),
+        import_files_to_iceberg(),
+        iceberg_copy_staging_to_prod(),
         copy_s3_files(
             selecteur_options=selecteur_options,
         ),
         del_s3_files(
-            selecteur_options=selecteur_options,
-        ),
-        delete_tmp_tables(
             selecteur_options=selecteur_options,
         ),
     )
