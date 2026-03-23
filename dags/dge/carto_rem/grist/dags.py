@@ -13,6 +13,7 @@ from utils.tasks.s3 import (
     del_s3_files,
     iceberg_copy_staging_to_prod,
     import_files_to_iceberg,
+    del_iceberg_staging_table,
 )
 
 from utils.tasks.validation import validate_dag_parameters
@@ -67,6 +68,7 @@ def cartographie_remuneration_grist() -> None:
             nom_projet=nom_projet,
             selecteur_options=selecteur_options,
         ),
+        del_iceberg_staging_table(),
         copy_s3_files(
             selecteur_options=selecteur_options,
         ),
