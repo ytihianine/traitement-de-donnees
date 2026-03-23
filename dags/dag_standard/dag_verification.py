@@ -92,6 +92,8 @@ def dag_verification() -> None:
         print(keys_with_pattern)
         print(len(keys_with_pattern))
 
+        s3_hook.delete_single(file_path="data_store/test_namespace/test_table_staging/")
+
     @task
     def iceberg_task(**context) -> None:
         import pandas as pd
