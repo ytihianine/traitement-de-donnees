@@ -9,6 +9,7 @@ from infra.mails.default_smtp import (
     MailStatus,
     MailMessage,
 )
+from infra.file_handling.factory import create_default_s3_handler
 from infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
 from utils.config.dag_params import create_default_args, create_dag_params, get_db_info
 from utils.config.tasks import get_list_source_fichier
@@ -20,7 +21,7 @@ from utils.tasks.sql import get_projet_snapshot  # , import_files_to_db
 from utils.tasks.projet import config_projet_group
 from utils.tasks.s3 import write_to_s3
 
-from utils.config.vars import DEFAULT_POLARIS_HOST
+from utils.config.vars import DEFAULT_POLARIS_HOST, DEFAULT_S3_CONN_ID
 from dags.dag_standard.config import selecteur_mapping
 
 nom_projet = "Configuration des projets"
@@ -80,6 +81,12 @@ def dag_verification() -> None:
         _callback(context=context, mail_status=MailStatus.SUCCESS)
 
     @task
+    def check_s3_hook() -> None:
+        s3_hook = create_default_s3_handler(connection_id=DEFAULT_S3_CONN_ID)
+        keys = s3_hook.list_files(directory="data_store/test_namespace/")
+        print(keys)
+
+    @task
     def iceberg_task(**context) -> None:
         import pandas as pd
 
@@ -124,6 +131,7 @@ def dag_verification() -> None:
             # ),
             iceberg_task(),
             check_liste_source_fichier(),
+            check_s3_hook(),
         ],
     )
 
