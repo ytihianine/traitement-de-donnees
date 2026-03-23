@@ -180,7 +180,7 @@ def del_iceberg_staging_table(nom_projet: str | None = None, **context) -> None:
         nom_projet = get_project_name(context=context)
 
     # Get project s3
-    namespace = get_projet_s3_info(nom_projet=nom_projet).key
+    s3_key = get_projet_s3_info(nom_projet=nom_projet).key
 
     # Get catalog
     properties = generate_catalog_properties(
@@ -189,7 +189,9 @@ def del_iceberg_staging_table(nom_projet: str | None = None, **context) -> None:
     catalog = IcebergCatalog(name=DEFAULT_POLARIS_CATALOG, properties=properties)
 
     # Get all tables
-    tables = catalog.list_tables(namespace=namespace, pattern="*_staging*")
+    tables = catalog.list_tables(
+        namespace=s3_key.replace("/", "."), pattern="*_staging*"
+    )
 
     # Drop staging tables from Iceberg catalog
     for table in tables:
@@ -201,7 +203,7 @@ def del_iceberg_staging_table(nom_projet: str | None = None, **context) -> None:
     s3_handler = create_default_s3_handler(
         connection_id=DEFAULT_S3_CONN_ID,
     )
-    staging_keys = s3_handler.list_files(directory=namespace, pattern="*_staging*")
+    staging_keys = s3_handler.list_files(directory=s3_key, pattern="*_staging*")
     for key in staging_keys:
         logging.info(msg=f"Deleting staging file {key} ...")
         s3_handler.delete_single(file_path=key)
