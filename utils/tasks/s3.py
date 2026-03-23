@@ -21,6 +21,7 @@ from utils.config.dag_params import (
 )
 from utils.config.tasks import (
     get_list_selecteur_storage_info,
+    get_projet_s3_info,
     merge_selecteur_config,
 )
 from enums.dags import DagStatus, TypeSource
@@ -170,6 +171,41 @@ def del_s3_files(
             except FileHandlerError as e:
                 logging.error(msg=f"Failed to delete source files: {str(e)}")
                 raise
+
+
+@task
+def del_iceberg_staging_table(nom_projet: str | None = None, **context) -> None:
+    """Delete Iceberg staging table."""
+    if nom_projet is None:
+        nom_projet = get_project_name(context=context)
+
+    # Get project s3
+    namespace = get_projet_s3_info(nom_projet=nom_projet).key
+
+    # Get catalog
+    properties = generate_catalog_properties(
+        uri=DEFAULT_POLARIS_HOST,
+    )
+    catalog = IcebergCatalog(name=DEFAULT_POLARIS_CATALOG, properties=properties)
+
+    # Get all tables
+    tables = catalog.list_tables(namespace=namespace, pattern="*_staging*")
+
+    # Drop staging tables from Iceberg catalog
+    for table in tables:
+        logging.info(msg=f"Dropping staging table {table} ...")
+        catalog.drop_table(table_name=table[1], purge=True)
+        logging.info(msg=f"Staging table {table} dropped successfully !")
+
+    # Delete staging files from S3
+    s3_handler = create_default_s3_handler(
+        connection_id=DEFAULT_S3_CONN_ID,
+    )
+    staging_keys = s3_handler.list_files(directory=namespace, pattern="*_staging*")
+    for key in staging_keys:
+        logging.info(msg=f"Deleting staging file {key} ...")
+        s3_handler.delete_single(file_path=key)
+        logging.info(msg=f"Staging file {key} deleted successfully !")
 
 
 def write_to_s3(
