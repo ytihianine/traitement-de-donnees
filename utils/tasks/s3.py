@@ -151,7 +151,7 @@ def del_s3_files(
     for config in selecteur_config:
         logging.info(msg=f"{config}")
         if config.selecteur_info.type_source == TypeSource.FILE:
-            s3_key_source = config.selecteur_info.get_full_s3_key()
+            s3_key_source = config.selecteur_info.get_full_s3_key(use_id_source=True)
             try:
                 logging.info(msg=f"Deleting source file {s3_key_source}")
                 s3_handler.delete_single(file_path=s3_key_source)
