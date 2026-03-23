@@ -52,7 +52,7 @@ def cartographie_remuneration_grist() -> None:
     """Task order"""
     chain(
         validate_dag_parameters(),
-        get_projet_snapshot(),
+        get_projet_snapshot(nom_projet="Cartographie rémunération"),
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci-dge",
