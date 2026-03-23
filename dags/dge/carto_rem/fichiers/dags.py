@@ -14,6 +14,7 @@ from utils.tasks.s3 import (
     del_s3_files,
     import_files_to_iceberg,
     iceberg_copy_staging_to_prod,
+    del_iceberg_staging_table,
 )
 from utils.config.tasks import get_list_source_fichier
 from utils.tasks.validation import validate_dag_parameters
@@ -85,6 +86,7 @@ def cartographie_remuneration() -> None:
         del_s3_files(
             selecteur_options=selecteur_options,
         ),
+        del_iceberg_staging_table(),
     )
 
 
