@@ -170,6 +170,9 @@ class S3FileHandler(BaseFileHandler):
     ) -> List[str]:
         """List files in S3 directory using Airflow's S3Hook."""
         prefix = str(directory).rstrip("/") + "/"
+        logging.info(
+            msg=f"Listing files in S3 directory: {prefix} with pattern: {pattern}"
+        )
         try:
             keys = self.hook.list_keys(bucket_name=self.bucket, prefix=prefix)
 
@@ -179,8 +182,9 @@ class S3FileHandler(BaseFileHandler):
             if pattern:
                 import fnmatch
 
-                return fnmatch.filter(names=keys, pat=pattern)
+                keys = fnmatch.filter(names=keys, pat=pattern)
 
+            logging.info(msg=f"Found {len(keys)} files in S3 directory")
             return keys
 
         except Exception as e:
