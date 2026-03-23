@@ -15,12 +15,16 @@ def process_data() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_direction,
         version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
     )
     ref_service = create_grist_etl_task(
         selecteur="service",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_service,
         version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
     )
     # Projet
     projets = create_grist_etl_task(
@@ -28,30 +32,40 @@ def process_data() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_projet,
         version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
     )
     projet_contact = create_grist_etl_task(
         selecteur="projet_contact",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_projet_contact,
         version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
     )
     projet_documentation = create_grist_etl_task(
         selecteur="projet_documentation",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_projet_documentation,
         version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
     )
     projet_s3 = create_grist_etl_task(
         selecteur="projet_s3",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_projet_s3,
         version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
     )
     projet_selecteur = create_grist_etl_task(
         selecteur="projet_selecteur",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_selecteur,
         version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
     )
     # Selecteur
     selecteur_source = create_grist_etl_task(
@@ -59,18 +73,24 @@ def process_data() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_source,
         version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
     )
     selecteur_database = create_grist_etl_task(
         selecteur="selecteur_database",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_selecteur_database,
         version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
     )
     selecteur_s3 = create_grist_etl_task(
         selecteur="selecteur_s3",
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_selecteur_s3,
         version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
     )
 
     selecteur_column_mapping = create_grist_etl_task(
@@ -78,6 +98,8 @@ def process_data() -> None:
         normalisation_process_func=normalize_grist_dataframe,
         process_func=process.process_col_mapping,
         version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
     )
 
     chain(
