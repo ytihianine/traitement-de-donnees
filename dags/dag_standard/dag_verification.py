@@ -87,7 +87,7 @@ def dag_verification() -> None:
         print(keys)
         print(len(keys))
         keys_with_pattern = s3_hook.list_files(
-            directory="data_store/test_namespace/", pattern=".*_staging.*"
+            directory="data_store/test_namespace/", pattern="*_staging*"
         )
         print(keys_with_pattern)
         print(len(keys_with_pattern))
