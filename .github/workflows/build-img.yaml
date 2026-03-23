@@ -1,9 +1,6 @@
 name: Build and Push custom airflow image
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 env:
