@@ -19,7 +19,7 @@ from enums.filesystem import IcebergTableStatus
 
 from utils.tasks.sql import get_projet_snapshot  # , import_files_to_db
 from utils.tasks.projet import config_projet_group
-from utils.tasks.s3 import write_to_s3
+from utils.tasks.s3 import write_to_s3, del_iceberg_staging_table
 
 from utils.config.vars import DEFAULT_POLARIS_HOST, DEFAULT_S3_CONN_ID
 from dags.dag_standard.config import selecteur_mapping
@@ -138,6 +138,7 @@ def dag_verification() -> None:
             iceberg_task(),
             check_liste_source_fichier(),
             check_s3_hook(),
+            del_iceberg_staging_table(),
         ],
     )
 
