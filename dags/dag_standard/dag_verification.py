@@ -85,6 +85,12 @@ def dag_verification() -> None:
         s3_hook = create_default_s3_handler(connection_id=DEFAULT_S3_CONN_ID)
         keys = s3_hook.list_files(directory="data_store/test_namespace/")
         print(keys)
+        print(len(keys))
+        keys_with_pattern = s3_hook.list_files(
+            directory="data_store/test_namespace/", pattern=".*_staging.*"
+        )
+        print(keys_with_pattern)
+        print(len(keys_with_pattern))
 
     @task
     def iceberg_task(**context) -> None:
