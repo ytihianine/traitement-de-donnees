@@ -73,6 +73,7 @@ def cartographie_remuneration() -> None:
         looking_for_files,
         create_projet_snapshot(),
         get_projet_snapshot(),
+        del_iceberg_staging_table(),
         source_files(),
         import_files_to_iceberg(
             nom_projet=nom_projet, selecteur_options=selecteur_options
@@ -80,13 +81,13 @@ def cartographie_remuneration() -> None:
         iceberg_copy_staging_to_prod(
             nom_projet=nom_projet, selecteur_options=selecteur_options
         ),
+        del_iceberg_staging_table(),
         copy_s3_files(
             selecteur_options=selecteur_options,
         ),
         del_s3_files(
             selecteur_options=selecteur_options,
         ),
-        del_iceberg_staging_table(),
     )
 
 
