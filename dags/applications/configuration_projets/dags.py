@@ -22,6 +22,7 @@ from utils.tasks.s3 import (
     copy_s3_files,
     iceberg_copy_staging_to_prod,
     del_s3_files,
+    del_iceberg_staging_table,
 )
 from dags.applications.configuration_projets.tasks import (
     process_data,
@@ -95,6 +96,7 @@ def configuration_projets() -> None:
             nom_projet=nom_projet,
             selecteur_options=selecteur_options,
         ),
+        del_iceberg_staging_table(),
     )
 
 
