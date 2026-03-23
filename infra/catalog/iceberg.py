@@ -199,5 +199,5 @@ class IcebergCatalog:
         if pattern:
             import fnmatch
 
-            tables = [t for t in tables if fnmatch.fnmatch(name=str(t), pat=pattern)]
+            tables = [t for t in tables if fnmatch.fnmatch(name=t[-1], pat=pattern)]
         return tables
