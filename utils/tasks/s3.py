@@ -200,7 +200,7 @@ def del_iceberg_staging_table(
     # Drop staging tables from Iceberg catalog
     for table in tables:
         logging.info(msg=f"Dropping staging table {table} ...")
-        catalog.drop_table(table_name=".".join(table), purge=True)
+        catalog.drop_table(table_name=".".join(table), purge=False)
         logging.info(msg=f"Staging table {table} dropped successfully !")
 
     # Delete staging files from S3
