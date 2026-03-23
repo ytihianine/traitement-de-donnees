@@ -157,7 +157,13 @@ class IcebergCatalog:
         else:
             table.append(df=pa_data)
 
-    def read_table(self, table_name: str) -> pd.DataFrame:
+    def read_table(self, table_name: str) -> Table:
+        # Logic to read data from a table in the Iceberg catalog
+        logging.info(msg=f"Reading from table with name: {table_name}")
+        table = self.catalog.load_table(identifier=table_name)
+        return table
+
+    def read_table_as_df(self, table_name: str) -> pd.DataFrame:
         # Logic to read data from a table in the Iceberg catalog
         logging.info(msg=f"Reading from table with name: {table_name}")
         table = self.catalog.load_table(identifier=table_name)
