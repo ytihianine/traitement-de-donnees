@@ -193,11 +193,12 @@ class IcebergCatalog:
     ) -> list[Identifier]:
         # Logic to list all tables in the Iceberg catalog
         logging.info(
-            msg=f"Listing tables in catalog {self.name} and namespace: {namespace}"
+            msg=f"Listing tables in catalog {self.name}, namespace: {namespace} and pattern: {pattern}"
         )
         tables = self.catalog.list_tables(namespace=namespace)
         if pattern:
             import fnmatch
 
             tables = [t for t in tables if fnmatch.fnmatch(name=t[-1], pat=pattern)]
+        logging.info(msg=f"Found {len(tables)} tables.")
         return tables
