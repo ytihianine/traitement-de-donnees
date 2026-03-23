@@ -8,6 +8,7 @@ from pyiceberg.catalog import Catalog, load_catalog
 from pyiceberg.table import Table
 from airflow.sdk import Variable
 import pandas as pd
+from pyiceberg.typedef import Identifier
 
 
 def generate_catalog_properties(
@@ -16,6 +17,7 @@ def generate_catalog_properties(
     client_id: str | None = None,
     client_secret: str | None = None,
     ca_bundle_path: str | None = None,
+    options: dict[str, Any] | None = None,
 ) -> Mapping[str, Any]:
     if client_id is None:
         client_id = Variable.get(key="iceberg_client_id")
@@ -29,12 +31,6 @@ def generate_catalog_properties(
         "credential": f"{client_id}:{client_secret}",
         "scope": "PRINCIPAL_ROLE:ALL",
         "header.X-Iceberg-Access-Delegation": None,
-        # "ssl": {"cabundle": ENV_VAR["SSL_CERT_FILE"]},
-        # "s3.endpoint": "https://your-s3-endpoint",  # if not AWS
-        # "s3.access-key-id": your_access_key,
-        # "s3.secret-access-key": your_secret_key,
-        # "s3.region": "your-region",
-        # "py-io-impl": "pyiceberg.io.fsspec.FsspecFileIO"
     }
 
     if ca_bundle_path:
@@ -44,6 +40,18 @@ def generate_catalog_properties(
         os_ca = ssl.get_default_verify_paths().cafile
         if os_ca:
             properties["ssl"] = {"cabundle": os_ca}
+
+    if options:
+        # Example additional options
+        # options = {
+        # "ssl": {"cabundle": ENV_VAR["SSL_CERT_FILE"]},
+        # "s3.endpoint": "https://your-s3-endpoint",  # if not AWS
+        # "s3.access-key-id": your_access_key,
+        # "s3.secret-access-key": your_secret_key,
+        # "s3.region": "your-region",
+        # "py-io-impl": "pyiceberg.io.fsspec.FsspecFileIO"
+        # }
+        properties = properties | options
 
     return properties
 
@@ -179,3 +187,17 @@ class IcebergCatalog:
                 msg=f"Dropping table {table_name} - data will not be removed from s3. Set purge=True to delete data"
             )
             self.catalog.drop_table(identifier=table_name)
+
+    def list_tables(
+        self, namespace: str, pattern: str | None = None
+    ) -> list[Identifier]:
+        # Logic to list all tables in the Iceberg catalog
+        logging.info(
+            msg=f"Listing tables in catalog {self.name} and namespace: {namespace}"
+        )
+        tables = self.catalog.list_tables(namespace=namespace)
+        if pattern:
+            import fnmatch
+
+            tables = [t for t in tables if fnmatch.fnmatch(name=str(t), pat=pattern)]
+        return tables
