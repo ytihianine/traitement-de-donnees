@@ -177,9 +177,10 @@ class S3FileHandler(BaseFileHandler):
                 return []
 
             if pattern:
-                from fnmatch import fnmatch
+                import fnmatch
 
-                return [k for k in keys if fnmatch(k, pattern)]
+                return fnmatch.filter(names=keys, pat=pattern)
+
             return keys
 
         except Exception as e:
