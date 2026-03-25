@@ -86,12 +86,16 @@ def process_service_prescripteur(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"centre_de_cout": "centre_cout"})
     df = df.dropna(subset=["centre_financier", "centre_cout"], how="any")
 
+    # Drop columns
+    cols_to_drop = ["import_timestamp"]
+    df = df.drop(columns=cols_to_drop)
+
     # Nettoyage des données textuelles
     txt_cols = ["centre_financier", "centre_cout", "couple_cf_cc", "observation"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     # Convertir les colonnes date
-    date_cols = ["date_creation", "date_derniere_maj"]
+    date_cols = ["date_derniere_maj"]
     df = convert_grist_date_to_date(df=df, columns=date_cols)
 
     # Gestion des références vides
@@ -130,6 +134,7 @@ def process_delai_global_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
         "annee_exercice",
         "societe",
         "type_piece",
+        "import_timestamp",
     ]
     df = df.drop(columns=cols_to_drop)
 
@@ -170,6 +175,7 @@ def process_demande_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
         "centre_financier",
         "unique_multiple",
         "texte_de_poste",
+        "import_timestamp",
     ]
     df = df.drop(columns=cols_to_drop)
 
@@ -191,6 +197,7 @@ def process_engagement_juridique_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
         "centre_financier",
         "orga",
         "gac",
+        "import_timestamp",
     ]
     df = df.drop(columns=cols_to_drop)
 

@@ -62,7 +62,6 @@ CREATE TABLE donnee_comptable."service_prescripteur" (
   "designation_bop" int,
   "designation_uo" int,
   "designation_cc" int,
-  "date_creation" TIMESTAMP,
   "date_derniere_maj" TIMESTAMP,
   "doublon" int,
   FOREIGN KEY ("service_prescripteur_pilotage_") REFERENCES donnee_comptable."ref_service_prescripteur_pilotage" ("id"),

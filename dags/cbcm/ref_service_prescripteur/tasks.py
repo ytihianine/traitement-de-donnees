@@ -8,7 +8,7 @@ from dags.cbcm.ref_service_prescripteur import process
 from dags.cbcm.ref_service_prescripteur import actions
 from utils.control.structures import normalize_grist_dataframe
 
-version = "v2"
+version = "v1"
 
 
 @task_group(group_id="grist_source")
