@@ -130,8 +130,11 @@ def process_demande_achat(df: pd.DataFrame) -> pd.DataFrame:
     df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
 
     # Déterminer si la DA est unique ou multiple
-    df_grouped = df.groupby(by=["id_da"], as_index=False)["id_da"].count()
-    df_grouped = df_grouped.rename(columns={"id_da": "nb_id_da"})  # type: ignore
+    df_grouped = (  # pyright: ignore[reportCallIssue]
+        df.groupby(by=["id_da"], as_index=False)
+        .size()
+        .rename(columns={"size": "nb_id_da"})
+    )
 
     # Catégoriser les données
     df_grouped["unique_multi"] = np.where(
@@ -139,7 +142,12 @@ def process_demande_achat(df: pd.DataFrame) -> pd.DataFrame:
         "Unique",
         "Multiple",
     )
-    df = pd.merge(left=df, right=df_grouped, how="left", on="id_da")
+    df = pd.merge(
+        left=df,
+        right=df_grouped[["id_da", "unique_multi", "nb_id_da"]],
+        how="left",
+        on="id_da",
+    )
 
     # Catégoriser les données
     df["mois"] = df["date_creation_da"].dt.month
