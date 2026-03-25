@@ -6,6 +6,7 @@ class DatabaseType(Enum):
 
     POSTGRES = auto()
     SQLITE = auto()
+    TRINO = auto()
 
 
 class PartitionTimePeriod(Enum):
