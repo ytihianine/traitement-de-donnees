@@ -115,7 +115,7 @@ def fetch_from_db() -> None:
                 fn=actions.get_all_cf_cc,
             )
         ],
-        add_import_date=False,
+        add_import_date=True,
         add_snapshot_id=False,
     )
     get_demande_achat = create_task(

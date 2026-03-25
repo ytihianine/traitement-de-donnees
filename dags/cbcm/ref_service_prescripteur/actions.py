@@ -1,4 +1,3 @@
-from typing import Mapping
 from airflow.sdk import Variable
 from infra.http_client.adapters import RequestsClient
 from infra.http_client.config import ClientConfig
@@ -16,7 +15,8 @@ def get_all_cf_cc() -> pd.DataFrame:
             select
                 distinct
                 centre_financier,
-                centre_cout
+                centre_cout,
+                import_timestamp
             from
                 donnee_comptable.demande_achat
             where
@@ -26,7 +26,8 @@ def get_all_cf_cc() -> pd.DataFrame:
             select
                 distinct
                 centre_financier,
-                centre_cout
+                centre_cout,
+                import_timestamp
             from
                 donnee_comptable.engagement_juridique
             where
@@ -36,7 +37,8 @@ def get_all_cf_cc() -> pd.DataFrame:
             select
                 distinct
                 centre_financier,
-                centre_cout
+                centre_cout,
+                import_timestamp
             from
                 donnee_comptable.delai_global_paiement
             where
@@ -46,7 +48,8 @@ def get_all_cf_cc() -> pd.DataFrame:
             select
                 distinct
                 centre_financier,
-                centre_cout
+                centre_cout,
+                import_timestamp
             from
                 donnee_comptable.demande_paiement_complet
             where
@@ -65,10 +68,12 @@ def get_demande_achat() -> pd.DataFrame:
             SELECT
                 id_da,
                 centre_financier,
-                centre_cout
+                centre_cout,
+                unique_multi,
+                import_timestamp
             FROM donnee_comptable.demande_achat
             GROUP BY
-                id_da, centre_financier, centre_cout
+                id_da, centre_financier, centre_cout, unique_multi, import_timestamp
             ;
         """)
 
@@ -84,7 +89,8 @@ def get_demande_paiement_complet() -> pd.DataFrame:
                 centre_financier,
                 centre_cout,
                 unique_multi,
-                texte_de_poste
+                texte_de_poste,
+                import_timestamp
             from
                 donnee_comptable.demande_paiement_complet
             group by
@@ -92,7 +98,8 @@ def get_demande_paiement_complet() -> pd.DataFrame:
                 centre_financier,
                 centre_cout,
                 unique_multi,
-                texte_de_poste
+                texte_de_poste,
+                import_timestamp
             ;
         """)
 
@@ -109,7 +116,8 @@ def get_delai_global_paiement() -> pd.DataFrame:
                 centre_cout,
                 annee_exercice,
                 societe,
-                type_piece
+                type_piece,
+                import_timestamp
             from
                 donnee_comptable.delai_global_paiement
             group by
@@ -118,7 +126,8 @@ def get_delai_global_paiement() -> pd.DataFrame:
                 centre_cout,
                 annee_exercice,
                 societe,
-                type_piece
+                type_piece,
+                import_timestamp
             ;
         """)
 
@@ -134,7 +143,8 @@ def get_engagement_juridique() -> pd.DataFrame:
                 centre_financier,
                 centre_cout,
                 orga,
-                gac
+                gac,
+                import_timestamp
             from
                 donnee_comptable.engagement_juridique
             group by
@@ -142,7 +152,8 @@ def get_engagement_juridique() -> pd.DataFrame:
                 centre_financier,
                 centre_cout,
                 orga,
-                gac
+                gac,
+                import_timestamp
             ;
         """)
 
@@ -152,36 +163,6 @@ def get_engagement_juridique() -> pd.DataFrame:
 # ========================================
 # Envoyer les nouvelles données sur Grist
 # ========================================
-def _send_to_grist(
-    df: pd.DataFrame, rename_columns: Mapping[str, str], grist_tbl_name: str
-) -> None:
-    # Intégrer ces lignes dans Grist
-    new_rows = df.rename(columns=rename_columns).to_dict(orient="records")
-    print(f"Nombre de nouvelles lignes à envoyer: {len(new_rows)}")
-
-    if len(new_rows) > 0:
-        print(f"Ajout des nouvelles lignes dans la table {grist_tbl_name}")
-        data = {"records": [{"fields": record} for record in new_rows]}
-
-        print(f"Exemple: {data['records'][0]}")
-
-        http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
-        request_client = RequestsClient(config=http_config)
-        grist_client = GristAPI(
-            http_client=request_client,
-            base_url=DEFAULT_GRIST_HOST,
-            workspace_id="dsci",
-            doc_id=Variable.get(key="grist_doc_id_cbcm"),
-            api_token=Variable.get(key="grist_secret_key"),
-        )
-        grist_client.post_records(tbl_name=grist_tbl_name, json=data)
-
-    else:
-        print(
-            f"Aucune nouvelle ligne à ajouter dans la table {grist_tbl_name} ... Skipping"
-        )
-
-
 def load_new_cf_cc(df_get_all_cf_cc: pd.DataFrame, df_sp: pd.DataFrame) -> None:
     # Filtrer les lignes
     df_get_all_cf_cc = df_get_all_cf_cc.loc[
@@ -227,7 +208,8 @@ def load_demande_achat(
 ) -> None:
     # Filtrer les lignes
     df_get_demande_achat = df_get_demande_achat.loc[
-        (df_get_demande_achat["centre_financier"] == "Ind")
+        (df_get_demande_achat["unique_multi"] == "Multiple")
+        | (df_get_demande_achat["centre_financier"] == "Ind")
         | (df_get_demande_achat["centre_cout"] == "Ind")
     ]
 
@@ -243,6 +225,12 @@ def load_demande_achat(
     # Conserver uniquement les nouvelles
     df = df.loc[df["_merge"] == "left_only"]
     df = df.drop(columns=["_merge"])
+
+    # Supprimer les CF/CC pour les id_da en "Multiple"
+    df.loc[df["unique_multi"] == "Multiple", ["centre_financier", "centre_cout"]] = (
+        pd.NA
+    )
+    df = df.drop_duplicates(subset=["id_da", "unique_multi"])
 
     # Les envoyers dans Grist
     print(df.columns)
