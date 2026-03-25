@@ -59,7 +59,6 @@ CREATE TABLE donnee_comptable.delai_global_paiement (
 	mois int,
 	mois_nom text,
 	mois_nombre_nom text,
-	id int,
 	import_timestamp timestamp not null,
 	import_date date not null,
 	snapshot_id text
@@ -79,7 +78,6 @@ CREATE TABLE donnee_comptable.demande_achat (
 	montant_cumule_postes_da_traites float8 NULL,
 	delai_traitement_da float8 NULL,
 	cf_cc text,
-	id int,
 	mois int,
 	mois_nom text,
 	mois_nombre_nom text,
@@ -204,7 +202,6 @@ CREATE TABLE donnee_comptable.demande_paiement_complet (
 	statut_dp_carte_achat text,
 	num_dp_flux bigint,
 	dp_flux_3 text,
-	id bigint,
 	num_piece_sfp bigint,
 	num_ej_sfp bigint,
 	type_flux_sfp text,
