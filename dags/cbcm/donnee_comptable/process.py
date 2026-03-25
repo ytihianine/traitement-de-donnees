@@ -5,6 +5,9 @@ import pandas as pd
 import numpy as np
 
 from utils.control.text import convert_str_cols_to_date, normalize_whitespace_columns
+from dags.cbcm.donnee_comptable.config import (
+    DEFAULT_NULL_CC_CF,
+)
 
 corr_mois = {
     "janvier": "01-janv",
@@ -105,7 +108,7 @@ def process_demande_achat(df: pd.DataFrame) -> pd.DataFrame:
     # Remplacer les valeurs nulles
     df[["centre_financier", "centre_cout"]] = df[
         ["centre_financier", "centre_cout"]
-    ].fillna("Ind")
+    ].fillna(DEFAULT_NULL_CC_CF)
 
     # Nettoyer les champs textuels
     txt_cols = ["centre_financier", "centre_cout"]
@@ -159,7 +162,7 @@ def process_engagement_juridique(df: pd.DataFrame) -> pd.DataFrame:
     # Remplacer les valeurs nulles
     df[["centre_financier", "centre_cout"]] = df[
         ["centre_financier", "centre_cout"]
-    ].fillna("Ind")
+    ].fillna(DEFAULT_NULL_CC_CF)
 
     # Nettoyer les champs textuels
     txt_cols = ["centre_financier", "centre_cout", "type_ej"]
@@ -210,7 +213,7 @@ def process_engagement_juridique(df: pd.DataFrame) -> pd.DataFrame:
 def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
     """fichier ZDEP53"""
     # Remplacer les valeurs nulles
-    df[["centre_financier"]] = df[["centre_financier"]].fillna("Ind")
+    df[["centre_financier"]] = df[["centre_financier"]].fillna(DEFAULT_NULL_CC_CF)
 
     # Nettoyer les champs textuels
     txt_cols = ["centre_financier", "societe", "statut_piece"]
@@ -330,7 +333,7 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     # Remplacer les valeurs nulles
     df[["centre_financier", "centre_cout"]] = df[
         ["centre_financier", "centre_cout"]
-    ].fillna("Ind")
+    ].fillna(DEFAULT_NULL_CC_CF)
 
     # Nettoyer les champs textuels
     txt_cols = ["societe", "centre_cout", "centre_financier", "texte_de_poste"]
@@ -435,7 +438,6 @@ def process_demande_paiement_complet(
     duplicate_to_drop = [
         "id_row_dp_",
         "societe_",
-        "centre_financier_",
         "automatisation_wf_cpt_",
         "import_timestamp_",
         "import_date_",
@@ -443,7 +445,22 @@ def process_demande_paiement_complet(
     ]
     df = df.drop(df.filter(regex="|".join(duplicate_to_drop)).columns, axis=1)  # type: ignore
 
+    # Rename columns
+    df = df.rename(
+        columns={
+            "centre_financier": "centre_financier_demande_paiement",
+            "centre_financier_a": "centre_financier_journal_pieces",
+        }
+    )
+
     # Ajout des colonnes calculées
+    df["centre_financier"] = (
+        df["centre_financier_journal_pieces"]
+        .combine_first(df["centre_financier_demande_paiement"])
+        .fillna(DEFAULT_NULL_CC_CF)
+    )
+    df["centre_cout"] = df["centre_cout"].fillna(DEFAULT_NULL_CC_CF)
+
     conditions = [
         (df["dp_flux_3"] == "Flux 3") & (df["automatisation_wf_cpt"] == "X"),
         (df["dp_flux_3"] == "Flux 3"),
@@ -474,10 +491,10 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
     df = normalize_whitespace_columns(df, columns=txt_cols)
 
     # Remplacer les valeurs nulles
-    df["centre_cout"] = df["centre_cout"].replace({"#": "Ind"})
+    df["centre_cout"] = df["centre_cout"].replace({"#": DEFAULT_NULL_CC_CF})
     df[["centre_financier", "centre_cout"]] = df[
         ["centre_financier", "centre_cout"]
-    ].fillna("Ind")
+    ].fillna(DEFAULT_NULL_CC_CF)
 
     # Filtrer les lignes
     df = df.loc[df["societe"].isin(["ADCE", "CSND"])]
