@@ -1,6 +1,6 @@
 from pprint import pprint
 
-from airflow.sdk import dag, task
+from airflow.sdk import Variable, dag, task
 from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import (
@@ -21,7 +21,12 @@ from utils.tasks.sql import get_projet_snapshot  # , import_files_to_db
 from utils.tasks.projet import config_projet_group
 from utils.tasks.s3 import write_to_s3, del_iceberg_staging_table
 
-from utils.config.vars import DEFAULT_POLARIS_HOST, DEFAULT_S3_CONN_ID
+from utils.config.vars import (
+    DEFAULT_POLARIS_HOST,
+    DEFAULT_S3_CONN_ID,
+    DEFAULT_POLARIS_CATALOG,
+    DEFAULT_TRINO_HOST,
+)
 from dags.dag_standard.config import selecteur_mapping
 
 nom_projet = "Configuration des projets"
@@ -95,6 +100,25 @@ def dag_verification() -> None:
         s3_hook.delete_single(file_path="data_store/test_namespace/test_table_staging/")
 
     @task
+    def check_trino_hook() -> None:
+        from infra.database.trino import TrinoDBHandler
+
+        trino_user = Variable.get(key="TRINO_USER")
+
+        trino_handler = TrinoDBHandler(
+            host=DEFAULT_TRINO_HOST,
+            user=trino_user,
+            catalog=DEFAULT_POLARIS_CATALOG,
+            port=443,
+            http_scheme="https",
+            verify=False,
+        )
+        df = trino_handler.fetch_df(
+            query="SELECT * FROM iceberg.information_schema.tables"
+        )
+        print(df.head())
+
+    @task
     def iceberg_task(**context) -> None:
         import pandas as pd
 
@@ -140,6 +164,7 @@ def dag_verification() -> None:
             iceberg_task(),
             check_liste_source_fichier(),
             check_s3_hook(),
+            check_trino_hook(),
             del_iceberg_staging_table(),
         ],
     )

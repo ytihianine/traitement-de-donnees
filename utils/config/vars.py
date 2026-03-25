@@ -57,6 +57,8 @@ DEFAULT_POLARIS_CATALOG = "data_store"
 # S3
 DEFAULT_S3_ENDPOINT_URL = "https://minio.lab.incubateur.finances.rie.gouv.fr"
 
+# Trino
+DEFAULT_TRINO_HOST = "trino-mef-sg.lab.incubateur.finances.rie.gouv.fr"
 
 # Grist
 DEFAULT_GRIST_HOST = "https://grist.numerique.gouv.fr"
