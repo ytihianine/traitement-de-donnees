@@ -17,7 +17,6 @@ from utils.config.vars import (
     DEFAULT_S3_CONN_ID,
 )
 
-
 http_client_config = ClientConfig(
     timeout=30, verify_ssl=False, user_agent=AGENT, proxy=PROXY
 )

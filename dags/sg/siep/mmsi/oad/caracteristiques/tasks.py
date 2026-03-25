@@ -7,7 +7,6 @@ from utils.tasks.etl import create_task
 
 from dags.sg.siep.mmsi.oad.caracteristiques import process
 
-
 oad_carac_to_parquet = create_parquet_converter_task(
     selecteur="oad_carac",
     task_params={"task_id": "convert_oad_caracteristique_to_parquet"},

@@ -1,4 +1,4 @@
-""" Répertorie les variables communes à toutes les pipelines """
+"""Répertorie les variables communes à toutes les pipelines"""
 
 import os
 import sys

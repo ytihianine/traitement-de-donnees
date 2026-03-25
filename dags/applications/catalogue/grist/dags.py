@@ -21,7 +21,6 @@ from dags.applications.catalogue.grist.tasks import (
     source_grist,
 )
 
-
 nom_projet = "Catalogue"
 
 

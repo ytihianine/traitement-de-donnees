@@ -82,7 +82,7 @@ def create_default_s3_handler(
 
 
 def create_local_handler(
-    base_path: Optional[Union[str, Path]] = None
+    base_path: Optional[Union[str, Path]] = None,
 ) -> BaseFileHandler:
     """
     Create local file handler.

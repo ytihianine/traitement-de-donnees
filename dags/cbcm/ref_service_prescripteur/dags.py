@@ -28,7 +28,6 @@ from dags.cbcm.ref_service_prescripteur.tasks import (
 )
 from dags.cbcm.ref_service_prescripteur.config import selecteur_options
 
-
 # Variables
 nom_projet = "Données comptable - référentiel"
 

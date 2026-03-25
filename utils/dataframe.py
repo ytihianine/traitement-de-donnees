@@ -29,8 +29,7 @@ def df_info(
     )
 
     if full_logs:
-        logging.info(
-            msg=f"""
+        logging.info(msg=f"""
             ### {df_name} ### \n
             Shape of DataFrame: {df.shape} \n
             Columns: {col_str_format} \n
@@ -39,19 +38,16 @@ def df_info(
             Descriptive Statistics (Numerical Columns): \n{df.describe()} \n
             Sample Data (First {sample_size} rows): \n{df.head(sample_size)} \n
             Memory Usage: {df.memory_usage(deep=True).sum() / 1048576} Mo
-            """
-        )
+            """)
     else:
-        logging.info(
-            msg=f"""
+        logging.info(msg=f"""
             ### {df_name} ### \n
             Shape of DataFrame: {df.shape} \n
             Columns: {col_str_format} \n
             Missing Values: \n{df.isnull().sum()} \n
             Sample Data (First {sample_size} rows): \n{df.head(sample_size)} \n
             Memory Usage: {df.memory_usage(deep=True).sum() / 1048576} Mo
-            """
-        )
+            """)
 
 
 def tag_last_value_rows(df: pd.DataFrame, colname_max_value: str) -> pd.DataFrame:

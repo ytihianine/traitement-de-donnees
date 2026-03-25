@@ -23,7 +23,6 @@ from dags.sg.srh.mentorat_merci.config import (
     selecteur_options,
 )
 
-
 # Mails
 nom_projet = "Mentorat MERCI"
 LINK_DOC_PIPELINE = "Non-défini"  # noqa

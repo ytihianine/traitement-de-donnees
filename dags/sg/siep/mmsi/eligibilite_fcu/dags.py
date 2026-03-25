@@ -26,7 +26,6 @@ from dags.sg.siep.mmsi.eligibilite_fcu.task import (
 )
 from dags.sg.siep.mmsi.eligibilite_fcu.config import selecteur_options
 
-
 nom_projet = "France Chaleur Urbaine (FCU)"
 
 

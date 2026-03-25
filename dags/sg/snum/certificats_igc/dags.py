@@ -27,7 +27,6 @@ from utils.tasks.validation import validate_dag_parameters
 from dags.sg.snum.certificats_igc.tasks import source_files, output_files
 from dags.sg.snum.certificats_igc.config import selecteur_options
 
-
 nom_projet = "Certificat IGC"
 
 

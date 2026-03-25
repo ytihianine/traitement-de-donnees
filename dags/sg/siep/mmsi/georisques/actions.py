@@ -24,7 +24,6 @@ from dags.sg.siep.mmsi.georisques.process import (
     format_risque_results,
 )
 
-
 logger = logging.getLogger(name=__name__)
 
 

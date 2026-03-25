@@ -22,7 +22,6 @@ from utils.config.vars import (
     paris_tz,
 )
 
-
 default_mail_config = {
     MailStatus.START: {
         "template_path": "pipeline_start.html",

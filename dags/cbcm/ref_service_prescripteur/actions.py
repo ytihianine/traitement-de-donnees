@@ -12,8 +12,7 @@ from utils.config.vars import AGENT, DEFAULT_GRIST_HOST, DEFAULT_PG_DATA_CONN_ID
 def get_all_cf_cc() -> pd.DataFrame:
     # Récupérer les SP déjà connus
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
-    df = db_handler.fetch_df(
-        query="""
+    df = db_handler.fetch_df(query="""
             select
                 distinct
                 centre_financier,
@@ -54,8 +53,7 @@ def get_all_cf_cc() -> pd.DataFrame:
                 centre_financier <> 'Ind'
                 and centre_cout <> 'Ind'
             ;
-        """
-    )
+        """)
 
     return df
 
@@ -63,8 +61,7 @@ def get_all_cf_cc() -> pd.DataFrame:
 def get_demande_achat() -> pd.DataFrame:
     # Récupérer les SP déjà connus
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
-    df = db_handler.fetch_df(
-        query="""
+    df = db_handler.fetch_df(query="""
             SELECT
                 id_da,
                 centre_financier,
@@ -73,8 +70,7 @@ def get_demande_achat() -> pd.DataFrame:
             GROUP BY
                 id_da, centre_financier, centre_cout
             ;
-        """
-    )
+        """)
 
     return df
 
@@ -82,8 +78,7 @@ def get_demande_achat() -> pd.DataFrame:
 def get_demande_paiement_complet() -> pd.DataFrame:
     # Récupérer les SP déjà connus
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
-    df = db_handler.fetch_df(
-        query="""
+    df = db_handler.fetch_df(query="""
             select
                 id_dp,
                 centre_financier,
@@ -99,8 +94,7 @@ def get_demande_paiement_complet() -> pd.DataFrame:
                 unique_multi,
                 texte_de_poste
             ;
-        """
-    )
+        """)
 
     return df
 
@@ -108,8 +102,7 @@ def get_demande_paiement_complet() -> pd.DataFrame:
 def get_delai_global_paiement() -> pd.DataFrame:
     # Récupérer les SP déjà connus
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
-    df = db_handler.fetch_df(
-        query="""
+    df = db_handler.fetch_df(query="""
             select
                 id_dgp::text,
                 centre_financier,
@@ -127,8 +120,7 @@ def get_delai_global_paiement() -> pd.DataFrame:
                 societe,
                 type_piece
             ;
-        """
-    )
+        """)
 
     return df
 
@@ -136,8 +128,7 @@ def get_delai_global_paiement() -> pd.DataFrame:
 def get_engagement_juridique() -> pd.DataFrame:
     # Récupérer les SP déjà connus
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
-    df = db_handler.fetch_df(
-        query="""
+    df = db_handler.fetch_df(query="""
             select
                 id_ej,
                 centre_financier,
@@ -153,8 +144,7 @@ def get_engagement_juridique() -> pd.DataFrame:
                 orga,
                 gac
             ;
-        """
-    )
+        """)
 
     return df
 

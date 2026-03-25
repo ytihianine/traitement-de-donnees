@@ -6,7 +6,6 @@ from utils.tasks.etl import (
 from dags.sg.siep.mmsi.eligibilite_fcu import actions
 from dags.sg.siep.mmsi.eligibilite_fcu import process
 
-
 get_eligibilite_fcu = create_task(
     task_config=TaskConfig(task_id="eligibilite_fcu_to_file"),
     output_selecteur="fcu",

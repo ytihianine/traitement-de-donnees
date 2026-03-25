@@ -33,7 +33,6 @@ from dags.cbcm.donnee_comptable.config import (
     selecteur_options,
 )
 
-
 # Mails
 nom_projet = "Données comptable"
 

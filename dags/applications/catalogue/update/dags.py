@@ -16,7 +16,6 @@ from dags.applications.catalogue.update.tasks import (
 )
 from enums.dags import DagStatus
 
-
 nom_projet = "Catalogue - Update"
 
 

@@ -4,7 +4,6 @@ from utils.tasks.etl import create_task, create_file_etl_task
 from dags.sg.srh.mentorat_merci import action
 from dags.sg.srh.mentorat_merci import process
 
-
 agent_inscrit = create_file_etl_task(
     selecteur="agent_inscrit",
     process_func=process.clean_data,

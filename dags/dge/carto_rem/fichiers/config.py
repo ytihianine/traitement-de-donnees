@@ -1,6 +1,5 @@
 from _types.projet import SelecteurStorageOptions
 
-
 selecteur_options = {
     "agent_carriere": SelecteurStorageOptions(
         write_to_s3=False,

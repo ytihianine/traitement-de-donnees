@@ -4,7 +4,6 @@ from utils.control.dates import convert_grist_date_to_date
 from utils.control.structures import handle_grist_null_references
 from utils.control.text import normalize_whitespace_columns
 
-
 """
     Functions de processing des référentiels
 """

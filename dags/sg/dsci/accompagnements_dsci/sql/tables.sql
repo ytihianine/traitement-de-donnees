@@ -155,8 +155,8 @@ DROP TABLE IF EXISTS activite_dsci."accompagnement_dsci_porteur" CASCADE;
 CREATE TABLE activite_dsci."accompagnement_dsci_porteur" (
   "id" integer PRIMARY KEY,
   "id_accompagnement" integer,
-  "id_porteur_dsci" integer, 
-  UNIQUE ("id_accompagnement", "id_porteur_dsci"), 
+  "id_porteur_dsci" integer,
+  UNIQUE ("id_accompagnement", "id_porteur_dsci"),
   FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id"),
   FOREIGN KEY ("id_porteur_dsci") REFERENCES activite_dsci."effectif_dsci" ("id")
 );
@@ -409,7 +409,7 @@ CREATE TABLE activite_dsci."formation_codev_quest_inscription"(
 	"attentes" text,
 	"id_session_formation_codev" int,
 	--"is_duplicate" int,
-	"id_id_accompagnement" int 
+	"id_id_accompagnement" int
 );
 ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id");
 ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id");
@@ -420,7 +420,7 @@ CREATE TABLE activite_dsci."formation_fac_quest_satisfaction"(
 	"id" integer PRIMARY KEY,
 	"id_quest_formation" int,
 	"mail" text,
-	"id_promotion" int, 
+	"id_promotion" int,
 	"note_module_1" int,
 	"commentaire_m1" text,
 	"note_module_2" int,

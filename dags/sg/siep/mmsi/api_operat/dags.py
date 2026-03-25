@@ -22,7 +22,6 @@ from utils.tasks.s3 import (
 
 from dags.sg.siep.mmsi.api_operat.task import taches
 
-
 nom_projet = "API Opera"
 
 

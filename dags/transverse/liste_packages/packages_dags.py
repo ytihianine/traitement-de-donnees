@@ -6,7 +6,6 @@ from _types.dags import FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 
-
 nom_projet = "Liste des packages installés"
 
 

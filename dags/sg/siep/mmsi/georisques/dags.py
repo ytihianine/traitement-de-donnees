@@ -11,7 +11,6 @@ from utils.tasks.sql import (
     copy_tmp_table_to_real_table,
     ensure_partition,
     get_projet_snapshot,
-    import_file_to_db,
     import_files_to_db,
 )
 
@@ -22,7 +21,6 @@ from utils.tasks.s3 import (
 )
 from dags.sg.siep.mmsi.georisques.task import georisques_group
 from dags.sg.siep.mmsi.georisques.config import selecteur_options
-
 
 # Mails
 nom_projet = "Géorisques"

@@ -129,11 +129,12 @@ def correspondant() -> None:
 
     # Ordre des tâches
     chain(
-        [correspondant(),
-         correspondant_profil(),
-         correspondant_competence_particuliere(),
-         correspondant_connaissance_communaute(),
-         ]
+        [
+            correspondant(),
+            correspondant_profil(),
+            correspondant_competence_particuliere(),
+            correspondant_connaissance_communaute(),
+        ]
     )
 
 
@@ -165,14 +166,15 @@ def dsci() -> None:
         process_func=process.process_accompagnement_dsci_typologie,
     )
     # Ordre des tâches
-    chain([
-        accompagnement_dsci(),
-        effectif_dsci(),
-        accompagnement_dsci_equipe(),
-        accompagnement_dsci_porteur(),
-        accompagnement_dsci_typologie(),
-
-        ])
+    chain(
+        [
+            accompagnement_dsci(),
+            effectif_dsci(),
+            accompagnement_dsci_equipe(),
+            accompagnement_dsci_porteur(),
+            accompagnement_dsci_typologie(),
+        ]
+    )
 
 
 @task_group
@@ -260,7 +262,7 @@ def mission_innovation() -> None:
     fac_hors_bercylab_quest_type_accompagnement = create_grist_etl_task(
         selecteur="fac_hors_bercylab_quest_type_accompagnement",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_quest_accompagnement_fac_hors_bercylab_type
+        process_func=process.process_quest_accompagnement_fac_hors_bercylab_type,
     )
     fac_hors_bercylab_quest_accompagnement_partiicipants = create_grist_etl_task(
         selecteur="fac_hors_bercylab_quest_accompagnement_participants",
@@ -294,8 +296,7 @@ def mission_innovation() -> None:
             fac_hors_bercylab_quest_accompagnement(),
             fac_hors_bercylab_quest_type_accompagnement(),
             fac_hors_bercylab_quest_accompagnement_partiicipants(),
-            fac_hors_bercylab_quest_accompagnement_facilitateurs()
-
+            fac_hors_bercylab_quest_accompagnement_facilitateurs(),
         ]
     )
 

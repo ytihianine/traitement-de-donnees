@@ -6,7 +6,6 @@ from enums.dags import DagStatus
 from _types.dags import DBParams, FeatureFlags
 from utils.tasks.sql import (
     create_tmp_tables,
-    import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     import_files_to_db,
@@ -15,14 +14,6 @@ from utils.tasks.grist import download_grist_doc_to_s3
 from utils.config.dag_params import create_dag_params, create_default_args
 
 from utils.tasks.validation import validate_dag_parameters
-from dags.sg.dsci.accompagnements_dsci.tasks import (
-    referentiels,
-    bilaterales,
-    correspondant,
-    mission_innovation,
-    dsci,
-    conseil_interne,
-)
 from dags.sg.dsci.accompagnements_dsci.tasks import (
     referentiels,
     bilaterales,

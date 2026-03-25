@@ -31,7 +31,6 @@ from dags.cgefi.barometre.tasks import (
     source_files,
 )
 
-
 nom_projet = "Baromètre"
 
 

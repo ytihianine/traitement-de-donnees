@@ -17,13 +17,12 @@ Usage example:
     )
 """
 
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Tuple
 import logging
 
-from airflow.sdk import task, XComArg
+from airflow.sdk import task
 
 from utils.exceptions import ConfigError
-from _types.dags import DagParams, DBParams, FeatureFlags
 from enums.dags import DagStatus
 
 

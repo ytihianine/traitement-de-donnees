@@ -361,12 +361,10 @@ def create_tmp_tables(
             continue
 
         drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
-        create_queries.append(
-            f"""CREATE TABLE
+        create_queries.append(f"""CREATE TABLE
                 IF NOT EXISTS {tmp_schema}.tmp_{tbl_name}
                 ( LIKE {prod_schema}.{tbl_name} INCLUDING ALL);
-            """
-        )
+            """)
         alter_queries.append(
             f"ALTER SEQUENCE {prod_schema}.{tbl_name}_id_seq RESTART WITH 1;"
         )
@@ -685,14 +683,10 @@ def import_file_to_db(
             schema=schema,
         )
         if not are_lists_egal(list_A=sorted_df_cols, list_B=sorted_db_colnames):
-            raise ValueError(
-                textwrap.dedent(
-                    text="""
+            raise ValueError(textwrap.dedent(text="""
                 Il y a des différences entre les colonnes du DataFrame et de la Table.
                 Impossible d'importer les données.
-            """
-                )
-            )
+            """))
 
         # Bulk load file to db
         bulk_load_local_tsv_file_to_db(

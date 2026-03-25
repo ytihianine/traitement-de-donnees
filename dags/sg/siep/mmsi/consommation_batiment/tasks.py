@@ -7,7 +7,6 @@ from utils.tasks.etl import create_file_etl_task, create_task
 
 from dags.sg.siep.mmsi.consommation_batiment import process
 
-
 conso_mens_parquet = create_parquet_converter_task(
     selecteur="conso_mens_source",
     task_params={"task_id": "convert_cons_mens_to_parquet"},

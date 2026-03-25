@@ -20,8 +20,7 @@ def get_agent_db(context: Mapping[str, Any]) -> pd.DataFrame:
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
 
     # Retrieve data
-    df = db_handler.fetch_df(
-        query=f"""
+    df = db_handler.fetch_df(query=f"""
             select
                 cra.matricule_agent,
                 cra.nom_usuel,
@@ -35,8 +34,7 @@ def get_agent_db(context: Mapping[str, Any]) -> pd.DataFrame:
             inner join {schema}.agent_carriere cracr
             on cra.matricule_agent = cracr.matricule_agent
             ;
-        """
-    )
+        """)
 
     return df
 

@@ -7,7 +7,6 @@ from utils.tasks.etl import create_task
 
 from dags.sg.siep.mmsi.oad.indicateurs import process
 
-
 oad_indic_to_parquet = create_parquet_converter_task(
     selecteur="oad_indic",
     task_params={"task_id": "convert_oad_indicateur_to_parquet"},

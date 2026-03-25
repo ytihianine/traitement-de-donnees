@@ -32,7 +32,6 @@ from dags.sg.siep.mmsi.consommation_batiment.tasks import (
 )
 from dags.sg.siep.mmsi.consommation_batiment.config import selecteur_options
 
-
 # Mails
 nom_projet = "Consommation des bâtiments"
 

@@ -15,8 +15,7 @@ def pg_info_scan() -> pd.DataFrame:
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
 
     # Get postgres catalog
-    df = db_handler.fetch_df(
-        query="""
+    df = db_handler.fetch_df(query="""
             SELECT
                 t.table_schema,
                 t.table_name,
@@ -36,8 +35,7 @@ def pg_info_scan() -> pd.DataFrame:
                 AND ns.nspname NOT LIKE '%_file_upload'
                 AND cls.relispartition = FALSE      -- EXCLUDE PARTITION CHILD TABLES
             ORDER BY t.table_schema, t.table_name, c.ordinal_position;
-        """
-    )
+        """)
 
     return df
 
@@ -47,14 +45,12 @@ def get_catalogue() -> pd.DataFrame:
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
 
     # Get postgres catalog
-    df = db_handler.fetch_df(
-        query="""
+    df = db_handler.fetch_df(query="""
             SELECT
                 doccat.schema_name,
                 doccat.table_name
             FROM documentation."catalogue" doccat;
-        """
-    )
+        """)
 
     return df
 
@@ -64,8 +60,7 @@ def get_dictionnaire() -> pd.DataFrame:
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
 
     # Get postgres catalog
-    df = db_handler.fetch_df(
-        query="""
+    df = db_handler.fetch_df(query="""
             SELECT
                 doccat.schema_name,
                 doccat.table_name,
@@ -74,8 +69,7 @@ def get_dictionnaire() -> pd.DataFrame:
             LEFT JOIN documentation."dictionnaire" docdic
             ON doccat.id = docdic.id_catalogue
             ;
-        """
-    )
+        """)
 
     return df
 

@@ -23,7 +23,6 @@ from dags.sg.dsci.carte_identite_mef.config import (
     selecteur_options,
 )
 
-
 nom_projet = "Carte_Identite_MEF"
 
 

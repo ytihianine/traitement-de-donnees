@@ -32,10 +32,8 @@ def load_new_sp(
 
     # Récupérer les SP déjà connus
     db = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
-    df_sp = db.fetch_df(
-        query="""SELECT DISTINCT centre_financier, centre_cout
-            FROM donnee_comptable.service_prescripteur;"""
-    )
+    df_sp = db.fetch_df(query="""SELECT DISTINCT centre_financier, centre_cout
+            FROM donnee_comptable.service_prescripteur;""")
     logging.info(msg=f"Nombre de SP connus: {len(df_sp)}")
 
     # Réaliser une jointure

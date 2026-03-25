@@ -16,7 +16,6 @@ from utils.tasks.validation import validate_dag_parameters
 from dags.applications.db_backup.tasks import dump_databases
 from dags.applications.db_backup.config import selecteur_options
 
-
 nom_projet = "Sauvegarde databases"
 
 

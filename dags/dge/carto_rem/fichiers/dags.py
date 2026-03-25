@@ -23,7 +23,6 @@ from dags.dge.carto_rem.fichiers.tasks import (
 )
 from dags.dge.carto_rem.fichiers.config import selecteur_options
 
-
 # Mails
 nom_projet = "Cartographie rémunération"
 

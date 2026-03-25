@@ -30,7 +30,6 @@ from utils.config.tasks import (
 
 from dags.sg.siep.mmsi.oad_referentiel.tasks import bien_typologie
 
-
 # Mails
 nom_projet = "Outil aide diagnostic - référentiel"
 
