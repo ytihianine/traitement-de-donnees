@@ -114,7 +114,7 @@ def dag_verification() -> None:
             verify=False,
         )
         df = trino_handler.fetch_df(
-            query="SELECT * FROM iceberg.information_schema.tables"
+            query='SELECT * FROM "infrastructure.configuration.projet".direction'
         )
         print(df.head())
 
