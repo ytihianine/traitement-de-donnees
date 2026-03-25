@@ -69,6 +69,8 @@ CREATE TABLE donnee_comptable.delai_global_paiement (
 DROP TABLE donnee_comptable."demande_achat" CASCADE;
 CREATE TABLE donnee_comptable.demande_achat (
 	id_da int,
+	nb_id_da int,
+	unique_multi text,
 	date_creation_da timestamp not null,
 	annee_exercice int,
 	centre_financier text,

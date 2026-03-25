@@ -129,6 +129,18 @@ def process_demande_achat(df: pd.DataFrame) -> pd.DataFrame:
     ).dt.days
     df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
 
+    # Déterminer si la DA est unique ou multiple
+    df_grouped = df.groupby(by=["id_da"], as_index=False)["id_da"].count()
+    df_grouped = df_grouped.rename(columns={"id_da": "nb_id_da"})  # type: ignore
+
+    # Catégoriser les données
+    df_grouped["unique_multi"] = np.where(
+        df_grouped["nb_id_da"] == 1,
+        "Unique",
+        "Multiple",
+    )
+    df = pd.merge(left=df, right=df_grouped, how="left", on="id_da")
+
     # Catégoriser les données
     df["mois"] = df["date_creation_da"].dt.month
     df["mois_nom"] = df.loc[:, "mois"].map(corr_num_mois).fillna("Non déterminé")
