@@ -57,7 +57,7 @@ def get_selecteur_config(
     nom_projet: str | None = None,
     selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
     **context
-) -> Mapping[str, Any]:
+) -> list[dict[str, Any]]:
     """Task to fetch the project selecteur configurations."""
     if nom_projet is None:
         nom_projet = get_project_name(context=context)
@@ -67,12 +67,10 @@ def get_selecteur_config(
         selecteur_info=selecteurs, options_map=selecteur_options
     )
 
-    configs = {
-        sel_config.selecteur_info.selecteur: asdict(
-            obj=sel_config, dict_factory=custom_asdict_factory
-        )
+    configs = [
+        asdict(obj=sel_config, dict_factory=custom_asdict_factory)
         for sel_config in merged_config
-    }
+    ]
     print(type(configs))
 
     return configs
