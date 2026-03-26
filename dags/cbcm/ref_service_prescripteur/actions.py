@@ -228,12 +228,6 @@ def load_demande_achat(
     df = df.loc[df["_merge"] == "left_only"]
     df = df.drop(columns=["_merge"])
 
-    # Supprimer les CF/CC pour les id_da en "Multiple"
-    df.loc[df["unique_multi"] == "Multiple", ["centre_financier", "centre_cout"]] = (
-        pd.NA
-    )
-    df = df.drop_duplicates(subset=["id_da", "unique_multi"])
-
     # Les envoyers dans Grist
     print(df.columns)
     http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
