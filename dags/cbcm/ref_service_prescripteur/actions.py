@@ -223,6 +223,9 @@ def load_demande_achat(
         indicator=True,
     )
     df["import_timestamp"] = df["import_timestamp"].astype("string")
+    df = df.drop_duplicates(
+        subset=["id_da", "centre_financier", "centre_cout", "unique_multi"]
+    )
 
     # Conserver uniquement les nouvelles
     df = df.loc[df["_merge"] == "left_only"]

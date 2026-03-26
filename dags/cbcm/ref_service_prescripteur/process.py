@@ -146,6 +146,9 @@ def process_demande_achat_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
     rename = {"service_prescripteur": "id_service_prescripteur"}
     df = df.rename(columns=rename)
 
+    # Drop duplicates
+    df = df.drop_duplicates(subset=["id_da"])
+
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
@@ -166,6 +169,9 @@ def process_demande_paiement_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
     # Renommer les colonnes
     rename = {"service_prescripteur": "id_service_prescripteur"}
     df = df.rename(columns=rename)
+
+    # Drop duplicates
+    df = df.drop_duplicates(subset=["id_dp"])
 
     # Handle Grist références
     ref_cols = ["id_service_prescripteur"]
