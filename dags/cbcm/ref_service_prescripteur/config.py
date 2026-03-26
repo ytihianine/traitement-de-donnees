@@ -1,12 +1,21 @@
 from _types.projet import (
     SelecteurStorageOptions,
 )
+from enums.database import LoadStrategy
 
 selecteur_options = {
-    "delai_global_paiement_sp_manuel": SelecteurStorageOptions(),
-    "demande_achat_sp_manuel": SelecteurStorageOptions(),
-    "demande_paiement_sp_manuel": SelecteurStorageOptions(),
-    "engagement_juridique_sp_manuel": SelecteurStorageOptions(),
+    "delai_global_paiement_sp_manuel": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.FULL_LOAD
+    ),
+    "demande_achat_sp_manuel": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.FULL_LOAD
+    ),
+    "demande_paiement_sp_manuel": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.FULL_LOAD
+    ),
+    "engagement_juridique_sp_manuel": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.FULL_LOAD
+    ),
     "get_all_cf_cc": SelecteurStorageOptions(
         write_to_s3_with_iceberg=False, write_to_db=False
     ),
