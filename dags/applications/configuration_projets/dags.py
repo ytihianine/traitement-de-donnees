@@ -7,20 +7,20 @@ from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
-    # import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     create_projet_snapshot,
     get_projet_snapshot,
-    import_files_to_db,
+    import_file_to_db,
 )
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
 
 from utils.tasks.validation import validate_dag_parameters
+from utils.tasks.projet import get_selecteur_config
 from utils.tasks.s3 import (
     copy_s3_files,
-    iceberg_copy_staging_to_prod,
+    copy_staging_to_prod,
     del_s3_files,
     del_iceberg_staging_table,
 )
@@ -58,6 +58,8 @@ nom_projet = "Configuration des projets"
 def configuration_projets() -> None:
     """Tasks order"""
 
+    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+
     chain(
         validate_dag_parameters(),
         download_grist_doc_to_s3(
@@ -75,11 +77,7 @@ def configuration_projets() -> None:
             pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID,
             reset_id_seq=False,
         ),
-        import_files_to_db(
-            nom_projet=nom_projet,
-            selecteur_options=selecteur_options,
-            pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID,
-        ),
+        import_file_to_db.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(
             selecteur_options=selecteur_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
         ),
@@ -92,10 +90,7 @@ def configuration_projets() -> None:
         delete_tmp_tables(
             selecteur_options=selecteur_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
         ),
-        iceberg_copy_staging_to_prod(
-            nom_projet=nom_projet,
-            selecteur_options=selecteur_options,
-        ),
+        copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
         del_iceberg_staging_table(),
     )
 

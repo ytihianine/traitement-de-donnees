@@ -2,16 +2,15 @@
 
 import logging
 import textwrap
-from typing import Mapping, Optional
+from typing import Any, Mapping, Optional
 from datetime import datetime, timedelta
 
-from airflow.sdk import chain, task, task_group
+from airflow.sdk import task
 from airflow.sdk import get_current_context
 
 from infra.database.base import BaseDBHandler
 from infra.database.factory import create_db_handler
 
-from infra.file_handling.base import BaseFileHandler
 from infra.file_handling.dataframe import read_dataframe
 from infra.file_handling.factory import create_default_s3_handler, create_local_handler
 
@@ -613,16 +612,18 @@ def bulk_load_local_tsv_file_to_db(
 
 @task(map_index_template="{{ import_task_name }}")
 def import_file_to_db(
-    selecteur_config: SelecteurConfig,
-    s3_handler: BaseFileHandler,
-    local_handler: BaseFileHandler,
-    db_handler: BaseDBHandler,
+    selecteur_config: Mapping[str, Any],
+    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    s3_conn_id: str = DEFAULT_S3_CONN_ID,
     **context,
 ) -> None:
-    selecteur = selecteur_config.selecteur_info.selecteur
+    # Init selecteur_config to SelecteurConfig if it's a dict
+    config = SelecteurConfig.from_dict(data=selecteur_config)
+    selecteur = config.selecteur_info.selecteur
+
     db_info = get_db_info(context=context)
     context = get_current_context()
-    context["import_task_name"] = selecteur  # type: ignore
+    context["import_task_name"] = config.selecteur_info.selecteur  # type: ignore
 
     dag_status = get_dag_status(context=context)
     db_enable = get_feature_flags(context=context).db
@@ -635,19 +636,24 @@ def import_file_to_db(
         print(FF_DB_DISABLED_MSG)
         return
 
-    if selecteur_config.options.write_to_db is False:
+    if config.options.write_to_db is False:
         logging.info(
-            msg=f"write_to_db option is set to False for selecteur <{selecteur}>. Skipping import to db ..."
+            msg=f"write_to_db option is set to False for selecteur <{selecteur}>. Skipping import to db ..."  # noqa
         )
         return
 
-    if selecteur_config.options.use_prod_schema:
+    if config.options.use_prod_schema:
         schema = db_info.prod_schema
     else:
         schema = db_info.tmp_schema
 
+    # Define hooks
+    db_handler = create_db_handler(connection_id=pg_conn_id)
+    s3_handler = create_default_s3_handler(connection_id=s3_conn_id)
+    local_handler = create_local_handler(base_path=None)
+
     # Variables
-    tbl_name = selecteur_config.selecteur_info.tbl_name
+    tbl_name = config.selecteur_info.tbl_name
 
     if tbl_name is None or tbl_name == "":
         logging.info(
@@ -655,10 +661,8 @@ def import_file_to_db(
         )
     else:
         # Variables
-        local_filepath = selecteur_config.selecteur_info.get_local_path()
-        s3_filepath = selecteur_config.selecteur_info.get_full_s3_key(
-            with_tmp_segment=True
-        )
+        local_filepath = config.selecteur_info.get_local_path()
+        s3_filepath = config.selecteur_info.get_full_s3_key(with_tmp_segment=True)
 
         # Check if old file exists
         local_handler.delete(file_path=local_filepath)
@@ -679,7 +683,7 @@ def import_file_to_db(
         # Check if columns are the same between df and db table
         sorted_db_colnames = sort_db_colnames(
             db_handler=db_handler,
-            selecteur_config=selecteur_config,
+            selecteur_config=config,
             schema=schema,
         )
         if not are_lists_egal(list_A=sorted_df_cols, list_B=sorted_db_colnames):
@@ -698,40 +702,6 @@ def import_file_to_db(
 
         # Clean up local file
         local_handler.delete(file_path=local_filepath)
-
-
-@task_group()
-def import_files_to_db(
-    nom_projet: str | None = None,
-    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
-    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
-    s3_conn_id: str = DEFAULT_S3_CONN_ID,
-    **context,
-) -> None:
-    """Group of tasks to import files to db."""
-    if nom_projet is None:
-        nom_projet = get_project_name(context=context)
-
-    # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    selecteur_config = merge_selecteur_config(
-        selecteur_info=selecteur_info, options_map=selecteur_options
-    )
-
-    # Define hooks
-    db_handler = create_db_handler(connection_id=pg_conn_id)
-    s3_handler = create_default_s3_handler(connection_id=s3_conn_id)
-    local_handler = create_local_handler(base_path=None)
-
-    chain(
-        import_file_to_db.partial(
-            db_handler=db_handler,
-            s3_handler=s3_handler,
-            local_handler=local_handler,
-        ).expand(
-            selecteur_config=selecteur_config,
-        ),
-    )
 
 
 @task(task_id="set_dataset_last_update")

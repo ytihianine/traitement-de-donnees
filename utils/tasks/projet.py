@@ -4,9 +4,7 @@ from typing import Any, Mapping
 from airflow.sdk import chain, task, task_group
 from dataclasses import asdict
 
-from _types.projet import (
-    SelecteurStorageOptions,
-)
+from _types.projet import SelecteurStorageOptions, custom_asdict_factory
 from utils.config.dag_params import get_project_name
 from utils.config.tasks import (
     get_list_documentation,
@@ -54,18 +52,27 @@ def show_selecteur_config(config: Mapping[str, Any]) -> None:
     print(config)
 
 
-@task_group()
+@task()
 def get_selecteur_config(
-    nom_projet: str,
+    nom_projet: str | None = None,
     selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
-) -> None:
-    """Group of tasks to fetch selecteur configurations."""
-    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    selecteur_config = merge_selecteur_config(
-        selecteur_info=selecteur_info, options_map=selecteur_options
+    **context
+) -> Mapping[str, Any]:
+    """Task to fetch the project selecteur configurations."""
+    if nom_projet is None:
+        nom_projet = get_project_name(context=context)
+
+    selecteurs = get_list_selecteur_storage_info(nom_projet=nom_projet)
+    merged_config = merge_selecteur_config(
+        selecteur_info=selecteurs, options_map=selecteur_options
     )
 
-    chain(show_selecteur_config.expand(config=selecteur_config))
+    return {
+        sel_config.selecteur_info.selecteur: asdict(
+            obj=sel_config, dict_factory=custom_asdict_factory
+        )
+        for sel_config in merged_config
+    }
 
 
 @task_group()

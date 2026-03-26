@@ -12,10 +12,11 @@ from utils.tasks.sql import create_projet_snapshot, get_projet_snapshot
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
-    import_files_to_iceberg,
-    iceberg_copy_staging_to_prod,
+    import_file_to_iceberg,
+    copy_staging_to_prod,
     del_iceberg_staging_table,
 )
+from utils.tasks.projet import get_selecteur_config
 from utils.config.tasks import get_list_source_fichier
 from utils.tasks.validation import validate_dag_parameters
 from dags.dge.carto_rem.fichiers.tasks import (
@@ -65,6 +66,7 @@ def cartographie_remuneration() -> None:
         on_skipped_callback=create_send_mail_callback(mail_status=MailStatus.SKIP),
         on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
+    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
 
     """ Task order """
     chain(
@@ -74,12 +76,8 @@ def cartographie_remuneration() -> None:
         get_projet_snapshot(),
         del_iceberg_staging_table(),
         source_files(),
-        import_files_to_iceberg(
-            nom_projet=nom_projet, selecteur_options=selecteur_options
-        ),
-        iceberg_copy_staging_to_prod(
-            nom_projet=nom_projet, selecteur_options=selecteur_options
-        ),
+        import_file_to_iceberg.expand(selecteur_config=selecteur_configs),
+        copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
         del_iceberg_staging_table(),
         copy_s3_files(
             selecteur_options=selecteur_options,

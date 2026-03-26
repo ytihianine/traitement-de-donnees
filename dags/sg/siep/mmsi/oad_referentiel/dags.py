@@ -8,7 +8,6 @@ from _types.dags import DBParams, FeatureFlags
 from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.sql import (
-    LoadStrategy,
     create_tmp_tables,
     copy_tmp_table_to_real_table,
     get_projet_snapshot,
@@ -23,10 +22,8 @@ from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from utils.config.tasks import (
-    get_list_source_fichier_key,
-    get_list_selector_info,
-)
+from utils.config.tasks import get_list_source_fichier
+from utils.tasks.projet import get_selecteur_config
 
 from dags.sg.siep.mmsi.oad_referentiel.tasks import bien_typologie
 
@@ -62,7 +59,7 @@ def oad_referentiel() -> None:
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
         bucket_name="dsci",
-        bucket_key=get_list_source_fichier_key(nom_projet=nom_projet),
+        bucket_key=get_list_source_fichier(nom_projet=nom_projet),
         mode="reschedule",
         poke_interval=timedelta(seconds=30),  # timedelta(minutes=1),
         timeout=timedelta(minutes=1),
@@ -73,6 +70,8 @@ def oad_referentiel() -> None:
         ),
     )
 
+    selecteur_configs = get_selecteur_config(selecteur_mapping={})
+
     """ Task order """
     chain(
         validate_dag_parameters(),
@@ -80,10 +79,8 @@ def oad_referentiel() -> None:
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         bien_typologie(),
         create_tmp_tables(),
-        import_file_to_db.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
-        ),
-        copy_tmp_table_to_real_table(load_strategy=LoadStrategy.APPEND),
+        import_file_to_db.expand(selecteur_config=selecteur_configs),
+        copy_tmp_table_to_real_table(),
         refresh_views(),
         copy_s3_files(),
         del_s3_files(),

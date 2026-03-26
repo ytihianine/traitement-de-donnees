@@ -11,7 +11,7 @@ from utils.config.dag_params import create_dag_params, create_default_args
 from enums.dags import DagStatus
 from utils.tasks.sql import (
     create_tmp_tables,
-    import_files_to_db,
+    import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     ensure_partition,
@@ -22,6 +22,7 @@ from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
+from utils.tasks.projet import get_selecteur_config
 
 from utils.config.tasks import get_list_source_fichier
 from utils.tasks.validation import validate_dag_parameters
@@ -73,6 +74,8 @@ def consommation_des_batiments() -> None:
         on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
 
+    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+
     # Ordre des tâches
     chain(
         validate_dag_parameters(),
@@ -82,10 +85,7 @@ def consommation_des_batiments() -> None:
         source_files(),
         additionnal_files(),
         create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
-        import_files_to_db(
-            nom_projet=nom_projet,
-            selecteur_options=selecteur_options,
-        ),
+        import_file_to_db.expand(selecteur_config=selecteur_configs),
         ensure_partition(selecteur_options=selecteur_options),
         copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
         refresh_views(),
