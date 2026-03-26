@@ -160,6 +160,7 @@ def dag_verification() -> None:
         **context,
     ) -> None:
         # Init selecteur_config to SelecteurConfig if it's a dict
+        print(f"Received selecteur_config: {selecteur_config}")
         config = SelecteurConfig.from_dict(data=selecteur_config)
         print(f"Selecteur config: {config.selecteur_info.selecteur}")
 
