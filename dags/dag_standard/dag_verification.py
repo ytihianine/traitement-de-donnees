@@ -167,7 +167,7 @@ def dag_verification() -> None:
     # Ordre des tâches
     chain(
         [
-            get_selecteur_config(selecteur_options={}),
+            selecteur_configs,
             get_projet_snapshot(),
             print_context(),
             send_simple_mail(),
