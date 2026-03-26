@@ -71,7 +71,7 @@ def chorus_service_prescripteur() -> None:
             nom_projet=nom_projet,
             selecteur_options=selecteur_options,
         ),
-        copy_tmp_table_to_real_table(),
+        copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
         copy_s3_files(
             selecteur_options=selecteur_options,
         ),
