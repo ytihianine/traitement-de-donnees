@@ -16,7 +16,6 @@ from utils.tasks.sql import (
 )
 from utils.tasks.s3 import (
     copy_s3_files,
-    iceberg_copy_staging_to_prod,
     del_s3_files,
 )
 
@@ -80,10 +79,6 @@ def chorus_service_prescripteur() -> None:
             selecteur_options=selecteur_options,
         ),
         delete_tmp_tables(),
-        iceberg_copy_staging_to_prod(
-            nom_projet=nom_projet,
-            selecteur_options=selecteur_options,
-        ),
     )
 
 
