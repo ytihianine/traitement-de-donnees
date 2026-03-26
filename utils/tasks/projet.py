@@ -67,12 +67,15 @@ def get_selecteur_config(
         selecteur_info=selecteurs, options_map=selecteur_options
     )
 
-    return {
+    configs = {
         sel_config.selecteur_info.selecteur: asdict(
             obj=sel_config, dict_factory=custom_asdict_factory
         )
         for sel_config in merged_config
     }
+    print(type(configs))
+
+    return configs
 
 
 @task_group()
