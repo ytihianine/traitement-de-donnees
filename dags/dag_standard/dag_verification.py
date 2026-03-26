@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from pprint import pprint
 from typing import Any
 
-from airflow.sdk import Variable, dag, task
+from airflow.sdk import Variable, dag, get_current_context, task
 from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import (
@@ -164,6 +164,9 @@ def dag_verification() -> None:
         print(type(selecteur_config))
         config = SelecteurConfig.from_dict(data=selecteur_config)
         print(f"Selecteur config: {config.selecteur_info.selecteur}")
+
+        context = get_current_context()
+        context["import_task_name"] = config.selecteur_info.selecteur  # type: ignore
 
     # Ordre des tâches
     chain(
