@@ -154,6 +154,8 @@ def process_demande_achat_sp_manuel(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_drop = [
         "centre_de_cout",
         "centre_financier",
+        "import_timestamp",
+        "unique_multi",
     ]
     df = df.drop(columns=cols_to_drop)
 
