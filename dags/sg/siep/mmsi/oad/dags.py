@@ -17,7 +17,7 @@ from utils.tasks.sql import (
     delete_tmp_tables,
     create_projet_snapshot,
     get_projet_snapshot,
-    import_files_to_db,
+    import_file_to_db,
     refresh_views,
 )
 
@@ -25,6 +25,7 @@ from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
+from utils.tasks.projet import get_selecteur_config
 
 from utils.tasks.validation import validate_dag_parameters
 from dags.sg.siep.mmsi.oad.caracteristiques.tasks import (
@@ -79,6 +80,8 @@ def oad() -> None:
         ),
     )
 
+    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+
     @task_group
     def convert_file_to_parquet() -> None:
         chain(
@@ -103,10 +106,7 @@ def oad() -> None:
         tasks_oad_caracteristiques(),
         tasks_oad_indicateurs(),
         create_tmp_tables(selecteur_options=selecteur_options),
-        import_files_to_db(
-            nom_projet=nom_projet,
-            selecteur_options=selecteur_options,
-        ),
+        import_file_to_db.expand(selecteur_config=selecteur_configs),
         ensure_partition(selecteur_options=selecteur_options),
         copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
         refresh_views(),

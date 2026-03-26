@@ -9,7 +9,7 @@ from enums.dags import DagStatus
 from utils.tasks.grist import download_grist_doc_to_s3
 from utils.tasks.sql import (
     create_tmp_tables,
-    import_files_to_db,
+    import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     get_projet_snapshot,
@@ -18,6 +18,7 @@ from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
+from utils.tasks.projet import get_selecteur_config
 
 from utils.tasks.validation import validate_dag_parameters
 from dags.cbcm.ref_service_prescripteur.tasks import (
@@ -55,6 +56,7 @@ nom_projet = "Données comptable - référentiel"
 )
 def chorus_service_prescripteur() -> None:
     """Task definition"""
+    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
 
     # Ordre des tâches
     chain(
@@ -67,11 +69,8 @@ def chorus_service_prescripteur() -> None:
         fetch_from_db(),
         load_to_grist(),
         create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
-        import_files_to_db(
-            nom_projet=nom_projet,
-            selecteur_options=selecteur_options,
-        ),
-        copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
+        import_file_to_db.expand(selecteur_config=selecteur_configs),
+        copy_tmp_table_to_real_table(),
         copy_s3_files(
             selecteur_options=selecteur_options,
         ),

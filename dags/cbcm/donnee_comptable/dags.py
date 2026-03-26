@@ -10,7 +10,7 @@ from enums.dags import DagStatus
 from _types.dags import DBParams, FeatureFlags
 from utils.tasks.sql import (
     create_tmp_tables,
-    import_files_to_db,
+    import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     ensure_partition,
@@ -21,6 +21,7 @@ from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
+from utils.tasks.projet import get_selecteur_config
 from utils.config.dag_params import create_default_args, create_dag_params
 from utils.config.tasks import get_list_source_fichier
 
@@ -77,6 +78,7 @@ def chorus_donnees_comptables() -> None:
         on_skipped_callback=create_send_mail_callback(mail_status=MailStatus.SKIP),
         on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
+    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
 
     # Ordre des tâches
     chain(
@@ -87,10 +89,7 @@ def chorus_donnees_comptables() -> None:
         source_files(),
         datasets_additionnels(),
         create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
-        import_files_to_db(
-            nom_projet=nom_projet,
-            selecteur_options=selecteur_options,
-        ),
+        import_file_to_db.expand(selecteur_config=selecteur_configs),
         ensure_partition(
             selecteur_options=selecteur_options,
         ),

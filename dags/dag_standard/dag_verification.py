@@ -1,4 +1,6 @@
+from collections.abc import Mapping
 from pprint import pprint
+from typing import Any
 
 from airflow.sdk import Variable, dag, task
 from airflow.sdk.bases.operator import chain
@@ -14,11 +16,12 @@ from infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
 from utils.config.dag_params import create_default_args, create_dag_params, get_db_info
 from utils.config.tasks import get_list_source_fichier
 from _types.dags import DBParams, FeatureFlags
+from _types.projet import SelecteurConfig
 from enums.dags import DagStatus
 from enums.filesystem import IcebergTableStatus
 
 from utils.tasks.sql import get_projet_snapshot  # , import_files_to_db
-from utils.tasks.projet import config_projet_group
+from utils.tasks.projet import config_projet_group, get_selecteur_config
 from utils.tasks.s3 import write_to_s3, del_iceberg_staging_table
 
 from utils.config.vars import (
@@ -147,6 +150,19 @@ def dag_verification() -> None:
         lst_fichiers = get_list_source_fichier(nom_projet="Cartographie rémunération")
         print(lst_fichiers)
 
+    selecteur_configs = get_selecteur_config(
+        nom_projet=nom_projet, selecteur_mapping=selecteur_mapping
+    )
+
+    @task(map_index_template="{{ import_task_name }}")
+    def print_selecteur_config(
+        selecteur_config: Mapping[str, Any],
+        **context,
+    ) -> None:
+        # Init selecteur_config to SelecteurConfig if it's a dict
+        config = SelecteurConfig.from_dict(data=selecteur_config)
+        print(f"Selecteur config: {config.selecteur_info.selecteur}")
+
     # Ordre des tâches
     chain(
         [
@@ -166,6 +182,7 @@ def dag_verification() -> None:
             check_s3_hook(),
             check_trino_hook(),
             del_iceberg_staging_table(),
+            print_selecteur_config.expand(selecteur_config=selecteur_configs),
         ],
     )
 

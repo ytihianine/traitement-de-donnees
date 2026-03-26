@@ -11,10 +11,11 @@ from utils.tasks.sql import get_projet_snapshot
 from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
-    iceberg_copy_staging_to_prod,
-    import_files_to_iceberg,
+    import_file_to_iceberg,
+    copy_staging_to_prod,
     del_iceberg_staging_table,
 )
+from utils.tasks.projet import get_selecteur_config
 
 from utils.tasks.validation import validate_dag_parameters
 from dags.dge.carto_rem.grist.tasks import (
@@ -50,6 +51,8 @@ nom_projet = "Cartographie rémunération - Grist"
 )
 def cartographie_remuneration_grist() -> None:
     """Task order"""
+    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+
     chain(
         validate_dag_parameters(),
         get_projet_snapshot(nom_projet="Cartographie rémunération"),
@@ -61,14 +64,8 @@ def cartographie_remuneration_grist() -> None:
         ),
         [referentiels(), source_grist()],
         # load_to_grist(),
-        import_files_to_iceberg(
-            nom_projet=nom_projet,
-            selecteur_options=selecteur_options,
-        ),
-        iceberg_copy_staging_to_prod(
-            nom_projet=nom_projet,
-            selecteur_options=selecteur_options,
-        ),
+        import_file_to_iceberg.expand(selecteur_config=selecteur_configs),
+        copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
         del_iceberg_staging_table(),
         copy_s3_files(
             selecteur_options=selecteur_options,

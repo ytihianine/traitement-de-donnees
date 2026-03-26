@@ -1,9 +1,26 @@
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
+from collections.abc import Mapping
 
 from enums.dags import TypeSource
 from enums.database import LoadStrategy, PartitionTimePeriod
 from utils.config.vars import DEFAULT_S3_CONN_ID, DEFAULT_PG_DATA_CONN_ID
+
+
+def custom_asdict_factory(data) -> dict[str, Any]:
+    """
+    Custom factory function for dataclasses asdict function
+    to convert Enum values to their actual values instead of Enum instances.
+    """
+    from enum import Enum
+
+    def convert_value(obj) -> Any:
+        if isinstance(obj, Enum):
+            return obj.value
+        return obj
+
+    return dict((k, convert_value(obj=v)) for k, v in data)
 
 
 @dataclass(frozen=True)
@@ -107,6 +124,20 @@ class SelecteurStorageOptions:
     partition_period: PartitionTimePeriod = PartitionTimePeriod.DAY
     load_strategy: LoadStrategy = LoadStrategy.INCREMENTAL
 
+    def __post_init__(self) -> None:
+        # Convert partition_period and load_strategy to their respective Enum types if they are provided as strings
+        if not isinstance(self.partition_period, PartitionTimePeriod):
+            object.__setattr__(
+                self,
+                "partition_period",
+                PartitionTimePeriod(value=self.partition_period),
+            )
+
+        if not isinstance(self.load_strategy, LoadStrategy):
+            object.__setattr__(
+                self, "load_strategy", LoadStrategy(value=self.load_strategy)
+            )
+
 
 @dataclass(frozen=True)
 class SelecteurConfig:
@@ -120,4 +151,11 @@ class SelecteurConfig:
         return cls(
             selecteur_info=selecteur_info,
             options=options,
+        )
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "SelecteurConfig":
+        return cls(
+            selecteur_info=SelecteurStorageInfo(**data["selecteur_info"]),
+            options=SelecteurStorageOptions(**data["options"]),
         )

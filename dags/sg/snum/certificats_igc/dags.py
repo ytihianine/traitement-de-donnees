@@ -13,9 +13,10 @@ from utils.tasks.sql import (
     delete_tmp_tables,
     create_projet_snapshot,
     get_projet_snapshot,
-    import_files_to_db,
+    import_file_to_db,
     ensure_partition,
 )
+from utils.tasks.projet import get_selecteur_config
 
 from utils.tasks.s3 import (
     copy_s3_files,
@@ -65,6 +66,8 @@ def certificats_igc() -> None:
         on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
 
+    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+
     """ Task order """
     chain(
         validate_dag_parameters(),
@@ -75,10 +78,7 @@ def certificats_igc() -> None:
         output_files(),
         ensure_partition(selecteur_options=selecteur_options),
         create_tmp_tables(selecteur_options=selecteur_options),
-        import_files_to_db(
-            nom_projet=nom_projet,
-            selecteur_options=selecteur_options,
-        ),
+        import_file_to_db.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
         copy_s3_files(selecteur_options=selecteur_options),
         del_s3_files(selecteur_options=selecteur_options),
