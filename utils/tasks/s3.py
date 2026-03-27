@@ -177,6 +177,7 @@ def del_s3_files(
 def del_iceberg_staging_table(
     nom_projet: str | None = None,
     catalog_name: str = DEFAULT_POLARIS_CATALOG,
+    s3_conn_id: str = DEFAULT_S3_CONN_ID,
     **context,
 ) -> None:
     """Delete Iceberg staging table."""
@@ -205,7 +206,7 @@ def del_iceberg_staging_table(
 
     # Delete staging files from S3
     s3_handler = create_default_s3_handler(
-        connection_id=DEFAULT_S3_CONN_ID,
+        connection_id=s3_conn_id,
     )
     staging_keys = s3_handler.list_files(
         directory=catalog_name + "/" + s3_key, pattern="*_staging*"
