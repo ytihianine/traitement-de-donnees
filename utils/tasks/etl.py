@@ -39,7 +39,7 @@ def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
 def _add_snapshot_id_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
     """Add snapshot_id column."""
     snapshot_id = context["ti"].xcom_pull(
-        key="snapshot_id", task_ids="get_projet_snapshot"
+        key="return_value", task_ids="get_projet_snapshot"
     )
     if not snapshot_id:
         raise ValueError("snapshot_id is not defined")

@@ -199,7 +199,7 @@ def get_projet_snapshot(
     nom_projet: Optional[str] = None,
     pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID,
     **context,
-) -> None:
+) -> str:
     """
     Récupérer le dernier snapshot_id d'un projet.
 
@@ -219,8 +219,8 @@ def get_projet_snapshot(
 
     snapshot_id = _get_snapshot_id(nom_projet=nom_projet, db_handler=db_handler)
     logging.info(msg=f"Adding snapshot_id {snapshot_id} to context")
-    context["ti"].xcom_push(key="snapshot_id", value=snapshot_id)
-    logging.info(msg="Snapshot_id added to context.")
+
+    return snapshot_id
 
 
 @task
