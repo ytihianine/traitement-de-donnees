@@ -238,6 +238,8 @@ def write_to_s3(
 @task(map_index_template="{{ task_name }}")
 def copy_staging_to_prod(
     selecteur_config: Mapping[str, Any],
+    catalog_uri: str = DEFAULT_POLARIS_HOST,
+    catalog_name: str = DEFAULT_POLARIS_CATALOG,
 ) -> None:
     """Copy Iceberg tables from staging key to prod key"""
     # Init selecteur_config to SelecteurConfig if it's a dict
@@ -258,9 +260,9 @@ def copy_staging_to_prod(
 
     # Get catalog
     properties = generate_catalog_properties(
-        uri=DEFAULT_POLARIS_HOST,
+        uri=catalog_uri,
     )
-    catalog = IcebergCatalog(name="data_store", properties=properties)
+    catalog = IcebergCatalog(name=catalog_name, properties=properties)
 
     # Read staging table
     df = catalog.read_table_as_df(table_name=namespace + "." + tbl_name + "_staging")
