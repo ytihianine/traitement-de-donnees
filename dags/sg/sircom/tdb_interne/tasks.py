@@ -7,7 +7,7 @@ from utils.control.structures import normalize_grist_dataframe
 
 from dags.sg.sircom.tdb_interne import process
 
-version = "v2"
+version = "v1"
 
 
 @task_group(group_id="abonnes_visites")
