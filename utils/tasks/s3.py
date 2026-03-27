@@ -80,9 +80,9 @@ def copy_s3_files(
 
     # Copier la liste des sources dans le dossier final
     for config in selecteur_config:
-        if config.options.write_to_s3 is False:
+        if not config.should_write_to_s3():
             logging.info(
-                msg=f"write_to_s3 option is set to False for selecteur <{config.selecteur_info.selecteur}>. Skipping copy to S3 ..."  # noqa
+                msg=f"Skipping S3 copy for selecteur <{config.selecteur_info.selecteur}>"
             )
             continue
 
@@ -246,13 +246,9 @@ def copy_staging_to_prod(
     context = get_current_context()
     context["task_name"] = config.selecteur_info.selecteur  # type: ignore
 
-    if config.selecteur_info.selecteur == "grist_doc":
-        logging.info(msg="Grist doc selecteur. Skipping ...")
-        return
-
-    if config.options.write_to_s3_with_iceberg is False:
+    if not config.should_write_to_iceberg():
         logging.info(
-            msg=f"write_to_s3_with_iceberg option is set to False for selecteur <{config.selecteur_info.selecteur}>. Skipping import to S3 ..."  # noqa
+            msg=f"Skipping Iceberg write for selecteur <{config.selecteur_info.selecteur}>"
         )
         return
 
@@ -294,13 +290,9 @@ def import_file_to_iceberg(
     context = get_current_context()
     context["task_name"] = config.selecteur_info.selecteur  # type: ignore
 
-    if config.selecteur_info.selecteur == "grist_doc":
-        logging.info(msg="Grist doc selecteur. Skipping ...")
-        return
-
-    if config.options.write_to_s3_with_iceberg is False:
+    if not config.should_write_to_iceberg():
         logging.info(
-            msg=f"write_to_s3_with_iceberg option is set to False for selecteur <{config.selecteur_info.selecteur}>. Skipping import to S3 ..."  # noqa
+            msg=f"Skipping Iceberg write for selecteur <{config.selecteur_info.selecteur}>"
         )
         return
 

@@ -159,3 +159,27 @@ class SelecteurConfig:
             selecteur_info=SelecteurStorageInfo(**data["selecteur_info"]),
             options=SelecteurStorageOptions(**data["options"]),
         )
+
+    # Methods to early-exit tasks based on the configuration options
+    def should_write_to_s3(self) -> bool:
+        """Return True if this selecteur should be written to S3."""
+        return self.options.write_to_s3
+
+    def should_write_to_iceberg(self) -> bool:
+        """Return True if this selecteur should be written to the Iceberg catalog.
+
+        Returns False for the special 'grist_doc' selecteur and when the
+        write_to_s3_with_iceberg option is disabled.
+        """
+        return (
+            self.selecteur_info.selecteur != "grist_doc"
+            and self.options.write_to_s3_with_iceberg
+        )
+
+    def should_write_to_db(self) -> bool:
+        """Return True if this selecteur should be written to the database.
+
+        Returns False when the write_to_db option is disabled or when no
+        tbl_name is defined for this selecteur.
+        """
+        return self.options.write_to_db and bool(self.selecteur_info.tbl_name)

@@ -345,19 +345,13 @@ def create_tmp_tables(
     alter_queries = []
 
     for config in selecteur_config:
-        if config.options.write_to_db is False:
+        if not config.should_write_to_db():
             logging.info(
-                msg=f"write_to_db option is set to False for selecteur <{config.selecteur_info.selecteur}>. Skipping creation of tmp table ..."  # noqa
+                msg=f"Skipping DB tmp table creation for selecteur <{config.selecteur_info.selecteur}>"
             )
             continue
 
         tbl_name = config.selecteur_info.tbl_name
-
-        if not tbl_name:
-            logging.info(
-                msg=f"tbl_name is not defined for selecteur <{config.selecteur_info.selecteur}>. Skipping creation of tmp table ..."  # noqa
-            )
-            continue
 
         drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
         create_queries.append(f"""CREATE TABLE
@@ -403,19 +397,13 @@ def delete_tmp_tables(
     db = create_db_handler(connection_id=pg_conn_id)
 
     for config in selecteur_config:
-        if config.options.write_to_db is False:
+        if not config.should_write_to_db():
             logging.info(
-                msg=f"write_to_db option is set to False for selecteur <{config.selecteur_info.selecteur}>. Skipping deletion of tmp table ..."  # noqa
+                msg=f"Skipping DB tmp table deletion for selecteur <{config.selecteur_info.selecteur}>"
             )
             continue
 
         tbl_name = config.selecteur_info.tbl_name
-
-        if not tbl_name:
-            logging.info(
-                msg=f"tbl_name is not defined for selecteur <{config.selecteur_info.selecteur}>. Skipping deletion of tmp table ..."  # noqa
-            )
-            continue
 
         db.execute(query=f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
 
@@ -465,22 +453,17 @@ def copy_tmp_table_to_real_table(
         logging.info(msg="Désactivation des triggers de réplication")
         queries = []
         for config in selecteur_config:
-            if config.options.write_to_db is False:
+            if not config.should_write_to_db():
                 logging.info(
-                    msg=f"write_to_db option is set to False for selecteur <{config.selecteur_info.selecteur}>. Skipping copy to real table ..."  # noqa
+                    msg=f"Skipping DB copy to real table for selecteur <{config.selecteur_info.selecteur}>"
                 )
                 continue
 
             load_strategy = config.options.load_strategy
             tbl_name = config.selecteur_info.tbl_name
+            assert tbl_name is not None  # guaranteed by should_write_to_db()
             prod_table = f"{prod_schema}.{tbl_name}"
             tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
-
-            if not tbl_name:
-                logging.info(
-                    msg=f"tbl_name is not defined for selecteur <{config.selecteur_info.selecteur}>. Skipping copy to real table ..."  # noqa
-                )
-                continue
 
             if load_strategy == LoadStrategy.APPEND:
                 query = f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
