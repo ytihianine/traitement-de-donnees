@@ -9,7 +9,6 @@ from utils.config.vars import custom_logger
 
 from enums.http import HttpHandlerType
 
-
 EVENT_TYPES = ["add", "update"]
 TBL_TO_EXCLUDE = ("test", "onglet", "doc")
 

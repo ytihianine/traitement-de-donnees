@@ -13,7 +13,6 @@ from scripts.handle_partitions.partitions import (
 
 from scripts.handle_partitions import config
 
-
 # VARIABLES
 ENV = os.environ.copy()
 

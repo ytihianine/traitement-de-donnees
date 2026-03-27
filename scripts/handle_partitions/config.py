@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from utils.config.vars import custom_logger
 from scripts.handle_partitions.commun import Actions
 
-
 # Database
 schema = "siep"
 tbl_to_keep = ("bien",)

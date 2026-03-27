@@ -12,7 +12,6 @@ from utils.dataframe import df_info
 
 from dags.applications.configuration_projets import process
 
-
 register_adapter(typ=np.int64, callable=AsIs)
 
 

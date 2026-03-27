@@ -27,16 +27,14 @@ pg_conn = psycopg2.connect(
 pg_cur = pg_conn.cursor()
 
 # get table columns sorted and remove ID columns
-pg_cur.execute(
-    query=f"""
+pg_cur.execute(query=f"""
     SELECT column_name
     FROM information_schema.columns
     WHERE table_schema = '{SCHEMA}'
     AND table_name = '{TABLE_NAME}'
     AND column_name != '{DB_ID_COLNAME}'
     ORDER BY column_name
-"""
-)
+""")
 db_columns = [row[0] for row in pg_cur.fetchall()]
 custom_logger.info(msg=f"Database columns sorted: {db_columns}")
 
