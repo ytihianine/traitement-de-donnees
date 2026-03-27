@@ -9,6 +9,7 @@ from pyiceberg.table import Table
 from airflow.sdk import Variable
 import pandas as pd
 from pyiceberg.typedef import Identifier
+from enums.filesystem import IcebergTableStatus
 
 
 def generate_catalog_properties(
@@ -164,6 +165,23 @@ class IcebergCatalog:
             table.overwrite(df=pa_data)
         else:
             table.append(df=pa_data)
+
+    def write_table_and_namespace(
+        self,
+        df: pd.DataFrame,
+        table_status: IcebergTableStatus,
+        namespace: str,
+        table_name: str,
+    ) -> None:
+        # Create namespace
+        self.create_namespace(namespace=namespace)
+
+        # load data to table
+        if table_status == IcebergTableStatus.STAGING:
+            table_name = table_name + "_staging"
+
+        table_name = namespace + "." + table_name
+        self.write_table(table_name=table_name, df=df)
 
     def read_table(self, table_name: str) -> Table:
         # Logic to read data from a table in the Iceberg catalog
