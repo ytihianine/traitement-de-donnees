@@ -22,7 +22,7 @@ from enums.filesystem import IcebergTableStatus
 
 from utils.tasks.sql import get_projet_snapshot  # , import_files_to_db
 from utils.tasks.projet import config_projet_group, get_selecteur_config
-from utils.tasks.s3 import write_to_s3, del_iceberg_staging_table
+from utils.tasks.s3 import del_iceberg_staging_table
 
 from utils.config.vars import (
     DEFAULT_POLARIS_HOST,
@@ -137,8 +137,7 @@ def dag_verification() -> None:
         key_split = key.split("/")
         tbl_name = key_split.pop(-1)
         namespace = ".".join([db_schema] + key_split)
-        write_to_s3(
-            catalog=catalog,
+        catalog.write_table_and_namespace(
             df=df,
             table_status=IcebergTableStatus.PROD,
             namespace=namespace,
