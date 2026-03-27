@@ -291,7 +291,7 @@ def import_file_to_iceberg(
     config = SelecteurConfig.from_dict(data=selecteur_config)
 
     context = get_current_context()
-    context["task_name"] = selecteur_config.selecteur_info.selecteur  # type: ignore
+    context["task_name"] = config.selecteur_info.selecteur  # type: ignore
 
     if config.selecteur_info.selecteur == "grist_doc":
         logging.info(msg="Grist doc selecteur. Skipping ...")
