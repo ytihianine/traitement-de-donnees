@@ -114,11 +114,6 @@ def process_effectif_dsci(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion nettoyage
     cols_date = ["absent_depuis"]
     df = convert_grist_date_to_date(df, columns=cols_date)
-    # Controle saisie
-    cols_a_controler = ["fonction"]
-    df = normalize_whitespace_columns(df, columns=cols_a_controler)
-    choix_valides = ["responsable", "cheffe de service"]
-    df.loc[~df["fonction"].isin(choix_valides), "fonction"] = None
     # Gestion doublon mail
     df = df.drop_duplicates(subset=["mail"], keep="last")
     # Gérer les références
