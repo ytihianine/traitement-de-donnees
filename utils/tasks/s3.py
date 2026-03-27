@@ -6,7 +6,6 @@ from typing import Any
 from collections.abc import Mapping
 
 from airflow.sdk import get_current_context, task
-import pandas as pd
 
 from _types.projet import SelecteurConfig, SelecteurStorageOptions
 from infra.file_handling.dataframe import read_dataframe
@@ -217,24 +216,6 @@ def del_iceberg_staging_table(
         logging.info(msg=f"Staging file {key} deleted successfully !")
 
 
-def write_to_s3(
-    catalog: IcebergCatalog,
-    df: pd.DataFrame,
-    table_status: IcebergTableStatus,
-    namespace: str,
-    table_name: str,
-) -> None:
-    # Create namespace
-    catalog.create_namespace(namespace=namespace)
-
-    # load data to table
-    if table_status == IcebergTableStatus.STAGING:
-        table_name = table_name + "_staging"
-
-    table_name = namespace + "." + table_name
-    catalog.write_table(table_name=table_name, df=df)
-
-
 @task(map_index_template="{{ task_name }}")
 def copy_staging_to_prod(
     selecteur_config: Mapping[str, Any],
@@ -268,8 +249,7 @@ def copy_staging_to_prod(
     df = catalog.read_table_as_df(table_name=namespace + "." + tbl_name + "_staging")
 
     # Write prod table
-    write_to_s3(
-        catalog=catalog,
+    catalog.write_table_and_namespace(
         df=df,
         table_status=IcebergTableStatus.PROD,
         namespace=namespace,
@@ -313,8 +293,7 @@ def import_file_to_iceberg(
     )
 
     # Write prod table
-    write_to_s3(
-        catalog=catalog,
+    catalog.write_table_and_namespace(
         df=df,
         table_status=IcebergTableStatus.STAGING,
         namespace=namespace,

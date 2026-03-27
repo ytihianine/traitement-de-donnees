@@ -13,7 +13,6 @@ from infra.file_handling.factory import create_default_s3_handler, create_local_
 from infra.database.factory import create_db_handler
 from infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
 from enums.filesystem import IcebergTableStatus
-from utils.tasks.s3 import write_to_s3
 from utils.control.structures import remove_grist_internal_cols
 from utils.dataframe import df_info
 from utils.config.tasks import (
@@ -79,8 +78,7 @@ def _write_to_iceberg_catalog(
         raise ValueError(f"Invalid filepath_s3 format: {filepath_s3}")
     namespace = ".".join(filepath.parts[:-1])
 
-    write_to_s3(
-        catalog=catalog,
+    catalog.write_table_and_namespace(
         df=df,
         table_status=table_status,
         namespace=namespace,
