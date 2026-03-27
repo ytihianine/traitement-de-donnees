@@ -687,44 +687,6 @@ def import_file_to_db(
         local_handler.delete(file_path=local_filepath)
 
 
-@task(task_id="set_dataset_last_update")
-def set_dataset_last_update_date(
-    dataset_ids: list[int], pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context
-) -> None:
-    db = create_db_handler(connection_id=pg_conn_id)
-    # Vérifier que le dataset existe
-    datasets = db.fetch_df(
-        query="""
-            SELECT id
-            FROM documentation.datasets
-            WHERE id = ANY(%s);""",
-        parameters=(dataset_ids,),
-    )
-
-    if len(datasets) == 0:
-        raise ValueError("Aucune dataset ne correspond aux ids fournis")
-
-    if len(datasets) < len(dataset_ids):
-        raise ValueError("Certains datasets n'ont pas été trouvés.")
-
-    # ne devrait jamais arriver
-    if len(datasets) > len(dataset_ids):
-        raise ValueError("Certains datasets possèdent le même id.")
-
-    # update la date de dernière mise à jour
-    execution_date = context.get("execution_date")
-    if not execution_date or not isinstance(execution_date, datetime):
-        raise ValueError("Invalid execution date in Airflow context")
-    for dataset_id in dataset_ids:
-        db.execute(
-            query="""UPDATE documentation.datasets
-                    SET last_update = %s
-                    WHERE id=%s;
-            """,
-            parameters=(execution_date, dataset_id),
-        )
-
-
 @task
 def refresh_views(pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context) -> None:
     """Tâche pour actualiser les vues matérialisées"""
