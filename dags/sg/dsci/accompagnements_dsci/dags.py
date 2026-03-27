@@ -56,6 +56,7 @@ def accompagnements_dsci_dag() -> None:
     # Ordre des tâches
     chain(
         validate_dag_parameters(),
+        selecteur_configs,
         download_grist_doc_to_s3(
             selecteur="grist_doc",
             workspace_id="dsci",

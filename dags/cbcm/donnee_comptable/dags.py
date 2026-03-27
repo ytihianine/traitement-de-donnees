@@ -83,6 +83,7 @@ def chorus_donnees_comptables() -> None:
     # Ordre des tâches
     chain(
         validate_dag_parameters(),
+        selecteur_configs,
         looking_for_files,
         create_projet_snapshot(nom_projet=nom_projet),
         get_projet_snapshot(nom_projet=nom_projet),
