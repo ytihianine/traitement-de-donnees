@@ -1,9 +1,27 @@
 # Documentation
+
+### Règles appliquées
+#### S3
+- Suppression des fichiers pour les keys `*/tmp*`
+
+Suppression pure et simple de toutes les keys qui comportent le segment `*/tmp*` dans la key.
+
+- Suppresion des keys qui comporte une date `*/YYYYMMJJ/*`
+
+Pour le mois actuel, on conserve tous les fichiers.  
+Pour les mois précédents, on ne conserve que le dernier fichier disponible du mois.
+
+#### Airflow logs
+
+- Suppresion des logs des tâches
+
+
+
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `old_logs_dags.py`     |
-| Description | Ce traitement permet de nettoyer les logs qui datent de plus de 60 jours |
+| Fichier source     | `dags.py`     |
+| Description | Ce traitement permet de nettoyer les logs des systèmes externes (db, s3, Airflow ...) |
 | Fréquence de mise à jour | Quotidien |
 | Fonctionnement | Automatisé |
 | Propriétaires des données | MEF - SG - DSCI |

@@ -3,33 +3,35 @@ from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from _types.dags import FeatureFlags
-from utils.config.dag_params import create_dag_params, create_default_args
-
-from dags.applications.clean_logs_and_tasks.task import (
-    clean_s3,
-    clean_old_logs,
-    clean_skipped_logs,
-)
 from enums.dags import DagStatus
 
-nom_projet = "Clean tasks and logs"
+from utils.tasks.validation import validate_dag_parameters
+from utils.config.dag_params import create_dag_params, create_default_args
+
+from dags.applications.clean_system.task import (
+    delete_tmp_keys,
+    delete_keys_with_date,
+    delete_airflow_keys,
+)
+
+nom_projet = "Nettoyer les systèmes"
 
 
 # Définition du DAG
 @dag(
-    dag_id="clean_logs_tasks",
-    schedule="@weekly",
+    dag_id="nettoyer_les_systemes",
+    schedule="@daily",
     max_active_runs=1,
     catchup=False,
-    tags=["SG", "DSCI", "PRODUCTION", "LOGS"],
-    description="Pipeline qui nettoie la base de données et S3",
+    tags=["SG", "DSCI", "PRODUCTION", "OLD", "S3"],
+    description="Pipeline qui nettoie les anciens éléments des systèmes externes.",
     default_args=create_default_args(),
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=None,
         feature_flags=FeatureFlags(
-            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False
+            db=True, mail=True, s3=True, convert_files=False, download_grist_doc=True
         ),
     ),
     on_failure_callback=create_send_mail_callback(
@@ -37,11 +39,18 @@ nom_projet = "Clean tasks and logs"
     ),
     on_success_callback=create_send_mail_callback(mail_status=MailStatus.SUCCESS),
 )
-def clean_logs_tasks() -> None:
+def nettoyer_les_systemes() -> None:
     # nom_projet = "Clean tasks and logs"
 
     """Task definitions"""
-    chain(clean_s3(), clean_old_logs(), clean_skipped_logs())
+    chain(
+        validate_dag_parameters(),
+        [
+            delete_tmp_keys(),
+            delete_keys_with_date(),
+            delete_airflow_keys(),
+        ],
+    )
 
 
-clean_logs_tasks()
+nettoyer_les_systemes()
