@@ -17,29 +17,13 @@ Usage example:
     )
 """
 
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Any, List, Mapping
 import logging
 
 from airflow.sdk import task
 
 from utils.exceptions import ConfigError
 from enums.dags import DagStatus
-
-
-def _get_by_path(mapping: Dict[str, Any], path: str) -> Tuple[Any, bool]:
-    """Retrieve a nested value from mapping using dot-separated path.
-
-    Returns (value, found) where found is False when any key in the path
-    is missing.
-    """
-    current: Any = mapping
-    if path == "":
-        return current, True
-    for part in path.split("."):
-        if not isinstance(current, dict) or part not in current:
-            return None, False
-        current = current[part]
-    return current, True
 
 
 def _is_missing(value: Any) -> bool:
