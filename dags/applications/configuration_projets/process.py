@@ -23,6 +23,7 @@ def replace_values(
 def process_direction(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "direction",
     ]
     df = df.loc[:, cols_to_keep]
@@ -37,6 +38,7 @@ def process_direction(df: pd.DataFrame) -> pd.DataFrame:
 def process_service(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "direction",
         "service",
     ]
@@ -59,6 +61,7 @@ def process_service(df: pd.DataFrame) -> pd.DataFrame:
 def process_projet(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "projet",
         "direction",
         "service",
@@ -88,6 +91,7 @@ def process_projet(df: pd.DataFrame) -> pd.DataFrame:
 def process_projet_contact(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "projet",
         "contact_mail",
         "is_mail_generic",
@@ -121,6 +125,7 @@ def process_projet_contact(df: pd.DataFrame) -> pd.DataFrame:
 def process_projet_documentation(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "projet",
         "type_documentation",
         "lien",
@@ -155,6 +160,7 @@ def process_projet_documentation(df: pd.DataFrame) -> pd.DataFrame:
 def process_projet_s3(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "projet",
         "bucket",
         "key",
@@ -182,6 +188,7 @@ def process_projet_s3(df: pd.DataFrame) -> pd.DataFrame:
 def process_selecteur(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "projet",
         "type_de_selecteur",
         "selecteur",
@@ -211,6 +218,7 @@ def process_selecteur(df: pd.DataFrame) -> pd.DataFrame:
 def process_source(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "projet",
         "type",
         "selecteur",
@@ -244,6 +252,7 @@ def process_source(df: pd.DataFrame) -> pd.DataFrame:
 def process_selecteur_s3(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "projet",
         "selecteur",
         "filename",
@@ -273,6 +282,7 @@ def process_selecteur_s3(df: pd.DataFrame) -> pd.DataFrame:
 def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "projet",
         "selecteur",
         "tbl_name",
@@ -318,6 +328,7 @@ def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
 def process_col_mapping(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "projet",
         "selecteur",
         "colname_source",
