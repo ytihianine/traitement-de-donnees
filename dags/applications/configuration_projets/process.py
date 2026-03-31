@@ -244,20 +244,23 @@ def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_col_mapping(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "selecteur",
+        "colname_source",
+        "colname_dest",
+        "to_keep",
+        "date_archivage",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     # Rename
     cols_to_rename = {
         "projet": "id_projet",
         "selecteur": "id_selecteur",
     }
     df = df.rename(columns=cols_to_rename)
-    df = df.drop(
-        columns=[
-            "nombre_d_utilisation",
-            "commentaire",
-            "statut",
-            "nouvelle_proposition",
-        ]
-    )
 
     # Réf colonnes
     ref_cols = ["id_projet", "id_selecteur"]
