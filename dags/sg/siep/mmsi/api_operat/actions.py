@@ -7,7 +7,7 @@ from infra.http_client.adapters import HttpxClient, ClientConfig
 from utils.config.dag_params import get_project_name
 from enums.filesystem import FileHandlerType
 from utils.config.vars import AGENT, PROXY, DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
-from utils.config.tasks import get_selecteur_config
+from utils.config.tasks import get_selecteur_storage_info
 from utils.dataframe import df_info
 
 from dags.sg.siep.mmsi.api_operat.process import (
@@ -75,10 +75,10 @@ def liste_declaration(context: dict) -> None:
     # Http client
     httpx_internet_client = HttpxClient(client_config)
     # Storage paths
-    declaration_ademe_config = get_selecteur_config(
+    declaration_ademe_config = get_selecteur_storage_info(
         nom_projet=nom_projet, selecteur="declaration_ademe"
     )
-    adresse_efa_config = get_selecteur_config(
+    adresse_efa_config = get_selecteur_storage_info(
         nom_projet=nom_projet, selecteur="adresse_efa"
     )
 
@@ -99,11 +99,11 @@ def liste_declaration(context: dict) -> None:
     # Export
     s3_handler.write(
         content=df_declarations.to_parquet(path=None, index=False),
-        file_path=declaration_ademe_config.filepath_tmp_s3,
+        file_path=declaration_ademe_config.get_full_s3_key(with_tmp_segment=True),
     )
     s3_handler.write(
         content=df_adresses_efa.to_parquet(path=None, index=False),
-        file_path=adresse_efa_config.filepath_tmp_s3,
+        file_path=adresse_efa_config.get_full_s3_key(with_tmp_segment=True),
     )
 
 
@@ -129,19 +129,24 @@ def consommation_by_id(context: dict) -> None:
     # Http client
     httpx_internet_client = HttpxClient(client_config)
     # Storage paths
-    declaration_ademe_config = get_selecteur_config(
+    declaration_ademe_config = get_selecteur_storage_info(
         nom_projet=nom_projet, selecteur="declaration_ademe"
     )
-    activite_config = get_selecteur_config(nom_projet=nom_projet, selecteur="activite")
-    indicateur_config = get_selecteur_config(
+    activite_config = get_selecteur_storage_info(
+        nom_projet=nom_projet, selecteur="activite"
+    )
+    indicateur_config = get_selecteur_storage_info(
         nom_projet=nom_projet, selecteur="indicateur"
     )
-    detail_config = get_selecteur_config(nom_projet=nom_projet, selecteur="detail")
+    detail_config = get_selecteur_storage_info(
+        nom_projet=nom_projet, selecteur="detail"
+    )
 
     # Main part
     token = get_token(api_client=httpx_internet_client, url=BASE_URL)
     df_declarations = read_dataframe(
-        file_handler=s3_handler, file_path=declaration_ademe_config.filepath_tmp_s3
+        file_handler=s3_handler,
+        file_path=declaration_ademe_config.get_full_s3_key(with_tmp_segment=True),
     )
 
     conso_ids = df_declarations["id_consommation"]
@@ -179,13 +184,13 @@ def consommation_by_id(context: dict) -> None:
     # Export files
     s3_handler.write(
         content=df_activite.to_parquet(path=None, index=False),
-        file_path=activite_config.filepath_tmp_s3,
+        file_path=activite_config.get_full_s3_key(with_tmp_segment=True),
     )
     s3_handler.write(
         content=df_indicateur.to_parquet(path=None, index=False),
-        file_path=indicateur_config.filepath_tmp_s3,
+        file_path=indicateur_config.get_full_s3_key(with_tmp_segment=True),
     )
     s3_handler.write(
         content=df_detail.to_parquet(path=None, index=False),
-        file_path=detail_config.filepath_tmp_s3,
+        file_path=detail_config.get_full_s3_key(with_tmp_segment=True),
     )
