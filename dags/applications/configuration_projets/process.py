@@ -214,6 +214,7 @@ def process_source(df: pd.DataFrame) -> pd.DataFrame:
         "projet",
         "type",
         "selecteur",
+        "id_source",
     ]
     df = df.loc[:, cols_to_keep]
 
