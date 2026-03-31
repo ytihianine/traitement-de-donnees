@@ -286,6 +286,7 @@ def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
         "projet",
         "selecteur",
         "tbl_name",
+        "tbl_order",
         "load_strategy",
         "is_partitionned",
         "partition_period",
