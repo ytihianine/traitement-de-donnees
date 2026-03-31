@@ -21,19 +21,27 @@ def replace_values(
 
 
 def process_direction(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "direction",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     df = df.assign(direction=df["direction"].str.strip()).convert_dtypes()
     df = df.drop_duplicates(subset=["direction"])
     df = df.dropna(subset=["direction"])
-
-    # Sort columns to match db cols order
-    cols = df.columns
-    sorted_cols = sorted(cols)
-    df = df.loc[:, sorted_cols]
 
     return df
 
 
 def process_service(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "direction",
+        "service",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     # Rename
     cols_to_rename = {"direction": "id_direction"}
 
@@ -45,15 +53,18 @@ def process_service(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop_duplicates(subset=["id_direction", "service"])
     df = df.dropna(subset=["id_direction", "service"])
 
-    # Sort columns to match db cols order
-    cols = df.columns
-    sorted_cols = sorted(cols)
-    df = df.loc[:, sorted_cols]
-
     return df
 
 
 def process_projet(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "direction",
+        "service",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     # Rename
     cols_to_rename = {
         "direction": "id_direction",
@@ -75,6 +86,14 @@ def process_projet(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_projet_contact(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "contact_mail",
+        "is_mail_generic",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     # Rename
     cols_to_rename = {
         "projet": "id_projet",
@@ -100,6 +119,14 @@ def process_projet_contact(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_projet_documentation(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "type_documentation",
+        "lien",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     # Rename
     cols_to_rename = {
         "projet": "id_projet",
@@ -126,6 +153,15 @@ def process_projet_documentation(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_projet_s3(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "bucket",
+        "key",
+        "key_tmp",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     # Rename
     cols_to_rename = {
         "projet": "id_projet",
@@ -144,6 +180,14 @@ def process_projet_s3(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_selecteur(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "type_de_selecteur",
+        "selecteur",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     # Rename
     cols_to_rename = {
         "projet": "id_projet",
@@ -165,6 +209,14 @@ def process_selecteur(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_source(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "type",
+        "selecteur",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     # Rename
     cols_to_rename = {
         "projet": "id_projet",
@@ -172,7 +224,6 @@ def process_source(df: pd.DataFrame) -> pd.DataFrame:
         "selecteur": "id_selecteur",
     }
     df = df.rename(columns=cols_to_rename)
-    df = df.drop(columns=["sous_type"])
 
     # Réf colonnes
     ref_cols = ["id_projet", "id_selecteur"]
@@ -190,6 +241,15 @@ def process_source(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_selecteur_s3(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "selecteur",
+        "filename",
+        "key",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     # Rename
     cols_to_rename = {
         "projet": "id_projet",
@@ -210,6 +270,17 @@ def process_selecteur_s3(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "selecteur",
+        "tbl_name",
+        "load_strategy",
+        "is_partitionned",
+        "partition_period",
+    ]
+    df = df.loc[:, cols_to_keep]
+
     # Rename
     cols_to_rename = {
         "projet": "id_projet",
