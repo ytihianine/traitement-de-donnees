@@ -22,10 +22,7 @@ from utils.tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from utils.config.tasks import (
-    get_list_selector_info,
-    get_list_source_fichier_key,
-)
+from utils.tasks.projet import get_selecteur_config, get_list_source_fichier
 
 from dags.cgefi.barometre.tasks import (
     source_files,
@@ -56,11 +53,14 @@ nom_projet = "Baromètre"
 )
 def barometre() -> None:
     """Tasks definition"""
+
+    selecteur_configs = get_selecteur_config(selecteur_mapping={})
+
     looking_for_files = S3KeySensor(
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
         bucket_name="dsci",
-        bucket_key=get_list_source_fichier_key(nom_projet=nom_projet),
+        bucket_key=get_list_source_fichier(nom_projet=nom_projet),
         mode="reschedule",
         poke_interval=timedelta(seconds=30),
         timeout=timedelta(minutes=13),
@@ -77,14 +77,12 @@ def barometre() -> None:
     """ Task order """
     chain(
         validate_dag_parameters(),
+        selecteur_configs,
         looking_for_files,
         source_files(),
         create_tmp_tables(),
-        import_file_to_db.expand(
-            selecteur_info=get_list_selector_info(nom_projet=nom_projet)
-        ),
+        import_file_to_db.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(),
-        # set_dataset_last_update_date(db_hook=POSTGRE_HOOK, dataset_ids=[3]),
         copy_s3_files(),
         del_s3_files(),
         end_task,
