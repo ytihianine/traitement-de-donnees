@@ -78,7 +78,9 @@ def configuration_projets() -> None:
             pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID,
             reset_id_seq=False,
         ),
-        import_file_to_db.expand(selecteur_config=selecteur_configs),
+        import_file_to_db.partial(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID).expand(
+            selecteur_config=selecteur_configs
+        ),
         copy_tmp_table_to_real_table(
             selecteur_options=selecteur_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
         ),
