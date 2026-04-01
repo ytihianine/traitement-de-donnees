@@ -182,7 +182,7 @@ def load_new_cf_cc(df_get_all_cf_cc: pd.DataFrame, df_sp: pd.DataFrame) -> None:
     df["import_timestamp"] = df["import_timestamp"].astype("string")
 
     # Conserver uniquement les nouvelles
-    df = df.loc[df["_merge"] == "left_only", on_cols]
+    df = df.loc[df["_merge"] == "left_only", on_cols + ["import_timestamp"]]
 
     # Intégrer ces lignes dans Grist
     http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
