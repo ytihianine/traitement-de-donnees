@@ -56,5 +56,5 @@ selecteur_options = {
     "ref_sp_choisi": SelecteurStorageOptions(),
     "ref_sp_pilotage": SelecteurStorageOptions(),
     "ref_uo": SelecteurStorageOptions(),
-    "sp": SelecteurStorageOptions(),
+    "sp": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
 }
