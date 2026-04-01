@@ -166,8 +166,8 @@ def get_engagement_juridique() -> pd.DataFrame:
 def load_new_cf_cc(df_get_all_cf_cc: pd.DataFrame, df_sp: pd.DataFrame) -> None:
     # Filtrer les lignes
     df_get_all_cf_cc = df_get_all_cf_cc.loc[
-        (df_get_all_cf_cc["centre_financier"] == "Ind")
-        | (df_get_all_cf_cc["centre_cout"] == "Ind")
+        (df_get_all_cf_cc["centre_financier"] != "Ind")
+        & (df_get_all_cf_cc["centre_cout"] != "Ind")
     ]
 
     # Merge pour comparer
