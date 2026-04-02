@@ -137,3 +137,8 @@ Quelques exemples
 - Groupe pour un utilisateur qui peut accéder à toutes les données du domaine `finance` => `data:schema:finance`  
 - Groupe pour un utilisateur qui peut accéder à toutes les données du domaine `communication` => `data:schema:communication`   
 
+## Bibliographies
+
+- Superset (permissions)
+  - [Gitlab Docs](https://docs.gitlab.com/development/permissions/conventions/#introducing-new-permissions)
+  - [FOLIO Project](https://folio-org.atlassian.net/wiki/spaces/FOLIJET/pages/156368925/Permissions+naming+convention)
