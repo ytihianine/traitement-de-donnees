@@ -7,6 +7,7 @@
   - [S3](#s3)
   - [SQL](#sql)
   - [Grist](#grist)
+  - [Superset](#superset)
 
 
 ## Dags
@@ -92,3 +93,47 @@ Si c'est une colonne qui servira pour un questionnaire => `quest_nom_colonne`
 Si c'est une colonne de traitement intermédiaire => `int_nom_colonne`
 
 > Cette convention de nommage n'empêche pas l'utilisation de label plus explicite pour les utilisateurs finaux.
+
+## Superset
+
+Superset met à disposition un ensemble de permissions qui peuvent être regroupées par rôles puis par groupe.  
+L'objectif de cette section est de fournir une convention pour nommer ces éléments.
+
+**Nomemclature des rôles**  
+La convention est la suivante: `ressource:nom_ressource:action`.  
+Tous les éléments sont au singulieur.
+
+Parmi les ressources possibles :
+| Ressource | Description | Exemples |
+| --------- | --------- | --------- |
+| entity | représente un élément général | user, superset, db ... |
+| dataset | représente un jeu de données |
+| schema | représente un ensemble de jeu de données |
+| dashboard | représente un tableau de bord |
+
+Parmi les permissions possibles :
+- `access` : peut accéder à la ressource
+- `read` : peut lire des éléments de la ressource
+- `create` : peut ajouter des éléments à la ressource
+- `update` : peut modifier des éléments de la ressource
+- `delete` : peut retirer des éléments à la ressource
+
+Quelques exemples  
+- Rôle pour accéder au SQLlab de Superset => `superset:sqllab:access`  
+- Rôle pour créer des graphiques dans Superset => `superset:graphiques:access`  
+- Rôle pour créer des datasets dans Superset => `superset:dataset:create`  
+- Rôle pour lire les données du dataset `test_data` => `dataset:test_data:read`  
+- Rôle pour importer des données => `superset:upload_file:access`  
+- Rôle pour accéder à un tableau de bord `Mon TDB` => `dashboard:mon_tdb:access`  
+
+**Nomenclature des groupes**  
+_[à confirmer]_ La convention est la suivante: `ressource:nom_ressource:perimetre`.  
+
+Quelques exemples  
+- Groupe pour un utilisateur admin => `user:admin`  
+- Groupe pour un utilisateur créateur => `user:createur`  
+- Groupe pour un utilisateur créateur avec SQLlab => `user:createur_sqllab`  
+- Groupe pour un utilisateur viewer => `user:viewer`  
+- Groupe pour un utilisateur qui peut accéder à toutes les données du domaine `finance` => `data:schema:finance`  
+- Groupe pour un utilisateur qui peut accéder à toutes les données du domaine `communication` => `data:schema:communication`   
+
