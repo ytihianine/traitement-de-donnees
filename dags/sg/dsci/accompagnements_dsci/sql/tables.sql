@@ -145,7 +145,6 @@ CREATE TABLE activite_dsci."accompagnement_dsci_equipe" (
   "id" integer PRIMARY KEY,
   "id_accompagnement" integer,
   "id_equipe_s_dsci" integer,
-  UNIQUE ("id_accompagnement", "id_equipe_s_dsci"),
   FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id"),
   FOREIGN KEY ("id_equipe_s_dsci") REFERENCES activite_dsci."ref_bureau" ("id")
 );
@@ -442,8 +441,7 @@ CREATE TABLE activite_dsci."formation_fac_envie_suite_quest_satisfaction"(
     "id" integer PRIMARY KEY,
 	"id_formation_fac" integer,
     "envies_pour_la_suite" text,
-    UNIQUE ("id_formation_fac", "envies_pour_la_suite"),
-    FOREIGN KEY ("id_formation_fac") REFERENCES activite_dsci."formation_fac_quest_satisfaction" ("id")
+    UNIQUE ("id_formation_fac", "envies_pour_la_suite")
 );
 
 DROP TABLE IF EXISTS activite_dsci."fac_hors_bercylab_quest_accompagnement" CASCADE;
