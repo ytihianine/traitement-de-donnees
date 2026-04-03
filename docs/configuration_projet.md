@@ -1,14 +1,7 @@
 # Configuration des projets
 
-TODO:
-- décrire la création des projets
-- décrire comment l'utiliser
-- Documenter les dags
-- Ajouter la section RGPD
-
 ## Création des projets
 La configuration des projets se fait via Grist pour les metadata du projet.
-La configuration des dags se réalise dans la section `dags/`, dans le fichier `mon_projet_dags.py`. Pour configurer votre dag, vous devez suivre la documentation [creation_dags](creation_dags.md).
 
 ## Documenter les DAGS
 Ci-dessous un template qui peut être copier/coller pour documenter les dags. Tous les champs sont obligatoires.
@@ -17,8 +10,8 @@ Ci-dessous un template qui peut être copier/coller pour documenter les dags. To
 | Information | Valeur |
 | -------- | -------- |
 | Fichier source     | `mmsi_dags.py`     |
-| Description | Ce traitement permet de suivre la consommation des bâtiments du MEF |
-| Fréquence de mise à jour | Mensuelle |
+| Description | A quoi sert le dag |
+| Fréquence d'exécution | [CronTab](https://crontab.guru/) ou [Fréquence](https://www.dublincore.org/specifications/dublin-core/collection-description/frequency/) |
 | Fonctionnement | Automatisé / Semi-automatisé |
 | Propriétaires des données | MEF - SG - SIEP |
 | Mise en place de la pipeline | MEF - SG - DSCI - LdT |
@@ -26,7 +19,7 @@ Ci-dessous un template qui peut être copier/coller pour documenter les dags. To
 ### Données
 | Information | Valeur |
 | -------- | -------- |
-| Données sources | Outil de suivi des fluides interministériel (OSFi), extraction format xls |
+| Données sources | Nom du SI |
 | Données de sorties | Base de données |
 | Données sources archivées | Oui, MinIO |
 | Structure des données sources | [insérer un lien vers la documentation des données sources]() |
@@ -37,6 +30,12 @@ Ci-dessous un template qui peut être copier/coller pour documenter les dags. To
 | -------- | -------- |
 | Variables | username, password, base_url |
 | Connexions | minio_sg |
+
+### RGPD
+| Information | Valeur |
+| -------- | -------- |
+| Déclaration nécessaire | Oui / Non |
+
 
 <br />
 <hr />
