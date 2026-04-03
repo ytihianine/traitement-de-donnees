@@ -208,11 +208,13 @@ def process_accompagnement_dsci_equipe(df: pd.DataFrame) -> pd.DataFrame:
     df = df.explode(column="id_equipe_s_dsci")
     # Nettoyage de ligne vide
     df = df.dropna(subset=["id_equipe_s_dsci"])
-    df["id"] = (
-        df.sort_values(by=["id_accompagnement", "id_equipe_s_dsci"])
-        .reset_index(drop=True)
-        .index
+
+    # Ajout colonne ID unique
+    df = df.sort_values(by=["id_accompagnement", "id_equipe_s_dsci"]).reset_index(
+        drop=True
     )
+    df["id"] = df.index
+
     return df
 
 
