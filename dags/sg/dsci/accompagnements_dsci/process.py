@@ -123,6 +123,7 @@ def process_effectif_dsci(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_accompagnement_dsci(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = [
         "id",
         "annee",
@@ -141,18 +142,18 @@ def process_accompagnement_dsci(df: pd.DataFrame) -> pd.DataFrame:
         "date_de_cloture_questionnaire",
         "porteur_metier",
     ]
-    cols_to_drop = list(set(df.columns) - set(cols_to_keep))
-    df = df.drop(columns=cols_to_drop)
+    df = df.loc[:, cols_to_keep]
+
     df = df.rename(
         columns={"direction": "id_direction", "prestataire": "recours_prestataire"}
     )
-    df["annee"] = pd.to_numeric(df["annee"], errors="coerce").astype("Int64")
+    df["annee"] = pd.to_numeric(arg=df["annee"], errors="coerce").astype("Int64")  # type: ignore
     date_cols = [
         "debut_previsionnel_de_l_accompagnement",
         "fin_previsionnelle_de_l_accompagnement",
         "date_de_cloture_questionnaire",
     ]
-    df = convert_grist_date_to_date(df, date_cols)
+    df = convert_grist_date_to_date(df, columns=date_cols)
     col_text = [
         "commentaires_complements",
         "intitule_de_l_accompagnement",
@@ -168,9 +169,10 @@ def process_accompagnement_dsci(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_accompagnement_dsci_typologie(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = ["id", "typologie"]
-    # Filtrage
-    df = df[cols_to_keep]
+    df = df.loc[:, cols_to_keep]
+
     # Renommage
     df = df.rename(columns={"id": "id_accompagnement", "typologie": "id_typologie"})
     # Gestion des refs
@@ -190,9 +192,10 @@ def process_accompagnement_dsci_typologie(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_accompagnement_dsci_equipe(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = ["id", "equipe_s_dsci"]
-    # Filtrage
-    df = df[cols_to_keep]
+    df = df.loc[:, cols_to_keep]
+
     # Renommage
     df = df.rename(
         columns={"id": "id_accompagnement", "equipe_s_dsci": "id_equipe_s_dsci"}
@@ -214,9 +217,10 @@ def process_accompagnement_dsci_equipe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_accompagnement_dsci_porteur(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = ["id", "porteur_dsci"]
-    # Filtrage
-    df = df[cols_to_keep]
+    df = df.loc[:, cols_to_keep]
+
     # Renommage
     df = df.rename(
         columns={"id": "id_accompagnement", "porteur_dsci": "id_porteur_dsci"}
@@ -260,8 +264,8 @@ def process_accompagnement_mi(df: pd.DataFrame) -> pd.DataFrame:
         "informations_complementaires",
         "id_type_accompagnement",
     ]
-    cols_to_drop = list(set(df.columns) - set(cols_to_keep))
-    df = df.drop(columns=cols_to_drop)
+    df = df.loc[:, cols_to_keep]
+
     df = df.rename(
         columns={
             "direction": "id_direction",
@@ -326,8 +330,7 @@ def process_animateur_fac(df: pd.DataFrame) -> pd.DataFrame:
         "accompagnement",
         "animateur",
     ]
-    cols_to_drop = list(set(df.columns) - set(cols_to_keep))
-    df = df.drop(columns=cols_to_drop)
+    df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={"accompagnement": "id_accompagnement", "animateur": "id_animateur"}
     )
@@ -339,10 +342,9 @@ def process_animateur_fac(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_animateur_fac_certification(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = ["id", "certifications_souhaitees"]
-    # Filtrage
-    df = df[cols_to_keep]
-    # Renommage
+    df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
             "id": "id_animateur_fac",
@@ -368,9 +370,9 @@ def process_animateur_fac_certification(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_animateur_fac_certification_valide(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = ["id", "certifications_validees"]
-    # Filtrage
-    df = df[cols_to_keep]
+    df = df.loc[:, cols_to_keep]
     # Renommage
     df = df.rename(
         columns={
@@ -418,7 +420,7 @@ def process_quest_inscription_pleniere(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_quest_satisfaction_pleniere(df: pd.DataFrame) -> pd.DataFrame:
-    df["note_globale"] = pd.to_numeric(df["note_globale"], errors="coerce").astype(
+    df["note_globale"] = pd.to_numeric(df["note_globale"], errors="coerce").astype(  # type: ignore
         "Int64"
     )
     # Gestion de doublons
@@ -511,7 +513,7 @@ def process_quest_satisfaction_formation_fac(df: pd.DataFrame) -> pd.DataFrame:
     )
     cols_notes = ["note_module_1", "note_module_2", "note_module_3", "nps"]
     for col in cols_notes:
-        df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
+        df[col] = pd.to_numeric(arg=df[col], errors="coerce").astype("Int64")  # type: ignore
     #  Nettoyage du texte
     col_text = [
         "commentaire_m1",
@@ -532,9 +534,9 @@ def process_quest_satisfaction_formation_fac(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_quest_satisfaction_formation_fac_envies(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = ["id", "envies_pour_la_suite"]
-    df = df[cols_to_keep]
-    # Renommage
+    df = df.loc[:, cols_to_keep]
     df = df.rename(columns={"id": "id_formation_fac"})
 
     # Gestion des refs
@@ -557,6 +559,7 @@ def process_quest_satisfaction_formation_fac_envies(df: pd.DataFrame) -> pd.Data
 
 
 def process_quest_accompagnement_fac_hors_bercylab(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = [
         "id",
         "intitule_de_l_accompagnement",
@@ -569,9 +572,7 @@ def process_quest_accompagnement_fac_hors_bercylab(df: pd.DataFrame) -> pd.DataF
         "facilitateur_2",
         "facilitateur_3",
     ]
-    cols_to_drop = list(set(df.columns) - set(cols_to_keep))
-    df = df.drop(columns=cols_to_drop)
-    # Renommage
+    df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
             "direction": "id_direction",
@@ -604,11 +605,11 @@ def process_quest_accompagnement_fac_hors_bercylab(df: pd.DataFrame) -> pd.DataF
 def process_quest_accompagnement_fac_hors_bercylab_type(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = ["id", "type_d_accompagnement"]
-    # Filtrage
-    df = df[cols_to_keep]
-    # Renommage
+    df = df.loc[:, cols_to_keep]
     df = df.rename(columns={"id": "id_formation_fac_hors_bercylab"})
+
     # Gestion des refs
     ref_cols = ["id_formation_fac_hors_bercylab"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
@@ -627,11 +628,11 @@ def process_quest_accompagnement_fac_hors_bercylab_type(
 def process_quest_accompagnement_fac_hors_bercylab_participants(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = ["id", "participants"]
-    # Filtrage
-    df = df[cols_to_keep]
-    # Renommage
+    df = df.loc[:, cols_to_keep]
     df = df.rename(columns={"id": "id_formation_fac_hors_bercylab"})
+
     # Gestion des refs
     ref_cols = ["id_formation_fac_hors_bercylab"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
@@ -650,10 +651,9 @@ def process_quest_accompagnement_fac_hors_bercylab_participants(
 def process_quest_accompagnement_fac_hors_bercylab_facilitateurs(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
+    # Gestion des colonnes
     cols_to_keep = ["id", "facilitateurs"]
-    # Filtrage
-    df = df[cols_to_keep]
-    # Renommage
+    df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
             "id": "id_formation_fac_hors_bercylab",
@@ -684,7 +684,9 @@ def process_quest_accompagnement_fac_hors_bercylab_facilitateurs(
 def process_accompagnement_cci_opportunite(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"accompagnement": "id_accompagnement"})
     # securité pour les saisies manuelles sans passer par la reference
-    df["id_accompagnement"] = pd.to_numeric(df["id_accompagnement"], errors="coerce")
+    df["id_accompagnement"] = pd.to_numeric(
+        arg=df["id_accompagnement"], errors="coerce"
+    )
     # Gestion des dates
     date_cols = [
         "date_de_reception",
@@ -707,10 +709,10 @@ def process_charge_agent_cci(df: pd.DataFrame) -> pd.DataFrame:
             "missions": "id_missions",
         }
     )
-    df["annee"] = pd.to_numeric(df["annee"], errors="coerce").astype("Int64")
+    df["annee"] = pd.to_numeric(arg=df["annee"], errors="coerce").astype("Int64")  # type: ignore
     num_cols = ["temps_passe", "taux_de_charge"]
     for col in num_cols:
-        df[col] = pd.to_numeric(df[col], errors="coerce")
+        df[col] = pd.to_numeric(arg=df[col], errors="coerce")
     ref_cols = ["id_agent_e_", "id_semaine", "id_missions"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
 
@@ -837,8 +839,7 @@ def process_correspondant(df: pd.DataFrame) -> pd.DataFrame:
 def process_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
     # Gérer les colonnes
     cols_to_keep = ["id", "type_de_correspondant"]
-    cols_to_drop = list(set(df.columns) - set(cols_to_keep))
-    df = df.drop(columns=cols_to_drop)
+    df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
             "id": "id_correspondant",
@@ -866,8 +867,7 @@ def process_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
 def process_correspondant_competence_particuliere(df: pd.DataFrame) -> pd.DataFrame:
     # Gérer les colonnes
     cols_to_keep = ["id", "competence_particuliere"]
-    cols_to_drop = list(set(df.columns) - set(cols_to_keep))
-    df = df.drop(columns=cols_to_drop)
+    df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
             "id": "id_correspondant",
@@ -895,8 +895,7 @@ def process_correspondant_competence_particuliere(df: pd.DataFrame) -> pd.DataFr
 def process_correspondant_connaissance_communaute(df: pd.DataFrame) -> pd.DataFrame:
     # Gérer les colonnes
     cols_to_keep = ["id", "connaissance_communaute"]
-    # Filtrage
-    df = df[cols_to_keep]
+    df = df.loc[:, cols_to_keep]
     df = df.rename(columns={"id": "id_correspondant"})
     # Gestion des references
     ref_cols = ["id_correspondant"]
