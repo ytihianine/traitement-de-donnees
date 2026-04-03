@@ -262,7 +262,6 @@ def process_accompagnement_mi(df: pd.DataFrame) -> pd.DataFrame:
         "places_restantes",
         "est_ouvert_notation",
         "informations_complementaires",
-        "id_type_accompagnement",
     ]
     df = df.loc[:, cols_to_keep]
 
