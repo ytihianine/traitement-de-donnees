@@ -1,7 +1,5 @@
 """Factory for creating database handlers."""
 
-from typing import Optional
-
 from infra.database.base import BaseDBHandler
 from infra.database.postgres import PostgresDBHandler
 from infra.database.sqlite import SQLiteDBHandler
@@ -10,8 +8,25 @@ from infra.database.trino import TrinoDBHandler
 from enums.database import DatabaseType
 
 
+def _check_required_params(db_type: DatabaseType, **db_config: dict) -> None:
+    """Check if required parameters are present for the given database type."""
+    if db_type == DatabaseType.TRINO:
+        required_params = ["host", "user", "catalog", "port", "schema"]
+        missing_params = [param for param in required_params if param not in db_config]
+        if missing_params:
+            raise ValueError(
+                f"Missing required parameters for Trino: {', '.join(missing_params)}"
+            )
+
+    if db_type in [DatabaseType.POSTGRES, DatabaseType.SQLITE]:
+        if "connection_id" not in db_config:
+            raise ValueError(
+                f"Missing required parameter 'connection_id' for {db_type.value}"
+            )
+
+
 def create_db_handler(
-    connection_id: str, db_type: DatabaseType = DatabaseType.POSTGRES
+    db_type: DatabaseType = DatabaseType.POSTGRES, **db_config
 ) -> BaseDBHandler:
     """Create a database handler based on connection type.
 
@@ -25,43 +40,22 @@ def create_db_handler(
     Raises:
         ValueError: If db_type is not supported
     """
+
+    _check_required_params(db_type, **db_config)
+
     if db_type == DatabaseType.POSTGRES:
-        return PostgresDBHandler(connection_id)
+        return PostgresDBHandler(connection_id=db_config.get("connection_id", ""))
+    elif db_type == DatabaseType.TRINO:
+        return TrinoDBHandler(
+            host=db_config.get("host", ""),
+            user=db_config.get("user", ""),
+            catalog=db_config.get("catalog", ""),
+            port=db_config.get("port", 443),
+            schema=db_config.get("schema", None),
+            http_scheme=db_config.get("http_scheme", "https"),
+            verify=db_config.get("verify", True),
+        )
     elif db_type == DatabaseType.SQLITE:
-        return SQLiteDBHandler(connection_id)
-    else:
-        raise ValueError(f"Unsupported database type: {db_type}")
+        return SQLiteDBHandler(connection_id=db_config.get("connection_id", ""))
 
-
-def create_trino_handler(
-    host: str,
-    user: str,
-    catalog: str,
-    port: int = 443,
-    schema: Optional[str] = None,
-    http_scheme: str = "https",
-    verify: bool = True,
-) -> TrinoDBHandler:
-    """Create a read-only Trino database handler.
-
-    Args:
-        host: Trino coordinator host.
-        user: User used for authentication.
-        catalog: Default catalog to query.
-        port: Trino coordinator port. Defaults to 443.
-        schema: Default schema within the catalog.
-        http_scheme: HTTP scheme ('http' or 'https'). Defaults to 'https'.
-        verify: Whether to verify SSL certificates. Defaults to True.
-
-    Returns:
-        A TrinoDBHandler instance.
-    """
-    return TrinoDBHandler(
-        host=host,
-        user=user,
-        catalog=catalog,
-        port=port,
-        schema=schema,
-        http_scheme=http_scheme,
-        verify=verify,
-    )
+    raise ValueError(f"Unsupported database type: {db_type}")
