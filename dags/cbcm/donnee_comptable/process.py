@@ -386,7 +386,7 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     )
     df = pd.merge(
         left=df,
-        right=df_unique_cf_cc[["id_dp", "n_unique_cf_cc", "unique_multi"]],
+        right=df_unique_cf_cc[["id_dp", "nb_unique_cf_cc", "unique_multi"]],
         how="left",
         on="id_dp",
     )
