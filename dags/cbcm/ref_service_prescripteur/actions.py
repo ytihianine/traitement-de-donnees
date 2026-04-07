@@ -168,6 +168,7 @@ def load_new_cf_cc(df_get_all_cf_cc: pd.DataFrame, df_sp: pd.DataFrame) -> None:
     df_get_all_cf_cc = df_get_all_cf_cc.loc[
         (df_get_all_cf_cc["centre_financier"] != "Ind")
         & (df_get_all_cf_cc["centre_cout"] != "Ind")
+        & (df_get_all_cf_cc["centre_cout"].str.upper() != "TECHNIQUE")
     ]
 
     # Merge pour comparer
@@ -211,7 +212,7 @@ def load_demande_achat(
     df_get_demande_achat = df_get_demande_achat.loc[
         (df_get_demande_achat["unique_multi"] == "Multiple")
         | (df_get_demande_achat["centre_financier"] == "Ind")
-        | (df_get_demande_achat["centre_cout"] == "Ind")
+        | (df_get_demande_achat["centre_cout"].isin(["Ind", "TECHNIQUE"]))
     ]
 
     # Merge pour comparer
@@ -223,9 +224,12 @@ def load_demande_achat(
         indicator=True,
     )
     df["import_timestamp"] = df["import_timestamp"].astype("string")
-    df = df.drop_duplicates(
-        subset=["id_da", "centre_financier", "centre_cout", "unique_multi"]
-    )
+
+    # Suppression des doublons
+    df = df.drop_duplicates(subset=["id_da"])
+    # CF & CC = None si Multiple
+    mask = df["unique_multi"] == "Multiple"
+    df.loc[mask, ["centre_financier", "centre_cout"]] = None
 
     # Conserver uniquement les nouvelles
     df = df.loc[df["_merge"] == "left_only"]
@@ -260,7 +264,7 @@ def load_demande_paiement_complet(
     # Filtrer les lignes
     df_get_demande_paiement_complet = df_get_demande_paiement_complet.loc[
         (df_get_demande_paiement_complet["centre_financier"] == "Ind")
-        | (df_get_demande_paiement_complet["centre_cout"] == "Ind")
+        | (df_get_demande_paiement_complet["centre_cout"].isin(["Ind", "TECHNIQUE"]))
         | (df_get_demande_paiement_complet["unique_multi"] == "Multiple")
     ]
 
@@ -273,11 +277,14 @@ def load_demande_paiement_complet(
         indicator=True,
     )
     df["import_timestamp"] = df["import_timestamp"].astype("string")
+    df = df.drop_duplicates(subset=["id_dp"])
 
     # Conserver uniquement les nouvelles
     df = df.loc[df["_merge"] == "left_only"]
     df = df.drop(columns=["_merge"])
-    df = df.drop_duplicates(subset=["centre_financier", "centre_cout", "unique_multi"])
+    # CF & CC = None si Multiple
+    mask = df["unique_multi"] == "Multiple"
+    df.loc[mask, ["centre_financier", "centre_cout"]] = None
 
     # Intégrer ces lignes dans Grist
     print(df.columns)
@@ -310,7 +317,7 @@ def load_delai_global_paiement(
     # Filtrer les lignes
     df_get_delai_global_paiement = df_get_delai_global_paiement.loc[
         (df_get_delai_global_paiement["centre_financier"] == "Ind")
-        | (df_get_delai_global_paiement["centre_cout"] == "Ind")
+        | (df_get_delai_global_paiement["centre_cout"].isin(["Ind", "TECHNIQUE"]))
     ]
 
     # Merge pour comparer
@@ -359,7 +366,7 @@ def load_engagement_juridique(
     # Filtrer les lignes
     df_get_engagement_juridique = df_get_engagement_juridique.loc[
         (df_get_engagement_juridique["centre_financier"] == "Ind")
-        | (df_get_engagement_juridique["centre_cout"] == "Ind")
+        | (df_get_engagement_juridique["centre_cout"].isin(["Ind", "TECHNIQUE"]))
     ]
 
     # Merge pour comparer
