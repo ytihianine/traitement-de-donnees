@@ -368,22 +368,28 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
     df["id_dp_cf_cc"] = df["id_dp"] + df["cf_cc"]
 
-    # Suppression des doublons
-    df = df.drop_duplicates(subset=["id_dp_cf_cc"])
+    # Compter le nombre de postes
+    df_grouped = df.groupby(by=["id_dp"], as_index=False).count()
+    df_grouped = df_grouped.rename(columns={"id_dp_cf_cc": "nb_poste"})
 
-    # Regroupement
-    df_grouped = df.groupby(by=["id_dp"], as_index=False)["id_dp_cf_cc"].count()
-    df_grouped = df_grouped.rename(columns={"id_dp_cf_cc": "nb_poste"})  # type: ignore
-
-    # Catégoriser les données
-    df_grouped["unique_multi"] = np.where(
-        df_grouped["nb_poste"] == 1,
+    # Déterminer s'il y plusieurs CF_CC par ID_DP
+    df_unique_cf_cc = df.groupby(by="id_dp")["cf_cc"].nunique().reset_index(name="n_unique_cf_cc")  # type: ignore
+    df_unique_cf_cc["unique_multi"] = np.where(
+        df_unique_cf_cc["n_unique_cf_cc"] == 1,
         "Unique",
         "Multiple",
     )
 
     # Ajout des colonnes calculées
-    df = pd.merge(left=df, right=df_grouped, how="left", on="id_dp")
+    df = pd.merge(
+        left=df, right=df_grouped[["id_dp", "nb_poste"]], how="left", on="id_dp"
+    )
+    df = pd.merge(
+        left=df,
+        right=df_unique_cf_cc[["id_dp", "n_unique_cf_cc", "unique_multi"]],
+        how="left",
+        on="id_dp",
+    )
 
     return df
 
@@ -470,10 +476,16 @@ def process_demande_paiement_complet(
         columns={
             "centre_financier": "centre_financier_demande_paiement",
             "centre_financier_a": "centre_financier_journal_pieces",
+            "montant_poste": "montant_poste_journal_pieces",
         }
     )
 
     # Ajout des colonnes calculées
+    df["montant_poste"] = (
+        df["montant_poste_journal_pieces"]
+        .combine_first(df["montant_dp"])
+        .fillna(DEFAULT_NULL_CC_CF)
+    )
     df["centre_financier"] = (
         df["centre_financier_journal_pieces"]
         .combine_first(df["centre_financier_demande_paiement"])
