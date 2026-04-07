@@ -373,9 +373,9 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     df_grouped = df_grouped.rename(columns={"id_dp_cf_cc": "nb_poste"})
 
     # Déterminer s'il y plusieurs CF_CC par ID_DP
-    df_unique_cf_cc = df.groupby(by="id_dp")["cf_cc"].nunique().reset_index(name="n_unique_cf_cc")  # type: ignore
+    df_unique_cf_cc = df.groupby(by="id_dp")["cf_cc"].nunique().reset_index(name="nb_unique_cf_cc")  # type: ignore
     df_unique_cf_cc["unique_multi"] = np.where(
-        df_unique_cf_cc["n_unique_cf_cc"] == 1,
+        df_unique_cf_cc["nb_unique_cf_cc"] == 1,
         "Unique",
         "Multiple",
     )
