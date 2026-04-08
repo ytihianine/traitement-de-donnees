@@ -1,11 +1,12 @@
-from typing import Union
 from functools import partial
 from datetime import datetime
 import pandas as pd
 import numpy as np
 
-valeur_indeterminee_dir = "ABSENT"
-valeur_indeterminee_autres = None
+from utils.control.text import normalize_whitespace_columns, convert_str_cols_to_date
+
+valeur_indeterminee_dir = "DIR_ABSENT"
+valeur_indeterminee_autres = "ABSENT"
 
 mapping_direction = {
     "ASSOCIATION": {
@@ -164,9 +165,10 @@ def determiner_aip_direction(aip_group: str) -> str:
     return aip_dir
 
 
-def find_certificat_dir_in_profile(profile: str) -> str:
+def find_certificat_dir_in_profile(profile: str) -> str | None:
+    direction = None
     if pd.isna(profile):
-        return valeur_indeterminee_dir
+        return direction
     profile = profile.upper()
     mapping = {
         # Autres structures
@@ -179,7 +181,7 @@ def find_certificat_dir_in_profile(profile: str) -> str:
         if key in profile:
             return value
 
-    return valeur_indeterminee_dir
+    return direction
 
 
 def find_certificat_dir_in_dn(dn: str) -> str:
@@ -280,30 +282,40 @@ def find_certificat_dir_in_mail(mail: str) -> str:
     return valeur_indeterminee_dir
 
 
-def determiner_certificat_direction(row: pd.Series) -> str:
-    certif_dir = find_certificat_dir_in_profile(profile=row.profile)
-    if certif_dir != valeur_indeterminee_dir:
-        return certif_dir
-    certif_dir = find_certificat_dir_in_dn(dn=row.dn)
-    if certif_dir != valeur_indeterminee_dir:
-        return certif_dir
-    certif_dir = find_certificat_dir_in_subjectid(subjectid=row.subjectid)
-    if certif_dir != valeur_indeterminee_dir:
-        return certif_dir
-    certif_dir = find_certificat_dir_in_contact(contact=row.contact)
-    if certif_dir != valeur_indeterminee_dir:
-        return certif_dir
-    certif_dir = find_certificat_dir_in_mail(mail=row.contact)
-    if certif_dir != valeur_indeterminee_dir:
-        return certif_dir
+def determiner_certificat_direction(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Déterminer à quelle direction le certificat est rattaché
+    """
+    # Déterminer la direction pour chaque informations disponibles
+    # A partir du profil
+    df["certif_dir_profile"] = list(map(find_certificat_dir_in_profile, df["profile"]))
+    # A partir du DN
+    df["certif_dir_dn"] = list(map(find_certificat_dir_in_dn, df["dn"]))
+    # A partir du subjectid
+    df["certif_dir_subjectid"] = list(
+        map(find_certificat_dir_in_subjectid, df["subjectid"])
+    )
+    # A partir du contact
+    df["certif_dir_contact"] = list(map(find_certificat_dir_in_contact, df["contact"]))
+    # A partir du mail
+    df["certif_dir_mail"] = list(map(find_certificat_dir_in_mail, df["email"]))
 
-    certif_dir = valeur_indeterminee_dir
-    return certif_dir
+    # Déterminer la direction du certificat
+    cols_sorted_by_priority = [
+        "certif_dir_profile",
+        "certif_dir_dn",
+        "certif_dir_subjectid",
+        "certif_dir_contact",
+        "certif_dir_mail",
+    ]
+    df["certificat_direction"] = df[cols_sorted_by_priority].bfill(axis=1).iloc[:, 0]
+
+    return df
 
 
 def _match_mapping(
     text: str,
-    mapping: dict[Union[str, tuple[str, ...]], str],
+    mapping: dict[str, str] | dict[tuple[str, ...], str],
     default: str = valeur_indeterminee_dir,
 ) -> str:
     """
@@ -387,11 +399,12 @@ def determiner_support(profile: str) -> str:
     )
 
 
-def determiner_etat(row: pd.Series, date_ajd: datetime) -> str:
-    date_debut_validite = row.date_debut_validite
-    date_fin_validite = row.date_fin_validite
-    date_revocation = row.date_revocation
-
+def determiner_etat(
+    date_debut_validite: datetime,
+    date_fin_validite: datetime,
+    date_revocation: datetime,
+    date_ajd: datetime,
+) -> str:
     # Check s'il y a une date de révocation
     if not pd.isna(date_revocation):
         return "REVOQUE"
@@ -434,8 +447,9 @@ def determiner_version_serveur(profile: str) -> str:
     )
 
 
-def map_agent_direction(row: pd.Series, mapping: dict) -> str | None:
-    affectation = row.ou_sigle
+def map_agent_direction(
+    affectation: str, mapping: dict = mapping_direction
+) -> str | None:
     if pd.isna(affectation):
         return valeur_indeterminee_dir
 
@@ -444,7 +458,7 @@ def map_agent_direction(row: pd.Series, mapping: dict) -> str | None:
     if affectation.startswith("DGTRESOR"):
         return "DG TRESOR"
 
-    affectation_split = affectation.split("/")
+    affectation_split = affectation.split(sep="/")
 
     direction = mapping.get(affectation_split[-1], None)
 
@@ -468,33 +482,46 @@ def map_agent_direction(row: pd.Series, mapping: dict) -> str | None:
 
 
 def process_agents(df: pd.DataFrame) -> pd.DataFrame:
-    df["agent_direction"] = df["agent_direction"].str.strip()
-    df["agent_mail"] = df["agent_mail"].str.strip()
+    # Normaliser les données textuelles
+    txt_cols = ["structure", "agent_mail"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Déterminer la direction de l'agent
+    df["agent_direction"] = list(map(map_agent_direction, df["structure"]))
     return df
 
 
 def process_aip(df: pd.DataFrame) -> pd.DataFrame:
+    # Normaliser les données textuelles
+    txt_cols = ["mail"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Déterminer la direction de l'AIP
     df["aip_direction"] = list(map(determiner_aip_direction, df["groupe"]))
-    df["mail"] = df["mail"].str.strip()
+
     return df
 
 
 def process_certificats(df: pd.DataFrame) -> pd.DataFrame:
     # df = df.fillna(np.nan).replace([np.nan], [None])
     date_cols = ["date_debut_validite", "date_fin_validite", "date_revocation"]
-    for date_col in date_cols:
-        df[date_col] = pd.to_datetime(
-            df[date_col], format="%Y-%m-%d %H:%M:%S", errors="raise"
-        )
-    df["certificat_direction"] = list(
-        map(determiner_certificat_direction, df.itertuples(index=False))
+    df = convert_str_cols_to_date(
+        df=df, columns=date_cols, str_date_format="%Y-%m-%d %H:%M:%S", errors="raise"
     )
+
+    # Ajout des colonnes additionnelles
+    df = determiner_certificat_direction(df=df)
     date_ajd = datetime.now()
     df["ac"] = list(map(determiner_ac, df["profile"]))
     df["type_offre"] = list(map(determiner_type_offre, df["profile"]))
     df["supports"] = list(map(determiner_support, df["profile"]))
     df["etat"] = list(
-        map(partial(determiner_etat, date_ajd=date_ajd), df.itertuples(index=False))
+        map(
+            partial(determiner_etat, date_ajd=date_ajd),
+            df["date_debut_validite"],
+            df["date_fin_validite"],
+            df["date_revocation"],
+        )
     )
     df["version"] = list(map(determiner_version, df["profile"]))
     df["version_serveur"] = list(map(determiner_version_serveur, df["profile"]))
@@ -502,8 +529,42 @@ def process_certificats(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_igc(df: pd.DataFrame) -> pd.DataFrame:
-    df["aip_mail"] = df["aip_mail"].str.strip()
-    df["aip_balf_mail"] = df["aip_balf_mail"].str.strip()
+    # Normaliser les données textuelles
+    txt_cols = ["aip_mail", "aip_balf_mail"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    return df
+
+
+def process_historique_certificat(df: pd.DataFrame) -> pd.DataFrame:
+    # Normaliser les données textuelles
+    txt_cols = ["direction", "cn", "statut", "email"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Normaliser les dates
+    date_cols = ["date_debut_validite", "date_fin_validite", "date_revocation"]
+    df = convert_str_cols_to_date(
+        df=df, columns=date_cols, str_date_format="%Y-%m-%d %H:%M:%S", errors="raise"
+    )
+
+    # Déterminer la direction de l'agent
+    df["agent_direction"] = list(map(map_agent_direction, df["direction"]))
+
+    return df
+
+
+def process_mandataire(df: pd.DataFrame) -> pd.DataFrame:
+    # Normaliser les données textuelles
+    txt_cols = ["structure", "sigle", "libelle", "mail"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    # Normaliser les dates
+    date_cols = ["date"]
+    df = convert_str_cols_to_date(
+        df=df, columns=date_cols, str_date_format="%d/%m/%Y", errors="coerce"
+    )
+
+    # Corriger les sigles
+    df["sigle"] = df["sigle"].str.replace("/", "", regex=False)
+
     return df
 
 
