@@ -21,9 +21,18 @@ def source_files() -> None:
         read_options={"sep": ";"},
     )
     igc = create_file_etl_task(selecteur="igc", process_func=process.process_igc)
+    historique_certificat = create_file_etl_task(
+        selecteur="historique_certificat",
+        process_func=process.process_historique_certificat,
+    )
+    mandataire = create_file_etl_task(
+        selecteur="mandataire", process_func=process.process_mandataire
+    )
 
     # ordre des tâches
-    chain([agents(), aip(), certificats(), igc()])
+    chain(
+        [agents(), aip(), certificats(), igc(), historique_certificat(), mandataire()]
+    )
 
 
 @task_group
