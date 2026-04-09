@@ -4,11 +4,11 @@ from airflow.sdk.bases.operator import chain
 from _types.dags import ETLStep, TaskConfig
 from utils.tasks.etl import create_task
 
-from dags.sg.siep.mmsi.api_operat import actions
+from dags.sg.siep.mmsi.api_operat import actions, process
 
 
 @task_group
-def taches():
+def source() -> None:
     declarations = create_task(
         task_config=TaskConfig(task_id="liste_declaration"),
         output_selecteur="declarations",
@@ -18,7 +18,9 @@ def taches():
                 use_context=True,
             ),
         ],
-        export_output=False,
+        add_import_date=False,
+        add_snapshot_id=False,
+        export_output=True,
     )
     consommations = create_task(
         task_config=TaskConfig(task_id="consommation_by_id"),
@@ -29,10 +31,89 @@ def taches():
                 use_context=True,
             ),
         ],
-        export_output=False,
+        add_import_date=False,
+        add_snapshot_id=False,
+        export_output=True,
     )
 
     chain(
         declarations(),
         consommations(),
+    )
+
+
+@task_group
+def output() -> None:
+    declarations = create_task(
+        task_config=TaskConfig(task_id="liste_declaration"),
+        input_selecteurs=["declarations"],
+        output_selecteur="declarations",
+        steps=[
+            ETLStep(
+                fn=actions.liste_declaration,
+                use_context=True,
+                read_data=True,
+            ),
+        ],
+        export_output=True,
+    )
+    adresses_efa = create_task(
+        task_config=TaskConfig(task_id="liste_declaration"),
+        input_selecteurs=["declarations"],
+        output_selecteur="adresses_efa",
+        steps=[
+            ETLStep(
+                fn=actions.liste_declaration,
+                use_context=True,
+                read_data=True,
+            ),
+        ],
+        export_output=True,
+    )
+    activite = create_task(
+        task_config=TaskConfig(task_id="liste_declaration"),
+        input_selecteurs=["consommations"],
+        output_selecteur="declarations",
+        steps=[
+            ETLStep(
+                fn=process.process_detail_conso_activite,
+                use_context=True,
+                read_data=True,
+            ),
+        ],
+        export_output=True,
+    )
+    indicateur = create_task(
+        task_config=TaskConfig(task_id="liste_declaration"),
+        input_selecteurs=["consommations"],
+        output_selecteur="declarations",
+        steps=[
+            ETLStep(
+                fn=process.process_detail_conso_indicateur,
+                use_context=True,
+                read_data=True,
+            ),
+        ],
+        export_output=True,
+    )
+    detail = create_task(
+        task_config=TaskConfig(task_id="liste_declaration"),
+        input_selecteurs=["consommations"],
+        output_selecteur="declarations",
+        steps=[
+            ETLStep(
+                fn=process.process_detail_conso,
+                use_context=True,
+                read_data=True,
+            ),
+        ],
+        export_output=True,
+    )
+
+    chain(
+        declarations(),
+        adresses_efa(),
+        activite(),
+        indicateur(),
+        detail(),
     )

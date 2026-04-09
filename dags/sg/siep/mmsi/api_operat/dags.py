@@ -20,7 +20,7 @@ from utils.tasks.s3 import (
     del_s3_files,
 )
 
-from dags.sg.siep.mmsi.api_operat.task import taches
+from dags.sg.siep.mmsi.api_operat.task import source, output
 
 nom_projet = "API Opera"
 
@@ -54,7 +54,8 @@ def api_operat_ademe() -> None:
     # Ordre des tâches
     chain(
         validate_dag_parameters(),
-        taches(),
+        source(),
+        output(),
         create_tmp_tables(),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(),

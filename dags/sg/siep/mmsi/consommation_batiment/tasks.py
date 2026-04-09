@@ -10,7 +10,7 @@ from dags.sg.siep.mmsi.consommation_batiment import process
 conso_mens_parquet = create_parquet_converter_task(
     selecteur="conso_mens_source",
     task_params={"task_id": "convert_cons_mens_to_parquet"},
-    process_func=process.process_source_conso_mens,
+    process_func=None,
 )
 
 
@@ -104,18 +104,6 @@ def additionnal_files():
         input_selecteurs=["conso_annuelle"],
         steps=[ETLStep(fn=process.process_conso_statut_par_fluide, read_data=True)],
     )
-    conso_avant_2019 = create_task(
-        task_config=TaskConfig(task_id="conso_avant_2019"),
-        output_selecteur="conso_avant_2019",
-        input_selecteurs=["conso_annuelle"],
-        steps=[ETLStep(fn=process.process_conso_avant_2019, read_data=True)],
-    )
-    conso_statut_fluide_global = create_task(
-        task_config=TaskConfig(task_id="conso_statut_fluide_global"),
-        output_selecteur="conso_statut_fluide_global",
-        input_selecteurs=["conso_statut_par_fluide"],
-        steps=[ETLStep(fn=process.process_conso_statut_fluide_global, read_data=True)],
-    )
     conso_statut_batiment = create_task(
         task_config=TaskConfig(task_id="conso_statut_batiment"),
         output_selecteur="conso_statut_batiment",
@@ -134,7 +122,5 @@ def additionnal_files():
         facture_annuelle_unpivot(),
         facture_annuelle_unpivot_comparaison(),
         conso_statut_par_fluide(),
-        conso_avant_2019(),
-        conso_statut_fluide_global(),
         conso_statut_batiment(),
     )
