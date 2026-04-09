@@ -50,7 +50,6 @@ def calculer_dju_moyen(df: pd.DataFrame) -> pd.DataFrame:
         by=["code_bat_gestionnaire", "mois_conso"], as_index=False
     ).mean()
     df_moyen = df_moyen.rename(columns={"degres_jours_de_chauffage": "dju_moyen"})
-    df_moyen = df_moyen.fillna(np.nan).replace([np.nan], [None])
     return df_moyen
 
 
@@ -247,7 +246,7 @@ def process_source_bien_info_comp(df: pd.DataFrame) -> pd.DataFrame:
         "code_bat_gestionnaire"
     ].count()
     df_grouped = df_grouped.rename(
-        {"code_bat_gestionnaire": "nb_code_bat_gestionnaire"}
+        columns={"code_bat_gestionnaire": "nb_code_bat_gestionnaire"}  # type: ignore
     )
 
     # Catégoriser les données
