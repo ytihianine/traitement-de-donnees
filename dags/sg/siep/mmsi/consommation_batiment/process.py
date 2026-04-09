@@ -100,16 +100,16 @@ def calculer_consommation_corrigee(df: pd.DataFrame) -> pd.DataFrame:
 
 def determiner_ratio(
     type_energie: str, mois_conso: float, dju_ref: float, dju_moy: float
-) -> float:
+) -> float | None:
     ratio = 1
 
-    if mois_conso is None:
+    if pd.isna(mois_conso):
         return None
 
-    if dju_ref is None:
+    if pd.isna(dju_ref):
         return None
 
-    if dju_moy is None:
+    if pd.isna(dju_moy):
         return None
 
     if type_energie == TypeEnergie.electricite.value:
