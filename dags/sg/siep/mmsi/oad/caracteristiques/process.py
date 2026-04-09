@@ -2,30 +2,16 @@ import pandas as pd
 import numpy as np
 
 
-def merge_old_df_to_new_df(
-    new_df: pd.DataFrame,
-    old_df: pd.DataFrame,
-    id_keys: list[str],
-    old_cols_to_keep: list[str] | None = None,
-) -> pd.DataFrame:
-    """
-    Certaines données sont disponibles via d'autres chaines de traitement.
-    Il faut donc les conserver.
-    """
-    if old_cols_to_keep is None:
-        old_cols_to_keep = list(old_df.columns)
-
-    df = pd.merge(
-        left=new_df, right=old_df.loc[:, old_cols_to_keep], on=id_keys, how="left"
-    )
+def keep_only_bien_mef(df: pd.DataFrame) -> pd.DataFrame:
+    # Filtrer les biens pour ne conserver que ceux appartenant aux MEF
+    df = df.loc[
+        (df["presence_mef_bat"] == "Avec MEF") & (df["filtre_manuel_a_conserver"])
+    ]
 
     return df
 
 
 def process_oad_file(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.loc[
-        (df["presence_mef_bat"] == "Avec MEF") & (df["filtre_manuel_a_conserver"])
-    ]
     df = df.replace("NC", pd.NA)
     df = df.replace("s/o", pd.NA)
     df["code_insee_normalise"] = df["code_insee_normalise"].astype(str)
@@ -33,6 +19,9 @@ def process_oad_file(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_sites(df: pd.DataFrame) -> pd.DataFrame:
+    # Filtrer les biens
+    df = keep_only_bien_mef(df=df)
+
     # Conserver uniquement les colonnes de ce dataset
     cols_to_keep = [
         "code_site",
@@ -53,6 +42,9 @@ def process_sites(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_biens(df: pd.DataFrame) -> pd.DataFrame:
+    # Filtrer les biens
+    df = keep_only_bien_mef(df=df)
+
     # Conserver uniquement les colonnes de ce dataset
     cols_to_keep = [
         "categorie_administrative_liste_bat",
@@ -123,6 +115,9 @@ def process_gestionnaires(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_biens_gestionnaires(df: pd.DataFrame) -> pd.DataFrame:
+    # Filtrer les biens
+    df = keep_only_bien_mef(df=df)
+
     # Conserver uniquement les colonnes de ce dataset
     cols_to_keep = [
         "code_bat_ter",
@@ -147,6 +142,9 @@ def process_biens_gestionnaires(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_biens_occupants(df: pd.DataFrame) -> pd.DataFrame:
+    # Filtrer les biens
+    df = keep_only_bien_mef(df=df)
+
     # Conserver uniquement les colonnes de ce dataset
     cols_to_keep = [
         "categorie_administrative",
