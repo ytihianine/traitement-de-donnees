@@ -584,9 +584,6 @@ def process_conso_statut_par_fluide(df: pd.DataFrame) -> pd.DataFrame:
         value_name="conso_presente",
     ).reset_index()
 
-    # Grouper les données par bâtiment, année et fluide
-    df = df.groupby(by=cols_id)[cols_conso_presente].sum(min_count=1).reset_index()
-
     # Déterminer le statut de chaque fluide
     df["statut_du_fluide"] = np.where(
         df["conso_presente"] == 12, Statuts.complet.value, Statuts.incomplet.value
@@ -596,10 +593,14 @@ def process_conso_statut_par_fluide(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_conso_statut_batiment(df: pd.DataFrame) -> pd.DataFrame:
+    # Conserver uniquement les lignes concernant l'élec et le gaz
+    df = df.loc[df["type_fluide"].str.contains(pat="elec|gaz_ci")]
+
+    # Déterminer le statut global du bâtiment en fonction du statut de chaque fluide
     df_statut = (
         df.groupby(by=["code_bat_gestionnaire", "annee"])["statut_du_fluide"]
         .apply(
-            lambda x: (
+            func=lambda x: (
                 Statuts.complet.value
                 if (x.str.upper() == Statuts.complet.value).all()
                 else Statuts.incomplet.value
