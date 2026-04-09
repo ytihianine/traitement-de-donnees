@@ -107,7 +107,7 @@ def additionnal_files():
     conso_statut_batiment = create_task(
         task_config=TaskConfig(task_id="conso_statut_batiment"),
         output_selecteur="conso_statut_batiment",
-        input_selecteurs=["cconso_statut_par_fluide"],
+        input_selecteurs=["conso_statut_par_fluide"],
         steps=[ETLStep(fn=process.process_conso_statut_batiment, read_data=True)],
     )
 
