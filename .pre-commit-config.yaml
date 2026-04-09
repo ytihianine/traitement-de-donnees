@@ -16,7 +16,11 @@ repos:
     -   id: black
         verbose: true
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.0
+    rev: v0.15.9
     hooks:
         - id: ruff                       # Linter ultra-rapide (remplace flake8, isort...)
           args: ["--fix"]
+-   repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+        - id: gitleaks
