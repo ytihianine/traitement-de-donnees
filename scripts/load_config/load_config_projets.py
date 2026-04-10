@@ -1,5 +1,6 @@
 import os
 import sqlite3
+from datetime import datetime
 import pandas as pd
 import numpy as np
 
@@ -44,6 +45,8 @@ tbl_names.reverse()
 
 ENV = os.environ.copy()
 DRY_RUN = False
+NOW = datetime.now()
+ADD_METADATA = True
 schema = "conf_projets"
 db_path = "/home/onyxia/work/Configuration - interne.grist"
 
@@ -66,6 +69,7 @@ if not DRY_RUN:
         pg_cur.execute(query=drop_query)
 
 for tbl in tbl_ordered:
+    print("\n", "=" * 50)
     print(f"Start processing table <{tbl["tbl_name"]}>")
     # read data for sqlite file
     df = pd.read_sql_query(
@@ -77,6 +81,14 @@ for tbl in tbl_ordered:
     df = tbl["process_func"](df=df)
     # df = df.drop(df.filter(regex="^(grist|manual)").columns, axis=1)
     df = df.fillna(np.nan).replace([np.nan], [None])
+
+    # Add metadata
+    if ADD_METADATA:
+        df["import_timestamp"] = NOW
+        df["import_date"] = NOW.date()
+        df["snapshot_id"] = NOW.strftime(format="%Y%m%d_%H:%M:%S")
+
+    # Show results
     # df = df.convert_dtypes()
     print(df.columns)
     print(df.dtypes)
@@ -88,7 +100,9 @@ for tbl in tbl_ordered:
         fetch_query = f"SELECT * FROM {schema}.{tbl["tbl_name"]} LIMIT 0;"
         pg_cur.execute(query=fetch_query)
         if pg_cur.description:
-            sorted_cols = sorted([col.name for col in pg_cur.description])
+            sorted_cols = sorted(
+                [col.name for col in pg_cur.description if col.name in df.columns]
+            )
             print(sorted_cols)
 
             # load data to config db
