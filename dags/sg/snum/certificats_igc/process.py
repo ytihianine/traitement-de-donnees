@@ -530,11 +530,11 @@ def process_aip(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_historique_certificat(df: pd.DataFrame) -> pd.DataFrame:
     # Normaliser les données textuelles
-    txt_cols = ["direction", "cn", "statut", "email"]
+    txt_cols = ["agent_structure", "cn", "statut", "agent_mail"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     # Normaliser les dates
-    date_cols = ["date_debut_validite", "date_fin_validite", "date_revocation"]
+    date_cols = ["date_debut_validite", "date_fin_validite"]
     df = convert_str_cols_to_date(
         df=df, columns=date_cols, str_date_format="%Y-%m-%d %H:%M:%S", errors="raise"
     )
