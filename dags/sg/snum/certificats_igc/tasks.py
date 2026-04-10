@@ -12,15 +12,12 @@ def source_files() -> None:
     agents = create_file_etl_task(
         selecteur="agents", process_func=process.process_agents
     )
-    aip = create_file_etl_task(
-        selecteur="aip", process_func=process.process_aip, read_options={"sep": ";"}
-    )
-    certificats = create_file_etl_task(
-        selecteur="certificats",
-        process_func=process.process_certificats,
+    aip = create_file_etl_task(selecteur="aip", process_func=process.process_aip)
+    certificat = create_file_etl_task(
+        selecteur="certificat",
+        process_func=process.process_certificat,
         read_options={"sep": ";"},
     )
-    igc = create_file_etl_task(selecteur="igc", process_func=process.process_igc)
     historique_certificat = create_file_etl_task(
         selecteur="historique_certificat",
         process_func=process.process_historique_certificat,
@@ -30,19 +27,11 @@ def source_files() -> None:
     )
 
     # ordre des tâches
-    chain(
-        [agents(), aip(), certificats(), igc(), historique_certificat(), mandataire()]
-    )
+    chain([agents(), aip(), certificat(), historique_certificat(), mandataire()])
 
 
 @task_group
 def output_files() -> None:
-    liste_aip = create_task(
-        task_config=TaskConfig(task_id="liste_aip"),
-        output_selecteur="liste_aip",
-        input_selecteurs=["igc", "agents"],
-        steps=[ETLStep(fn=process.process_liste_aip, read_data=True)],
-    )
     liste_certificats = create_task(
         task_config=TaskConfig(task_id="liste_certificats"),
         output_selecteur="liste_certificats",
@@ -51,4 +40,4 @@ def output_files() -> None:
     )
 
     # ordre des tâches
-    chain([liste_aip(), liste_certificats()])
+    chain([liste_certificats()])

@@ -448,19 +448,19 @@ def determiner_version_serveur(profile: str) -> str:
 
 
 def map_agent_direction(
-    affectation: str, mapping: dict = mapping_direction
+    structure: str, mapping: dict = mapping_direction
 ) -> str | None:
-    if pd.isna(affectation):
+    if pd.isna(structure):
         return valeur_indeterminee_dir
 
-    affectation = affectation.strip().upper()
+    structure = structure.strip().upper()
 
-    if affectation.startswith("DGTRESOR"):
+    if structure.startswith("DGTRESOR"):
         return "DG TRESOR"
 
-    affectation_split = affectation.split(sep="/")
+    structure_split = structure.split(sep="/")
 
-    direction = mapping.get(affectation_split[-1], None)
+    direction = mapping.get(structure_split[-1], None)
 
     if direction is None:
         return valeur_indeterminee_dir
@@ -470,7 +470,7 @@ def map_agent_direction(
 
     if isinstance(direction, dict):
         for k, v in direction.items():
-            if k in affectation_split:
+            if k in structure_split:
                 return v
 
     return valeur_indeterminee_dir
@@ -491,18 +491,7 @@ def process_agents(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_aip(df: pd.DataFrame) -> pd.DataFrame:
-    # Normaliser les données textuelles
-    txt_cols = ["mail"]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
-    # Déterminer la direction de l'AIP
-    df["aip_direction"] = list(map(determiner_aip_direction, df["groupe"]))
-
-    return df
-
-
-def process_certificats(df: pd.DataFrame) -> pd.DataFrame:
+def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
     # df = df.fillna(np.nan).replace([np.nan], [None])
     date_cols = ["date_debut_validite", "date_fin_validite", "date_revocation"]
     df = convert_str_cols_to_date(
@@ -528,10 +517,14 @@ def process_certificats(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_igc(df: pd.DataFrame) -> pd.DataFrame:
+def process_aip(df: pd.DataFrame) -> pd.DataFrame:
     # Normaliser les données textuelles
-    txt_cols = ["aip_mail", "aip_balf_mail"]
+    txt_cols = ["structure", "aip_mail", "aip_balf_mail"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Déterminer la direction que gère l'AIP
+    df["aip_direction_geree"] = list(map(determiner_aip_direction, df["structure"]))
+
     return df
 
 
@@ -571,29 +564,6 @@ def process_mandataire(df: pd.DataFrame) -> pd.DataFrame:
 """
     Fonctions de processing des fichiers finaux
 """
-
-
-def process_liste_aip(df_igc: pd.DataFrame, df_agents: pd.DataFrame) -> pd.DataFrame:
-    df_agents = df_agents[["agent_direction", "agent_mail"]].drop_duplicates()
-
-    df = pd.merge(
-        left=df_igc,
-        right=df_agents,
-        how="left",
-        left_on=["aip_mail"],
-        right_on=["agent_mail"],
-    )
-
-    cols_to_keep = {
-        "aip_mail": "aip_mail",
-        "aip_balf_mail": "aip_balf_mail",
-        "agent_direction": "aip_direction",
-    }
-    df = df[list(cols_to_keep.keys())]
-    df = df.rename(columns=cols_to_keep)
-    df = df.drop_duplicates(subset=["aip_mail", "aip_direction", "aip_balf_mail"])
-
-    return df
 
 
 def process_liste_certificats(
