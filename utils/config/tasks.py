@@ -231,7 +231,7 @@ def _get_selecteur_storage_info(
             cpss3db.bucket, cpss3db.s3_key, cpss3db.filename,
             cpss3db.tbl_name
         FROM {CONF_SCHEMA}.selecteur_s3_db_vw cpss3db
-        WHERE 1=1 AND cpss3db.projet = %s AND rang = 1;
+        WHERE 1=1 AND cpss3db.projet = %s AND rang = 1
     """
 
     if only_source:
