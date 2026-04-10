@@ -1,5 +1,4 @@
 from enums.dags import TypeDocumentation
-from enums.database import LoadStrategy, PartitionTimePeriod
 import pandas as pd
 from utils.control.dates import convert_grist_date_to_date
 from utils.control.structures import (
@@ -27,6 +26,7 @@ def process_direction(df: pd.DataFrame) -> pd.DataFrame:
         "direction",
     ]
     df = df.loc[:, cols_to_keep]
+    df = df.rename(columns={"id": "id_direction"})
 
     df = df.assign(direction=df["direction"].str.strip()).convert_dtypes()
     df = df.drop_duplicates(subset=["direction"])
@@ -43,6 +43,7 @@ def process_service(df: pd.DataFrame) -> pd.DataFrame:
         "service",
     ]
     df = df.loc[:, cols_to_keep]
+    df = df.rename(columns={"id": "id_service"})
 
     # Rename
     cols_to_rename = {"direction": "id_direction"}
@@ -70,6 +71,7 @@ def process_projet(df: pd.DataFrame) -> pd.DataFrame:
 
     # Rename
     cols_to_rename = {
+        "id": "id_projet",
         "direction": "id_direction",
         "service": "id_service",
     }
@@ -91,7 +93,6 @@ def process_projet(df: pd.DataFrame) -> pd.DataFrame:
 def process_projet_contact(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
-        "id",
         "projet",
         "contact_mail",
         "is_mail_generic",
@@ -125,7 +126,6 @@ def process_projet_contact(df: pd.DataFrame) -> pd.DataFrame:
 def process_projet_documentation(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
-        "id",
         "projet",
         "type_documentation",
         "lien",
@@ -160,7 +160,6 @@ def process_projet_documentation(df: pd.DataFrame) -> pd.DataFrame:
 def process_projet_s3(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
-        "id",
         "projet",
         "bucket",
         "key",
@@ -197,6 +196,7 @@ def process_selecteur(df: pd.DataFrame) -> pd.DataFrame:
 
     # Rename
     cols_to_rename = {
+        "id": "id_selecteur",
         "projet": "id_projet",
         "type_de_selecteur": "type_selecteur",
         "selecteur": "selecteur",
@@ -218,7 +218,6 @@ def process_selecteur(df: pd.DataFrame) -> pd.DataFrame:
 def process_source(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
-        "id",
         "projet",
         "type",
         "selecteur",
@@ -252,7 +251,6 @@ def process_source(df: pd.DataFrame) -> pd.DataFrame:
 def process_selecteur_s3(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
-        "id",
         "projet",
         "selecteur",
         "filename",
@@ -282,14 +280,9 @@ def process_selecteur_s3(df: pd.DataFrame) -> pd.DataFrame:
 def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
-        "id",
         "projet",
         "selecteur",
         "tbl_name",
-        "tbl_order",
-        "load_strategy",
-        "is_partitionned",
-        "partition_period",
     ]
     df = df.loc[:, cols_to_keep]
 
@@ -307,21 +300,6 @@ def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
     # Txt colonnes
     txt_cols = ["tbl_name", "partition_period", "load_strategy"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
-    # Bool colonnes
-    bool_cols = ["is_partitionned"]
-    df = handle_grist_boolean_columns(df=df, columns=bool_cols)
-
-    # Check constraintes - Partition period
-    validate_enum_column(
-        df=df.loc[df["is_partitionned"]],
-        column="partition_period",
-        enum_class=PartitionTimePeriod,
-        allow_null=False,
-    )
-    validate_enum_column(
-        df=df, column="load_strategy", enum_class=LoadStrategy, allow_null=False
-    )
 
     return df
 
@@ -341,6 +319,7 @@ def process_col_mapping(df: pd.DataFrame) -> pd.DataFrame:
 
     # Rename
     cols_to_rename = {
+        "id": "id_col_mapping",
         "projet": "id_projet",
         "selecteur": "id_selecteur",
     }

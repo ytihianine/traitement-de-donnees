@@ -4,32 +4,34 @@ CREATE SCHEMA IF NOT EXISTS conf_projets;
 
 DROP TABLE conf_projets."ref_direction" CASCADE;
 CREATE TABLE conf_projets."ref_direction" (
-  "id" int,
+  "id" serial,
+  "id_direction" int,
   "direction" text,
   "import_timestamp" TIMESTAMP NOT NULL,
   "import_date" DATE NOT NULL,
   "snapshot_id" TEXT,
   PRIMARY KEY ("id"),
-  UNIQUE ("direction")
+  UNIQUE ("id_direction", "import_timestamp")
 );
 
-
+DROP TABLE conf_projets."ref_service" CASCADE;
 CREATE TABLE conf_projets."ref_service" (
-  "id" int,
+  "id" serial,
+  "id_service" int,
   "id_direction" int,
   "service" text,
   "import_timestamp" TIMESTAMP NOT NULL,
   "import_date" DATE NOT NULL,
   "snapshot_id" TEXT,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("id_direction") REFERENCES conf_projets."ref_direction" ("id"),
-  UNIQUE ("service")
+  UNIQUE ("id_service", "import_timestamp")
 );
 
 
 DROP TABLE conf_projets."projet" CASCADE;
 CREATE TABLE conf_projets."projet" (
-  "id" int,
+  "id" serial,
+  "id_projet" int,
   "id_direction" int,
   "id_service" int,
   "projet" text,
@@ -37,15 +39,13 @@ CREATE TABLE conf_projets."projet" (
   "import_date" DATE NOT NULL,
   "snapshot_id" TEXT,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("id_direction") REFERENCES conf_projets."ref_direction" ("id"),
-  FOREIGN KEY ("id_service") REFERENCES conf_projets."ref_service" ("id"),
-  UNIQUE ("id_direction", "id_service", "projet")
+  UNIQUE ("id_projet", "import_timestamp")
 );
 
 
-DROP TABLE conf_projets."projet_documentation";
+DROP TABLE conf_projets."projet_documentation" CASCADE;
 CREATE TABLE conf_projets."projet_documentation" (
-  "id" int,
+  "id" serial,
   "id_projet" int,
   "type_documentation" text,
   "lien" text,
@@ -53,13 +53,12 @@ CREATE TABLE conf_projets."projet_documentation" (
   "import_date" DATE NOT NULL,
   "snapshot_id" TEXT,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  UNIQUE ("id_projet", "type_documentation")
+  UNIQUE ("id_projet", "type_documentation", "import_timestamp")
 );
 
-DROP TABLE conf_projets."projet_s3";
+DROP TABLE conf_projets."projet_s3" CASCADE;
 CREATE TABLE conf_projets."projet_s3" (
-  "id" int,
+  "id" serial,
   "id_projet" int,
   "bucket" text,
   "key" text,
@@ -68,14 +67,14 @@ CREATE TABLE conf_projets."projet_s3" (
   "import_date" DATE NOT NULL,
   "snapshot_id" TEXT,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  UNIQUE ("id_projet")
+  UNIQUE ("id_projet", "import_timestamp")
 );
 
 
-DROP TABLE conf_projets."projet_contact";
+DROP TABLE conf_projets."projet_contact" CASCADE;
 CREATE TABLE conf_projets."projet_contact" (
-  "id" int,
+  "id" serial,
+  "id_contact" int,
   "id_projet" int,
   "contact_mail" text,
   "is_mail_generic" bool,
@@ -83,13 +82,13 @@ CREATE TABLE conf_projets."projet_contact" (
   "import_date" DATE NOT NULL,
   "snapshot_id" TEXT,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  UNIQUE ("id_projet", "contact_mail")
+  UNIQUE ("id_projet", "id_contact", "import_timestamp")
 );
 
-DROP TABLE conf_projets."projet_selecteur";
+DROP TABLE conf_projets."projet_selecteur" CASCADE;
 CREATE TABLE conf_projets."projet_selecteur" (
-  "id" int,
+  "id" serial,
+  "id_selecteur" int,
   "id_projet" int,
   "type_selecteur" text,
   "selecteur" text,
@@ -97,13 +96,12 @@ CREATE TABLE conf_projets."projet_selecteur" (
   "import_date" DATE NOT NULL,
   "snapshot_id" TEXT,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  UNIQUE ("id_projet", "selecteur")
+  UNIQUE ("id_projet", "id_selecteur", "import_timestamp")
 );
 
-DROP TABLE conf_projets."selecteur_source";
+DROP TABLE conf_projets."selecteur_source" CASCADE;
 CREATE TABLE conf_projets."selecteur_source" (
-  "id" int,
+  "id" serial,
   "id_projet" int,
   "id_selecteur" int,
   "type_source" text,
@@ -112,15 +110,13 @@ CREATE TABLE conf_projets."selecteur_source" (
   "import_date" DATE NOT NULL,
   "snapshot_id" TEXT,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id"),
-  UNIQUE ("id_projet", "id_selecteur", "type_source", "id_source")
+  UNIQUE ("id_projet", "id_selecteur", "import_timestamp")
 );
 
 
-DROP TABLE conf_projets."selecteur_s3";
+DROP TABLE conf_projets."selecteur_s3" CASCADE;
 CREATE TABLE conf_projets."selecteur_s3" (
-  "id" int,
+  "id" serial,
   "id_projet" int,
   "id_selecteur" int,
   "key" text,
@@ -129,35 +125,28 @@ CREATE TABLE conf_projets."selecteur_s3" (
   "import_date" DATE NOT NULL,
   "snapshot_id" TEXT,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id"),
-  UNIQUE ("id_projet", "id_selecteur", "filename")
+  UNIQUE ("id_projet", "id_selecteur", "import_timestamp")
 );
 
 
-DROP TABLE conf_projets."selecteur_database";
+DROP TABLE conf_projets."selecteur_database" CASCADE;
 CREATE TABLE conf_projets."selecteur_database" (
-  "id" int,
+  "id" serial,
   "id_projet" int,
   "id_selecteur" int,
   "tbl_name" text,
-  "tbl_order" int,
-  "is_partitionned" bool,
-  "partition_period" text,
-  "load_strategy" text,
   "import_timestamp" TIMESTAMP NOT NULL,
   "import_date" DATE NOT NULL,
   "snapshot_id" TEXT,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id"),
-  UNIQUE ("id_projet", "id_selecteur", "tbl_name")
+  UNIQUE ("id_projet", "id_selecteur", "import_timestamp")
 );
 
 
-DROP TABLE conf_projets."selecteur_column_mapping";
+DROP TABLE conf_projets."selecteur_column_mapping" CASCADE;
 CREATE TABLE conf_projets."selecteur_column_mapping" (
-  "id" int,
+  "id" serial,
+  "id_col_mapping" int,
   "id_projet" int,
   "id_selecteur" int,
   "colname_source" text,
@@ -168,9 +157,7 @@ CREATE TABLE conf_projets."selecteur_column_mapping" (
   "import_date" DATE NOT NULL,
   "snapshot_id" TEXT,
   PRIMARY KEY ("id"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id"),
-  FOREIGN KEY ("id_selecteur") REFERENCES conf_projets."projet_selecteur" ("id"),
-  UNIQUE ("id_projet", "id_selecteur", "colname_source")
+  UNIQUE ("id_projet", "id_selecteur", "id_col_mapping", "import_timestamp")
 );
 
 
@@ -181,11 +168,8 @@ CREATE TABLE conf_projets."projet_snapshot"(
   "snapshot_id" text NOT NULL,
 	"creation_timestamp" timestamp NOT NULL,
   PRIMARY KEY ("id"),
-  UNIQUE ("id_projet", "snapshot_id"),
-  FOREIGN KEY ("id_projet") REFERENCES conf_projets."projet" ("id")
+  UNIQUE ("id_projet", "snapshot_id")
 )
-
-
 
 
 -- Vue pour get_projet_s3_info()
@@ -199,76 +183,6 @@ SELECT
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_s3 cpps ON cpp.id = cpps.id_projet;
 
-
--- Vue pour selecteur_s3 avec fallback sur projet_s3
-DROP VIEW conf_projets.selecteur_s3_vw;
-CREATE OR REPLACE VIEW conf_projets.selecteur_s3_vw AS
-SELECT
-    cpp.projet,
-    cpps.selecteur,
-    cpss3.filename,
-    COALESCE(cpss3.key, cpps3.key) as s3_key,
-    cpps3.bucket,
-    cpps3.key as projet_s3_key,
-    cpps3.key_tmp as projet_s3_key_tmp,
-    CONCAT(COALESCE(cpss3.key, cpps3.key), '/', cpss3.filename) as filepath_s3,
-    CONCAT(cpps3.key_tmp, '/', cpss3.filename) as filepath_tmp_s3
-FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_selecteur cpps ON cpp.id = cpps.id_projet
-INNER JOIN conf_projets.selecteur_s3 cpss3 ON cpps.id = cpss3.id_selecteur
-    AND cpps.id_projet = cpss3.id_projet
-INNER JOIN conf_projets.projet_s3 cpps3 ON cpp.id = cpps3.id_projet;
-
--- Vue pour les sources de type Grist
-DROP VIEW conf_projets.selecteur_source_grist_vw;
-CREATE OR REPLACE VIEW conf_projets.selecteur_source_grist_vw AS
-SELECT
-    cpp.projet,
-    cpps.selecteur,
-    cpss.type_source,
-    cpss.id_source,
-    cpss3.filename,
-    COALESCE(cpss3.key, cpps3.key) as s3_key,
-    cpps3.bucket,
-    cpps3.key as projet_s3_key,
-    cpps3.key_tmp as projet_s3_key_tmp,
-    CONCAT(COALESCE(cpss3.key, cpps3.key), '/', cpss3.filename) as filepath_s3,
-    CONCAT(cpps3.key_tmp, '/', cpss3.filename) as filepath_tmp_s3
-FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_s3 cpps3 ON cpp.id = cpps3.id_projet
-INNER JOIN conf_projets.projet_selecteur cpps ON cpp.id = cpps.id_projet
-INNER JOIN conf_projets.selecteur_s3 cpss3 ON cpps.id = cpss3.id_selecteur
-    AND cpps.id_projet = cpss3.id_projet
-INNER JOIN conf_projets.selecteur_source cpss ON cpps.id = cpss.id_selecteur
-    AND cpps.id_projet = cpss.id_projet
-WHERE cpss.type_source = 'Grist';
-
--- Vue pour les sources de type Fichier avec S3
-DROP VIEW conf_projets.selecteur_source_fichier_vw;
-CREATE OR REPLACE VIEW conf_projets.selecteur_source_fichier_vw AS
-SELECT
-    cpp.projet,
-    cpps.selecteur,
-    cpss.type_source,
-    cpss.id_source,
-    CONCAT(cpps3.key, '/', cpss.id_source) as filepath_source_s3,
-    cpss3.filename,
-    COALESCE(cpss3.key, cpps3.key) as s3_key,
-    cpps3.bucket,
-    cpps3.key as projet_s3_key,
-    cpps3.key_tmp as projet_s3_key_tmp,
-    CONCAT(COALESCE(cpss3.key, cpps3.key), '/', cpss3.filename) as filepath_s3,
-    CONCAT(cpps3.key_tmp, '/', cpss3.filename) as filepath_tmp_s3
-FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_selecteur cpps
-  ON cpp.id = cpps.id_projet
-INNER JOIN conf_projets.selecteur_source cpss
-  ON cpps.id = cpss.id_selecteur
-  AND cpps.id_projet = cpss.id_projet
-INNER JOIN conf_projets.projet_s3 cpps3 ON cpp.id = cpps3.id_projet
-INNER JOIN conf_projets.selecteur_s3 cpss3 ON cpps.id = cpss3.id_selecteur
-    AND cpps.id_projet = cpss3.id_projet
-WHERE cpss.type_source = 'Fichier';
 
 -- Vue pour column_mapping_dataframe()
 DROP VIEW conf_projets.cols_mapping_vw;
@@ -305,25 +219,8 @@ SELECT
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_contact cppc ON cpp.id = cppc.id_projet;
 
--- Vue pour les info db
-DROP VIEW conf_projets.projet_database_vw;
-CREATE OR REPLACE VIEW conf_projets.projet_database_vw AS
-SELECT
-    cpp.projet,
-    cpps.selecteur,
-    cpsd.tbl_name,
-    cpsd.tbl_order,
-    cpsd.is_partitionned,
-    cpsd.partition_period,
-    cpsd.load_strategy
-FROM conf_projets.projet cpp
-INNER JOIN conf_projets.selecteur_database cpsd ON cpp.id = cpsd.id_projet
-INNER JOIN conf_projets.projet_selecteur cpps ON cpps.id = cpsd.id_selecteur
-    AND cpps.id_projet = cpsd.id_projet
-ORDER BY cpsd.tbl_order;
 
-
--- Vue pour selecteur_s3_db_info
+-- Vue pour _get_selecteur_storage_info()
 DROP VIEW conf_projets.selecteur_s3_db_vw;
 CREATE OR REPLACE VIEW conf_projets.selecteur_s3_db_vw AS
 SELECT
@@ -339,11 +236,7 @@ SELECT
     cpps3.key_tmp as projet_s3_key_tmp,
     CONCAT(COALESCE(cpss3.key, cpps3.key), '/', cpss3.filename) as filepath_s3,
     CONCAT(cpps3.key_tmp, '/', cpss3.filename) as filepath_tmp_s3,
-    cpsd.tbl_name,
-    cpsd.tbl_order,
-    cpsd.is_partitionned,
-    cpsd.partition_period,
-    cpsd.load_strategy
+    cpsd.tbl_name
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_selecteur cpps
   ON cpp.id = cpps.id_projet
