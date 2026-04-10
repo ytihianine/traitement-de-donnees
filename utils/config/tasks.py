@@ -54,8 +54,15 @@ def column_mapping_dataframe(
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     df = db.fetch_df(
-        query=f"""SELECT cpcm.projet, cpcm.selecteur, cpcm.colname_source, cpcm.colname_dest
+        query=f"""
+            WITH latest AS (
+                SELECT MAX(import_timestamp) AS max_ts
+                FROM {CONF_SCHEMA}.projet
+                LIMIT 1
+            )
+            SELECT cpcm.projet, cpcm.selecteur, cpcm.colname_source, cpcm.colname_dest
             FROM {CONF_SCHEMA}.cols_mapping_vw cpcm
+            JOIN latest ON cpcm.import_timestamp = latest.max_ts
             WHERE cpcm.projet = %s AND cpcm.selecteur = %s;
         """,
         parameters=(nom_projet, selecteur),
@@ -88,8 +95,14 @@ def get_list_contact(nom_projet: str) -> list[Contact]:
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     query = f"""
+        WITH latest AS (
+            SELECT MAX(import_timestamp) AS max_ts
+            FROM {CONF_SCHEMA}.projet
+            LIMIT 1
+        )
         SELECT cppc.projet, cppc.contact_mail, cppc.is_mail_generic
         FROM {CONF_SCHEMA}.projet_contact_vw cppc
+        JOIN latest ON cppc.import_timestamp = latest.max_ts
         WHERE cppc.projet = %s;
     """
 
@@ -111,8 +124,14 @@ def get_list_documentation(
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     query = f"""
+        WITH latest AS (
+            SELECT MAX(import_timestamp) AS max_ts
+            FROM {CONF_SCHEMA}.projet
+            LIMIT 1
+        )
         SELECT cppd.projet, cppd.type_documentation, cppd.lien
         FROM {CONF_SCHEMA}.projet_documentation_vw cppd
+        JOIN latest ON cppd.import_timestamp = latest.max_ts
         WHERE cppd.projet = %s;
     """
 
@@ -146,10 +165,16 @@ def get_projet_s3_info(
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     query = f"""
+        WITH latest AS (
+            SELECT MAX(import_timestamp) AS max_ts
+            FROM {CONF_SCHEMA}.projet
+            LIMIT 1
+        )
         SELECT cpps3.projet, cpps3.bucket,
             cpps3.key,
             cpps3.key_tmp
         FROM {CONF_SCHEMA}.projet_s3_vw cpps3
+        JOIN latest ON cpps3.import_timestamp = latest.max_ts
         WHERE cpps3.projet = %s;
     """
 
@@ -226,10 +251,16 @@ def _get_selecteur_storage_info(
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     query = f"""
+        WITH latest AS (
+            SELECT MAX(import_timestamp) AS max_ts
+            FROM {CONF_SCHEMA}.projet
+            LIMIT 1
+        )
         SELECT cpss3db.projet, cpss3db.selecteur, cpss3db.type_source, cpss3db.id_source,
             cpss3db.bucket, cpss3db.s3_key, cpss3db.filename,
             cpss3db.tbl_name
         FROM {CONF_SCHEMA}.selecteur_s3_db_vw cpss3db
+        JOIN latest ON cpss3db.import_timestamp = latest.max_ts
         WHERE 1=1 AND cpss3db.projet = %s
     """
 
