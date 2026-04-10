@@ -65,6 +65,22 @@ def _get_primary_keys(schema: str, table: str, db_handler: BaseDBHandler) -> lis
     return df.loc[:, "column_name"].tolist()
 
 
+def _get_table_columns(schema: str, table: str, db_handler: BaseDBHandler) -> list[str]:
+    df = db_handler.fetch_df(
+        query="""
+            SELECT isc.table_catalog, isc.table_schema, isc.table_name, isc.column_name
+            FROM information_schema.columns isc
+            WHERE
+                isc.table_schema = %s
+                AND isc.table_name = %s
+                AND isc.column_default IS NULL
+            ORDER BY table_schema ASC, table_name ASC, column_name ASC;
+        """,
+        parameters=(schema, table),
+    )
+    return df.loc[:, "column_name"].tolist()
+
+
 def _create_snapshot_id(
     nom_projet: str, execution_date: datetime, db_handler: BaseDBHandler
 ) -> None:
@@ -530,27 +546,14 @@ def sort_db_colnames(
         Sorted list of column names
     """
     tbl_name = selecteur_config.selecteur_info.tbl_name
-    keep_file_id_col = selecteur_config.options.keep_file_id_col
     pg_conn_id = selecteur_config.options.db_conn_id
 
-    df = db_handler.fetch_df(
-        query="""SELECT isc.table_catalog, isc.table_schema, isc.table_name, isc.column_name
-            FROM information_schema.columns isc
-            WHERE
-                isc.table_schema = %s
-                AND isc.table_name = %s
-            ORDER BY table_schema ASC, table_name ASC, column_name ASC;
-        """,
-        parameters=(schema, tbl_name),
-    )
+    if tbl_name is None or tbl_name == "":
+        return []  # noqa
 
-    if keep_file_id_col:
-        logging.info(msg="Parameter keep_file_id_col is deprecated")
-        cols = df.loc[:, "column_name"].tolist()
-    else:
-        cols = df.loc[df["column_name"] != "id", "column_name"].tolist()
+    tbl_cols = _get_table_columns(schema=schema, table=tbl_name, db_handler=db_handler)
 
-    sorted_cols = sorted(cols)
+    sorted_cols = sorted(tbl_cols)
     logging.info(
         msg=f"Sorted columns for > {pg_conn_id} - {schema}.{tbl_name}: {sorted_cols}"
     )
