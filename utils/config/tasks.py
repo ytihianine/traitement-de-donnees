@@ -249,7 +249,7 @@ def _get_selecteur_storage_info(
         query += " AND cpss3db.selecteur = %s"
         params.append(selecteur)
 
-    query += " ORDER BY cpss3db.projet, cpss3db.tbl_order;"
+    query += " ORDER BY cpss3db.projet;"
 
     df = db.fetch_df(query, parameters=tuple(params))
 
