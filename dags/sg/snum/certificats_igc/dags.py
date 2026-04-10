@@ -71,6 +71,7 @@ def certificats_igc() -> None:
     """ Task order """
     chain(
         validate_dag_parameters(),
+        selecteur_configs,
         looking_for_files,
         create_projet_snapshot(),
         get_projet_snapshot(),
