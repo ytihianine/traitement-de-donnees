@@ -16,7 +16,7 @@ def source_files() -> None:
     certificat = create_file_etl_task(
         selecteur="certificat",
         process_func=process.process_certificat,
-        read_options={"sep": ";"},
+        read_options={"sep": ","},
     )
     historique_certificat = create_file_etl_task(
         selecteur="historique_certificat",
