@@ -179,23 +179,35 @@ SELECT
     cpp.projet,
     cpps.bucket,
     cpps.key,
-    cpps.key_tmp
+    cpps.key_tmp,
+    cpp.import_timestamp,
+    DENSE_RANK() OVER (
+      ORDER BY cpp.import_timestamp ASC
+  ) as rang
 FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_s3 cpps ON cpp.id_projet = cpps.id_projet;
+INNER JOIN conf_projets.projet_s3 cpps ON cpp.id_projet = cpps.id_projet
+  AND cpp.import_timestamp = cpps.import_timestamp;
 
 
 -- Vue pour column_mapping_dataframe()
 DROP VIEW conf_projets.cols_mapping_vw;
 CREATE OR REPLACE VIEW conf_projets.cols_mapping_vw AS
 SELECT
-    p.projet,
-    ps.selecteur,
+    cpp.projet,
+    cpps.selecteur,
     scm.colname_source,
-    scm.colname_dest
-FROM conf_projets.projet p
-INNER JOIN conf_projets.projet_selecteur ps ON p.id_projet = ps.id_projet
-INNER JOIN conf_projets.selecteur_column_mapping scm ON ps.id = scm.id_selecteur
-    AND ps.id_projet = scm.id_projet
+    scm.colname_dest,
+    cpp.import_timestamp,
+    DENSE_RANK() OVER (
+      ORDER BY cpp.import_timestamp ASC
+  ) as rang
+FROM conf_projets.projet cpp
+INNER JOIN conf_projets.projet_selecteur cpps ON cpp.id_projet = cpps.id_projet
+  AND cpp.import_timestamp = cpps.import_timestamp
+INNER JOIN conf_projets.selecteur_column_mapping scm
+  ON cpps.id_selecteur = scm.id_selecteur
+    AND cpps.id_projet = scm.id_projet
+    AND cpp.import_timestamp = cpps.import_timestamp
 WHERE scm.to_keep = true;
 
 
@@ -205,19 +217,33 @@ CREATE OR REPLACE VIEW conf_projets.projet_documentation_vw AS
 SELECT
     cpp.projet,
     cppd.type_documentation,
-    cppd.lien
+    cppd.lien,
+  cpp.import_timestamp,
+    DENSE_RANK() OVER (
+      ORDER BY cppd.import_timestamp ASC
+  ) as rang
 FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_documentation cppd ON cpp.id_projet = cppd.id_projet;
+INNER JOIN conf_projets.projet_documentation cppd ON cpp.id_projet = cppd.id_projet
+  AND cpp.import_timestamp = cppd.import_timestamp;
 
 -- Vue pour get_list_contact()
 DROP VIEW conf_projets.projet_contact_vw;
-CREATE OR REPLACE VIEW conf_projets.projet_contact_vw AS
-SELECT
-    cpp.projet,
-    cppc.contact_mail,
-    cppc.is_mail_generic
-FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_contact cppc ON cpp.id_projet = cppc.id_projet;
+create or replace
+view conf_projets.projet_contact_vw as
+select
+	cpp.projet,
+	cppc.contact_mail,
+	cppc.is_mail_generic,
+	cpp.import_timestamp,
+	dense_rank() over (
+order by
+	cpp.import_timestamp asc
+  ) as rang
+from
+	conf_projets.projet cpp
+inner join conf_projets.projet_contact cppc on
+	cpp.id_projet = cppc.id_projet
+	and cpp.import_timestamp = cppc.import_timestamp;
 
 
 -- Vue pour _get_selecteur_storage_info()
@@ -236,19 +262,28 @@ SELECT
     cpps3.key_tmp as projet_s3_key_tmp,
     CONCAT(COALESCE(cpss3.key, cpps3.key), '/', cpss3.filename) as filepath_s3,
     CONCAT(cpps3.key_tmp, '/', cpss3.filename) as filepath_tmp_s3,
-    cpsd.tbl_name
+    cpsd.tbl_name,
+    cpp.import_timestamp,
+    DENSE_RANK() OVER (
+      ORDER BY cpp.import_timestamp ASC
+  ) as rang
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_selecteur cpps
   ON cpp.id_projet = cpps.id_projet
+  AND cpp.import_timestamp = cpps.import_timestamp
 LEFT JOIN conf_projets.selecteur_source cpss
   ON cpps.id_selecteur = cpss.id_selecteur
     AND cpps.id_projet = cpss.id_projet
+  AND cpp.import_timestamp = cpss.import_timestamp
 INNER JOIN conf_projets.projet_s3 cpps3
   ON cpp.id_projet = cpps3.id_projet
+  AND cpp.import_timestamp = cpps3.import_timestamp
 LEFT JOIN conf_projets.selecteur_s3 cpss3
   ON cpps.id_selecteur = cpss3.id_selecteur
     AND cpps.id_projet = cpss3.id_projet
+  AND cpp.import_timestamp = cpss3.import_timestamp
 LEFT JOIN conf_projets.selecteur_database cpsd
   ON cpps.id_selecteur = cpsd.id_selecteur
     AND cpps.id_projet = cpsd.id_projet
+  AND cpp.import_timestamp = cpsd.import_timestamp
 ;

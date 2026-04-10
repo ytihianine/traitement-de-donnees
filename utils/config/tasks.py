@@ -57,7 +57,7 @@ def column_mapping_dataframe(
         query=f"""
             SELECT cpcm.projet, cpcm.selecteur, cpcm.colname_source, cpcm.colname_dest
             FROM {CONF_SCHEMA}.cols_mapping_vw cpcm
-            WHERE cpcm.projet = %s AND cpcm.selecteur = %s;
+            WHERE cpcm.projet = %s AND cpcm.selecteur = %s AND rang = 1;
         """,
         parameters=(nom_projet, selecteur),
     )
@@ -91,7 +91,7 @@ def get_list_contact(nom_projet: str) -> list[Contact]:
     query = f"""
         SELECT cppc.projet, cppc.contact_mail, cppc.is_mail_generic
         FROM {CONF_SCHEMA}.projet_contact_vw cppc
-        WHERE cppc.projet = %s;
+        WHERE cppc.projet = %s AND rang = 1;
     """
 
     df = db.fetch_df(query, parameters=(nom_projet,))
@@ -114,7 +114,7 @@ def get_list_documentation(
     query = f"""
         SELECT cppd.projet, cppd.type_documentation, cppd.lien
         FROM {CONF_SCHEMA}.projet_documentation_vw cppd
-        WHERE cppd.projet = %s;
+        WHERE cppd.projet = %s AND rang = 1;
     """
 
     df = db.fetch_df(query, parameters=(nom_projet,))
@@ -151,7 +151,7 @@ def get_projet_s3_info(
             cpps3.key,
             cpps3.key_tmp
         FROM {CONF_SCHEMA}.projet_s3_vw cpps3
-        WHERE cpps3.projet = %s;
+        WHERE cpps3.projet = %s AND rang = 1;
     """
 
     df = db.fetch_df(query, parameters=(nom_projet,))
@@ -231,7 +231,7 @@ def _get_selecteur_storage_info(
             cpss3db.bucket, cpss3db.s3_key, cpss3db.filename,
             cpss3db.tbl_name
         FROM {CONF_SCHEMA}.selecteur_s3_db_vw cpss3db
-        WHERE 1=1 AND cpss3db.projet = %s
+        WHERE 1=1 AND cpss3db.projet = %s AND rang = 1;
     """
 
     if only_source:
