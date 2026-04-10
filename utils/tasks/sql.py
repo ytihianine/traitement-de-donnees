@@ -110,20 +110,9 @@ def _create_snapshot_id(
 
 def _get_snapshot_id(nom_projet: str, db_handler: BaseDBHandler) -> str:
     query = """
-        WITH cte_id_projet AS (
-            SELECT id as id_projet
-            FROM conf_projets.projet
-            WHERE projet = %(nom_projet)s
-        ),
-        ranked_snapshots AS (
-            SELECT psi.snapshot_id,
-                    ROW_NUMBER() OVER (ORDER BY psi.creation_timestamp DESC) as rank
-            FROM conf_projets.projet_snapshot psi
-            WHERE psi.id_projet = (SELECT id_projet FROM cte_id_projet)
-        )
         SELECT snapshot_id
-        FROM ranked_snapshots
-        WHERE rank = 1;
+        FROM conf_projets.projet_snapshot_vw
+        WHERE projet = %(nom_projet)s AND rang = 1;
     """
 
     # Paramètres pour la requête
