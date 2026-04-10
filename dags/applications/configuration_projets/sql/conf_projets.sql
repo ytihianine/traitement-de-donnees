@@ -181,7 +181,7 @@ SELECT
     cpps.key,
     cpps.key_tmp
 FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_s3 cpps ON cpp.id = cpps.id_projet;
+INNER JOIN conf_projets.projet_s3 cpps ON cpp.id_projet = cpps.id_projet;
 
 
 -- Vue pour column_mapping_dataframe()
@@ -193,7 +193,7 @@ SELECT
     scm.colname_source,
     scm.colname_dest
 FROM conf_projets.projet p
-INNER JOIN conf_projets.projet_selecteur ps ON p.id = ps.id_projet
+INNER JOIN conf_projets.projet_selecteur ps ON p.id_projet = ps.id_projet
 INNER JOIN conf_projets.selecteur_column_mapping scm ON ps.id = scm.id_selecteur
     AND ps.id_projet = scm.id_projet
 WHERE scm.to_keep = true;
@@ -207,7 +207,7 @@ SELECT
     cppd.type_documentation,
     cppd.lien
 FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_documentation cppd ON cpp.id = cppd.id_projet;
+INNER JOIN conf_projets.projet_documentation cppd ON cpp.id_projet = cppd.id_projet;
 
 -- Vue pour get_list_contact()
 DROP VIEW conf_projets.projet_contact_vw;
@@ -217,7 +217,7 @@ SELECT
     cppc.contact_mail,
     cppc.is_mail_generic
 FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_contact cppc ON cpp.id = cppc.id_projet;
+INNER JOIN conf_projets.projet_contact cppc ON cpp.id_projet = cppc.id_projet;
 
 
 -- Vue pour _get_selecteur_storage_info()
@@ -239,16 +239,16 @@ SELECT
     cpsd.tbl_name
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_selecteur cpps
-  ON cpp.id = cpps.id_projet
+  ON cpp.id_projet = cpps.id_projet
 LEFT JOIN conf_projets.selecteur_source cpss
-  ON cpps.id = cpss.id_selecteur
+  ON cpps.id_selecteur = cpss.id_selecteur
     AND cpps.id_projet = cpss.id_projet
 INNER JOIN conf_projets.projet_s3 cpps3
-  ON cpp.id = cpps3.id_projet
+  ON cpp.id_projet = cpps3.id_projet
 LEFT JOIN conf_projets.selecteur_s3 cpss3
-  ON cpps.id = cpss3.id_selecteur
+  ON cpps.id_selecteur = cpss3.id_selecteur
     AND cpps.id_projet = cpss3.id_projet
 LEFT JOIN conf_projets.selecteur_database cpsd
-  ON cpps.id = cpsd.id_selecteur
+  ON cpps.id_selecteur = cpsd.id_selecteur
     AND cpps.id_projet = cpsd.id_projet
 ;
