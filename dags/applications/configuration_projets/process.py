@@ -93,6 +93,7 @@ def process_projet(df: pd.DataFrame) -> pd.DataFrame:
 def process_projet_contact(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
+        "id",
         "projet",
         "contact_mail",
         "is_mail_generic",
@@ -101,6 +102,7 @@ def process_projet_contact(df: pd.DataFrame) -> pd.DataFrame:
 
     # Rename
     cols_to_rename = {
+        "id": "id_contact",
         "projet": "id_projet",
     }
     df = df.rename(columns=cols_to_rename)
