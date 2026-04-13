@@ -1,7 +1,8 @@
 """Functions for retrieving and managing project configurations."""
 
-from typing import Mapping, Optional
+from collections.abc import Mapping
 import logging
+from typing import Any
 
 from tenacity import (
     retry,
@@ -21,6 +22,7 @@ from _types.projet import (
     SelecteurConfig,
 )
 from utils.exceptions import ConfigError
+from infra.database.exceptions import DatabaseError
 from infra.database.factory import create_db_handler
 from utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
 
@@ -30,7 +32,7 @@ logger = logging.getLogger(name=__name__)
 # Configuration du retry decorator
 db_retry = retry(
     retry=retry_if_exception_type(
-        exception_types=(ConnectionError, TimeoutError, Exception)
+        exception_types=(ConnectionError, TimeoutError, DatabaseError, OSError)
     ),
     stop=stop_after_attempt(max_attempt_number=3),
     wait=wait_exponential(multiplier=1, min=2, max=10),
@@ -65,18 +67,20 @@ def column_mapping_dataframe(
 
 
 def column_mapping_dict(
-    df_cols_map: pd.DataFrame, selecteur: Optional[str] = None
+    df_cols_map: pd.DataFrame, selecteur: str | None = None
 ) -> dict[str, str]:
-    print("Colonnes du dataframe de mapping: ", df_cols_map.columns)
-    print("Selecteurs du dataframe de mapping: ", df_cols_map["selecteur"].unique())
+    logger.debug("Colonnes du dataframe de mapping: %s", df_cols_map.columns.tolist())
+    logger.debug(
+        "Selecteurs du dataframe de mapping: %s",
+        df_cols_map["selecteur"].unique().tolist(),
+    )
     if selecteur is not None:
         df_cols_map = df_cols_map.loc[df_cols_map["selecteur"] == selecteur]
-    records_cols_map = df_cols_map.to_dict("records")
-    cols_map = {}
-    for record in records_cols_map:
-        cols_map[record["colname_source"]] = record["colname_dest"]
 
-    return cols_map
+    records = df_cols_map.set_index("colname_source")["colname_dest"].to_dict(
+        into=dict[str, Any]
+    )
+    return records
 
 
 @db_retry
@@ -95,8 +99,7 @@ def get_list_contact(nom_projet: str) -> list[Contact]:
     """
 
     df = db.fetch_df(query, parameters=(nom_projet,))
-    records = df.to_dict("records")
-    records = [{str(k): v for k, v in record.items()} for record in records]
+    records = df.to_dict("records", into=dict[str, Any])
     return [Contact(**record) for record in records]
 
 
@@ -106,7 +109,7 @@ def get_list_documentation(
 ) -> list[Documentation]:
     if not nom_projet:
         raise ValueError(
-            "Variable nom_projet is required to fetch contact information. Current value is None or empty."
+            "Variable nom_projet is required to fetch documentation. Current value is None or empty."
         )
 
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
@@ -118,14 +121,13 @@ def get_list_documentation(
     """
 
     df = db.fetch_df(query, parameters=(nom_projet,))
-    records = df.to_dict("records")
-    records = [{str(k): v for k, v in record.items()} for record in records]
+    records = df.to_dict("records", into=dict)
     return [Documentation(**record) for record in records]
 
 
 @db_retry
 def get_projet_s3_info(
-    nom_projet: str | None = None,
+    nom_projet: str,
 ) -> ProjetS3:
     """Get S3 configuration for a specific selecteur.
 
@@ -141,7 +143,7 @@ def get_projet_s3_info(
     """
     if not nom_projet:
         raise ValueError(
-            "Variable nom_projet is required to fetch contact information. Current value is None or empty."
+            "Variable nom_projet is required to fetch S3 configuration. Current value is None or empty."
         )
 
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
@@ -162,8 +164,7 @@ def get_projet_s3_info(
             nom_projet=nom_projet,
         )
 
-    record = df.iloc[0].to_dict()
-    record = {str(k): v for k, v in record.items()}
+    record = df.iloc[0].to_dict(into=dict[str, Any])
     return ProjetS3(**record)
 
 
@@ -221,7 +222,7 @@ def _get_selecteur_storage_info(
     """
     if not nom_projet:
         raise ValueError(
-            "Variable nom_projet is required to fetch contact information. Current value is None or empty."
+            "Variable nom_projet is required to fetch selecteur storage info. Current value is None or empty."
         )
 
     db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
@@ -256,13 +257,8 @@ def _get_selecteur_storage_info(
     if df.empty:
         return []
 
-    records = df.to_dict("records")
-    return [
-        SelecteurStorageInfo(
-            **{str(k): v for k, v in record.items()}, local_dir=local_dir
-        )
-        for record in records
-    ]
+    records = df.to_dict("records", into=dict[str, Any])
+    return [SelecteurStorageInfo(**record, local_dir=local_dir) for record in records]
 
 
 def get_list_selecteur_storage_info(
