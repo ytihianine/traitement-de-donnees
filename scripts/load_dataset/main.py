@@ -4,25 +4,27 @@ import psycopg2
 
 from utils.config.vars import custom_logger
 from utils.control.structures import are_lists_egal
+from scripts.settings import get_settings
+
+settings = get_settings()
 
 # FIXED VARIABLES
-TSV_FILE_PATH = "/tmp/df_result.tsv"
-ENV = os.environ.copy()
+TSV_FILE_PATH = settings.load_dataset.tsv_file_path
 
 # USER VARIABLES
-FILE_PATH = ""
-DB_ID_COLNAME = "id"
-SCHEMA = ""
-TABLE_NAME = ""
-IMPORT_TIMESTAMP = "2025-11-01 12:00:00.000"
-SNAPSHOT_ID = "20251101_12:00:00"
+FILE_PATH = settings.load_dataset.file_path
+DB_ID_COLNAME = settings.load_dataset.db_id_colname
+SCHEMA = settings.load_dataset.schema
+TABLE_NAME = settings.load_dataset.table_name
+IMPORT_TIMESTAMP = settings.load_dataset.import_timestamp
+SNAPSHOT_ID = settings.load_dataset.snapshot_id
 
 pg_conn = psycopg2.connect(
-    host=ENV["CONFIG_DB_HOST"],
-    port=ENV["CONFIG_DB_PORT"],
-    dbname=ENV["CONFIG_DB_NAME"],
-    user=ENV["CONFIG_DB_USER"],
-    password=ENV["CONFIG_DB_PASSWORD"],
+    host=settings.db.host,
+    port=settings.db.port,
+    dbname=settings.db.name,
+    user=settings.db.user,
+    password=settings.db.password,
 )
 pg_cur = pg_conn.cursor()
 

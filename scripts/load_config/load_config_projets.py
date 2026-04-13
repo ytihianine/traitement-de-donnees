@@ -1,4 +1,3 @@
-import os
 import sqlite3
 from datetime import datetime
 import pandas as pd
@@ -10,6 +9,7 @@ from psycopg2.extras import execute_values
 
 from utils.control.structures import normalize_grist_dataframe
 from utils.dataframe import df_info
+from scripts.settings import get_settings
 
 from dags.applications.configuration_projets import process
 
@@ -43,20 +43,20 @@ tbl_names = [action["tbl_name"] for action in tbl_ordered]
 print(tbl_names)
 tbl_names.reverse()
 
-ENV = os.environ.copy()
+settings = get_settings()
 DRY_RUN = False
 NOW = datetime.now()
 ADD_METADATA = True
-schema = "conf_projets"
-db_path = "/home/onyxia/work/Configuration - interne.grist"
+schema = settings.load_config.schema
+db_path = settings.load_config.grist_db_path
 
 sqlite_conn = sqlite3.connect(db_path)
 pg_conn = psycopg2.connect(
-    host=ENV["CONFIG_DB_HOST"],
-    port=ENV["CONFIG_DB_PORT"],
-    dbname=ENV["CONFIG_DB_NAME"],
-    user=ENV["CONFIG_DB_USER"],
-    password=ENV["CONFIG_DB_PASSWORD"],
+    host=settings.db.host,
+    port=settings.db.port,
+    dbname=settings.db.name,
+    user=settings.db.user,
+    password=settings.db.password,
 )
 pg_cur = pg_conn.cursor()
 # for each tbl

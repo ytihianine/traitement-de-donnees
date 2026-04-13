@@ -1,7 +1,7 @@
-import os
 import psycopg2
 
 from utils.config.vars import custom_logger
+from scripts.settings import get_settings
 
 from scripts.handle_partitions.commun import list_table_names, get_partitions, Actions
 from scripts.handle_partitions.partitions import (
@@ -13,18 +13,18 @@ from scripts.handle_partitions.partitions import (
 
 from scripts.handle_partitions import config
 
-# VARIABLES
-ENV = os.environ.copy()
+# SETTINGS
+settings = get_settings()
 
 
 if __name__ == "__main__":
     # Connect to database
     pg_conn = psycopg2.connect(
-        host=ENV["CONFIG_DB_HOST"],
-        port=ENV["CONFIG_DB_PORT"],
-        dbname=ENV["CONFIG_DB_NAME"],
-        user=ENV["CONFIG_DB_USER"],
-        password=ENV["CONFIG_DB_PASSWORD"],
+        host=settings.db.host,
+        port=settings.db.port,
+        dbname=settings.db.name,
+        user=settings.db.user,
+        password=settings.db.password,
     )
     pg_cur = pg_conn.cursor()
 

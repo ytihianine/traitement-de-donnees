@@ -1,21 +1,16 @@
-import os
-import pathlib
-from configparser import ConfigParser
 from typing import Iterable, Sequence
 
 from infra.http_client.config import ClientConfig
 from infra.http_client.factory import create_http_client
 from utils.config.vars import custom_logger
+from scripts.settings import get_settings
 
 from enums.http import HttpHandlerType
 
 EVENT_TYPES = ["add", "update"]
 TBL_TO_EXCLUDE = ("test", "onglet", "doc")
 
-
-current_dir = pathlib.Path(__file__).parent.resolve()
-config = ConfigParser()
-config.read(filenames=os.path.join(current_dir, "vars.cfg"))
+settings = get_settings()
 
 
 def filter_tables(
@@ -29,22 +24,19 @@ def filter_tables(
 if __name__ == "__main__":
     # External clients
     http_config = ClientConfig(
-        user_agent=config["HTTP"]["AGENT"], proxy=config["HTTP"]["PROXY"]
+        user_agent=settings.http.agent, proxy=settings.http.proxy
     )
     http_client = create_http_client(
         client_type=HttpHandlerType.REQUEST, config=http_config
     )
     headers = {
-        "Authorization": f"Bearer {config["GRIST"]["TOKEN"]}",
+        "Authorization": f"Bearer {settings.grist.token}",
         "accept": "application/json",
     }
 
     # Récupérer toutes les tables du document
     response = http_client.get(
-        endpoint=config["GRIST"]["GRIST_HOST"]
-        + "/api/docs/"
-        + config["GRIST"]["DOC_ID"]
-        + "/tables",
+        endpoint=settings.grist.host + "/api/docs/" + settings.grist.doc_id + "/tables",
         headers=headers,
     )
     tables = [table["id"] for table in response.json()["tables"]]
@@ -63,7 +55,7 @@ if __name__ == "__main__":
             "fields": {
                 "name": table,
                 "memo": "Auto generated",
-                "url": config["GRIST"]["N8N_PIPELINE_URL"],
+                "url": settings.grist.n8n_pipeline_url,
                 "enabled": True,
                 "eventTypes": EVENT_TYPES,
                 "isReadyColumn": None,
@@ -75,9 +67,9 @@ if __name__ == "__main__":
     custom_logger.info(msg=f"Exemple: \n{webhooks[0]}")
 
     http_client.post(
-        endpoint=config["GRIST"]["GRIST_HOST"]
+        endpoint=settings.grist.host
         + "/api/docs/"
-        + config["GRIST"]["DOC_ID"]
+        + settings.grist.doc_id
         + "/webhooks",
         headers=headers | {"Content-Type": "application/json"},
         json={"webhooks": webhooks},
