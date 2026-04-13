@@ -47,7 +47,7 @@ settings = get_settings()
 DRY_RUN = False
 NOW = datetime.now()
 ADD_METADATA = True
-schema = settings.load_config.schema
+schema = settings.load_config.db_schema
 db_path = settings.load_config.grist_db_path
 
 sqlite_conn = sqlite3.connect(db_path)

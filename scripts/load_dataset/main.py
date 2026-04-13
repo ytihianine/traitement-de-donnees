@@ -14,7 +14,7 @@ TSV_FILE_PATH = settings.load_dataset.tsv_file_path
 # USER VARIABLES
 FILE_PATH = settings.load_dataset.file_path
 DB_ID_COLNAME = settings.load_dataset.db_id_colname
-SCHEMA = settings.load_dataset.schema
+SCHEMA = settings.load_dataset.db_schema
 TABLE_NAME = settings.load_dataset.table_name
 IMPORT_TIMESTAMP = settings.load_dataset.import_timestamp
 SNAPSHOT_ID = settings.load_dataset.snapshot_id
