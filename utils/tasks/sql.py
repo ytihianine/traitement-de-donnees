@@ -89,11 +89,11 @@ def _create_snapshot_id(
     query = """
         INSERT INTO conf_projets.projet_snapshot (id_projet, snapshot_id, creation_timestamp)
         SELECT
-            p.id,
+            cpp.id_projet,
             %(snapshot_id)s,
             %(creation_timestamp)s
-        FROM conf_projets.projet p
-        WHERE p.projet = %(nom_projet)s
+        FROM conf_projets.projet cpp
+        WHERE cpp.projet = %(nom_projet)s
         AND EXISTS (SELECT 1 FROM conf_projets.projet WHERE projet = %(nom_projet)s);
     """
 
