@@ -43,12 +43,10 @@ def create_file_handler(
         return LocalFileHandler(base_path=base_path)
 
     elif handler_type == FileHandlerType.S3:
-        required_args = {"bucket", "connection_id"}
-        missing_args = required_args - kwargs.keys()
-        if missing_args:
-            raise ValueError(
-                f"Missing required arguments for S3 handler: {missing_args}"
-            )
+        if "bucket" not in kwargs:
+            raise ValueError("Missing required argument for S3 handler: 'bucket'")
+        if "connection_id" not in kwargs and "client" not in kwargs:
+            raise ValueError("S3 handler requires either 'connection_id' or 'client'")
         return S3FileHandler(**kwargs)
 
     else:
