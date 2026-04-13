@@ -22,12 +22,21 @@ from _types.projet import (
     SelecteurConfig,
 )
 from utils.exceptions import ConfigError
+from infra.database.base import DBInterface
 from infra.database.exceptions import DatabaseError
 from infra.database.factory import create_db_handler
 from utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
 
 CONF_SCHEMA = "conf_projets"
 logger = logging.getLogger(name=__name__)
+
+
+def _get_db(db: DBInterface | None = None) -> DBInterface:
+    """Return the provided db handler or create the default one."""
+    if db is not None:
+        return db
+    return create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+
 
 # Configuration du retry decorator
 db_retry = retry(
@@ -45,6 +54,7 @@ db_retry = retry(
 def column_mapping_dataframe(
     nom_projet: str,
     selecteur: str,
+    db: DBInterface | None = None,
 ) -> pd.DataFrame:
     """
     Permet de récupérer la correspondance des colonnes entre
@@ -53,7 +63,7 @@ def column_mapping_dataframe(
         Dataframe
         Columns: selecteur, colname_source, colname_dest
     """
-    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+    db = _get_db(db)
 
     df = db.fetch_df(
         query=f"""
@@ -84,13 +94,13 @@ def column_mapping_dict(
 
 
 @db_retry
-def get_list_contact(nom_projet: str) -> list[Contact]:
+def get_list_contact(nom_projet: str, db: DBInterface | None = None) -> list[Contact]:
     if not nom_projet:
         raise ValueError(
             "Variable nom_projet is required to fetch contact information. Current value is None or empty."
         )
 
-    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+    db = _get_db(db)
 
     query = f"""
         SELECT cppc.projet, cppc.contact_mail, cppc.is_mail_generic
@@ -106,13 +116,14 @@ def get_list_contact(nom_projet: str) -> list[Contact]:
 @db_retry
 def get_list_documentation(
     nom_projet: str,
+    db: DBInterface | None = None,
 ) -> list[Documentation]:
     if not nom_projet:
         raise ValueError(
             "Variable nom_projet is required to fetch documentation. Current value is None or empty."
         )
 
-    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+    db = _get_db(db)
 
     query = f"""
         SELECT cppd.projet, cppd.type_documentation, cppd.lien
@@ -128,12 +139,13 @@ def get_list_documentation(
 @db_retry
 def get_projet_s3_info(
     nom_projet: str,
+    db: DBInterface | None = None,
 ) -> ProjetS3:
     """Get S3 configuration for a specific selecteur.
 
     Args:
-        context: Optional Airflow task context
         nom_projet: Project name
+        db: Optional database handler (defaults to Airflow config connection)
 
     Returns:
         ProjetS3 object with S3 configuration
@@ -146,7 +158,7 @@ def get_projet_s3_info(
             "Variable nom_projet is required to fetch S3 configuration. Current value is None or empty."
         )
 
-    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+    db = _get_db(db)
 
     query = f"""
         SELECT cpps3.projet, cpps3.bucket,
@@ -208,14 +220,15 @@ def _get_selecteur_storage_info(
     only_source: bool = False,
     only_grist: bool = False,
     only_fichier: bool = False,
+    db: DBInterface | None = None,
 ) -> list[SelecteurStorageInfo]:
     """Get SelecteurStorageInfo for a project and optionally a specific selecteur.
 
     Args:
-        context: Airflow task context
         nom_projet: Project name
         selecteur: Optional selecteur filter
         local_dir: Local directory used to build local_path (default: /tmp)
+        db: Optional database handler (defaults to Airflow config connection)
 
     Returns:
         List of SelecteurStorageInfo objects
@@ -225,7 +238,7 @@ def _get_selecteur_storage_info(
             "Variable nom_projet is required to fetch selecteur storage info. Current value is None or empty."
         )
 
-    db = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+    db = _get_db(db)
 
     query = f"""
         SELECT cpss3db.projet, cpss3db.selecteur, cpss3db.type_source, cpss3db.id_source,
