@@ -183,10 +183,8 @@ def process_accompagnement_dsci_typologie(df: pd.DataFrame) -> pd.DataFrame:
     df = df.explode(column="id_typologie")
     # Nettoyage de ligne vide
     df = df.dropna(subset=["id_typologie"])
-    df["id"] = (
-        df.sort_values(by=["id_accompagnement", "id_typologie"])
-        .reset_index(drop=True)
-        .index
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_accompagnement", "id_typologie"]], index=False
     )
     return df
 
@@ -210,11 +208,9 @@ def process_accompagnement_dsci_equipe(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["id_equipe_s_dsci"])
 
     # Ajout colonne ID unique
-    df = df.sort_values(by=["id_accompagnement", "id_equipe_s_dsci"]).reset_index(
-        drop=True
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_accompagnement", "id_equipe_s_dsci"]], index=False
     )
-    df["id"] = df.index
-
     return df
 
 
@@ -235,10 +231,9 @@ def process_accompagnement_dsci_porteur(df: pd.DataFrame) -> pd.DataFrame:
     df = df.explode(column="id_porteur_dsci")
     # Nettoyage de ligne vide
     df = df.dropna(subset=["id_porteur_dsci"])
-    df["id"] = (
-        df.sort_values(by=["id_accompagnement", "id_porteur_dsci"])
-        .reset_index(drop=True)
-        .index
+    # Ajout colonne ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_accompagnement", "id_porteur_dsci"]], index=False
     )
     return df
 
@@ -362,10 +357,9 @@ def process_animateur_fac_certification(df: pd.DataFrame) -> pd.DataFrame:
     df = df.explode(column="id_certifications_souhaitees")
     # Nettoyage de ligne vide
     df = df.dropna(subset=["id_certifications_souhaitees"])
-    df["id"] = (
-        df.sort_values(by=["id_animateur_fac", "id_certifications_souhaitees"])
-        .reset_index(drop=True)
-        .index
+    # Ajout colonne ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_animateur_fac", "id_certifications_souhaitees"]], index=False
     )
     return df
 
@@ -389,10 +383,9 @@ def process_animateur_fac_certification_valide(df: pd.DataFrame) -> pd.DataFrame
     df = df.explode(column="id_certifications_validees")
     # Nettoyage de ligne vide
     df = df.dropna(subset=["id_certifications_validees"])
-    df["id"] = (
-        df.sort_values(by=["id_animateur_fac", "id_certifications_validees"])
-        .reset_index(drop=True)
-        .index
+    # Ajout colonne ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_animateur_fac", "id_certifications_validees"]], index=False
     )
     return df
 
@@ -549,11 +542,9 @@ def process_quest_satisfaction_formation_fac_envies(df: pd.DataFrame) -> pd.Data
     df = df.explode(column="envies_pour_la_suite")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["envies_pour_la_suite"])
-    # Nouvel ID unique
-    df["id"] = (
-        df.sort_values(by=["id_formation_fac", "envies_pour_la_suite"])
-        .reset_index(drop=True)
-        .index
+    # Ajout colonne ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_formation_fac", "envies_pour_la_suite"]], index=False
     )
 
     return df
@@ -618,11 +609,11 @@ def process_quest_accompagnement_fac_hors_bercylab_type(
     df = df.explode(column="type_d_accompagnement")
     #  Nettoyage
     df = df.dropna(subset=["type_d_accompagnement"])
-    df["id"] = (
-        df.sort_values(by=["id_formation_fac_hors_bercylab", "type_d_accompagnement"])
-        .reset_index(drop=True)
-        .index
+    # Ajout colonne ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_formation_fac_hors_bercylab", "type_d_accompagnement"]], index=False
     )
+
     return df
 
 
@@ -641,11 +632,11 @@ def process_quest_accompagnement_fac_hors_bercylab_participants(
     df = df.explode(column="participants")
     #  Nettoyage
     df = df.dropna(subset=["participants"])
-    df["id"] = (
-        df.sort_values(by=["id_formation_fac_hors_bercylab", "participants"])
-        .reset_index(drop=True)
-        .index
+    # Ajout colonne ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_formation_fac_hors_bercylab", "participants"]], index=False
     )
+
     return df
 
 
@@ -669,11 +660,11 @@ def process_quest_accompagnement_fac_hors_bercylab_facilitateurs(
     df = df.explode(column="id_facilitateurs")
     #  Nettoyage
     df = df.dropna(subset=["id_facilitateurs"])
-    df["id"] = (
-        df.sort_values(by=["id_formation_fac_hors_bercylab", "id_facilitateurs"])
-        .reset_index(drop=True)
-        .index
+    # Ajout colonne ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_formation_fac_hors_bercylab", "id_facilitateurs"]], index=False
     )
+
     return df
 
 
@@ -855,11 +846,9 @@ def process_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
     # Convert str of list to python list
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_type_de_correspondant")
     df = df.explode(column="id_type_de_correspondant")
-
-    df["id"] = (
-        df.sort_values(by=["id_correspondant", "id_type_de_correspondant"])
-        .reset_index(drop=True)
-        .index
+    # Ajout colonne ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_correspondant", "id_type_de_correspondant"]], index=False
     )
 
     return df
@@ -883,11 +872,9 @@ def process_correspondant_competence_particuliere(df: pd.DataFrame) -> pd.DataFr
     # Convertion str en liste
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_competence_particuliere")
     df = df.explode(column="id_competence_particuliere")
-
-    df["id"] = (
-        df.sort_values(by=["id_correspondant", "id_competence_particuliere"])
-        .reset_index(drop=True)
-        .index
+    # Ajout colonne ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_correspondant", "id_competence_particuliere"]], index=False
     )
 
     return df
@@ -906,10 +893,9 @@ def process_correspondant_connaissance_communaute(df: pd.DataFrame) -> pd.DataFr
     df = df.explode(column="connaissance_communaute")
     # Nettoyage de ligne vide
     df = df.dropna(subset=["connaissance_communaute"])
-    df["id"] = (
-        df.sort_values(by=["id_correspondant", "connaissance_communaute"])
-        .reset_index(drop=True)
-        .index
+    # Ajout colonne ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_correspondant", "connaissance_communaute"]], index=False
     )
 
     return df
