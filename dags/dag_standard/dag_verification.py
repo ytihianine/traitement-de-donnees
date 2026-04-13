@@ -104,11 +104,11 @@ def dag_verification() -> None:
 
     @task
     def check_trino_hook() -> None:
-        from infra.database.trino import TrinoDBHandler
+        from infra.database.trino import TrinoAdapter
 
         trino_user = Variable.get(key="TRINO_USER")
 
-        trino_handler = TrinoDBHandler(
+        trino_handler = TrinoAdapter(
             host=DEFAULT_TRINO_HOST,
             user=trino_user,
             catalog=DEFAULT_POLARIS_CATALOG,

@@ -25,7 +25,7 @@ Base de données supportées
 
 ### Classes principales
 
-#### `BaseDBHandler` (Classe abstraite)
+#### `DBInterface` (Classe abstraite)
 Interface de base définissant les méthodes communes :
 - `execute()` : Exécution de requêtes sans retour
 - `fetch_one()`, `fetch_all()` : Récupération de lignes sous forme de dictionnaires
@@ -33,10 +33,10 @@ Interface de base définissant les méthodes communes :
 - `insert()`, `bulk_insert()` : Insertion de données
 - `get_uri()` : Récupération de l'URI de connexion
 
-#### `PostgresDBHandler`
+#### `PgAdapter`
 Implémentation pour PostgreSQL utilisant Airflow PostgresHook.
 
-#### `SQLiteDBHandler`
+#### `SQLiteAdapter`
 Implémentation pour SQLite (utile pour les tests et imports Grist).
 
 ### Initialisation
@@ -321,10 +321,10 @@ Chaque handler peut être mocké facilement grâce aux interfaces abstraites :
 
 ```python
 from unittest.mock import Mock
-from infra.database.base import BaseDBHandler
+from infra.database.base import DBInterface
 
 # Mock pour les tests
-mock_db = Mock(spec=BaseDBHandler)
+mock_db = Mock(spec=DBInterface)
 mock_db.fetch_all.return_value = [{"id": 1, "name": "test"}]
 ```
 
