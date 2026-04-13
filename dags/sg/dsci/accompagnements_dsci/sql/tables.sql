@@ -142,7 +142,7 @@ CREATE TABLE activite_dsci."accompagnement_dsci_typologie" (
 -- Table liaison pour les équipes DSCI
 DROP TABLE IF EXISTS activite_dsci."accompagnement_dsci_equipe" CASCADE;
 CREATE TABLE activite_dsci."accompagnement_dsci_equipe" (
-  "id" integer PRIMARY KEY,
+  "id" bigint PRIMARY KEY,
   "id_accompagnement" integer,
   "id_equipe_s_dsci" integer,
   FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id"),
