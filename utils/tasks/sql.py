@@ -94,7 +94,8 @@ def _create_snapshot_id(
             %(creation_timestamp)s
         FROM conf_projets.projet cpp
         WHERE cpp.projet = %(nom_projet)s
-        AND EXISTS (SELECT 1 FROM conf_projets.projet WHERE projet = %(nom_projet)s);
+        AND EXISTS (SELECT 1 FROM conf_projets.projet WHERE projet = %(nom_projet)s)
+        LIMIT 1;
     """
 
     # Paramètres pour la requête
