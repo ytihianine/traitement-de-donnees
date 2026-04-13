@@ -287,3 +287,79 @@ LEFT JOIN conf_projets.selecteur_database cpsd
     AND cpps.id_projet = cpsd.id_projet
   AND cpp.import_timestamp = cpsd.import_timestamp
 ;
+
+-- Vue pour _get_snapshot_id()
+DROP VIEW conf_projets.projet_snapshot_vw;
+CREATE OR REPLACE VIEW conf_projets.projet_snapshot_vw AS
+  WITH latest_projet AS (
+    SELECT id_projet, projet, import_timestamp,
+      DENSE_RANK() OVER (
+        PARTITION BY id_projet
+        ORDER BY import_timestamp ASC
+    ) as rang
+    FROM conf_projets.projet
+  )
+  SELECT
+    cte_projet.id_projet,
+    cte_projet.projet,
+    cppsnap.creation_timestamp,
+    cppsnap.snapshot_id,
+    DENSE_RANK() OVER (
+        PARTITION BY cte_projet.id_projet
+        ORDER BY cppsnap.creation_timestamp DESC
+    ) as rang
+  FROM conf_projets.projet_snapshot cppsnap
+  INNER JOIN latest_projet cte_projet
+    ON cte_projet.id_projet = cppsnap.id_projet
+  WHERE cte_projet.rang = 1
+  ORDER BY id_projet, creation_timestamp;
+
+-- [TO REFACTOR] vue_source pour l'interface de dépôt de fichier
+DROP VIEW conf_projets.vue_source;
+create or replace
+view conf_projets.vue_source
+as
+select
+	cpp.snapshot_id,
+	cpp.id_projet as "id",
+	cpp.projet as "nom_projet",
+	cpp.id_direction,
+	cp_ref_dir.direction,
+	cpp.id_service,
+	cp_ref_service.service,
+	cpps3.bucket as "s3_bucket",
+	cpps3.key as "s3_key",
+	'selecteur' as "selecteur",
+	cppsource.id_source as "nom_source"
+from
+	conf_projets.projet cpp
+inner join conf_projets.projet_s3 cpps3
+  on
+	cpp.id_projet = cpps3.id_projet
+	and cpp.snapshot_id = cpps3.snapshot_id
+join conf_projets.selecteur_source cppsource
+  on
+	cpp.id_projet = cppsource.id_projet
+	and cpp.snapshot_id = cppsource.snapshot_id
+	and cppsource.type_source = 'Fichier'
+join conf_projets.ref_direction cp_ref_dir
+  on
+	cpp.id_direction = cp_ref_dir.id_direction
+	and cpp.snapshot_id = cp_ref_dir.snapshot_id
+join conf_projets.ref_service cp_ref_service
+  on
+	cpp.id_service = cp_ref_service.id_service
+	and cpp.snapshot_id = cp_ref_service.snapshot_id
+	-- Conserver uniquement la dernière configuration
+where
+	cpp.import_timestamp = (
+	select
+		MAX(import_timestamp)
+	from
+		conf_projets.projet
+	limit 1
+)
+order by
+	cpp.id_projet,
+	cpp.import_timestamp desc
+;
