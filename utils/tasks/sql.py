@@ -418,6 +418,7 @@ def delete_tmp_tables(
 def copy_tmp_table_to_real_table(
     selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    merge_delete: bool = False,
     **context,
 ) -> None:
     """
@@ -500,12 +501,15 @@ def copy_tmp_table_to_real_table(
                     WHEN NOT MATCHED THEN
                         INSERT ({', '.join(col_list)})
                             VALUES ({', '.join([f'tbl_source.{col}' for col in col_list])})
-                    /* Need to implement soft_delete first
-                    WHEN NOT MATCHED BY SOURCE THEN
-                        DELETE
-                    */
-                    ;
                 """
+
+                if merge_delete:
+                    merge_query += """
+                        WHEN NOT MATCHED BY SOURCE THEN
+                            DELETE
+                        ;
+                    """
+
                 queries.append(merge_query)
 
         if queries:

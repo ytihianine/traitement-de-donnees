@@ -73,6 +73,7 @@ def accompagnements_dsci_dag() -> None:
         import_file_to_db.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(
             selecteur_options=selecteur_options,
+            merge_delete=True,
         ),
         delete_tmp_tables(
             selecteur_options=selecteur_options,
