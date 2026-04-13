@@ -1,9 +1,9 @@
 """Factory for creating database handlers."""
 
-from infra.database.base import BaseDBHandler
-from infra.database.postgres import PostgresDBHandler
-from infra.database.sqlite import SQLiteDBHandler
-from infra.database.trino import TrinoDBHandler
+from infra.database.base import DBInterface
+from infra.database.postgres import PgAdapter
+from infra.database.sqlite import SQLiteAdapter
+from infra.database.trino import TrinoAdapter
 
 from enums.database import DatabaseType
 
@@ -27,7 +27,7 @@ def _check_required_params(db_type: DatabaseType, **db_config: dict) -> None:
 
 def create_db_handler(
     db_type: DatabaseType = DatabaseType.POSTGRES, **db_config
-) -> BaseDBHandler:
+) -> DBInterface:
     """Create a database handler based on connection type.
 
     Args:
@@ -44,9 +44,9 @@ def create_db_handler(
     _check_required_params(db_type, **db_config)
 
     if db_type == DatabaseType.POSTGRES:
-        return PostgresDBHandler(connection_id=db_config.get("connection_id", ""))
+        return PgAdapter(connection_id=db_config.get("connection_id", ""))
     elif db_type == DatabaseType.TRINO:
-        return TrinoDBHandler(
+        return TrinoAdapter(
             host=db_config.get("host", ""),
             user=db_config.get("user", ""),
             catalog=db_config.get("catalog", ""),
@@ -56,6 +56,6 @@ def create_db_handler(
             verify=db_config.get("verify", True),
         )
     elif db_type == DatabaseType.SQLITE:
-        return SQLiteDBHandler(connection_id=db_config.get("connection_id", ""))
+        return SQLiteAdapter(connection_id=db_config.get("connection_id", ""))
 
     raise ValueError(f"Unsupported database type: {db_type}")

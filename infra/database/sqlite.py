@@ -7,11 +7,11 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from infra.database.base import BaseDBHandler
+from infra.database.base import DBInterface
 from infra.database.exceptions import DatabaseError
 
 
-class SQLiteDBHandler(BaseDBHandler):
+class SQLiteAdapter(DBInterface):
     """Handler for SQLite database operations using sqlite3."""
 
     def __init__(self, connection_id: str) -> None:

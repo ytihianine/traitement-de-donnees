@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from airflow.sdk import task
 from airflow.sdk import get_current_context
 
-from infra.database.base import BaseDBHandler
+from infra.database.base import DBInterface
 from infra.database.factory import create_db_handler
 
 from infra.file_handling.dataframe import read_dataframe
@@ -48,7 +48,7 @@ from utils.config.vars import (
 # ------------------------------------------------------------------------------
 
 
-def _get_primary_keys(schema: str, table: str, db_handler: BaseDBHandler) -> list[str]:
+def _get_primary_keys(schema: str, table: str, db_handler: DBInterface) -> list[str]:
     """Get primary key columns of a table."""
     query = """
         SELECT kcu.column_name
@@ -65,7 +65,7 @@ def _get_primary_keys(schema: str, table: str, db_handler: BaseDBHandler) -> lis
     return df.loc[:, "column_name"].tolist()
 
 
-def _get_table_columns(schema: str, table: str, db_handler: BaseDBHandler) -> list[str]:
+def _get_table_columns(schema: str, table: str, db_handler: DBInterface) -> list[str]:
     df = db_handler.fetch_df(
         query="""
             SELECT isc.table_catalog, isc.table_schema, isc.table_name, isc.column_name
@@ -82,7 +82,7 @@ def _get_table_columns(schema: str, table: str, db_handler: BaseDBHandler) -> li
 
 
 def _create_snapshot_id(
-    nom_projet: str, execution_date: datetime, db_handler: BaseDBHandler
+    nom_projet: str, execution_date: datetime, db_handler: DBInterface
 ) -> None:
 
     snapshot_id = execution_date.strftime(format="%Y%m%d_%H:%M:%S")
@@ -109,7 +109,7 @@ def _create_snapshot_id(
     db_handler.execute(query, parameters=params)
 
 
-def _get_snapshot_id(nom_projet: str, db_handler: BaseDBHandler) -> str:
+def _get_snapshot_id(nom_projet: str, db_handler: DBInterface) -> str:
     query = """
         SELECT snapshot_id
         FROM conf_projets.projet_snapshot_vw
@@ -526,7 +526,7 @@ def copy_tmp_table_to_real_table(
 
 
 def sort_db_colnames(
-    db_handler: BaseDBHandler,
+    db_handler: DBInterface,
     selecteur_config: SelecteurConfig,
     schema: str = DEFAULT_TMP_SCHEMA,
 ) -> list[str]:
@@ -558,7 +558,7 @@ def bulk_load_local_tsv_file_to_db(
     local_filepath: str,
     tbl_name: str,
     column_names: list[str],
-    db_handler: BaseDBHandler,
+    db_handler: DBInterface,
     schema: str = DEFAULT_TMP_SCHEMA,
 ) -> None:
     """Bulk load TSV file into database using COPY.

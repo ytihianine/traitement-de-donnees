@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 
 
-class BaseDBHandler(ABC):
+class DBInterface(ABC):
     """Base class for database operations."""
 
     @abstractmethod

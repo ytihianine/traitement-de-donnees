@@ -7,11 +7,11 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 import trino.dbapi
 
-from .base import BaseDBHandler
+from .base import DBInterface
 from .exceptions import DatabaseError
 
 
-class TrinoDBHandler(BaseDBHandler):
+class TrinoAdapter(DBInterface):
     """Read-only handler for Trino database operations using trino.dbapi."""
 
     def __init__(
@@ -130,45 +130,45 @@ class TrinoDBHandler(BaseDBHandler):
         self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
     ) -> None:
         raise NotImplementedError(
-            "TrinoDBHandler is read-only and does not support execute()."
+            "TrinoAdapter is read-only and does not support execute()."
         )
 
     def insert(self, table: str, data: Dict[str, Any]) -> None:
         raise NotImplementedError(
-            "TrinoDBHandler is read-only and does not support insert()."
+            "TrinoAdapter is read-only and does not support insert()."
         )
 
     def bulk_insert(self, table: str, data: List[Dict[str, Any]]) -> None:
         raise NotImplementedError(
-            "TrinoDBHandler is read-only and does not support bulk_insert()."
+            "TrinoAdapter is read-only and does not support bulk_insert()."
         )
 
     def update(self, table: str, data: Dict[str, Any], where: Dict[str, Any]) -> None:
         raise NotImplementedError(
-            "TrinoDBHandler is read-only and does not support update()."
+            "TrinoAdapter is read-only and does not support update()."
         )
 
     def delete(self, table: str, where: Dict[str, Any]) -> None:
         raise NotImplementedError(
-            "TrinoDBHandler is read-only and does not support delete()."
+            "TrinoAdapter is read-only and does not support delete()."
         )
 
     def begin(self) -> None:
         raise NotImplementedError(
-            "TrinoDBHandler is read-only and does not support begin()."
+            "TrinoAdapter is read-only and does not support begin()."
         )
 
     def commit(self) -> None:
         raise NotImplementedError(
-            "TrinoDBHandler is read-only and does not support commit()."
+            "TrinoAdapter is read-only and does not support commit()."
         )
 
     def rollback(self) -> None:
         raise NotImplementedError(
-            "TrinoDBHandler is read-only and does not support rollback()."
+            "TrinoAdapter is read-only and does not support rollback()."
         )
 
     def copy_expert(self, sql: str, filepath: str) -> None:
         raise NotImplementedError(
-            "TrinoDBHandler is read-only and does not support copy_expert()."
+            "TrinoAdapter is read-only and does not support copy_expert()."
         )

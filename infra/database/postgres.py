@@ -11,11 +11,11 @@ import psycopg2
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
-from .base import BaseDBHandler
+from .base import DBInterface
 from .exceptions import DatabaseError
 
 
-class PostgresDBHandler(BaseDBHandler):
+class PgAdapter(DBInterface):
     """Handler for PostgreSQL database operations.
 
     Supports two initialization modes:
