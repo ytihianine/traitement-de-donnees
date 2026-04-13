@@ -6,11 +6,11 @@ from typing import Optional, Union
 from pathlib import Path
 import pandas as pd
 
-from .base import BaseFileHandler
+from .base import FSInterface
 
 
 def read_dataframe(
-    file_handler: BaseFileHandler,
+    file_handler: FSInterface,
     file_path: Union[str, Path],
     file_format: str = "auto",
     read_options: Optional[dict] = None,
@@ -20,7 +20,7 @@ def read_dataframe(
     Read a file into a pandas DataFrame using the provided file handler.
 
     Args:
-        file_handler: Instance of BaseFileHandler
+        file_handler: Instance of FSInterface
         file_path: Path to the file to read
         file_format: Format of the file ('csv', 'excel', 'parquet', 'json', or 'auto')
         **kwargs: Additional arguments passed to the pandas read function

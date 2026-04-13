@@ -9,11 +9,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Union
 
-from .base import BaseFileHandler, FileMetadata
+from .base import FSInterface, FileMetadata
 from .exceptions import FileHandlerError, FileNotFoundError, FilePermissionError
 
 
-class LocalFileHandler(BaseFileHandler):
+class LocalFS(FSInterface):
     """Handler for local filesystem operations."""
 
     def read(self, file_path: Union[str, Path], validate: bool = True) -> BinaryIO:

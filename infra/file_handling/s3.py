@@ -6,11 +6,11 @@ import mimetypes
 from pathlib import Path
 from typing import Any, BinaryIO, List, Optional, Union
 
-from .base import BaseFileHandler, FileMetadata
+from .base import FSInterface, FileMetadata
 from .exceptions import FileHandlerError, FileNotFoundError
 
 
-class S3FileHandler(BaseFileHandler):
+class S3FS(FSInterface):
     """Handler for S3 storage operations using Airflow's S3Hook or a boto3 client."""
 
     def __init__(

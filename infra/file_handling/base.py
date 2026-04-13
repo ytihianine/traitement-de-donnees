@@ -32,7 +32,7 @@ class FileMetadata:
         self.extra = extra or {}
 
 
-class BaseFileHandler(ABC):
+class FSInterface(ABC):
     """Abstract base class for file handling operations."""
 
     def __init__(self, base_path: Optional[Union[str, Path]] = None):

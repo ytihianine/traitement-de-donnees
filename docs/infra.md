@@ -67,7 +67,7 @@ Système unifié de gestion des fichiers supportant différents backends de stoc
 
 ### Classes principales
 
-#### `BaseFileHandler` (Classe abstraite)
+#### `FSInterface` (Classe abstraite)
 Interface de base pour les opérations sur fichiers :
 - `read()` : Lecture de fichier
 - `write()` : Écriture de fichier
@@ -75,10 +75,10 @@ Interface de base pour les opérations sur fichiers :
 - `exists()` : Vérification d'existence
 - `get_metadata()` : Récupération des métadonnées
 
-#### `LocalFileHandler`
+#### `LocalFS`
 Gestion des fichiers sur le système de fichiers local.
 
-#### `S3FileHandler`
+#### `S3FS`
 Gestion des fichiers sur S3/MinIO utilisant Airflow S3Hook.
 
 ### Initialisation
