@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS sircom.budget_depense (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     semestre TEXT,
     date DATE,

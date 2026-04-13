@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS sircom.rh_formation (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     semestre TEXT,
     date DATE,
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS sircom.rh_formation (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.rh_turnover (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     semestre TEXT,
     date DATE,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS sircom.rh_turnover (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.rh_contractuel (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     semestre TEXT,
     date DATE,

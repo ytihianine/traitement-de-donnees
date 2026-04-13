@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS sircom.indicateurs_metiers (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     semestre TEXT,
     date DATE,
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS sircom.indicateurs_metiers (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.enquete_de_satisfaction (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     semestre TEXT,
     date DATE,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS sircom.enquete_de_satisfaction (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.etudes (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     semestre TEXT,
     date DATE,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS sircom.etudes (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.communique_presse (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     semestre TEXT,
     date DATE,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS sircom.communique_presse (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.creation_graphique (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     semestre TEXT,
     date DATE,
@@ -49,14 +49,14 @@ CREATE TABLE IF NOT EXISTS sircom.creation_graphique (
     is_last_value BOOLEAN
 );
 CREATE TABLE IF NOT EXISTS sircom.notes_veilles (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     date DATE,
     nombre_note INTEGER,
     nombre_signalements INTEGER,
     is_last_value BOOLEAN
 );
 CREATE TABLE IF NOT EXISTS sircom.projets_graphiques(
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     date DATE,
     commanditaire TEXT,
     nombre_projets_graphique INTEGER,
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS sircom.projets_graphiques(
     is_last_value BOOLEAN
 );
 CREATE TABLE IF NOT EXISTS sircom.recommandation_strat(
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     nombre_recommandation INTEGER,
     date DATE,
     is_last_value BOOLEAN

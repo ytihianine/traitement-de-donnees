@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS sircom.engagement_agents_mef (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     indicateurs TEXT,
     taux_engagement DOUBLE PRECISION,
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS sircom.engagement_agents_mef (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.qualite_de_vie_au_travail (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     indicateurs TEXT,
     taux_satisfaction INTEGER,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS sircom.qualite_de_vie_au_travail (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.collab_inter_structures (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     structure TEXT,
     indicateurs TEXT,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS sircom.collab_inter_structures (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.observatoire_interne (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     indicateurs TEXT,
     valeur DOUBLE PRECISION,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS sircom.observatoire_interne (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.enquete_360 (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     indicateurs TEXT,
     valeur DOUBLE PRECISION,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS sircom.enquete_360 (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.participation_observatoire_interne (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     taux_participation FLOAT,
     is_last_value BOOLEAN
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS sircom.participation_observatoire_interne (
 
 
 CREATE TABLE IF NOT EXISTS sircom.engagement_environnement (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     niveau TEXT,
     indicateurs_regroupement TEXT,

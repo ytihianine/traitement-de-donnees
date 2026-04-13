@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS sircom.abonnes_reseaux_sociaux (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     date DATE,
     reseaux_sociaux TEXT,
     abonnes INTEGER,
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS sircom.abonnes_reseaux_sociaux (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.abonnes_aux_lettres (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     date DATE,
     nouveaux_abonnes_bip INTEGER,
     desabonnes_bip INTEGER,
@@ -22,21 +22,21 @@ CREATE TABLE IF NOT EXISTS sircom.abonnes_aux_lettres (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.visites_portail (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     date DATE,
     visites INTEGER,
     is_last_value BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS sircom.visites_bercyinfo (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     date DATE,
     visites INTEGER,
     is_last_value BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS sircom.performances_lettres (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     date DATE,
     indicateurs TEXT,
     taux DOUBLE PRECISION,
@@ -44,35 +44,35 @@ CREATE TABLE IF NOT EXISTS sircom.performances_lettres (
 );
 
 CREATE TABLE IF NOT EXISTS sircom.visites_alize (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     date DATE,
     visites INTEGER,
     is_last_value BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS sircom.visites_intranet_sg (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     date DATE,
     visites INTEGER,
     is_last_value BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS sircom.ouverture_lettres_alize (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     annee INTEGER,
     nombre_agent INTEGER,
     taux_ouverture FLOAT,
     is_last_value BOOLEAN
 );
 CREATE TABLE IF NOT EXISTS sircom.impact_actions_com(
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     nombre_article INTEGER,
     nombre_vue INTEGER,
     date DATE,
     is_last_value BOOLEAN
 );
 CREATE TABLE IF NOT EXISTS sircom.impressions_reseaux_sociaux (
-    id BIGSERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     date DATE,
     impressions INTEGER,
     is_last_value BOOLEAN

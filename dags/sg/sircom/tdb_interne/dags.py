@@ -74,7 +74,7 @@ def tdb_sircom() -> None:
         enquetes(),
         metiers(),
         ressources_humaines(),
-        create_tmp_tables(),
+        create_tmp_tables(reset_id_seq=False),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(),
         delete_tmp_tables(),
