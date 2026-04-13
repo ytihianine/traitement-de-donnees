@@ -131,7 +131,7 @@ ALTER TABLE "accompagnement_dsci" ADD FOREIGN KEY ("id_direction") REFERENCES ac
 
 DROP TABLE IF EXISTS activite_dsci."accompagnement_dsci_typologie" CASCADE;
 CREATE TABLE activite_dsci."accompagnement_dsci_typologie" (
-  "id" integer PRIMARY KEY,
+  "id" bigint PRIMARY KEY,
   "id_accompagnement" integer,
   "id_typologie" integer,
   UNIQUE ("id_accompagnement", "id_typologie"),
@@ -152,7 +152,7 @@ CREATE TABLE activite_dsci."accompagnement_dsci_equipe" (
 -- Table de liaison pour les porteurs DSCI
 DROP TABLE IF EXISTS activite_dsci."accompagnement_dsci_porteur" CASCADE;
 CREATE TABLE activite_dsci."accompagnement_dsci_porteur" (
-  "id" integer PRIMARY KEY,
+  "id" bigint PRIMARY KEY,
   "id_accompagnement" integer,
   "id_porteur_dsci" integer,
   UNIQUE ("id_accompagnement", "id_porteur_dsci"),
@@ -213,7 +213,7 @@ CREATE TABLE activite_dsci."correspondant" (
 
 DROP TABLE activite_dsci."correspondant_profil" CASCADE;
 CREATE TABLE activite_dsci."correspondant_profil" (
-	"id" integer PRIMARY KEY,
+	"id" bigint PRIMARY KEY,
 	"id_correspondant" integer,
 	"id_type_de_correspondant" int,
 	UNIQUE ("id_correspondant", "id_type_de_correspondant"),
@@ -222,7 +222,7 @@ CREATE TABLE activite_dsci."correspondant_profil" (
 );
 
 CREATE TABLE activite_dsci."correspondant_competence_particuliere" (
-	"id" integer PRIMARY KEY,
+	"id" bigint PRIMARY KEY,
 	"id_correspondant" integer,
 	"id_competence_particuliere" int,
 	UNIQUE ("id_correspondant", "id_competence_particuliere"),
@@ -231,7 +231,7 @@ CREATE TABLE activite_dsci."correspondant_competence_particuliere" (
 );
 
 CREATE TABLE activite_dsci."correspondant_connaissance_communaute" (
-	"id" integer PRIMARY KEY,
+	"id" bigint PRIMARY KEY,
 	"id_correspondant" integer,
 	"connaissance_communaute" text,
 	UNIQUE ("id_correspondant", "connaissance_communaute")
@@ -316,7 +316,7 @@ ALTER TABLE "animateur_fac" ADD FOREIGN KEY ("id_animateur") REFERENCES activite
 -- Table de liaison pour les certifications_souhaitées
 DROP TABLE IF EXISTS activite_dsci."animateur_fac_certification" CASCADE;
 CREATE TABLE activite_dsci."animateur_fac_certification" (
-  "id" integer PRIMARY KEY,
+  "id" bigint PRIMARY KEY,
   "id_animateur_fac" integer,
   "id_certifications_souhaitees" integer,
   UNIQUE ("id_animateur_fac", "id_certifications_souhaitees"),
@@ -327,7 +327,7 @@ CREATE TABLE activite_dsci."animateur_fac_certification" (
 -- Table de liaison pour les certifications_validées
 DROP TABLE IF EXISTS activite_dsci."animateur_fac_certification_valide" CASCADE;
 CREATE TABLE activite_dsci."animateur_fac_certification_valide" (
-  "id" integer PRIMARY KEY,
+  "id" bigint PRIMARY KEY,
   "id_animateur_fac" integer,
   "id_certifications_validees" integer,
   UNIQUE ("id_animateur_fac", "id_certifications_validees"),
@@ -438,7 +438,7 @@ ALTER TABLE "formation_fac_quest_satisfaction" ADD FOREIGN KEY ("id_id_formation
 -- Nouvelle table de liaison pour les envies_pour_la_suite
 DROP TABLE IF EXISTS activite_dsci."formation_fac_envie_suite_quest_satisfaction" CASCADE;
 CREATE TABLE activite_dsci."formation_fac_envie_suite_quest_satisfaction"(
-    "id" integer PRIMARY KEY,
+    "id" bigint PRIMARY KEY,
 	"id_formation_fac" integer,
     "envies_pour_la_suite" text,
     UNIQUE ("id_formation_fac", "envies_pour_la_suite")
@@ -468,7 +468,7 @@ ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_region
 -- Table de liaison pour les facilitateurs
 DROP TABLE IF EXISTS activite_dsci."fac_hors_bercylab_quest_accompagnement_facilitateurs" CASCADE;
 CREATE TABLE activite_dsci."fac_hors_bercylab_quest_accompagnement_facilitateurs" (
-    "id" integer PRIMARY KEY,
+    "id" bigint PRIMARY KEY,
     "id_formation_fac_hors_bercylab" integer,
     "id_facilitateurs" integer,
     UNIQUE ("id_formation_fac_hors_bercylab", "id_facilitateurs"),
@@ -479,7 +479,7 @@ CREATE TABLE activite_dsci."fac_hors_bercylab_quest_accompagnement_facilitateurs
 -- Table de liaison pour le type d'accompagnement
 DROP TABLE IF EXISTS activite_dsci."fac_hors_bercylab_quest_type_accompagnement" CASCADE;
 CREATE TABLE activite_dsci."fac_hors_bercylab_quest_type_accompagnement" (
-    "id" integer PRIMARY KEY,
+    "id" bigint PRIMARY KEY,
     "id_formation_fac_hors_bercylab" integer,
     "type_d_accompagnement" text,
     UNIQUE ("id_formation_fac_hors_bercylab", "type_d_accompagnement"),
@@ -489,7 +489,7 @@ CREATE TABLE activite_dsci."fac_hors_bercylab_quest_type_accompagnement" (
 -- 4. Table de liaison pour les participants
 DROP TABLE IF EXISTS activite_dsci."fac_hors_bercylab_quest_accompagnement_participants" CASCADE;
 CREATE TABLE activite_dsci."fac_hors_bercylab_quest_accompagnement_participants" (
-    "id" integer PRIMARY KEY,
+    "id" bigint PRIMARY KEY,
     "id_formation_fac_hors_bercylab" integer,
     "participants" text,
     UNIQUE ("id_formation_fac_hors_bercylab", "participants"),
