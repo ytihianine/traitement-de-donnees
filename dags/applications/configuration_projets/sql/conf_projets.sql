@@ -315,31 +315,37 @@ CREATE OR REPLACE VIEW conf_projets.projet_snapshot_vw AS
   ORDER BY id_projet, creation_timestamp;
 
 -- [TO REFACTOR] vue_source pour l'interface de dépôt de fichier
-DROP VIEW conf_projets.vue_source;
+drop view conf_projets.vue_source;
+
 create or replace
 view conf_projets.vue_source
 as
 select
 	cpp.snapshot_id,
-	cpp.id_projet as "id",
+	cpps.id_selecteur as "id",
 	cpp.projet as "nom_projet",
+	cpps.selecteur,
+	cpps3.bucket as "s3_bucket",
+	cpps3.key as "s3_key",
+	cppsource.id_source as "nom_source",
 	cpp.id_direction,
 	cp_ref_dir.direction,
 	cpp.id_service,
-	cp_ref_service.service,
-	cpps3.bucket as "s3_bucket",
-	cpps3.key as "s3_key",
-	'selecteur' as "selecteur",
-	cppsource.id_source as "nom_source"
+	cp_ref_service.service
 from
 	conf_projets.projet cpp
 inner join conf_projets.projet_s3 cpps3
   on
 	cpp.id_projet = cpps3.id_projet
 	and cpp.snapshot_id = cpps3.snapshot_id
+inner join conf_projets.projet_selecteur cpps
+  on
+	cpp.id_projet = cpps.id_projet
+	and cpp.snapshot_id = cpps.snapshot_id
 join conf_projets.selecteur_source cppsource
   on
 	cpp.id_projet = cppsource.id_projet
+	and cpps.id_selecteur = cppsource.id_selecteur
 	and cpp.snapshot_id = cppsource.snapshot_id
 	and cppsource.type_source = 'Fichier'
 join conf_projets.ref_direction cp_ref_dir
