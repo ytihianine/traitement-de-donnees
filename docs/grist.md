@@ -176,7 +176,8 @@ Pour conserver une structure similaire à l'ensemble des projets, l'organisation
 │   │   └── table_n
 ```
 
-Cette structuration est une base à adapter selon la complexité des cas d'usages.
+Cette structuration est une base à adapter selon la complexité des cas d'usages.  
+Un template est disponible à cette addresse [https://grist.numerique.gouv.fr/o/dsci/9MAU7yrYuiyN/Template-projet/p/5](https://grist.numerique.gouv.fr/o/dsci/9MAU7yrYuiyN/Template-projet/p/5)
 
 **Accueil**  
 

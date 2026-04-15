@@ -83,13 +83,13 @@ Ajouter le préfix `ref_` => `ref_direction`
 
 - Les tables d'onglets
 
-Ajouter le préfix `onglet_` => `onglet_global_dsci`
+Ajouter le préfix `onglet_` => `onglet_global_dsci`  
 Les onglets permettent de hiérarchiser visuellement les tables sur le bandeau latéral gauche. Elles ne contiennent pas de données mais peuvent être utilisées pour de la documentation.
 
 - Les colonnes intermédiaires
 
-Toutes les colonnes qui n'ont pas de significations métiers mais qui servent pour mettre en place certaines fonctionnalités
-Si c'est une colonne qui servira pour un questionnaire => `quest_nom_colonne`
+Il s'agit de toutes les colonnes qui n'ont pas de significations métiers mais qui servent à mettre en place certaines fonctionnalités.  
+Si c'est une colonne qui servira pour un questionnaire => `quest_nom_colonne`  
 Si c'est une colonne de traitement intermédiaire => `int_nom_colonne`
 
 > Cette convention de nommage n'empêche pas l'utilisation de label plus explicite pour les utilisateurs finaux.
