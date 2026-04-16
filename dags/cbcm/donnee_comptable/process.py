@@ -379,6 +379,7 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
         "Unique",
         "Multiple",
     )
+    df_unique_cf_cc = df_unique_cf_cc.drop_duplicates(subset=["id_dp"])
 
     # Ajout des colonnes calculées
     df = pd.merge(
@@ -390,6 +391,12 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
         how="left",
         on="id_dp",
     )
+
+    # Suppression des doublons
+    df = df.drop_duplicates(
+        subset=["annee_exercice", "num_piece_reference", "societe", "poste_reference"]
+    )
+    df = df.drop(columns=["poste_reference"])
 
     return df
 
