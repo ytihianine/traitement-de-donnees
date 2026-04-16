@@ -16,12 +16,12 @@ def source_files() -> None:
     certificat = create_file_etl_task(
         selecteur="certificat",
         process_func=process.process_certificat,
-        read_options={"sep": ","},
+        read_options={"sep": ";"},
     )
     historique_certificat = create_file_etl_task(
         selecteur="historique_certificat",
         process_func=process.process_historique_certificat,
-        read_options={"sep": ","},
+        read_options={"sep": ";"},
     )
     mandataire = create_file_etl_task(
         selecteur="mandataire", process_func=process.process_mandataire
