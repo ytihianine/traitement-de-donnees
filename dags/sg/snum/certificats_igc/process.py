@@ -495,7 +495,7 @@ def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
     # df = df.fillna(np.nan).replace([np.nan], [None])
     date_cols = ["date_debut_validite", "date_fin_validite", "date_revocation"]
     df = convert_str_cols_to_date(
-        df=df, columns=date_cols, str_date_format="%Y-%m-%d", errors="raise"
+        df=df, columns=date_cols, str_date_format="%Y-%m-%d %H:%M:%S", errors="raise"
     )
 
     # Ajout des colonnes additionnelles
