@@ -9,9 +9,7 @@ from dags.sg.snum.certificats_igc import process
 
 @task_group
 def source_files() -> None:
-    agents = create_file_etl_task(
-        selecteur="agents", process_func=process.process_agents
-    )
+    agent = create_file_etl_task(selecteur="agent", process_func=process.process_agent)
     aip = create_file_etl_task(selecteur="aip", process_func=process.process_aip)
     certificat = create_file_etl_task(
         selecteur="certificat",
@@ -28,17 +26,17 @@ def source_files() -> None:
     )
 
     # ordre des tâches
-    chain([agents(), aip(), certificat(), historique_certificat(), mandataire()])
+    chain([agent(), aip(), certificat(), historique_certificat(), mandataire()])
 
 
 @task_group
 def output_files() -> None:
-    liste_certificats = create_task(
-        task_config=TaskConfig(task_id="liste_certificats"),
-        output_selecteur="liste_certificats",
-        input_selecteurs=["certificats", "agents"],
-        steps=[ETLStep(fn=process.process_liste_certificats, read_data=True)],
+    liste_certificat = create_task(
+        task_config=TaskConfig(task_id="liste_certificat"),
+        output_selecteur="liste_certificat",
+        input_selecteurs=["certificat", "agent"],
+        steps=[ETLStep(fn=process.process_liste_certificat, read_data=True)],
     )
 
     # ordre des tâches
-    chain([liste_certificats()])
+    chain([liste_certificat()])
