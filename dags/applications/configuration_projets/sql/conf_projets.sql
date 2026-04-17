@@ -182,7 +182,7 @@ SELECT
     cpps.key_tmp,
     cpp.import_timestamp,
     DENSE_RANK() OVER (
-      ORDER BY cpp.import_timestamp ASC
+      ORDER BY cpp.import_timestamp desc
   ) as rang
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_s3 cpps ON cpp.id_projet = cpps.id_projet
@@ -199,7 +199,7 @@ SELECT
     scm.colname_dest,
     cpp.import_timestamp,
     DENSE_RANK() OVER (
-      ORDER BY cpp.import_timestamp ASC
+      ORDER BY cpp.import_timestamp desc
   ) as rang
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_selecteur cpps ON cpp.id_projet = cpps.id_projet
@@ -220,7 +220,7 @@ SELECT
     cppd.lien,
   cpp.import_timestamp,
     DENSE_RANK() OVER (
-      ORDER BY cppd.import_timestamp ASC
+      ORDER BY cppd.import_timestamp desc
   ) as rang
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_documentation cppd ON cpp.id_projet = cppd.id_projet
@@ -237,7 +237,7 @@ select
 	cpp.import_timestamp,
 	dense_rank() over (
 order by
-	cpp.import_timestamp asc
+	cpp.import_timestamp desc
   ) as rang
 from
 	conf_projets.projet cpp
