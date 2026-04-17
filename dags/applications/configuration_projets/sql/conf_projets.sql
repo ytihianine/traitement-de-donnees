@@ -265,7 +265,7 @@ SELECT
     cpsd.tbl_name,
     cpp.import_timestamp,
     DENSE_RANK() OVER (
-      ORDER BY cpp.import_timestamp ASC
+      ORDER BY cpp.import_timestamp DESC
   ) as rang
 FROM conf_projets.projet cpp
 INNER JOIN conf_projets.projet_selecteur cpps
