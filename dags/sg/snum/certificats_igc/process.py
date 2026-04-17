@@ -481,7 +481,7 @@ def map_agent_direction(
 """
 
 
-def process_agents(df: pd.DataFrame) -> pd.DataFrame:
+def process_agent(df: pd.DataFrame) -> pd.DataFrame:
     # Normaliser les données textuelles
     txt_cols = ["structure", "agent_mail"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
@@ -566,12 +566,14 @@ def process_mandataire(df: pd.DataFrame) -> pd.DataFrame:
 """
 
 
-def process_liste_certificats(
-    df_certificats: pd.DataFrame, df_agents: pd.DataFrame
+def process_liste_certificat(
+    df_certificat: pd.DataFrame, df_agent: pd.DataFrame
 ) -> pd.DataFrame:
-    df_agents = df_agents[["agent_direction", "agent_mail"]].drop_duplicates()
+    df_agents = df_agent[["agent_direction", "agent_mail"]].drop_duplicates()
 
-    df_certificats_exp = df_certificats.copy().explode("contact", ignore_index=True)
+    df_certificats_exp = df_certificat.copy().explode(
+        column="contact", ignore_index=True
+    )
 
     df = pd.merge(
         left=df_certificats_exp,
