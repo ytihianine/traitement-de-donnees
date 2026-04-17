@@ -34,3 +34,28 @@ CREATE TABLE certificat_igc.certificat (
     import_date DATE NOT NULL,
     snapshot_id TEXT
 ) PARTITION BY RANGE (import_date);
+
+
+CREATE TABLE certificat_igc.historique_certificat (
+    id SERIAL,
+    agent_mail TEXT,
+    cn TEXT,
+    agent_structure TEXT,
+    date_fin_validite DATE,
+    date_debut_validite DATE,
+    agent_direction TEXT,
+    import_timestamp TIMESTAMP NOT NULL,
+    import_date DATE NOT NULL,
+    snapshot_id TEXT
+) PARTITION BY RANGE (import_date);
+
+
+CREATE TABLE certificat_igc.mandataire (
+    id SERIAL,
+    libelle TEXT,
+    sigle TEXT,
+    structure TEXT,
+    import_timestamp TIMESTAMP NOT NULL,
+    import_date DATE NOT NULL,
+    snapshot_id TEXT
+) PARTITION BY RANGE (import_date);
