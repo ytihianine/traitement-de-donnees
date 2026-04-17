@@ -540,7 +540,7 @@ def process_historique_certificat(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Déterminer la direction de l'agent
-    df["agent_direction"] = list(map(map_agent_direction, df["direction"]))
+    df["agent_direction"] = list(map(map_agent_direction, df["agent_structure"]))
 
     return df
 
