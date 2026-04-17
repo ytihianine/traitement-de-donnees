@@ -536,7 +536,7 @@ def process_historique_certificat(df: pd.DataFrame) -> pd.DataFrame:
     # Normaliser les dates
     date_cols = ["date_debut_validite", "date_fin_validite"]
     df = convert_str_cols_to_date(
-        df=df, columns=date_cols, str_date_format="%Y-%m-%d %H:%M:%S", errors="raise"
+        df=df, columns=date_cols, str_date_format="%d.%m.%Y", errors="raise"
     )
 
     # Déterminer la direction de l'agent
