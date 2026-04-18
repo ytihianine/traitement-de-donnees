@@ -61,7 +61,7 @@ def bien_georisques() -> None:
         georisques_group(),
         create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
-        ensure_partition(selecteur_options=selecteur_options),
+        ensure_partition.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
         copy_s3_files(selecteur_options=selecteur_options),
         del_s3_files(selecteur_options=selecteur_options),

@@ -77,7 +77,7 @@ def certificats_igc() -> None:
         get_projet_snapshot(),
         source_files(),
         output_files(),
-        ensure_partition(selecteur_options=selecteur_options),
+        ensure_partition.expand(selecteur_config=selecteur_configs),
         create_tmp_tables(selecteur_options=selecteur_options),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(selecteur_options=selecteur_options),

@@ -232,10 +232,9 @@ def get_projet_snapshot(
     return snapshot_id
 
 
-@task
+@task(map_index_template="{{ import_task_name }}")
 def ensure_partition(
-    nom_projet: str | None = None,
-    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
+    selecteur_config: Mapping[str, Any],
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     **context,
 ) -> None:
@@ -250,63 +249,62 @@ def ensure_partition(
     Returns:
         Le nom de la partition (créée ou existante)
     """
-    if nom_projet is None:
-        nom_projet = get_project_name(context=context)
+    # Init selecteur_config to SelecteurConfig if it's a dict
+    config = SelecteurConfig.from_dict(data=selecteur_config)
+
+    context = get_current_context()
+    context["import_task_name"] = config.selecteur_info.selecteur  # type: ignore
+
     dag_status = get_dag_status(context=context)
-    db_enable = get_feature_flags(context=context).db
-    execution_date = get_execution_date(context=context)
-    db_info = get_db_info(context=context)
-    prod_schema = db_info.prod_schema
 
     if dag_status == DagStatus.DEV:
         logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
         return
 
+    db_enable = get_feature_flags(context=context).db
+
     if not db_enable:
         logging.info(msg=FF_DB_DISABLED_MSG)
         return
 
-    # Récupérer les informations de la table parente
-    # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    selecteur_config = merge_selecteur_config(
-        selecteur_info=selecteur_info, options_map=selecteur_options
-    )
+    execution_date = get_execution_date(context=context)
+    db_info = get_db_info(context=context)
+    prod_schema = db_info.prod_schema
 
+    # Hook
     db = create_db_handler(connection_id=pg_conn_id)
 
-    for config in selecteur_config:
-        tbl_name = config.selecteur_info.tbl_name
-        is_partitioned = config.options.is_partitioned
-        partition_period = config.options.partition_period
+    tbl_name = config.selecteur_info.tbl_name
+    is_partitioned = config.options.is_partitioned
+    partition_period = config.options.partition_period
 
-        if not is_partitioned:
-            logging.info(msg=f"{tbl_name} is not partitioned ... skipping")
-            continue
+    if not is_partitioned:
+        logging.info(msg=f"{tbl_name} is not partitioned ... skipping")
+        return
 
-        # Get partition period range
-        from_date, to_date = determine_partition_period(
-            time_period=partition_period,
-            execution_date=execution_date,
-        )
+    # Get partition period range
+    from_date, to_date = determine_partition_period(
+        time_period=partition_period,
+        execution_date=execution_date,
+    )
 
-        # Nom de la partition : parenttable_YYYY_MM
-        partition_name = f"{tbl_name}_{from_date.strftime(format='%Y%m%d')}_{to_date.strftime(format='%Y%m%d')}"  # noqa
+    # Nom de la partition : parenttable_YYYY_MM
+    partition_name = f"{tbl_name}_{from_date.strftime(format='%Y%m%d')}_{to_date.strftime(format='%Y%m%d')}"  # noqa
 
-        try:
-            logging.info(msg=f"Creating partition {partition_name} for {tbl_name}.")
-            # Créer la partition
-            create_sql = f"""
-                CREATE TABLE IF NOT EXISTS {prod_schema}.{partition_name}
-                PARTITION OF {prod_schema}.{tbl_name}
-                FOR VALUES FROM
-                    ('{from_date.strftime(format="%Y-%m-%d")}') TO ('{to_date.strftime(format="%Y-%m-%d")}');
-            """
-            db.execute(query=create_sql)
-            logging.info(msg=f"Partition {partition_name} created successfully.")
-        except Exception as e:
-            logging.error(msg=f"Error creating partition {partition_name}: {str(e)}")
-            raise
+    try:
+        logging.info(msg=f"Creating partition {partition_name} for {tbl_name}.")
+        # Créer la partition
+        create_sql = f"""
+            CREATE TABLE IF NOT EXISTS {prod_schema}.{partition_name}
+            PARTITION OF {prod_schema}.{tbl_name}
+            FOR VALUES FROM
+                ('{from_date.strftime(format="%Y-%m-%d")}') TO ('{to_date.strftime(format="%Y-%m-%d")}');
+        """
+        db.execute(query=create_sql)
+        logging.info(msg=f"Partition {partition_name} created successfully.")
+    except Exception as e:
+        logging.error(msg=f"Error creating partition {partition_name}: {str(e)}")
+        raise
 
 
 @task(task_id="create_tmp_tables")
