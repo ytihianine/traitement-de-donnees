@@ -149,12 +149,12 @@ class GristAPI:
 
         # Convert DataFrame to list of records
         new_rows = df_to_send.to_dict(orient="records")
-        print(f"Nombre de nouvelles lignes à envoyer: {len(new_rows)}")
+        logging.info(msg=f"Nombre de nouvelles lignes à envoyer: {len(new_rows)}")
 
         if len(new_rows) == 0:
             if skip_empty:
-                print(
-                    f"Aucune nouvelle ligne à ajouter dans la table {tbl_name} ... Skipping"
+                logging.info(
+                    msg=f"Aucune nouvelle ligne à ajouter dans la table {tbl_name} ... Skipping"
                 )
                 return
             else:
@@ -162,8 +162,8 @@ class GristAPI:
 
         # Prepare data in Grist format
         data = {"records": [{"fields": record} for record in new_rows]}
-        print(f"Ajout des nouvelles lignes dans la table {tbl_name}")
-        print(f"Exemple: {data['records'][0]}")
+        logging.info(msg=f"Ajout des nouvelles lignes dans la table {tbl_name}")
+        logging.debug(msg=f"Exemple: {data['records'][0]}")
 
         # Send to Grist using post_records with batching
         self.post_records(
