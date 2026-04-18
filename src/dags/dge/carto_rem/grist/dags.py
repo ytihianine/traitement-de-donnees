@@ -5,19 +5,19 @@ from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from src._types.dags import DBParams, FeatureFlags
 from src.utils.config.dag_params import create_dag_params, create_default_args
 from src.enums.dags import DagStatus
-from src.utils.tasks.grist import download_grist_doc_to_s3
+from src.common_tasks.grist import download_grist_doc_to_s3
 
-from src.utils.tasks.sql import get_projet_snapshot
-from src.utils.tasks.s3 import (
+from src.common_tasks.sql import get_projet_snapshot
+from src.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
     import_file_to_iceberg,
     copy_staging_to_prod,
     del_iceberg_staging_table,
 )
-from src.utils.tasks.projet import get_selecteur_config
+from src.common_tasks.projet import get_selecteur_config
 
-from src.utils.tasks.validation import validate_dag_parameters
+from src.common_tasks.validation import validate_dag_parameters
 from src.dags.dge.carto_rem.grist.tasks import (
     referentiels,
     source_grist,

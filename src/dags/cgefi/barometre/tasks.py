@@ -1,7 +1,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src.utils.tasks.etl import create_file_etl_task
+from src.common_tasks.etl import create_file_etl_task
 
 from src.dags.cgefi.barometre import process
 

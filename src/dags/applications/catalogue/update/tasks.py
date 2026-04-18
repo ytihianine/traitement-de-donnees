@@ -3,7 +3,7 @@ from airflow.sdk.bases.operator import chain
 
 from src._types.dags import ETLStep, TaskConfig
 from src.dags.applications.catalogue.update import actions
-from src.utils.tasks.etl import (
+from src.common_tasks.etl import (
     create_task,
 )
 

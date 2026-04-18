@@ -4,17 +4,17 @@ from airflow.sdk.bases.operator import chain
 from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from src._types.dags import DBParams, FeatureFlags
 from src.utils.config.dag_params import create_dag_params, create_default_args
-from src.utils.tasks.projet import get_selecteur_config
+from src.common_tasks.projet import get_selecteur_config
 from src.enums.dags import DagStatus
-from src.utils.tasks.validation import validate_dag_parameters
-from src.utils.tasks.grist import download_grist_doc_to_s3
-from src.utils.tasks.sql import (
+from src.common_tasks.validation import validate_dag_parameters
+from src.common_tasks.grist import download_grist_doc_to_s3
+from src.common_tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
     import_file_to_db,
 )
-from src.utils.tasks.s3 import copy_s3_files, del_s3_files
+from src.common_tasks.s3 import copy_s3_files, del_s3_files
 
 from src.dags.applications.catalogue.grist.tasks import (
     referentiels_grist,

@@ -7,7 +7,7 @@ from src._types.dags import DBParams, FeatureFlags
 from src.utils.config.dag_params import create_dag_params, create_default_args
 from src.enums.dags import DagStatus
 
-from src.utils.tasks.sql import (
+from src.common_tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
     get_projet_snapshot,
@@ -15,7 +15,7 @@ from src.utils.tasks.sql import (
     refresh_views,
     # set_dataset_last_update_date,
 )
-from src.utils.tasks.validation import validate_dag_parameters
+from src.common_tasks.validation import validate_dag_parameters
 from src.dags.commun.code_geographique.tasks import code_geographique, geojson, code_iso
 
 nom_projet = "Code géographique"

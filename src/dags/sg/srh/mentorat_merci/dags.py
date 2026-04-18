@@ -12,8 +12,8 @@ from src._types.dags import FeatureFlags
 from src.utils.config.dag_params import create_default_args, create_dag_params
 
 from src.utils.config.tasks import get_list_source_fichier
-from src.utils.tasks.validation import validate_dag_parameters
-from src.utils.tasks.s3 import copy_s3_files, del_s3_files
+from src.common_tasks.validation import validate_dag_parameters
+from src.common_tasks.s3 import copy_s3_files, del_s3_files
 
 from src.dags.sg.srh.mentorat_merci.tasks import (
     agent_inscrit,

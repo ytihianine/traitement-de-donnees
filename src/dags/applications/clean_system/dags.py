@@ -5,7 +5,7 @@ from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from src._types.dags import FeatureFlags
 from src.enums.dags import DagStatus
 
-from src.utils.tasks.validation import validate_dag_parameters
+from src.common_tasks.validation import validate_dag_parameters
 from src.utils.config.dag_params import create_dag_params, create_default_args
 
 from src.dags.applications.clean_system.task import (

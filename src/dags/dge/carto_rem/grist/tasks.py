@@ -2,7 +2,7 @@ from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
 from src.dags.dge.carto_rem.grist import actions
-from src.utils.tasks.etl import (
+from src.common_tasks.etl import (
     create_grist_etl_task,
     create_task,
 )

@@ -2,7 +2,7 @@ from src._types.dags import (
     ETLStep,
     TaskConfig,
 )
-from src.utils.tasks.etl import create_task
+from src.common_tasks.etl import create_task
 
 from src.dags.applications.db_backup import actions
 

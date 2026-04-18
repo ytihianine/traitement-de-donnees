@@ -1,7 +1,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src.utils.tasks.etl import create_grist_etl_task
+from src.common_tasks.etl import create_grist_etl_task
 from src.utils.control.structures import normalize_grist_dataframe
 
 
