@@ -9,8 +9,8 @@ import pandas as pd
 from src.infra.file_system.factory import create_default_s3_handler
 from src.infra.file_system.dataframe import read_dataframe
 
-from src.utils.config.dag_params import get_feature_flags, get_project_name
-from src.constants import FF_CONVERT_DISABLED_MSG
+from src.utils.config.dag_params import get_project_name, should_skip_task
+from src.enums.dags import FeatureFlags
 from src.utils.logs import df_info
 from src.utils.config.tasks import (
     column_mapping_dataframe,
@@ -54,10 +54,8 @@ def create_parquet_converter_task(
         s3_handler = create_default_s3_handler()
 
         nom_projet = get_project_name(context=context)
-        convert_file_enable = get_feature_flags(context=context).convert_files
 
-        if not convert_file_enable:
-            print(FF_CONVERT_DISABLED_MSG)
+        if should_skip_task(context=context, feature_flag=FeatureFlags.CONVERT_FILES):
             return
 
         # Get input file path

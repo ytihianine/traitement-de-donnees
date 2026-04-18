@@ -13,23 +13,22 @@ from src.infra.file_system.exceptions import FileHandlerError
 from src.infra.file_system.factory import create_default_s3_handler
 from src.infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
 from src.utils.config.dag_params import (
-    get_dag_status,
     get_execution_date,
-    get_feature_flags,
     get_project_name,
+    should_skip_task,
 )
+from src.enums.dags import FeatureFlags
 from src.utils.config.tasks import (
     get_list_selecteur_storage_info,
     get_projet_s3_info,
     merge_selecteur_config,
 )
-from src.enums.dags import DagStatus, TypeSource
+from src.enums.dags import TypeSource
 from src.enums.filesystem import IcebergTableStatus
 from src.constants import (
     DEFAULT_POLARIS_HOST,
     DEFAULT_POLARIS_CATALOG,
     DEFAULT_S3_CONN_ID,
-    FF_S3_DISABLED_MSG,
 )
 
 
@@ -51,20 +50,13 @@ def copy_s3_files(
         FileHandlerError: If file operations fail
     """
     # Récupérer les info du dag
-    dag_status = get_dag_status(context=context)
-    s3_enable = get_feature_flags(context=context).s3
+    if should_skip_task(context=context, feature_flag=FeatureFlags.S3):
+        return
+
     nom_projet = get_project_name(context=context)
     execution_date = get_execution_date(context=context, use_tz=False)
     curr_day = execution_date.strftime(format="%Y%m%d")
     curr_time = execution_date.strftime(format="%Hh%M")
-
-    if dag_status == DagStatus.DEV:
-        print("Dag status parameter is set to DEV -> skipping this task ...")
-        return
-
-    if not s3_enable:
-        print(FF_S3_DISABLED_MSG)
-        return
 
     # Créer les hooks
     s3_handler = create_default_s3_handler(
@@ -124,17 +116,10 @@ def del_s3_files(
         FileHandlerError: If file operations fail
     """
     # Récupérer les info du dag
-    dag_status = get_dag_status(context=context)
-    s3_enable = get_feature_flags(context=context).s3
+    if should_skip_task(context=context, feature_flag=FeatureFlags.S3):
+        return
+
     nom_projet = get_project_name(context=context)
-
-    if dag_status == DagStatus.DEV:
-        print("Dag status parameter is set to DEV -> skipping this task ...")
-        return
-
-    if not s3_enable:
-        print(FF_S3_DISABLED_MSG)
-        return
 
     # Créer les hooks
     s3_handler = create_default_s3_handler(

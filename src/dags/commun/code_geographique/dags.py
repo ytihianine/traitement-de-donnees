@@ -3,7 +3,7 @@ from airflow.sdk.bases.operator import chain
 
 from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
-from src._types.dags import DBParams, FeatureFlags
+from src._types.dags import DBParams, FeatureFlagsEnable
 from src.utils.config.dag_params import create_dag_params, create_default_args
 from src.enums.dags import DagStatus
 
@@ -35,7 +35,7 @@ nom_projet = "Code géographique"
         nom_projet=nom_projet,
         dag_status=DagStatus.DEV,
         db_params=DBParams(prod_schema="commun"),
-        feature_flags=FeatureFlags(
+        feature_flags=FeatureFlagsEnable(
             db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
         ),
     ),

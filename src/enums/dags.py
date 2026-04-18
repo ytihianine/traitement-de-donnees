@@ -8,6 +8,16 @@ class DagStatus(Enum):
     DEV = auto()
 
 
+class FeatureFlags(Enum):
+    """Feature flags for conditional task execution"""
+
+    DB = "db"
+    MAIL = "mail"
+    S3 = "s3"
+    CONVERT_FILES = "convert_files"
+    DOWNLOAD_GRIST_DOC = "download_grist_doc"
+
+
 class TypeDocumentation(Enum):
     """Type de documentation"""
 

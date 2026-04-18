@@ -18,12 +18,12 @@ from src.infra.file_system.factory import (
 )
 
 from src.utils.config.dag_params import (
-    get_dag_status,
     get_db_info,
     get_execution_date,
-    get_feature_flags,
     get_project_name,
+    should_skip_task,
 )
+from src.enums.dags import FeatureFlags
 from src.utils.config.tasks import (
     get_list_selecteur_storage_info,
     merge_selecteur_config,
@@ -32,7 +32,6 @@ from src.enums.database import (
     LoadStrategy,
     PartitionTimePeriod,
 )
-from src._types.dags import DagStatus
 from src._types.projet import (
     SelecteurConfig,
     SelecteurStorageOptions,
@@ -43,7 +42,6 @@ from src.constants import (
     DEFAULT_PG_DATA_CONN_ID,
     DEFAULT_PG_CONFIG_CONN_ID,
     DEFAULT_S3_CONN_ID,
-    FF_DB_DISABLED_MSG,
 )
 
 # ------------------------------------------------------------------------------
@@ -181,19 +179,11 @@ def create_projet_snapshot(
     pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID, **context
 ) -> None:
     """ """
+    if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
+        return
+
     nom_projet = get_project_name(context=context)
-    db_enable = get_feature_flags(context=context).db
     execution_date = get_execution_date(context=context)
-    dag_status = get_dag_status(context=context)
-
-    if dag_status == DagStatus.DEV:
-        logging.info(msg=f"Pipeline start execution date: {execution_date}")
-        logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
-        return
-
-    if not db_enable:
-        logging.info(msg=FF_DB_DISABLED_MSG)
-        return
 
     # Hook
     db_handler = create_db_handler(connection_id=pg_conn_id)
@@ -255,16 +245,7 @@ def ensure_partition(
     context = get_current_context()
     context["import_task_name"] = config.selecteur_info.selecteur  # type: ignore
 
-    dag_status = get_dag_status(context=context)
-
-    if dag_status == DagStatus.DEV:
-        logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
-        return
-
-    db_enable = get_feature_flags(context=context).db
-
-    if not db_enable:
-        logging.info(msg=FF_DB_DISABLED_MSG)
+    if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
     execution_date = get_execution_date(context=context)
@@ -318,10 +299,8 @@ def create_tmp_tables(
     Used to create temporary tables in the database.
     """
     nom_projet = get_project_name(context=context)
-    dag_status = get_dag_status(context=context)
 
-    if dag_status == DagStatus.DEV:
-        logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
+    if should_skip_task(context=context):
         return
 
     db_info = get_db_info(context=context)
@@ -421,15 +400,8 @@ def copy_tmp_table_to_real_table(
         APPEND    -> ADD all rows from tmp to prod
     """
     nom_projet = get_project_name(context=context)
-    dag_status = get_dag_status(context=context)
-    db_enable = get_feature_flags(context=context).db
 
-    if dag_status == DagStatus.DEV:
-        logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
-        return
-
-    if not db_enable:
-        logging.info(msg=FF_DB_DISABLED_MSG)
+    if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
     db_info = get_db_info(context=context)
@@ -596,15 +568,7 @@ def import_file_to_db(
     context = get_current_context()
     context["import_task_name"] = config.selecteur_info.selecteur  # type: ignore
 
-    dag_status = get_dag_status(context=context)
-    db_enable = get_feature_flags(context=context).db
-
-    if dag_status == DagStatus.DEV:
-        print("Dag status parameter is set to DEV -> skipping this task ...")
-        return
-
-    if not db_enable:
-        print(FF_DB_DISABLED_MSG)
+    if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
     if config.options.write_to_db is False:
@@ -678,13 +642,11 @@ def import_file_to_db(
 @task
 def refresh_views(pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context) -> None:
     """Tâche pour actualiser les vues matérialisées"""
-    dag_status = get_dag_status(context=context)
+    if should_skip_task(context=context):
+        return
+
     db_info = get_db_info(context=context)
     prod_schema = db_info.prod_schema
-
-    if dag_status == DagStatus.DEV:
-        logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
-        return
 
     db = create_db_handler(connection_id=pg_conn_id)
 

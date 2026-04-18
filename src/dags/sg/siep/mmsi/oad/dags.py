@@ -6,7 +6,7 @@ from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from src.infra.mails.default_smtp import MailStatus, create_send_mail_callback
-from src._types.dags import DBParams, FeatureFlags
+from src._types.dags import DBParams, FeatureFlagsEnable
 from src.utils.config.dag_params import create_dag_params, create_default_args
 from src.utils.config.tasks import get_list_source_fichier
 from src.enums.dags import DagStatus
@@ -56,7 +56,7 @@ nom_projet = "Outil aide diagnostic"
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="siep"),
-        feature_flags=FeatureFlags(
+        feature_flags=FeatureFlagsEnable(
             db=False, mail=False, s3=False, convert_files=True, download_grist_doc=False
         ),
     ),

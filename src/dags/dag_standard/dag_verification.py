@@ -19,7 +19,7 @@ from src.utils.config.dag_params import (
     get_db_info,
 )
 from src.utils.config.tasks import get_list_source_fichier
-from src._types.dags import DBParams, FeatureFlags
+from src._types.dags import DBParams, FeatureFlagsEnable
 from src._types.projet import SelecteurConfig
 from src.enums.dags import DagStatus
 from src.enums.filesystem import IcebergTableStatus
@@ -53,7 +53,7 @@ nom_projet = "Configuration des projets"
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="iceberg"),
-        feature_flags=FeatureFlags(
+        feature_flags=FeatureFlagsEnable(
             db=True,
             mail=False,
             s3=True,

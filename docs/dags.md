@@ -53,7 +53,7 @@ Chaque DAG doit définir ses paramètres selon la structure TypedDict suivante :
 ```python
 from airflow.sdk import dag
 from enums.dags import DagStatus
-from _types.dags import DBParams, FeatureFlags
+from _types.dags import DBParams, FeatureFlagsEnable
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
 @dag(
@@ -69,7 +69,7 @@ from infra.mails.default_smtp import create_send_mail_callback, MailStatus
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="schema"),
-        feature_flags=FeatureFlags(
+        feature_flags=FeatureFlagsEnable(
             db=True,
             mail=False,
             s3=False,
@@ -84,7 +84,7 @@ from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 )
 ```
 
-Les FeatureFlags permettent d'activer/désactiver certaines fonctionnalités du dag et/ou des tâches sans avoir à modifier le code.  
+Les FeatureFlagsEnable permettent d'activer/désactiver certaines fonctionnalités du dag et/ou des tâches sans avoir à modifier le code.  
 
 
 ## Tâches Pré-définies Disponibles

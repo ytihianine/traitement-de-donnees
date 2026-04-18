@@ -2,7 +2,7 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
 from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
-from src._types.dags import FeatureFlags
+from src._types.dags import FeatureFlagsEnable
 from src.enums.dags import DagStatus
 
 from src.common_tasks.validation import validate_dag_parameters
@@ -30,7 +30,7 @@ nom_projet = "Nettoyer les systèmes"
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=None,
-        feature_flags=FeatureFlags(
+        feature_flags=FeatureFlagsEnable(
             db=True, mail=True, s3=True, convert_files=False, download_grist_doc=True
         ),
     ),

@@ -54,7 +54,7 @@ class DBParams:
 
 
 @dataclass(frozen=True)
-class FeatureFlags:
+class FeatureFlagsEnable:
     db: bool
     mail: bool
     s3: bool
@@ -67,4 +67,4 @@ class DagParams:
     nom_projet: str
     dag_status: DagStatus | int
     db: DBParams | None
-    enable: FeatureFlags
+    enable: FeatureFlagsEnable

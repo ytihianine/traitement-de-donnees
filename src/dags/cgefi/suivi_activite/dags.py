@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from src.enums.dags import DagStatus
-from src._types.dags import DBParams, FeatureFlags
+from src._types.dags import DBParams, FeatureFlagsEnable
 from src.common_tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
@@ -43,7 +43,7 @@ nom_projet = "Emploi et formation"
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="cgefi_poc"),
-        feature_flags=FeatureFlags(
+        feature_flags=FeatureFlagsEnable(
             db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
         ),
     ),

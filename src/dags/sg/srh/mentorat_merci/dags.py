@@ -8,7 +8,7 @@ from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
 from src.enums.dags import DagStatus
 
-from src._types.dags import FeatureFlags
+from src._types.dags import FeatureFlagsEnable
 from src.utils.config.dag_params import create_default_args, create_dag_params
 
 from src.utils.config.tasks import get_list_source_fichier
@@ -43,7 +43,7 @@ LINK_DOC_DATA = "Non-défini"  # noqa
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=None,
-        feature_flags=FeatureFlags(
+        feature_flags=FeatureFlagsEnable(
             db=False, mail=True, s3=True, convert_files=False, download_grist_doc=False
         ),
     ),

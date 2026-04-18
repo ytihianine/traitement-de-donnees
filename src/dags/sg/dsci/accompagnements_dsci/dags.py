@@ -3,7 +3,7 @@ from airflow.sdk.bases.operator import chain
 
 from src.infra.mails.default_smtp import MailStatus, create_send_mail_callback
 from src.enums.dags import DagStatus
-from src._types.dags import DBParams, FeatureFlags
+from src._types.dags import DBParams, FeatureFlagsEnable
 from src.common_tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
@@ -42,7 +42,7 @@ nom_projet = "Accompagnements DSCI"
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="activite_dsci"),
-        feature_flags=FeatureFlags(
+        feature_flags=FeatureFlagsEnable(
             db=True, mail=False, s3=True, convert_files=False, download_grist_doc=True
         ),
     ),
