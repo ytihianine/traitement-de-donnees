@@ -41,7 +41,7 @@ def _make_handler(files: dict[str, bytes] | None = None) -> S3FS:
 
     def put_object(Bucket: str, Key: str, Body: object, **kwargs: object) -> None:
         if hasattr(Body, "read"):
-            store[Key] = Body.read()
+            store[Key] = Body.read()  # type: ignore
         elif isinstance(Body, bytes):
             store[Key] = Body
         else:
@@ -71,7 +71,7 @@ def _make_handler(files: dict[str, bytes] | None = None) -> S3FS:
     client.get_paginator = MagicMock(return_value=paginator)
 
     handler = S3FS(bucket="test-bucket", client=client)
-    handler._store = store  # expose for assertions
+    handler._store = store  # expose for assertions   # type: ignore
     return handler
 
 

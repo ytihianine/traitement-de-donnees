@@ -154,7 +154,7 @@ class TestContextManager:
             assert ctx is client
 
     def test_exit_calls_close(self, client: ConcreteHttpClient) -> None:
-        client._session = "something"
+        client._session = "something"  # type: ignore
         with client:
             pass
         assert client._session is None

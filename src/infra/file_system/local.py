@@ -47,7 +47,7 @@ class LocalFS(FSInterface):
                     elif isinstance(content, bytes):
                         tmp.write(content)
                     else:
-                        shutil.copyfileobj(content, tmp)
+                        shutil.copyfileobj(content, tmp)  # type: ignore
 
                     tmp.flush()
                     os.fsync(tmp.fileno())

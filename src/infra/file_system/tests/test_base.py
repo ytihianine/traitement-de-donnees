@@ -32,7 +32,7 @@ class ConcreteFileHandler(FSInterface):
         elif isinstance(content, bytes):
             self._files[str(file_path)] = content
         else:
-            self._files[str(file_path)] = content.read()
+            self._files[str(file_path)] = content.read()  # type: ignore
 
     def delete(self, file_path: Union[str, Path]) -> None:
         key = str(file_path)
