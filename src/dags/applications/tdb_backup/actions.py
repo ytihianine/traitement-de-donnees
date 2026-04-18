@@ -156,7 +156,7 @@ def get_dashboard_export(
 #         )
 
 #         # Date d'execution du dag
-#         execution_date = context["dag_run"].execution_date.astimezone(paris_tz)
+#         execution_date = context["dag_run"].execution_date.astimezone(PARIS_TZ)
 #         curr_day = execution_date.strftime("%Y%m%d")
 #         curr_time = execution_date.strftime("%Hh%M")
 

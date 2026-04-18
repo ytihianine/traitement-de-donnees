@@ -16,7 +16,7 @@ def get_root_folder() -> str:
     return os.path.join(base_folder, "dags", "repo")
 
 
-# It doesn't work
+# Custom logger configuration for scripts - Airflow has its own logger
 custom_logger = logging.Logger(name=__name__, level=logging.DEBUG)
 handler = logging.StreamHandler(
     stream=sys.stdout
@@ -25,21 +25,15 @@ formatter = logging.Formatter(fmt="%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(fmt=formatter)
 custom_logger.addHandler(hdlr=handler)
 
-NO_PROCESS_MSG = "No complementary actions needed ! Skipping ..."
 
 ENV_VAR = os.environ.copy()
 
-""" Configuration du proxy """
-PROXY = "172.16.0.53:3128"
-AGENT = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0"
-)
+# HTTP Proxy Configuration
+PROXY = ENV_VAR.get("AIRFLOW_PROXY", None)
+AGENT = ENV_VAR.get("AIRFLOW_USER_AGENT", None)
 
-""" TimeZone """
-paris_tz = pytz.timezone(zone="Europe/Paris")
-
-""" MinIO """
-TMP_KEY = "tmp"
+# Timezone configuration
+PARIS_TZ = pytz.timezone(zone="Europe/Paris")
 
 # DEFAULT VARIABLES
 DEFAULT_SMTP_CONN_ID = "smtp_nubonyxia"
@@ -62,6 +56,9 @@ DEFAULT_TRINO_HOST = "trino-mef-sg.lab.incubateur.finances.rie.gouv.fr"
 
 # Grist
 DEFAULT_GRIST_HOST = "https://grist.numerique.gouv.fr"
+
+# Processing messages
+NO_PROCESS_MSG = "No complementary actions needed ! Skipping ..."
 
 # Feature flags messages
 FF_MAIL_DISABLED_MSG = "Mail feature flag is disabled ! Skipping mail sending ..."

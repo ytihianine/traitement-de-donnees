@@ -19,7 +19,7 @@ from src.constants import (
     get_root_folder,
     DEFAULT_SMTP_CONN_ID,
     DEFAULT_MAIL_CC,
-    paris_tz,
+    PARIS_TZ,
 )
 
 default_mail_config = {
@@ -179,7 +179,7 @@ def _callback(context: dict[str, Any], mail_status: MailStatus) -> None:
         template_parameters={
             "dag_name": context["dag"].dag_id,
             "dag_statut": mail_status.value,
-            "start_date": execution_date.replace(tzinfo=paris_tz).strftime(
+            "start_date": execution_date.replace(tzinfo=PARIS_TZ).strftime(
                 format="%d-%m-%Y %H:%M:%S"
             ),
             "link_doc_pipeline": ";".join(doc_pipeline),

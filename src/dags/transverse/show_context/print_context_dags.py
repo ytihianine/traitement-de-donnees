@@ -56,8 +56,8 @@ def liste_contexte_var() -> None:
             msg=f"avant timezone {execution_date.strftime('%Y-%m-%d %H:%M:%S')}"
         )
         # Convert to Paris Timezone
-        paris_tz = pytz.timezone("Europe/Paris")
-        execution_date_paris = execution_date.astimezone(paris_tz)
+        PARIS_TZ = pytz.timezone("Europe/Paris")
+        execution_date_paris = execution_date.astimezone(PARIS_TZ)
 
         # Format without timezone info
         formatted_time = execution_date_paris.strftime(
