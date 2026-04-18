@@ -5,13 +5,16 @@ import os
 import pandas as pd
 from pathlib import Path
 
-from utils.config.vars import custom_logger
+from src.constants import custom_logger
+from scripts.settings import get_settings
+
+settings = get_settings()
 
 # Chemin du dossier contenant les fichiers
-DOSSIER_PARQUET = "/home/onyxia/work/traitement-des-donnees/scripts/generate_tables/tmp"
+DOSSIER_PARQUET = settings.generate_tables.dossier_parquet
 
 # Fichier de sortie pour les scripts SQL
-FICHIER_SQL = "create_tables.sql"
+FICHIER_SQL = settings.generate_tables.fichier_sql
 
 
 def mapper_type_postgres(type_pandas):

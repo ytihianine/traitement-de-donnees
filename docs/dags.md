@@ -19,6 +19,7 @@ Ce guide explique comment créer des pipelines Airflow (appelées DAGs dans Airf
 Le framework propose une architecture en couches :
 
 - **DAGs (`dags/`)** : Orchestration des traitements métiers
+- **Tasks (`common_tasks/`)** : Tâches génériques réutilisables
 - **Infrastructure (`infra/`)** : Interaction avec les systèmes externes (base de données, S3, HTTP, mails)
 - **Enums (`enums/`)** : Enums transverses nécessaires dans les dags, tâches, fonctions ...
 - **Types (`_types/`)** : Types transverses nécessaires dans les dags, tâches, fonctions ...
@@ -29,14 +30,14 @@ Les dags doivent respecter [cette organisation](./convention.md#dags)
 ### Workflow Standard
 
 Il existe deux worflows principaux génériques qui nécessitent d'être adapté à chaque pipeline.
-Le premier workflow permet d'effectuer un ETL classique. Il contient les étapes suivantes
+Le premier workflow permet de réaliser un ETL classique. Il contient les étapes suivantes
 1. **Validation des paramètres** : Vérification des paramètres requis du DAG
 2. **Extraction** : Lecture des données depuis diverses sources (S3, Grist, base de données)
 3. **Transformation** : Application de fonctions de processing personnalisées
 4. **Chargement** : Sauvegarde des résultats (S3, base de données)
 5. **Notification** : Envoi de mails de succès/échec
 
-Le second workflow permet des actions qui ne nécessitent pas nécessairement de données. Il contient les étapes suivantes
+Le second workflow permet de réaliser des actions qui ne nécessitent pas nécessairement de données. Il contient les étapes suivantes
 1. **Validation des paramètres** : Vérification des paramètres requis du DAG
 2. **Actions**: Réalise une action définie (ping, envoi de mail, requête API ...)
 5. **Notification** : Envoi de mails de succès/échec
@@ -48,12 +49,12 @@ Les workflows peuvent être plus complexes et mélanger des étapes de chacun de
 
 ## Structure des Paramètres
 
-Chaque DAG doit définir ses paramètres selon la structure TypedDict suivante :
+Chaque DAG doit définir ses paramètres selon la structure suivante :
 
 ```python
 from airflow.sdk import dag
 from enums.dags import DagStatus
-from _types.dags import DBParams, FeatureFlags
+from _types.dags import DBParams, FeatureFlagsEnable
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
 @dag(
@@ -69,7 +70,7 @@ from infra.mails.default_smtp import create_send_mail_callback, MailStatus
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="schema"),
-        feature_flags=FeatureFlags(
+        feature_flags=FeatureFlagsEnable(
             db=True,
             mail=False,
             s3=False,
@@ -84,25 +85,25 @@ from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 )
 ```
 
-Les FeatureFlags permettent d'activer/désactiver certaines fonctionnalités du dag et/ou des tâches sans avoir à modifier le code.  
+Les FeatureFlagsEnable permettent d'activer/désactiver certaines fonctionnalités du dag et/ou des tâches sans avoir à modifier le code.  
 
 
 ## Tâches Pré-définies Disponibles
 
 ### 1. Validation des Paramètres
 
-Une tâche générique est disponible: `from utils.tasks.validation import validate_dag_parameters`
+Une tâche générique est disponible: `from src.common_tasks.alidation import validate_dag_parameters`
 
 ### 2. Tâches ETL (Extract, Transform, Load)
 
 #### ETL depuis Grist
 ```python
-from utils.tasks.grist import download_grist_doc_to_s3
-from utils.tasks.etl import create_grist_etl_task
+from src.common_tasks.grist import download_grist_doc_to_s3
+from src.common_tasks.etl import create_grist_etl_task
 
 # Télécharger le document Grist
 grist_doc = download_grist_doc_to_s3(
-    selecteur="grist_doc,
+    selecteur="grist_doc",
     workspace_id="grist_ws_id",
     grist_host=DEFAULT_GRIST_HOST,
     api_token_key="grist_secret_key",
@@ -153,7 +154,7 @@ etl_task = create_task(
 
 #### Conversion vers Parquet
 ```python
-from utils.tasks.file import create_parquet_converter_task
+from src.common_tasks.file import create_parquet_converter_task
 
 # Conversion de fichiers vers Parquet
 convert_to_parquet = create_parquet_converter_task(
@@ -168,14 +169,14 @@ convert_to_parquet = create_parquet_converter_task(
 
 #### Création de Tables Temporaires
 ```python
-from utils.tasks.sql import (
+from src.common_tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
     ensure_partition,
     import_file_to_db,
     LoadStrategy,
 )
-from utils.config.vars import (
+from src.constants import (
     DEFAULT_PG_DATA_CONN_ID,
     DEFAULT_S3_CONN_ID,
 )
@@ -203,7 +204,7 @@ copy_to_prod = copy_tmp_table_to_real_table()
 ### 5. Opérations S3
 
 ```python
-from utils.tasks.s3 import copy_s3_files, del_s3_files
+from src.common_tasks.s3 import copy_s3_files, del_s3_files
 
 # Copie de fichiers S3
 copy_files = copy_s3_files()

@@ -1,23 +1,23 @@
-import os
 import requests
 
-from infra.catalog.polaris import PolarisCatalog
+from src.infra.catalog.polaris import PolarisCatalog
+from scripts.settings import get_settings
 
-env_var = os.environ.copy()
+settings = get_settings()
 
-# CREDENTIALS - FILL THESE IN
-S3_ACCESS_KEY_ID = env_var.get("S3_ACCESS_KEY_ID", "YOUR_MINIO_ACCESS_KEY")
-S3_ACCESS_SECRET_KEY = env_var.get("S3_ACCESS_SECRET_KEY", "YOUR_MINIO_SECRET_KEY")
-CLIENT_ID = env_var.get("CLIENT_ID", "")
-CLIENT_SECRET = env_var.get("CLIENT_SECRET", "")
+# CREDENTIALS
+S3_ACCESS_KEY_ID = settings.s3.access_key_id
+S3_ACCESS_SECRET_KEY = settings.s3.access_secret_key
+CLIENT_ID = settings.catalog.client_id
+CLIENT_SECRET = settings.catalog.client_secret
 
-POLARIS_URL = "https://polaris-catalog.lab.incubateur.finances.rie.gouv.fr"
-REALM = "POLARIS"
-CATALOG_NAME = "data_store"
-PRINCIPAL_NAME = "data_store_trino"
-PRINCIPAL_ROLE_NAME = "data_store_user_role"
-CATALOG_ROLE_NAME = "data_store_catalog_role"
-ca_bundle = "/home/onyxia/work/bercyCA.crt"
+POLARIS_URL = settings.polaris.url
+REALM = settings.polaris.realm
+CATALOG_NAME = settings.polaris.catalog_name
+PRINCIPAL_NAME = settings.polaris.principal_name
+PRINCIPAL_ROLE_NAME = settings.polaris.principal_role_name
+CATALOG_ROLE_NAME = settings.polaris.catalog_role_name
+ca_bundle = settings.polaris.ca_bundle
 
 polaris_client = PolarisCatalog(url=POLARIS_URL, realm=REALM)
 

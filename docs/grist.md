@@ -4,18 +4,22 @@ Cette documentation décrit le processus d'un projet Grist, de la phase de cadra
 
 ## Table des matières
 - [Documentation Grist](#documentation-grist)
-  - [Table des matières](#table-des-matières)
-  - [Prendre en main Grist](#prendre-en-main-grist)
-    - [Glossaire et ressources](#glossaire-et-ressources)
-    - [Convention de nommage](#convention-de-nommage)
-    - [Widget custom](#widget-custom)
-  - [Accompagner un projet Grist](#accompagner-un-projet-grist)
-    - [Cadrer le besoin métier](#cadrer-le-besoin-métier)
-    - [Lister et structurer les données](#lister-et-structurer-les-données)
-    - [Création du document Grist](#création-du-document-grist)
-    - [Estimer le coût évité](#estimer-le-coût-évité)
-  - [Tableau de bord](#tableau-de-bord)
-  - [Créer automatiquement un document Grist](#créer-automatiquement-un-document-grist)
+- [Table des matières](#table-des-matières)
+- [Prendre en main Grist](#prendre-en-main-grist)
+  - [Glossaire et ressources](#glossaire-et-ressources)
+  - [Convention de nommage](#convention-de-nommage)
+  - [Widget custom](#widget-custom)
+- [Accompagner un projet Grist](#accompagner-un-projet-grist)
+  - [Cadrer le besoin métier](#cadrer-le-besoin-métier)
+  - [Lister et structurer les données](#lister-et-structurer-les-données)
+  - [Création du document Grist](#création-du-document-grist)
+  - [Estimer le coût évité](#estimer-le-coût-évité)
+- [Tableau de bord](#tableau-de-bord)
+  - [Connecter le document Grist à l'outil de datavisualisation](#connecter-le-document-grist-à-loutil-de-datavisualisation)
+  - [Générer les tables au format dbml](#générer-les-tables-au-format-dbml)
+  - [Générer les ERD associés au document](#générer-les-erd-associés-au-document)
+  - [Générer le script SQL](#générer-le-script-sql)
+  - [Créer le dag associé](#créer-le-dag-associé)
 
 ## Prendre en main Grist
 ### Glossaire et ressources
@@ -262,10 +266,5 @@ Depuis [https://dbdiagram.io](https://dbdiagram.io), exporter le résultat au bo
 
 ### Créer le dag associé
 
-La dernière étape est de créer le dag qui ira récupérer les données depuis Grist. Voir la documentation [dags.md](./dags.md) pour le créer.
-
-## Créer automatiquement un document Grist
-
-_réflexion en cours_
-
-objectif: convertir automatiquement la structure des données définies avec les métiers en document Grist
+La dernière étape est de créer le dag qui ira récupérer les données depuis Grist. Voir la documentation [dags.md](./dags.md) pour le créer.  
+Une fois le dag créé et exécuté, les données seront disponibles dans l'instance ChartsGouv.

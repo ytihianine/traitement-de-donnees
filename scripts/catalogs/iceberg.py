@@ -1,19 +1,19 @@
-import os
 import pandas as pd
-from infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
-from enums.filesystem import IcebergTableStatus
+from src.infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
+from src.enums.filesystem import IcebergTableStatus
+from scripts.settings import get_settings
 
-env_var = os.environ.copy()
+settings = get_settings()
 
-# CREDENTIALS - FILL THESE IN
-CATALOG_URI = env_var.get("CATALOG_URI", "")
-CATALOG_WAREHOUSE = env_var.get("CATALOG_WAREHOUSE", "")
-CATALOG_NAME = env_var.get("CATALOG_NAME", "")
-CLIENT_ID = env_var.get("CLIENT_ID", "")
-CLIENT_SECRET = env_var.get("CLIENT_SECRET", "")
-S3_ACCESS_KEY_ID = env_var.get("S3_ACCESS_KEY_ID", "YOUR_MINIO_ACCESS_KEY")
-S3_ACCESS_SECRET_KEY = env_var.get("S3_ACCESS_SECRET_KEY", "YOUR_MINIO_SECRET_KEY")
-S3_ENDPOINT = env_var.get("S3_ENDPOINT", "")
+# CREDENTIALS
+CATALOG_URI = settings.catalog.uri
+CATALOG_WAREHOUSE = settings.catalog.warehouse
+CATALOG_NAME = settings.catalog.name
+CLIENT_ID = settings.catalog.client_id
+CLIENT_SECRET = settings.catalog.client_secret
+S3_ACCESS_KEY_ID = settings.s3.access_key_id
+S3_ACCESS_SECRET_KEY = settings.s3.access_secret_key
+S3_ENDPOINT = settings.s3.endpoint
 
 additional_options = {
     "s3.endpoint": S3_ENDPOINT,

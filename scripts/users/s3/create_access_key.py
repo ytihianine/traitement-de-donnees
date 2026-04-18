@@ -57,11 +57,15 @@ def create_minio_user_with_policy(
 
 
 if __name__ == "__main__":
+    from scripts.settings import get_settings
+
+    settings = get_settings()
+
     # Define variables
-    ALIAS_NAME = "s3_admin"
-    BUCKET = "bucket"
-    KEY_ACCESS = "*"
-    POLICY_NAME = "user-policy"
+    ALIAS_NAME = settings.s3_user.alias_name
+    BUCKET = settings.s3_user.bucket
+    KEY_ACCESS = settings.s3_user.key_access
+    POLICY_NAME = settings.s3_user.policy_name
     ACCESS_KEY_NAME = (
         f"auto-{BUCKET.lower()}-{datetime.now().strftime(format='%Y%m%d-%H%M%S')}"
     )
