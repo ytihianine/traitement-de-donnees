@@ -1,0 +1,350 @@
+from src.enums.dags import TypeDocumentation
+import pandas as pd
+from src.utils.control.dates import convert_grist_date_to_date
+from src.utils.control.structures import (
+    handle_grist_boolean_columns,
+    handle_grist_null_references,
+    validate_enum_column,
+)
+from src.utils.control.text import normalize_whitespace_columns
+
+
+def replace_values(
+    df: pd.DataFrame, to_replace: dict[str, str], cols: list[str] | None = None
+) -> pd.DataFrame:
+    if cols:
+        df[cols] = df[cols].replace(to_replace=to_replace)
+    else:
+        df = df.replace(to_replace=to_replace)
+    return df
+
+
+def process_direction(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "id",
+        "direction",
+    ]
+    df = df.loc[:, cols_to_keep]
+    df = df.rename(columns={"id": "id_direction"})
+
+    df = df.assign(direction=df["direction"].str.strip()).convert_dtypes()
+    df = df.drop_duplicates(subset=["direction"])
+    df = df.dropna(subset=["direction"])
+
+    return df
+
+
+def process_service(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "id",
+        "direction",
+        "service",
+    ]
+    df = df.loc[:, cols_to_keep]
+    df = df.rename(columns={"id": "id_service"})
+
+    # Rename
+    cols_to_rename = {"direction": "id_direction"}
+
+    df = (
+        df.rename(columns=cols_to_rename)
+        .assign(service=df["service"].str.strip())
+        .convert_dtypes()
+    )
+    df = df.drop_duplicates(subset=["id_direction", "service"])
+    df = df.dropna(subset=["id_direction", "service"])
+
+    return df
+
+
+def process_projet(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "id",
+        "projet",
+        "direction",
+        "service",
+    ]
+    df = df.loc[:, cols_to_keep]
+
+    # Rename
+    cols_to_rename = {
+        "id": "id_projet",
+        "direction": "id_direction",
+        "service": "id_service",
+    }
+    df = df.rename(columns=cols_to_rename)
+
+    # Réf colonnes
+    ref_cols = ["id_direction", "id_service"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    # Txt colonnes
+    txt_cols = ["projet"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    df = df.dropna(subset=["projet", "id_direction", "id_service"])
+
+    return df
+
+
+def process_projet_contact(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "id",
+        "projet",
+        "contact_mail",
+        "is_mail_generic",
+    ]
+    df = df.loc[:, cols_to_keep]
+
+    # Rename
+    cols_to_rename = {
+        "id": "id_contact",
+        "projet": "id_projet",
+    }
+    df = df.rename(columns=cols_to_rename)
+
+    # Réf colonnes
+    ref_cols = ["id_projet"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    # Txt colonnes
+    txt_cols = ["contact_mail"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Bool colonnes
+    bool_cols = ["is_mail_generic"]
+    df = handle_grist_boolean_columns(df=df, columns=bool_cols)
+
+    # Retirer les lignes avec contact_mail vide (après normalisation)
+    df = df.loc[df["contact_mail"].astype(bool)]
+
+    return df
+
+
+def process_projet_documentation(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "type_documentation",
+        "lien",
+    ]
+    df = df.loc[:, cols_to_keep]
+
+    # Rename
+    cols_to_rename = {
+        "projet": "id_projet",
+    }
+    df = df.rename(columns=cols_to_rename)
+
+    # Réf colonnes
+    ref_cols = ["id_projet"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    # Txt colonnes
+    txt_cols = ["type_documentation", "lien"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Check constraintes
+    validate_enum_column(
+        df=df,
+        column="type_documentation",
+        enum_class=TypeDocumentation,
+        allow_null=False,
+    )
+
+    return df
+
+
+def process_projet_s3(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "bucket",
+        "key",
+        "key_tmp",
+    ]
+    df = df.loc[:, cols_to_keep]
+
+    # Rename
+    cols_to_rename = {
+        "projet": "id_projet",
+    }
+    df = df.rename(columns=cols_to_rename)
+
+    # Réf colonnes
+    ref_cols = ["id_projet"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    # Txt colonnes
+    txt_cols = ["bucket", "key", "key_tmp"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    return df
+
+
+def process_selecteur(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "id",
+        "projet",
+        "type_de_selecteur",
+        "selecteur",
+    ]
+    df = df.loc[:, cols_to_keep]
+
+    # Rename
+    cols_to_rename = {
+        "id": "id_selecteur",
+        "projet": "id_projet",
+        "type_de_selecteur": "type_selecteur",
+        "selecteur": "selecteur",
+    }
+    df = df.rename(columns=cols_to_rename)
+
+    # Réf colonnes
+    ref_cols = ["id_projet"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+    df = df.dropna(subset=["id_projet"])
+
+    # Txt colonnes
+    txt_cols = ["selecteur"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    return df
+
+
+def process_source(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "type",
+        "selecteur",
+        "id_source",
+    ]
+    df = df.loc[:, cols_to_keep]
+
+    # Rename
+    cols_to_rename = {
+        "projet": "id_projet",
+        "type": "type_source",
+        "selecteur": "id_selecteur",
+    }
+    df = df.rename(columns=cols_to_rename)
+
+    # Réf colonnes
+    ref_cols = ["id_projet", "id_selecteur"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+    df = df.dropna(subset=["id_projet", "id_selecteur"])
+
+    # Txt colonnes
+    txt_cols = ["type_source", "id_source"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Retirer les lignes avec contact_mail vide (après normalisation)
+    df = df.loc[df["id_source"].astype(bool)]
+
+    return df
+
+
+def process_selecteur_s3(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "selecteur",
+        "filename",
+        "key",
+    ]
+    df = df.loc[:, cols_to_keep]
+
+    # Rename
+    cols_to_rename = {
+        "projet": "id_projet",
+        "selecteur": "id_selecteur",
+    }
+    df = df.rename(columns=cols_to_rename)
+
+    # Réf colonnes
+    ref_cols = ["id_projet", "id_selecteur"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    # Txt colonnes
+    txt_cols = ["filename", "key"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    df["key"] = df["key"].astype("string")
+
+    return df
+
+
+def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "projet",
+        "selecteur",
+        "tbl_name",
+    ]
+    df = df.loc[:, cols_to_keep]
+
+    # Rename
+    cols_to_rename = {
+        "projet": "id_projet",
+        "selecteur": "id_selecteur",
+    }
+    df = df.rename(columns=cols_to_rename)
+
+    # Réf colonnes
+    ref_cols = ["id_projet", "id_selecteur"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    # Txt colonnes
+    txt_cols = ["tbl_name", "partition_period", "load_strategy"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    return df
+
+
+def process_col_mapping(df: pd.DataFrame) -> pd.DataFrame:
+    # Keep only mandatory columns
+    cols_to_keep = [
+        "id",
+        "projet",
+        "selecteur",
+        "colname_source",
+        "colname_dest",
+        "to_keep",
+        "date_archivage",
+    ]
+    df = df.loc[:, cols_to_keep]
+
+    # Rename
+    cols_to_rename = {
+        "id": "id_col_mapping",
+        "projet": "id_projet",
+        "selecteur": "id_selecteur",
+    }
+    df = df.rename(columns=cols_to_rename)
+
+    # Réf colonnes
+    ref_cols = ["id_projet", "id_selecteur"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    # Bool colonnes
+    bool_cols = ["to_keep"]
+    df = handle_grist_boolean_columns(df=df, columns=bool_cols)
+
+    # Txt colonnes
+    txt_cols = ["colname_source", "colname_dest"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Date columns
+    date_cols = ["date_archivage"]
+    df = convert_grist_date_to_date(df=df, columns=date_cols)
+
+    df = df.dropna(subset=["id_projet", "id_selecteur"])
+
+    df = df.loc[df["to_keep"]]
+
+    return df

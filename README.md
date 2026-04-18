@@ -6,13 +6,16 @@ Ce repo contient des scripts et dags permettant de traiter des données.
 
 ```
 .
-├── dags: Contient l'ensemble des dags
+├── airflow
+|    ├── dags: Contient l'ensemble des dags
+|    ├── entities: types transverses
+|    ├── enums: enums transverses
+|    ├── _types: types transverses
+|    ├── infra: Code pour interagir avec l'infrastructure / systèmes externes
+|    └── utils: Code réutilisable (variables globales, tâches, fonctions ...)
 ├── docs: Contient toute la documentation du repo
-├── entities: types transverses
-├── enums: enums transverses
-├── infra: Code pour interagir avec l'infrastructure / systèmes externes
-├── scripts: Contient différents scripts utilitaires
-└── utils: Code réutilisable (variables globales, tâches, fonctions ...)
+├── test: Contient tous les tests unitaires
+└── scripts: Contient différents scripts utilitaires
 ```
 
 Le code est organisé de façon modulaire et réutilisable. L'objectif est de développer uniquement les éléments spécifiques à chaque traitement (les logiques métiers).

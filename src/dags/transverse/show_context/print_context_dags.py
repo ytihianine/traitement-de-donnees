@@ -1,0 +1,103 @@
+import logging
+from airflow.sdk import dag, task
+from airflow.sdk.bases.operator import chain
+from datetime import timedelta
+from pprint import pprint
+import pytz
+
+from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
+
+default_args = {
+    "owner": "airflow",
+    "depends_on_past": False,
+    "email_on_failure": False,
+    "email_on_retry": False,
+    "retries": 0,
+    "retry_delay": timedelta(minutes=1),
+}
+
+link_documentation_pipeline = "Non-défini"
+link_documentation_donnees = "Non-défini"
+
+
+# Définition du DAG
+@dag(
+    dag_id="liste-des-variables-contexte",
+    schedule="@once",
+    max_active_runs=1,
+    catchup=False,
+    tags=["SG", "DSCI", "PRODUCTION", "INFO"],
+    description="Liste les variables disponibles dans le contexte d'un DAG",
+    default_args=default_args,
+    params={
+        "nom_projet": "Projet test",
+        "mail": {
+            "enable": False,
+            "To": ["yanis.tihianine@finances.gouv.fr"],
+            "CC": [""],
+        },
+        "docs": {
+            "lien_pipeline": link_documentation_pipeline,
+            "lien_donnees": link_documentation_donnees,
+        },
+    },
+    on_success_callback=create_send_mail_callback(mail_status=MailStatus.SUCCESS),
+)
+def liste_contexte_var() -> None:
+    @task
+    def print_context(**context) -> None:
+        pprint(object=context)
+
+    @task
+    def my_task(**context) -> None:
+        execution_date = context["dag_run"].execution_date
+        logging.info(msg=execution_date)
+        logging.info(
+            msg=f"avant timezone {execution_date.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+        # Convert to Paris Timezone
+        paris_tz = pytz.timezone("Europe/Paris")
+        execution_date_paris = execution_date.astimezone(paris_tz)
+
+        # Format without timezone info
+        formatted_time = execution_date_paris.strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )  # Ensures output like "14:00:00"
+        logging.info(msg=f"apres timezone {formatted_time}")
+
+    @task
+    def print_conf_var(**context) -> None:
+        send_mail = context.get("params", {}).get("send_mail")
+        logging.info(msg=f"send_mail value: {send_mail}")
+
+    @task
+    def mail_success(**context) -> None:
+        mail_func_success = create_send_mail_callback(
+            mail_status=MailStatus.SUCCESS,
+        )
+        mail_func_success(context=context)
+
+    @task
+    def mail_start(**context) -> None:
+        mail_func_start = create_send_mail_callback(
+            mail_status=MailStatus.START,
+        )
+        mail_func_start(context=context)
+
+    @task
+    def mail_error(**context) -> None:
+        mail_func_error = create_send_mail_callback(
+            mail_status=MailStatus.ERROR,
+        )
+        mail_func_error(context=context)
+
+    chain(
+        print_context(),
+        my_task(),
+        print_conf_var(),
+        [mail_success(), mail_start(), mail_error()],
+    )
+
+
+# Exécution du DAG
+liste_contexte_var()

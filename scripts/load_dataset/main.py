@@ -2,8 +2,8 @@ import os
 import pandas as pd
 import psycopg2
 
-from utils.config.vars import custom_logger
-from utils.control.structures import are_lists_egal
+from src.utils.config.vars import custom_logger
+from src.utils.control.structures import are_lists_egal
 from scripts.settings import get_settings
 
 settings = get_settings()
