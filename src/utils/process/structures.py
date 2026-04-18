@@ -1,6 +1,7 @@
 import logging
 from enum import Enum
 import pandas as pd
+import numpy as np
 import ast
 
 
@@ -111,3 +112,21 @@ def validate_enum_column(
             f"Valeurs invalides dans '{column}': {invalid_values}. "
             f"Valeurs acceptées: {valid_values}"
         )
+
+
+def tag_last_value_rows(df: pd.DataFrame, colname_max_value: str) -> pd.DataFrame:
+    """
+    The objectiv of this function is to tag every rows which contains the last values.
+    The primary goal is to be able to filter the dataset on the new created column
+
+    Args:
+        df (pd.DataFrame): _description_
+        colname_max_value (str): the name of the column to find the max value.
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    max_value = df[colname_max_value].max()
+    df["is_last_value"] = np.where(df[colname_max_value] == max_value, True, False)
+
+    return df

@@ -1,6 +1,5 @@
 import logging
 import pandas as pd
-import numpy as np
 
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", 1000)
@@ -48,21 +47,3 @@ def df_info(
             Sample Data (First {sample_size} rows): \n{df.head(sample_size)} \n
             Memory Usage: {df.memory_usage(deep=True).sum() / 1048576} Mo
             """)
-
-
-def tag_last_value_rows(df: pd.DataFrame, colname_max_value: str) -> pd.DataFrame:
-    """
-    The objectiv of this function is to tag every rows which contains the last values.
-    The primary goal is to be able to filter the dataset on the new created column
-
-    Args:
-        df (pd.DataFrame): _description_
-        colname_max_value (str): the name of the column to find the max value.
-
-    Returns:
-        pd.DataFrame: _description_
-    """
-    max_value = df[colname_max_value].max()
-    df["is_last_value"] = np.where(df[colname_max_value] == max_value, True, False)
-
-    return df
