@@ -11,7 +11,7 @@ from src.infra.file_system.dataframe import read_dataframe
 
 from src.utils.config.dag_params import get_feature_flags, get_project_name
 from src.constants import FF_CONVERT_DISABLED_MSG
-from src.utils.dataframe import df_info
+from src.utils.logs import df_info
 from src.utils.config.tasks import (
     column_mapping_dataframe,
     column_mapping_dict,

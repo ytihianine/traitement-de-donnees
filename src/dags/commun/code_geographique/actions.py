@@ -6,7 +6,7 @@ from airflow.models.variable import Variable
 from src.infra.grist.client import GristAPI
 from src.infra.http_client.adapters import ClientConfig, RequestsClient
 from src.constants import AGENT, DEFAULT_GRIST_HOST, PROXY
-from src.utils.dataframe import df_info
+from src.utils.logs import df_info
 
 
 from src.dags.commun.code_geographique import process

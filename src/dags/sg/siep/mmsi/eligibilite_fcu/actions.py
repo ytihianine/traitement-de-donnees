@@ -11,7 +11,7 @@ from src.infra.database.factory import create_db_handler
 from src.dags.sg.siep.mmsi.eligibilite_fcu.process import (
     get_eligibilite_fcu,
 )
-from src.utils.dataframe import df_info
+from src.utils.logs import df_info
 
 
 def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
