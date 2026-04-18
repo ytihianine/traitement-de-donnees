@@ -241,7 +241,7 @@ def ensure_partition(
 ) -> None:
     """
     Vérifie si une partition mensuelle existe pour une table partitionnée par date.
-    Si elle n'existe pas, la crée.
+    Si elle n'existe pas, la créer.
 
     Args:
         pg_conn_id: Connexion Postgres
@@ -340,15 +340,6 @@ def create_tmp_tables(
         selecteur_info=selecteur_info, options_map=selecteur_options
     )
 
-    rows_result = db.fetch_all(
-        query="""SELECT COUNT(*) as count_tmp_tables
-            FROM information_schema.tables
-            WHERE table_schema= %s
-                AND table_name LIKE 'tmp_%%';
-        """,
-        parameters=(tmp_schema,),
-    )
-
     drop_queries = []
     create_queries = []
     alter_queries = []
@@ -371,9 +362,8 @@ def create_tmp_tables(
             f"ALTER SEQUENCE {prod_schema}.{tbl_name}_id_seq RESTART WITH 1;"
         )
 
-    if rows_result[0]["count_tmp_tables"] != 0:
-        for drop_query in drop_queries:
-            db.execute(query=drop_query)
+    for drop_query in drop_queries:
+        db.execute(query=drop_query)
 
     for create_query in create_queries:
         db.execute(query=create_query)
