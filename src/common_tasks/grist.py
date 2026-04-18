@@ -49,12 +49,11 @@ def download_grist_doc_to_s3(
     )
 
     # Instanciate Grist client
+    http_config = ClientConfig()
     if use_proxy:
         http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
-        request_client = RequestsClient(config=http_config)
-    else:
-        http_config = ClientConfig()
-        request_client = RequestsClient(config=http_config)
+
+    request_client = RequestsClient(config=http_config)
 
     grist_client = GristAPI(
         http_client=request_client,
