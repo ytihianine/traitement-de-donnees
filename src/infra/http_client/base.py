@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any
 from urllib.parse import urljoin
 
 from src.infra.http_client.config import ClientConfig
 from src.infra.http_client.types import HTTPResponse
 
 
-class AbstractHTTPClient(ABC):
+class HttpInterface(ABC):
     """Abstract base class for HTTP clients."""
 
     def __init__(self, config: ClientConfig):
@@ -24,33 +24,45 @@ class AbstractHTTPClient(ABC):
         self,
         method: str,
         endpoint: str,
-        params: Optional[Dict[str, Any]] = None,
-        data: Optional[Any] = None,
-        json: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, str]] = None,
-        timeout: Optional[int] = None,
-        **kwargs
-    ) -> HTTPResponse:  # 👈 always return wrapper
+        params: dict[str, Any] | None = None,
+        data: Any | None = None,
+        json: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+        timeout: int | None = None,
+        **kwargs,
+    ) -> HTTPResponse:
         """Make an HTTP request."""
         raise NotImplementedError
 
     def get(
-        self, endpoint: str, params: Optional[Dict[str, Any]] = None, **kwargs
+        self, endpoint: str, params: dict[str, Any] | None = None, **kwargs
     ) -> HTTPResponse:
         return self.request("GET", endpoint, params=params, **kwargs)
 
     def post(
-        self, endpoint: str, data: Any = None, json: Dict[str, Any] = {}, **kwargs
+        self,
+        endpoint: str,
+        data: Any = None,
+        json: dict[str, Any] | None = None,
+        **kwargs,
     ) -> HTTPResponse:
         return self.request("POST", endpoint, data=data, json=json, **kwargs)
 
     def put(
-        self, endpoint: str, data: Any = None, json: Dict[str, Any] = {}, **kwargs
+        self,
+        endpoint: str,
+        data: Any = None,
+        json: dict[str, Any] | None = None,
+        **kwargs,
     ) -> HTTPResponse:
         return self.request("PUT", endpoint, data=data, json=json, **kwargs)
 
     def patch(
-        self, endpoint: str, data: Any = None, json: Dict[str, Any] = {}, **kwargs
+        self,
+        endpoint: str,
+        data: Any = None,
+        json: dict[str, Any] | None = None,
+        **kwargs,
     ) -> HTTPResponse:
         return self.request("PATCH", endpoint, data=data, json=json, **kwargs)
 

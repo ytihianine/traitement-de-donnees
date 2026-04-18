@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from src.infra.http_client.base import AbstractHTTPClient
+from src.infra.http_client.base import HttpInterface
 from src.utils.control.text import normalize_whitespace_columns
 
 
@@ -61,7 +61,7 @@ def process_result(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_eligibilite_fcu(
-    api_client: AbstractHTTPClient, url: str, latitude: float, longitude: float
+    api_client: HttpInterface, url: str, latitude: float, longitude: float
 ) -> dict[str, str]:
     result_json = {}
 

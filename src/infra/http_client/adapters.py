@@ -1,12 +1,12 @@
 """HTTP client implementations."""
 
 import time
-from typing import Any, Dict, Optional
+from typing import Any
 
 import httpx
 import requests
 
-from src.infra.http_client.base import AbstractHTTPClient
+from src.infra.http_client.base import HttpInterface
 from src.infra.http_client.config import ClientConfig
 from src.infra.http_client.types import HTTPResponse
 from src.infra.http_client.exceptions import (
@@ -22,7 +22,7 @@ from src.infra.http_client.exceptions import (
 )
 
 
-class HttpxClient(AbstractHTTPClient):
+class HttpxClient(HttpInterface):
     """HTTPX-based HTTP client implementation."""
 
     def __init__(self, config: ClientConfig):
@@ -86,11 +86,11 @@ class HttpxClient(AbstractHTTPClient):
         self,
         method: str,
         endpoint: str,
-        params: Optional[Dict[str, Any]] = None,
-        data: Optional[Any] = None,
-        json: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, str]] = None,
-        timeout: Optional[int] = None,
+        params: dict[str, Any] | None = None,
+        data: Any | None = None,
+        json: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+        timeout: int | None = None,
         **kwargs,
     ) -> HTTPResponse:
         url = self._build_url(endpoint)
@@ -123,7 +123,7 @@ class HttpxClient(AbstractHTTPClient):
             self._session.close()
 
 
-class RequestsClient(AbstractHTTPClient):
+class RequestsClient(HttpInterface):
     """Requests-based HTTP client implementation."""
 
     def __init__(self, config: ClientConfig) -> None:
@@ -174,11 +174,11 @@ class RequestsClient(AbstractHTTPClient):
         self,
         method: str,
         endpoint: str,
-        params: Optional[Dict[str, Any]] = None,
-        data: Optional[Any] = None,
-        json: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, str]] = None,
-        timeout: Optional[int] = None,
+        params: dict[str, Any] | None = None,
+        data: Any | None = None,
+        json: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+        timeout: int | None = None,
         **kwargs,
     ) -> HTTPResponse:
         url = self._build_url(endpoint)

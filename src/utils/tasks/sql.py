@@ -11,8 +11,8 @@ from airflow.sdk import get_current_context
 from src.infra.database.base import DBInterface
 from src.infra.database.factory import create_db_handler
 
-from src.infra.file_handling.dataframe import read_dataframe
-from src.infra.file_handling.factory import (
+from src.infra.file_system.dataframe import read_dataframe
+from src.infra.file_system.factory import (
     create_default_s3_handler,
     create_local_handler,
 )

@@ -11,7 +11,7 @@ from src.infra.mails.default_smtp import (
     MailStatus,
     MailMessage,
 )
-from src.infra.file_handling.factory import create_default_s3_handler
+from src.infra.file_system.factory import create_default_s3_handler
 from src.infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
 from src.utils.config.dag_params import (
     create_default_args,

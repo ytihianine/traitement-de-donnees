@@ -1,14 +1,14 @@
 import logging
 from typing import Optional, Any
 import pandas as pd
-from src.infra.http_client.base import AbstractHTTPClient
+from src.infra.http_client.base import HttpInterface
 from src.infra.http_client.types import HTTPResponse
 
 
 class GristAPI:
     def __init__(
         self,
-        http_client: AbstractHTTPClient,
+        http_client: HttpInterface,
         base_url: Optional[str] = None,
         workspace_id: Optional[str] = None,
         doc_endpoint: str = "api/docs",

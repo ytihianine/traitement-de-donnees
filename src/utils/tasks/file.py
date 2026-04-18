@@ -6,8 +6,8 @@ from typing import Any, Callable, Dict, Optional
 from airflow.sdk import task
 import pandas as pd
 
-from src.infra.file_handling.factory import create_default_s3_handler
-from src.infra.file_handling.dataframe import read_dataframe
+from src.infra.file_system.factory import create_default_s3_handler
+from src.infra.file_system.dataframe import read_dataframe
 
 from src.utils.config.dag_params import get_feature_flags, get_project_name
 from src.constants import FF_CONVERT_DISABLED_MSG

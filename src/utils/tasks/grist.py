@@ -2,7 +2,7 @@ from datetime import timedelta
 from airflow.sdk import task
 from airflow.sdk import Variable
 
-from src.infra.file_handling.factory import create_file_handler
+from src.infra.file_system.factory import create_file_handler
 from src.infra.http_client.adapters import RequestsClient
 from src.infra.http_client.config import ClientConfig
 from src.infra.grist.client import GristAPI

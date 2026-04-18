@@ -4,7 +4,7 @@ from typing import Any
 from airflow.sdk import Variable
 
 from src.dags.applications.tdb_backup.process import convert_str_to_ascii_str
-from src.infra.file_handling.factory import create_file_handler
+from src.infra.file_system.factory import create_file_handler
 from src.infra.http_client.config import ClientConfig
 from src.infra.http_client.adapters import RequestsClient
 from src.utils.config.tasks import get_projet_s3_info
