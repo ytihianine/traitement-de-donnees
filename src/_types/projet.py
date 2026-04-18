@@ -5,7 +5,7 @@ from collections.abc import Mapping
 
 from src.enums.dags import TypeSource
 from src.enums.database import LoadStrategy, PartitionTimePeriod
-from src.utils.config.vars import DEFAULT_S3_CONN_ID, DEFAULT_PG_DATA_CONN_ID
+from src.constants import DEFAULT_S3_CONN_ID, DEFAULT_PG_DATA_CONN_ID
 
 
 def custom_asdict_factory(data) -> dict[str, Any]:

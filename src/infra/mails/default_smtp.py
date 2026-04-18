@@ -14,7 +14,7 @@ from src.utils.config.dag_params import (
 from src._types.dags import DagStatus
 from src.enums.mail import MailPriority, MailStatus
 from src.utils.config.tasks import get_list_contact, get_list_documentation
-from src.utils.config.vars import (
+from src.constants import (
     FF_MAIL_DISABLED_MSG,
     get_root_folder,
     DEFAULT_SMTP_CONN_ID,

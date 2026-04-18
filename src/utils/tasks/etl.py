@@ -26,7 +26,7 @@ from src.utils.config.tasks import (
 from src.utils.config.dag_params import get_execution_date, get_project_name
 from src._types.dags import ETLStep, TaskConfig
 from src.enums.database import DatabaseType
-from src.utils.config.vars import DEFAULT_POLARIS_HOST, DEFAULT_POLARIS_CATALOG
+from src.constants import DEFAULT_POLARIS_HOST, DEFAULT_POLARIS_CATALOG
 
 
 def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:

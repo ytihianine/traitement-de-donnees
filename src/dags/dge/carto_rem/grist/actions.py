@@ -6,7 +6,7 @@ from src.infra.http_client.adapters import RequestsClient
 from src.infra.http_client.config import ClientConfig
 
 from src.infra.grist.client import GristAPI
-from src.utils.config.vars import (
+from src.constants import (
     AGENT,
     DEFAULT_GRIST_HOST,
     DEFAULT_PG_DATA_CONN_ID,

@@ -5,7 +5,7 @@ import os
 import pandas as pd
 from pathlib import Path
 
-from src.utils.config.vars import custom_logger
+from src.constants import custom_logger
 from scripts.settings import get_settings
 
 settings = get_settings()

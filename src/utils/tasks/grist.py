@@ -10,7 +10,7 @@ from src.utils.config.dag_params import get_feature_flags, get_project_name
 from src.utils.config.tasks import get_selecteur_storage_info
 
 from src.enums.filesystem import FileHandlerType
-from src.utils.config.vars import (
+from src.constants import (
     DEFAULT_GRIST_HOST,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_CONN_ID,

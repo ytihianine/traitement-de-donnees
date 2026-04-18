@@ -2,7 +2,7 @@ from typing import Iterable, Sequence
 
 from src.infra.http_client.config import ClientConfig
 from src.infra.http_client.factory import create_http_client
-from src.utils.config.vars import custom_logger
+from src.constants import custom_logger
 from scripts.settings import get_settings
 
 from src.enums.http import HttpHandlerType

@@ -2,7 +2,7 @@ from typing import Any, Optional
 from datetime import datetime
 from psycopg2 import extensions, sql
 
-from src.utils.config.vars import custom_logger
+from src.constants import custom_logger
 
 
 def drop_partitions(

@@ -7,7 +7,7 @@ import pandas as pd
 
 from src.infra.database.factory import create_db_handler
 
-from src.utils.config.vars import (
+from src.constants import (
     AGENT,
     DEFAULT_GRIST_HOST,
     DEFAULT_PG_DATA_CONN_ID,

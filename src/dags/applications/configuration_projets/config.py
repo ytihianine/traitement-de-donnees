@@ -1,6 +1,6 @@
 from src._types.projet import SelecteurStorageOptions
 from src.enums.database import LoadStrategy
-from src.utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
+from src.constants import DEFAULT_PG_CONFIG_CONN_ID
 
 selecteur_options = {
     "service": SelecteurStorageOptions(

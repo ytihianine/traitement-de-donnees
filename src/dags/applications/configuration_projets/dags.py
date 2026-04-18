@@ -14,7 +14,7 @@ from src.utils.tasks.sql import (
     import_file_to_db,
 )
 from src.utils.tasks.grist import download_grist_doc_to_s3
-from src.utils.config.vars import DEFAULT_PG_CONFIG_CONN_ID
+from src.constants import DEFAULT_PG_CONFIG_CONN_ID
 
 from src.utils.tasks.validation import validate_dag_parameters
 from src.utils.tasks.projet import get_selecteur_config

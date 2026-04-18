@@ -28,7 +28,7 @@ from src.utils.tasks.sql import get_projet_snapshot  # , import_files_to_db
 from src.utils.tasks.projet import config_projet_group, get_selecteur_config
 from src.utils.tasks.s3 import del_iceberg_staging_table
 
-from src.utils.config.vars import (
+from src.constants import (
     DEFAULT_POLARIS_HOST,
     DEFAULT_S3_CONN_ID,
     DEFAULT_POLARIS_CATALOG,

@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import psycopg2
 
-from src.utils.config.vars import custom_logger
+from src.constants import custom_logger
 from src.utils.control.structures import are_lists_egal
 from scripts.settings import get_settings
 

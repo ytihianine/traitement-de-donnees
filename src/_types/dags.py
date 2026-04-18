@@ -5,7 +5,7 @@ from typing import ParamSpec, TypeVar, Callable, Any
 from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
 
 from src.enums.dags import DagStatus
-from src.utils.config.vars import DEFAULT_TMP_SCHEMA
+from src.constants import DEFAULT_TMP_SCHEMA
 
 # ==================
 # Dags

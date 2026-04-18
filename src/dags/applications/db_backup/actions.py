@@ -9,7 +9,7 @@ from src.infra.file_handling.factory import create_file_handler
 from src.utils.config.dag_params import get_project_name
 from src.utils.config.tasks import get_list_selecteur_storage_info
 from src.enums.filesystem import FileHandlerType
-from src.utils.config.vars import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
+from src.constants import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
 
 
 def create_dump_files(context: dict) -> None:

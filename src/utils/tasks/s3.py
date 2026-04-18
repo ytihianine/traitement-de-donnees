@@ -25,7 +25,7 @@ from src.utils.config.tasks import (
 )
 from src.enums.dags import DagStatus, TypeSource
 from src.enums.filesystem import IcebergTableStatus
-from src.utils.config.vars import (
+from src.constants import (
     DEFAULT_POLARIS_HOST,
     DEFAULT_POLARIS_CATALOG,
     DEFAULT_S3_CONN_ID,

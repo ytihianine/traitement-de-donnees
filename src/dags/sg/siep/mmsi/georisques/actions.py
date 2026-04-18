@@ -17,7 +17,7 @@ from src.infra.http_client.factory import create_http_client
 from src.infra.http_client.config import ClientConfig
 from src.utils.config.dag_params import get_db_info
 from src.enums.http import HttpHandlerType
-from src.utils.config.vars import AGENT, PROXY, DEFAULT_PG_DATA_CONN_ID
+from src.constants import AGENT, PROXY, DEFAULT_PG_DATA_CONN_ID
 
 from src.dags.sg.siep.mmsi.georisques.process import (
     format_query_param,

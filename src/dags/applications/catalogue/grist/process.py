@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 
-from src.utils.config.vars import NO_PROCESS_MSG
+from src.constants import NO_PROCESS_MSG
 from src.utils.control.dates import convert_grist_date_to_date
 from src.utils.control.structures import handle_grist_null_references
 from src.utils.control.text import normalize_whitespace_columns

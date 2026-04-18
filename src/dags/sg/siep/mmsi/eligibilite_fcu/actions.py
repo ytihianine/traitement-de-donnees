@@ -5,7 +5,7 @@ import pandas as pd
 from src.infra.http_client.adapters import ClientConfig
 from src.infra.http_client.factory import create_http_client
 from src.enums.http import HttpHandlerType
-from src.utils.config.vars import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
+from src.constants import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
 from src.infra.database.factory import create_db_handler
 
 from src.dags.sg.siep.mmsi.eligibilite_fcu.process import (

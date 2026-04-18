@@ -9,7 +9,7 @@ from src.infra.http_client.config import ClientConfig
 from src.infra.http_client.adapters import RequestsClient
 from src.utils.config.tasks import get_projet_s3_info
 from src.enums.filesystem import FileHandlerType
-from src.utils.config.vars import (
+from src.constants import (
     get_root_folder,
     AGENT,
     PROXY,
