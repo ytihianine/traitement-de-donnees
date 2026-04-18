@@ -41,11 +41,8 @@ Le titre de la PR doit suivre les [conventional commits](https://gist.github.com
 
 - Pour les developpeurs
 
-Assurez vous d'avoir exécuter le script de [setup.sh](../setup.sh).
-```bash
-# Depuis la racine
-bash scripts/setup.sh
-```
+Assurez vous d'avoir configurer votre environnement de développement (cf [README.md](../README.md#environnement-de-développement)).  
+En complément, il faut privilégier la réutilisation des éléments mis à disposition.
 
 - Pour les maintainers
 
