@@ -6,7 +6,7 @@ from src._types.dags import TaskConfig, ETLStep
 
 from src.dags.cbcm.ref_service_prescripteur import process
 from src.dags.cbcm.ref_service_prescripteur import actions
-from src.utils.control.structures import normalize_grist_dataframe
+from src.utils.process.structures import normalize_grist_dataframe
 
 version = "v1"
 

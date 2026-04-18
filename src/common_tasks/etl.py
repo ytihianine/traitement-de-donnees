@@ -16,7 +16,7 @@ from src.infra.file_system.factory import (
 from src.infra.database.factory import create_db_handler
 from src.infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
 from src.enums.filesystem import IcebergTableStatus
-from src.utils.control.structures import remove_grist_internal_cols
+from src.utils.process.structures import remove_grist_internal_cols
 from src.utils.dataframe import df_info
 from src.utils.config.tasks import (
     get_selecteur_storage_info,

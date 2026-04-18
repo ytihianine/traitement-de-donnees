@@ -7,7 +7,7 @@ from src.common_tasks.etl import (
     create_task,
 )
 from src._types.dags import TaskConfig, ETLStep
-from src.utils.control.structures import normalize_grist_dataframe
+from src.utils.process.structures import normalize_grist_dataframe
 
 from src.dags.dge.carto_rem.grist import process
 

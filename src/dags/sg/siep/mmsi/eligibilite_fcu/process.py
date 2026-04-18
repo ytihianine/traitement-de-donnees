@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 from src.infra.http_client.base import HttpInterface
-from src.utils.control.text import normalize_whitespace_columns
+from src.utils.process.text import normalize_whitespace_columns
 
 
 def can_perform_api_call(lat: float, lon: float) -> bool:

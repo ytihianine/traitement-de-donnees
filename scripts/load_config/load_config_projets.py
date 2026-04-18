@@ -7,7 +7,7 @@ import psycopg2
 from psycopg2.extensions import register_adapter, AsIs
 from psycopg2.extras import execute_values
 
-from src.utils.control.structures import normalize_grist_dataframe
+from src.utils.process.structures import normalize_grist_dataframe
 from src.utils.dataframe import df_info
 from scripts.settings import get_settings
 

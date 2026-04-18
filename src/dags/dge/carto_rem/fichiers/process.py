@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.utils.control.text import (
+from src.utils.process.text import (
     convert_str_cols_to_date,
     normalize_whitespace_columns,
 )

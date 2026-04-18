@@ -37,7 +37,7 @@ from src._types.projet import (
     SelecteurConfig,
     SelecteurStorageOptions,
 )
-from src.utils.control.structures import are_lists_egal
+from src.utils.process.structures import are_lists_egal
 from src.constants import (
     DEFAULT_TMP_SCHEMA,
     DEFAULT_PG_DATA_CONN_ID,

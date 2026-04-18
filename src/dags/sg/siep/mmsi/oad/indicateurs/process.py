@@ -1,7 +1,7 @@
 from datetime import datetime
 import pandas as pd
 import numpy as np
-from src.utils.control.text import normalize_whitespace_columns
+from src.utils.process.text import normalize_whitespace_columns
 
 
 def filter_bien(df: pd.DataFrame, df_bien: pd.DataFrame) -> pd.DataFrame:

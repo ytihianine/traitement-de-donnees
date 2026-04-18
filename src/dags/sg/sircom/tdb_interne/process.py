@@ -4,7 +4,7 @@ import numpy as np
 import datetime
 from typing import Union
 
-from src.utils.control.number import is_in_range, is_upper
+from src.utils.process.number import is_in_range, is_upper
 
 from src.utils.dataframe import tag_last_value_rows
 
