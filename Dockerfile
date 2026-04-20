@@ -1,5 +1,5 @@
 # Define ARGS (Defaults, overridden in Git CI)
-ARG AIRFLOW_VERSION=3.1.8
+ARG AIRFLOW_VERSION=3.2.0
 
 # ------------------------------------------
 # Install apps and packages
