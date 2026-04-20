@@ -2,9 +2,9 @@
 
 from src._enums.http import HttpHandlerType
 
-from src.infrahttp_client.adapters import HttpxClient, RequestsClient
-from src.infrahttp_client.base import HttpInterface
-from src.infrahttp_client.config import ClientConfig
+from src.infra.http_client.adapters import HttpxClient, RequestsClient
+from src.infra.http_client.base import HttpInterface
+from src.infra.http_client.config import ClientConfig
 
 
 def create_http_client(

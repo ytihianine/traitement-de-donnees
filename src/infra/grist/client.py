@@ -1,8 +1,8 @@
 import logging
 from typing import Optional, Any
 import pandas as pd
-from src.infrahttp_client.base import HttpInterface
-from src.infrahttp_client.types import HTTPResponse
+from src.infra.http_client.base import HttpInterface
+from src.infra.http_client.types import HTTPResponse
 
 
 class GristAPI:

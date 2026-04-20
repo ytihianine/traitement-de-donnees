@@ -4,14 +4,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.infradatabase.exceptions import DatabaseError
-from src.infradatabase.trino import TrinoAdapter
+from src.infra.database.exceptions import DatabaseError
+from src.infra.database.trino import TrinoAdapter
 
 
 @pytest.fixture()
 def adapter() -> TrinoAdapter:
     """Create a TrinoAdapter with test parameters."""
-    with patch("src.infradatabase.trino.trino.dbapi.connect") as mock_connect:
+    with patch("src.infra.database.trino.trino.dbapi.connect") as mock_connect:
         mock_conn = MagicMock()
         mock_connect.return_value = mock_conn
         handler = TrinoAdapter(
@@ -153,7 +153,7 @@ class TestTrinoAdapterReadOnlyMethods:
 
 
 class TestTrinoAdapterConnectionError:
-    @patch("src.infradatabase.trino.trino.dbapi.connect")
+    @patch("src.infra.database.trino.trino.dbapi.connect")
     def test_connection_error_raises_database_error(
         self, mock_connect: MagicMock
     ) -> None:

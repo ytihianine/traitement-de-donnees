@@ -6,10 +6,10 @@ from typing import Any
 import httpx
 import requests
 
-from src.infrahttp_client.base import HttpInterface
-from src.infrahttp_client.config import ClientConfig
-from src.infrahttp_client.types import HTTPResponse
-from src.infrahttp_client.exceptions import (
+from src.infra.http_client.base import HttpInterface
+from src.infra.http_client.config import ClientConfig
+from src.infra.http_client.types import HTTPResponse
+from src.infra.http_client.exceptions import (
     APIError,
     AuthenticationError,
     AuthorizationError,

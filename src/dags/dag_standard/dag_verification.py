@@ -5,14 +5,14 @@ from typing import Any
 from airflow.sdk import Variable, dag, get_current_context, task
 from airflow.sdk.bases.operator import chain
 
-from src.inframails.default_smtp import (
+from src.infra.mails.default_smtp import (
     send_mail,
     _callback,
     MailStatus,
     MailMessage,
 )
-from src.infrafile_system.factory import create_default_s3_handler
-from src.infracatalog.iceberg import generate_catalog_properties, IcebergCatalog
+from src.infra.file_system.factory import create_default_s3_handler
+from src.infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
 from src.utils.config.dag_params import (
     create_default_args,
     create_dag_params,
@@ -108,7 +108,7 @@ def dag_verification() -> None:
 
     @task
     def check_trino_hook() -> None:
-        from src.infradatabase.trino import TrinoAdapter
+        from src.infra.database.trino import TrinoAdapter
 
         trino_user = Variable.get(key="TRINO_USER")
 

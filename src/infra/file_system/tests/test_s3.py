@@ -6,8 +6,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.infrafile_system.s3 import S3FS
-from src.infrafile_system.exceptions import FileHandlerError, FileNotFoundError
+from src.infra.file_system.s3 import S3FS
+from src.infra.file_system.exceptions import FileHandlerError, FileNotFoundError
 
 
 class FakeClientExceptions:

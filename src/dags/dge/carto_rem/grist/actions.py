@@ -2,10 +2,10 @@ from typing import Any, Mapping
 import pandas as pd
 from airflow.sdk import Variable
 
-from src.infrahttp_client.adapters import RequestsClient
-from src.infrahttp_client.config import ClientConfig
+from src.infra.http_client.adapters import RequestsClient
+from src.infra.http_client.config import ClientConfig
 
-from src.infragrist.client import GristAPI
+from src.infra.grist.client import GristAPI
 from src.constants import (
     AGENT,
     DEFAULT_GRIST_HOST,
@@ -13,7 +13,7 @@ from src.constants import (
     PROXY,
 )
 
-from src.infradatabase.factory import create_db_handler
+from src.infra.database.factory import create_db_handler
 from src.utils.config.dag_params import get_db_info, get_project_name
 from src.utils.config.tasks import get_selecteur_storage_info
 

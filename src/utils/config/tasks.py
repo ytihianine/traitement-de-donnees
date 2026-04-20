@@ -22,9 +22,9 @@ from src._types.projet import (
     SelecteurConfig,
 )
 from src.utils.exceptions import ConfigError
-from src.infradatabase.base import DBInterface
-from src.infradatabase.exceptions import DatabaseError
-from src.infradatabase.factory import create_db_handler
+from src.infra.database.base import DBInterface
+from src.infra.database.exceptions import DatabaseError
+from src.infra.database.factory import create_db_handler
 from src.constants import DEFAULT_PG_CONFIG_CONN_ID
 
 CONF_SCHEMA = "conf_projets"

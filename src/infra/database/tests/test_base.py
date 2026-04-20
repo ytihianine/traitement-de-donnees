@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.infradatabase.base import DBInterface
+from src.infra.database.base import DBInterface
 
 
 class TestDBInterfaceCannotBeInstantiatedDirectly:

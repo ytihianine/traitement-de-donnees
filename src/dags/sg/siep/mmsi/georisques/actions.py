@@ -9,12 +9,12 @@ from tenacity import (
     retry_if_result,
     before_sleep_log,
 )
-from src.infrahttp_client.types import HTTPResponse
+from src.infra.http_client.types import HTTPResponse
 import pandas as pd
 
-from src.infradatabase.factory import create_db_handler
-from src.infrahttp_client.factory import create_http_client
-from src.infrahttp_client.config import ClientConfig
+from src.infra.database.factory import create_db_handler
+from src.infra.http_client.factory import create_http_client
+from src.infra.http_client.config import ClientConfig
 from src.utils.config.dag_params import get_db_info
 from src._enums.http import HttpHandlerType
 from src.constants import AGENT, PROXY, DEFAULT_PG_DATA_CONN_ID

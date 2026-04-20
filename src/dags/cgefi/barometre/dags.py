@@ -5,7 +5,7 @@ from airflow.sdk.bases.operator import chain
 from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
-from src.inframails.default_smtp import create_send_mail_callback, MailStatus
+from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
 from src._types.dags import DBParams, FeatureFlagsEnable
 from src.utils.config.dag_params import create_dag_params, create_default_args
 

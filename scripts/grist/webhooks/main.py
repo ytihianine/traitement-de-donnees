@@ -1,7 +1,7 @@
 from typing import Iterable, Sequence
 
-from src.infrahttp_client.config import ClientConfig
-from src.infrahttp_client.factory import create_http_client
+from src.infra.http_client.config import ClientConfig
+from src.infra.http_client.factory import create_http_client
 from src.constants import custom_logger
 from scripts.settings import get_settings
 

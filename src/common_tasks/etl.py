@@ -8,13 +8,13 @@ import pandas as pd
 from airflow.sdk import task, XComArg
 
 
-from src.infrafile_system.dataframe import read_dataframe
-from src.infrafile_system.factory import (
+from src.infra.file_system.dataframe import read_dataframe
+from src.infra.file_system.factory import (
     create_default_s3_handler,
     create_local_handler,
 )
-from src.infradatabase.factory import create_db_handler
-from src.infracatalog.iceberg import generate_catalog_properties, IcebergCatalog
+from src.infra.database.factory import create_db_handler
+from src.infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
 from src._enums.filesystem import IcebergTableStatus
 from src.utils.process.structures import remove_grist_internal_cols
 from src.utils.logs import df_info

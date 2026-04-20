@@ -4,7 +4,7 @@
 # from airflow.sdk.bases.operator import chain
 # from airflow.src.utils.dates import days_ago
 
-# from src.inframails.default_smtp import create_send_mail_callback, MailStatus
+# from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
 # from dags.applications.tdb_backup.tasks import (
 #     validate_params,

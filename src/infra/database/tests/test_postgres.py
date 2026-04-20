@@ -5,8 +5,8 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 
-from src.infradatabase.exceptions import DatabaseError
-from src.infradatabase.postgres import PgAdapter
+from src.infra.database.exceptions import DatabaseError
+from src.infra.database.postgres import PgAdapter
 
 
 class TestPgAdapterInit:
@@ -53,7 +53,7 @@ class TestPgAdapterHook:
 
 
 class TestPgAdapterExecute:
-    @patch("src.infradatabase.postgres.psycopg2")
+    @patch("src.infra.database.postgres.psycopg2")
     def test_execute_local_mode(self, mock_psycopg2: MagicMock) -> None:
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
@@ -71,7 +71,7 @@ class TestPgAdapterExecute:
         mock_cursor.execute.assert_called_once_with("SELECT 1", None)
         mock_conn.commit.assert_called_once()
 
-    @patch("src.infradatabase.postgres.psycopg2")
+    @patch("src.infra.database.postgres.psycopg2")
     def test_execute_raises_database_error(self, mock_psycopg2: MagicMock) -> None:
         mock_psycopg2.connect.side_effect = Exception("connection failed")
 
@@ -83,7 +83,7 @@ class TestPgAdapterExecute:
 
 
 class TestPgAdapterFetchOne:
-    @patch("src.infradatabase.postgres.psycopg2")
+    @patch("src.infra.database.postgres.psycopg2")
     def test_fetch_one_returns_dict(self, mock_psycopg2: MagicMock) -> None:
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
@@ -101,7 +101,7 @@ class TestPgAdapterFetchOne:
         result = adapter.fetch_one("SELECT * FROM users WHERE id = 1")
         assert result == {"id": 1, "name": "Alice"}
 
-    @patch("src.infradatabase.postgres.psycopg2")
+    @patch("src.infra.database.postgres.psycopg2")
     def test_fetch_one_returns_none_when_empty(self, mock_psycopg2: MagicMock) -> None:
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
@@ -121,7 +121,7 @@ class TestPgAdapterFetchOne:
 
 
 class TestPgAdapterFetchAll:
-    @patch("src.infradatabase.postgres.psycopg2")
+    @patch("src.infra.database.postgres.psycopg2")
     def test_fetch_all_returns_list_of_dicts(self, mock_psycopg2: MagicMock) -> None:
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
@@ -142,8 +142,8 @@ class TestPgAdapterFetchAll:
 
 
 class TestPgAdapterFetchDf:
-    @patch("src.infradatabase.postgres.pd.read_sql")
-    @patch("src.infradatabase.postgres.create_engine")
+    @patch("src.infra.database.postgres.pd.read_sql")
+    @patch("src.infra.database.postgres.create_engine")
     def test_fetch_df_local_mode(
         self, mock_engine: MagicMock, mock_read_sql: MagicMock
     ) -> None:
@@ -171,14 +171,14 @@ class TestPgAdapterInsert:
 
 
 class TestPgAdapterBulkInsert:
-    @patch("src.infradatabase.postgres.psycopg2")
+    @patch("src.infra.database.postgres.psycopg2")
     def test_bulk_insert_empty_list(self, mock_psycopg2: MagicMock) -> None:
         adapter = PgAdapter(
             host="localhost", dbname="testdb", user="user", password="pass"
         )
         adapter.bulk_insert("users", [])  # should return early
 
-    @patch("src.infradatabase.postgres.psycopg2")
+    @patch("src.infra.database.postgres.psycopg2")
     def test_bulk_insert_multiple_rows(self, mock_psycopg2: MagicMock) -> None:
         mock_conn = MagicMock()
         mock_cursor = MagicMock()

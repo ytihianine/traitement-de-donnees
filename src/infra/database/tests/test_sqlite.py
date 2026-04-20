@@ -2,8 +2,8 @@
 
 import pytest
 
-from src.infradatabase.exceptions import DatabaseError
-from src.infradatabase.sqlite import SQLiteAdapter
+from src.infra.database.exceptions import DatabaseError
+from src.infra.database.sqlite import SQLiteAdapter
 
 
 @pytest.fixture()
