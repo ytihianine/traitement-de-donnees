@@ -24,8 +24,8 @@ jobs:
       - name: Build Docker image
         run: docker build -f Dockerfile
           --build-arg AIRFLOW_VERSION=$AIRFLOW_VERSION
-          -t $IMAGE_NAME:$AIRFLOW_VERSION .
+          -t $IMAGE_NAME:$AIRFLOW_VERSION-${GITHUB_SHA::7} .
 
       - name: Push Docker image
         if: github.ref == 'refs/heads/main'
-        run: docker push $IMAGE_NAME:$AIRFLOW_VERSION-${GITHUB_SHA}
+        run: docker push $IMAGE_NAME:$AIRFLOW_VERSION-${GITHUB_SHA::7}
