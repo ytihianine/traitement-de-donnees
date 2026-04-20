@@ -49,7 +49,7 @@ Client pour l'administration d'un catalogue Polaris :
 ### Initialisation
 
 ```python
-from src.infra.catalog.iceberg import IcebergCatalog
+from infra.catalog.iceberg import IcebergCatalog
 
 catalog = IcebergCatalog(
     name="my_catalog",
@@ -74,7 +74,7 @@ df = catalog.read_table_as_df(namespace="my_namespace", table_name="my_table")
 ### Fonctions utilitaires
 
 ```python
-from src.infra.catalog.iceberg import generate_catalog_properties
+from infra.catalog.iceberg import generate_catalog_properties
 
 # Génération des propriétés de catalogue (SSL, credentials, options custom)
 properties = generate_catalog_properties(
@@ -120,8 +120,8 @@ Implémentation en lecture seule pour Trino. Les opérations d'écriture (`inser
 ### Initialisation
 
 ```python
-from src.infra.database.factory import create_db_handler
-from src.enums.database import DatabaseType
+from infra.database.factory import create_db_handler
+from _enums.database import DatabaseType
 
 # PostgreSQL (par défaut)
 db = create_db_handler(connection_id="my_postgres_conn_id", db_type=DatabaseType.POSTGRES)
@@ -180,8 +180,8 @@ Gestion des fichiers sur S3/MinIO utilisant Airflow S3Hook ou un client boto3. S
 ### Initialisation
 
 ```python
-from src.infra.file_system.factory import create_file_handler, create_default_s3_handler, create_local_handler
-from src.enums.filesystem import FileHandlerType
+from infra.file_system.factory import create_file_handler, create_default_s3_handler, create_local_handler
+from _enums.filesystem import FileHandlerType
 
 # Fichiers locaux
 local_handler = create_file_handler(handler_type=FileHandlerType.LOCAL, base_path="/tmp")
@@ -207,7 +207,7 @@ s3_handler.write("remote/key/file.txt", "Hello World")
 Une fonction utilitaire est définie pour obtenir un DataFrame directement. Le format est auto-détecté à partir de l'extension du fichier (CSV, Excel, Parquet, JSON).
 
 ```python
-from src.infra.file_system.dataframe import read_dataframe
+from infra.file_system.dataframe import read_dataframe
 
 # Lecture d'un DataFrame depuis différents formats
 df = read_dataframe(
@@ -262,9 +262,9 @@ Configuration du client HTTP :
 ### Initialisation
 
 ```python
-from src.infra.http_client.factory import create_http_client
-from src.infra.http_client.config import ClientConfig
-from src.enums.http import HttpHandlerType
+from infra.http_client.factory import create_http_client
+from infra.http_client.config import ClientConfig
+from _enums.http import HttpHandlerType
 
 config = ClientConfig(
     timeout=30,
@@ -313,10 +313,10 @@ Client pour les opérations Grist :
 ### Initialisation
 
 ```python
-from src.infra.grist.client import GristAPI
-from src.infra.http_client.factory import create_http_client
-from src.infra.http_client.config import ClientConfig
-from src.enums.http import HttpHandlerType
+from infra.grist.client import GristAPI
+from infra.http_client.factory import create_http_client
+from infra.http_client.config import ClientConfig
+from _enums.http import HttpHandlerType
 
 config = ClientConfig(timeout=30)
 http_client = create_http_client(client_type=HttpHandlerType.REQUEST, config=config)
@@ -371,8 +371,8 @@ Crée une fonction callback Airflow pour les notifications automatiques de pipel
 ### Initialisation
 
 ```python
-from src.infra.mails.default_smtp import MailMessage, send_mail, create_send_mail_callback
-from src.enums.mail import MailStatus
+from infra.mails.default_smtp import MailMessage, send_mail, create_send_mail_callback
+from _enums.mail import MailStatus
 
 # Envoi avec statut (template auto-généré)
 message = MailMessage(
@@ -400,8 +400,8 @@ send_mail(message)
 ### Callbacks Airflow
 
 ```python
-from src.infra.mails.default_smtp import create_send_mail_callback
-from src.enums.mail import MailStatus
+from infra.mails.default_smtp import create_send_mail_callback
+from _enums.mail import MailStatus
 
 # Création de callbacks pour notifications automatiques
 on_failure = create_send_mail_callback(MailStatus.ERROR)
@@ -425,8 +425,8 @@ Toujours utiliser les factory fonctions (`create_db_handler`, `create_file_handl
 Capturer les exceptions spécifiques à chaque module plutôt que les exceptions génériques.
 
 ```python
-from src.infra.database.exceptions import DatabaseError
-from src.infra.file_system.exceptions import FileHandlerError
+from infra.database.exceptions import DatabaseError
+from infra.file_system.exceptions import FileHandlerError
 
 try:
     db.execute("INSERT INTO...")
@@ -449,7 +449,7 @@ Chaque handler peut être mocké facilement grâce aux interfaces abstraites :
 
 ```python
 from unittest.mock import Mock
-from src.infra.database.base import DBInterface
+from infra.database.base import DBInterface
 
 # Mock pour les tests
 mock_db = Mock(spec=DBInterface)

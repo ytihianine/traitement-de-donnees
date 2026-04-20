@@ -1,0 +1,95 @@
+"""Factory for creating file handlers."""
+
+from typing import Optional, Union
+from pathlib import Path
+
+from _enums.filesystem import FileHandlerType
+
+from .base import FSInterface
+from .local import LocalFS
+from .s3 import S3FS
+
+# Default values
+DEFAULT_S3_CONNECTION_ID = "minio_bucket_dsci"
+DEFAULT_S3_BUCKET = "dsci"
+
+
+def create_file_handler(
+    handler_type: FileHandlerType,
+    base_path: Optional[Union[str, Path]] = None,
+    **kwargs,
+) -> FSInterface:
+    """
+    Create and return a file handler instance.
+
+    Args:
+        handler_type: Type of handler ('local' or 's3')
+        base_path: Optional base path for relative paths
+        **kwargs: Additional arguments for specific handlers
+            For S3: bucket, connection_id
+
+    Returns:
+        FSInterface: Instance of the requested file handler
+
+    Raises:
+        ValueError: If handler_type is unsupported or required args are missing
+
+    Examples:
+        >>> handler = create_file_handler("local", base_path="/data")
+        >>> handler = create_file_handler("s3", bucket="my-bucket", connection_id="s3_conn")
+    """
+
+    if handler_type == FileHandlerType.LOCAL:
+        return LocalFS(base_path=base_path)
+
+    elif handler_type == FileHandlerType.S3:
+        if "bucket" not in kwargs:
+            raise ValueError("Missing required argument for S3 handler: 'bucket'")
+        if "connection_id" not in kwargs and "client" not in kwargs:
+            raise ValueError("S3 handler requires either 'connection_id' or 'client'")
+        return S3FS(**kwargs)
+
+    else:
+        raise ValueError(
+            f"Unsupported handler type: '{handler_type}'. "
+            f"Supported types: 'local', 's3'"
+        )
+
+
+def create_default_s3_handler(
+    connection_id: Optional[str] = None,
+    bucket: Optional[str] = None,
+) -> FSInterface:
+    """
+    Create S3 handler with default DSCI bucket configuration.
+
+    This is the most commonly used S3 handler in the codebase.
+
+    Args:
+        connection_id: S3 connection ID (default: minio_bucket_dsci)
+        bucket: S3 bucket name (default: dsci)
+
+    Returns:
+        FSInterface: Configured S3 handler instance
+    """
+    connection_id = connection_id or DEFAULT_S3_CONNECTION_ID
+    bucket = bucket or DEFAULT_S3_BUCKET
+    return create_file_handler(
+        FileHandlerType.S3, connection_id=connection_id, bucket=bucket
+    )
+
+
+def create_local_handler(
+    base_path: Optional[Union[str, Path]] = None,
+) -> FSInterface:
+    """
+    Create local file handler.
+
+    Args:
+        base_path: Optional base path for relative paths
+
+    Returns:
+        FSInterface: Configured local handler instance
+    """
+    base_path = base_path or None
+    return create_file_handler(FileHandlerType.LOCAL, base_path=base_path)

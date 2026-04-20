@@ -92,14 +92,14 @@ Les FeatureFlagsEnable permettent d'activer/désactiver certaines fonctionnalit�
 
 ### 1. Validation des Paramètres
 
-Une tâche générique est disponible: `from src.common_tasks.alidation import validate_dag_parameters`
+Une tâche générique est disponible: `from common_tasks.alidation import validate_dag_parameters`
 
 ### 2. Tâches ETL (Extract, Transform, Load)
 
 #### ETL depuis Grist
 ```python
-from src.common_tasks.grist import download_grist_doc_to_s3
-from src.common_tasks.etl import create_grist_etl_task
+from common_tasks.grist import download_grist_doc_to_s3
+from common_tasks.etl import create_grist_etl_task
 
 # Télécharger le document Grist
 grist_doc = download_grist_doc_to_s3(
@@ -154,7 +154,7 @@ etl_task = create_task(
 
 #### Conversion vers Parquet
 ```python
-from src.common_tasks.file import create_parquet_converter_task
+from common_tasks.file import create_parquet_converter_task
 
 # Conversion de fichiers vers Parquet
 convert_to_parquet = create_parquet_converter_task(
@@ -169,14 +169,14 @@ convert_to_parquet = create_parquet_converter_task(
 
 #### Création de Tables Temporaires
 ```python
-from src.common_tasks.sql import (
+from common_tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
     ensure_partition,
     import_file_to_db,
     LoadStrategy,
 )
-from src.constants import (
+from constants import (
     DEFAULT_PG_DATA_CONN_ID,
     DEFAULT_S3_CONN_ID,
 )
@@ -204,7 +204,7 @@ copy_to_prod = copy_tmp_table_to_real_table()
 ### 5. Opérations S3
 
 ```python
-from src.common_tasks.s3 import copy_s3_files, del_s3_files
+from common_tasks.s3 import copy_s3_files, del_s3_files
 
 # Copie de fichiers S3
 copy_files = copy_s3_files()

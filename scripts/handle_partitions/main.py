@@ -1,6 +1,6 @@
 import psycopg2
 
-from src.constants import custom_logger
+from constants import custom_logger
 from scripts.settings import get_settings
 
 from scripts.handle_partitions.commun import list_table_names, get_partitions, Actions

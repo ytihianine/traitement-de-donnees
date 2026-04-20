@@ -1,11 +1,11 @@
 from typing import Iterable, Sequence
 
-from src.infra.http_client.config import ClientConfig
-from src.infra.http_client.factory import create_http_client
-from src.constants import custom_logger
+from infra.http_client.config import ClientConfig
+from infra.http_client.factory import create_http_client
+from constants import custom_logger
 from scripts.settings import get_settings
 
-from src.enums.http import HttpHandlerType
+from _enums.http import HttpHandlerType
 
 EVENT_TYPES = ["add", "update"]
 TBL_TO_EXCLUDE = ("test", "onglet", "doc")

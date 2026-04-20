@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from src.constants import custom_logger
+from constants import custom_logger
 from scripts.handle_partitions.commun import Actions
 
 # Database
