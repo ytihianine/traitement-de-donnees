@@ -94,7 +94,7 @@ def column_mapping_dict(
 
 
 @db_retry
-def get_list_contact(nom_projet: str, db: DBInterface | None = None) -> list[Contact]:
+def get_list_contact(nom_projet: str, db: DBInterface | None = None) -> List[Contact]:
     if not nom_projet:
         raise ValueError(
             "Variable nom_projet is required to fetch contact information. Current value is None or empty."
@@ -117,7 +117,7 @@ def get_list_contact(nom_projet: str, db: DBInterface | None = None) -> list[Con
 def get_list_documentation(
     nom_projet: str,
     db: DBInterface | None = None,
-) -> list[Documentation]:
+) -> List[Documentation]:
     if not nom_projet:
         raise ValueError(
             "Variable nom_projet is required to fetch documentation. Current value is None or empty."
@@ -181,9 +181,9 @@ def get_projet_s3_info(
 
 
 def merge_selecteur_config(
-    selecteur_info: list[SelecteurStorageInfo],
+    selecteur_info: List[SelecteurStorageInfo],
     options_map: Mapping[str, SelecteurStorageOptions] | None = None,
-) -> list[SelecteurConfig]:
+) -> List[SelecteurConfig]:
     """Merge SelecteurStorageInfo from DB with local SelecteurStorageOptions config.
 
     Items like S3 paths and table names come from the DB (via ``selecteur_info``).
@@ -221,7 +221,7 @@ def _get_selecteur_storage_info(
     only_grist: bool = False,
     only_fichier: bool = False,
     db: DBInterface | None = None,
-) -> list[SelecteurStorageInfo]:
+) -> List[SelecteurStorageInfo]:
     """Get SelecteurStorageInfo for a project and optionally a specific selecteur.
 
     Args:
@@ -326,7 +326,7 @@ def get_selecteur_storage_info(
     return configs[0]
 
 
-def get_list_source_fichier(nom_projet: str) -> list[str]:
+def get_list_source_fichier(nom_projet: str) -> List[str]:
     """Get SelecteurStorageInfo for all selecteurs with file source."""
     selecteur_storage_info = _get_selecteur_storage_info(
         nom_projet=nom_projet, only_source=True, only_fichier=True
