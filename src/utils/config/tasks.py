@@ -2,7 +2,7 @@
 
 from collections.abc import Mapping
 import logging
-from typing import Any, List
+from typing import List
 
 from tenacity import (
     retry,
@@ -87,9 +87,7 @@ def column_mapping_dict(
     if selecteur is not None:
         df_cols_map = df_cols_map.loc[df_cols_map["selecteur"] == selecteur]
 
-    records = df_cols_map.set_index("colname_source")["colname_dest"].to_dict(
-        into=dict[str, Any]
-    )
+    records = df_cols_map.set_index("colname_source")["colname_dest"].to_dict(into=dict)
     return records
 
 
@@ -109,7 +107,7 @@ def get_list_contact(nom_projet: str, db: DBInterface | None = None) -> List[Con
     """
 
     df = db.fetch_df(query, parameters=(nom_projet,))
-    records = df.to_dict("records", into=dict[str, Any])
+    records = df.to_dict("records", into=dict)
     return [Contact(**record) for record in records]
 
 
@@ -176,7 +174,7 @@ def get_projet_s3_info(
             nom_projet=nom_projet,
         )
 
-    record = df.iloc[0].to_dict(into=dict[str, Any])
+    record = df.iloc[0].to_dict(into=dict)
     return ProjetS3(**record)
 
 
@@ -270,7 +268,7 @@ def _get_selecteur_storage_info(
     if df.empty:
         return []
 
-    records = df.to_dict("records", into=dict[str, Any])
+    records = df.to_dict("records", into=dict)
     return [SelecteurStorageInfo(**record, local_dir=local_dir) for record in records]
 
 
