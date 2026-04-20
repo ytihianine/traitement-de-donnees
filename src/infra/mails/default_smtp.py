@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
 from jinja2 import Environment, FileSystemLoader
 
-from airflow.src.utils.email import send_email_smtp
+from airflow.utils.email import send_email_smtp
 
 from src.utils.config.dag_params import (
     get_dag_status,
