@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  AIRFLOW_VERSION: 3.2.0
+  AIRFLOW_VERSION: 3.1.8
   IMAGE_NAME: ghcr.io/${{ github.repository }}
 
 jobs:
@@ -28,4 +28,4 @@ jobs:
 
       - name: Push Docker image
         if: github.ref == 'refs/heads/main'
-        run: docker push $IMAGE_NAME:$AIRFLOW_VERSION
+        run: docker push $IMAGE_NAME:$AIRFLOW_VERSION-${GITHUB_SHA}
