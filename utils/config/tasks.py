@@ -2,7 +2,7 @@
 
 from collections.abc import Mapping
 import logging
-from typing import Any
+from typing import Any, List
 
 from tenacity import (
     retry,
@@ -277,7 +277,7 @@ def _get_selecteur_storage_info(
 def get_list_selecteur_storage_info(
     nom_projet: str,
     local_dir: str = "/tmp",
-) -> list[SelecteurStorageInfo]:
+) -> List[SelecteurStorageInfo]:
     """Get SelecteurStorageInfo for all selecteurs in a project.
 
     Args:
