@@ -1,5 +1,5 @@
 import pandas as pd
-from infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
+from src.infracatalog.iceberg import IcebergCatalog, generate_catalog_properties
 from src._enums.filesystem import IcebergTableStatus
 from scripts.settings import get_settings
 

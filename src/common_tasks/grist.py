@@ -2,10 +2,10 @@ from datetime import timedelta
 from airflow.sdk import task
 from airflow.sdk import Variable
 
-from infra.file_system.factory import create_file_handler
-from infra.http_client.adapters import RequestsClient
-from infra.http_client.config import ClientConfig
-from infra.grist.client import GristAPI
+from src.infrafile_system.factory import create_file_handler
+from src.infrahttp_client.adapters import RequestsClient
+from src.infrahttp_client.config import ClientConfig
+from src.infragrist.client import GristAPI
 from src.utils.config.dag_params import get_project_name, should_skip_task
 from src._enums.dags import FeatureFlags
 from src.utils.config.tasks import get_selecteur_storage_info

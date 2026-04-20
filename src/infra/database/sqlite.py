@@ -7,8 +7,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from infra.database.base import DBInterface
-from infra.database.exceptions import DatabaseError
+from src.infradatabase.base import DBInterface
+from src.infradatabase.exceptions import DatabaseError
 
 
 class SQLiteAdapter(DBInterface):

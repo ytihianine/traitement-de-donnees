@@ -1,7 +1,7 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
-from infra.mails.default_smtp import MailStatus, create_send_mail_callback
+from src.inframails.default_smtp import MailStatus, create_send_mail_callback
 from src._enums.dags import DagStatus
 from src._types.dags import DBParams, FeatureFlagsEnable
 from src.common_tasks.sql import (

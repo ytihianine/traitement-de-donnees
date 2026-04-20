@@ -2,7 +2,7 @@ import logging
 from airflow.sdk import task
 import pandas as pd
 
-from infra.file_system.factory import create_default_s3_handler
+from src.infrafile_system.factory import create_default_s3_handler
 from src.constants import (
     DEFAULT_S3_CONN_ID,
 )

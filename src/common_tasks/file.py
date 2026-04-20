@@ -6,8 +6,8 @@ from typing import Any, Callable, Dict, Optional
 from airflow.sdk import task
 import pandas as pd
 
-from infra.file_system.factory import create_default_s3_handler
-from infra.file_system.dataframe import read_dataframe
+from src.infrafile_system.factory import create_default_s3_handler
+from src.infrafile_system.dataframe import read_dataframe
 
 from src.utils.config.dag_params import get_project_name, should_skip_task
 from src._enums.dags import FeatureFlags

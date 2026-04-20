@@ -6,7 +6,7 @@ from typing import Any, Mapping
 import pandas as pd
 
 from src.utils.config.dag_params import get_execution_date, get_project_name
-from infra.mails.default_smtp import MailMessage, render_template, send_mail
+from src.inframails.default_smtp import MailMessage, render_template, send_mail
 from src.utils.config.tasks import get_list_contact
 
 from dags.sg.srh.mentorat_merci import process

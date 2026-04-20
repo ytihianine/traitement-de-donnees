@@ -5,9 +5,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from infra.http_client.base import HttpInterface
-from infra.http_client.config import ClientConfig
-from infra.http_client.types import HTTPResponse
+from src.infrahttp_client.base import HttpInterface
+from src.infrahttp_client.config import ClientConfig
+from src.infrahttp_client.types import HTTPResponse
 
 
 class ConcreteHttpClient(HttpInterface):

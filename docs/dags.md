@@ -55,7 +55,7 @@ Chaque DAG doit définir ses paramètres selon la structure suivante :
 from airflow.sdk import dag
 from enums.dags import DagStatus
 from src._types.dags import DBParams, FeatureFlagsEnable
-from infra.mails.default_smtp import create_send_mail_callback, MailStatus
+from src.inframails.default_smtp import create_send_mail_callback, MailStatus
 
 @dag(
     dag_id="id_unique_du_dag",
@@ -282,7 +282,7 @@ def calculer_taux_conversion(df: pd.DataFrame) -> pd.DataFrame:
 ### 1. Callbacks de Notification
 
 ```python
-from infra.mails.default_smtp import create_send_mail_callback, MailStatus
+from src.inframails.default_smtp import create_send_mail_callback, MailStatus
 
 @dag(
     ...,
@@ -318,4 +318,4 @@ detect_files = S3KeySensor(
 
 ---
 
-Ce guide vous permet de créer des DAGs robustes en utilisant les tâches pré-définies et vos propres fonctions de processing métier. Pour plus d'informations, consultez la [documentation de l'infrastructure](infra.md) et les [conventions du projet](convention.md).
+Ce guide vous permet de créer des DAGs robustes en utilisant les tâches pré-définies et vos propres fonctions de processing métier. Pour plus d'informations, consultez la [documentation de l'infrastructure](src.inframd) et les [conventions du projet](convention.md).

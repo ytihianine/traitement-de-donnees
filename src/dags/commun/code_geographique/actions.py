@@ -3,8 +3,8 @@ import numpy as np
 
 from airflow.models.variable import Variable
 
-from infra.grist.client import GristAPI
-from infra.http_client.adapters import ClientConfig, RequestsClient
+from src.infragrist.client import GristAPI
+from src.infrahttp_client.adapters import ClientConfig, RequestsClient
 from src.constants import AGENT, DEFAULT_GRIST_HOST, PROXY
 from src.utils.logs import df_info
 

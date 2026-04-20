@@ -1,11 +1,11 @@
 import logging
 from airflow.sdk import Variable
-from infra.http_client.adapters import RequestsClient
-from infra.http_client.config import ClientConfig
+from src.infrahttp_client.adapters import RequestsClient
+from src.infrahttp_client.config import ClientConfig
 import pandas as pd
 
-from infra.grist.client import GristAPI
-from infra.database.factory import create_db_handler
+from src.infragrist.client import GristAPI
+from src.infradatabase.factory import create_db_handler
 from src.constants import (
     AGENT,
     DEFAULT_GRIST_HOST,

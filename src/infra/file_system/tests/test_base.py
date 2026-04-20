@@ -7,8 +7,8 @@ from typing import BinaryIO, List, Optional, Union
 
 import pytest
 
-from infra.file_system.base import FSInterface, FileMetadata
-from infra.file_system.exceptions import FileNotFoundError
+from src.infrafile_system.base import FSInterface, FileMetadata
+from src.infrafile_system.exceptions import FileNotFoundError
 
 
 class ConcreteFileHandler(FSInterface):

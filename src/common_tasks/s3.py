@@ -8,10 +8,10 @@ from collections.abc import Mapping
 from airflow.sdk import get_current_context, task
 
 from src._types.projet import SelecteurConfig, SelecteurStorageOptions
-from infra.file_system.dataframe import read_dataframe
-from infra.file_system.exceptions import FileHandlerError
-from infra.file_system.factory import create_default_s3_handler
-from infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
+from src.infrafile_system.dataframe import read_dataframe
+from src.infrafile_system.exceptions import FileHandlerError
+from src.infrafile_system.factory import create_default_s3_handler
+from src.infracatalog.iceberg import IcebergCatalog, generate_catalog_properties
 from src.utils.config.dag_params import (
     get_execution_date,
     get_project_name,

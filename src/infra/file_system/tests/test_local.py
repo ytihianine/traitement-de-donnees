@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from infra.file_system.local import LocalFS
-from infra.file_system.exceptions import (
+from src.infrafile_system.local import LocalFS
+from src.infrafile_system.exceptions import (
     FileNotFoundError,
 )
 

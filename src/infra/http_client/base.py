@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Any
 from urllib.parse import urljoin
 
-from infra.http_client.config import ClientConfig
-from infra.http_client.types import HTTPResponse
+from src.infrahttp_client.config import ClientConfig
+from src.infrahttp_client.types import HTTPResponse
 
 
 class HttpInterface(ABC):

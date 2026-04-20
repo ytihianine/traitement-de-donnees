@@ -49,7 +49,7 @@ Client pour l'administration d'un catalogue Polaris :
 ### Initialisation
 
 ```python
-from infra.catalog.iceberg import IcebergCatalog
+from src.infracatalog.iceberg import IcebergCatalog
 
 catalog = IcebergCatalog(
     name="my_catalog",
@@ -74,7 +74,7 @@ df = catalog.read_table_as_df(namespace="my_namespace", table_name="my_table")
 ### Fonctions utilitaires
 
 ```python
-from infra.catalog.iceberg import generate_catalog_properties
+from src.infracatalog.iceberg import generate_catalog_properties
 
 # Génération des propriétés de catalogue (SSL, credentials, options custom)
 properties = generate_catalog_properties(
@@ -120,7 +120,7 @@ Implémentation en lecture seule pour Trino. Les opérations d'écriture (`inser
 ### Initialisation
 
 ```python
-from infra.database.factory import create_db_handler
+from src.infradatabase.factory import create_db_handler
 from src._enums.database import DatabaseType
 
 # PostgreSQL (par défaut)
@@ -180,7 +180,7 @@ Gestion des fichiers sur S3/MinIO utilisant Airflow S3Hook ou un client boto3. S
 ### Initialisation
 
 ```python
-from infra.file_system.factory import create_file_handler, create_default_s3_handler, create_local_handler
+from src.infrafile_system.factory import create_file_handler, create_default_s3_handler, create_local_handler
 from src._enums.filesystem import FileHandlerType
 
 # Fichiers locaux
@@ -207,7 +207,7 @@ s3_handler.write("remote/key/file.txt", "Hello World")
 Une fonction utilitaire est définie pour obtenir un DataFrame directement. Le format est auto-détecté à partir de l'extension du fichier (CSV, Excel, Parquet, JSON).
 
 ```python
-from infra.file_system.dataframe import read_dataframe
+from src.infrafile_system.dataframe import read_dataframe
 
 # Lecture d'un DataFrame depuis différents formats
 df = read_dataframe(
@@ -262,8 +262,8 @@ Configuration du client HTTP :
 ### Initialisation
 
 ```python
-from infra.http_client.factory import create_http_client
-from infra.http_client.config import ClientConfig
+from src.infrahttp_client.factory import create_http_client
+from src.infrahttp_client.config import ClientConfig
 from src._enums.http import HttpHandlerType
 
 config = ClientConfig(
@@ -313,9 +313,9 @@ Client pour les opérations Grist :
 ### Initialisation
 
 ```python
-from infra.grist.client import GristAPI
-from infra.http_client.factory import create_http_client
-from infra.http_client.config import ClientConfig
+from src.infragrist.client import GristAPI
+from src.infrahttp_client.factory import create_http_client
+from src.infrahttp_client.config import ClientConfig
 from src._enums.http import HttpHandlerType
 
 config = ClientConfig(timeout=30)
@@ -371,7 +371,7 @@ Crée une fonction callback Airflow pour les notifications automatiques de pipel
 ### Initialisation
 
 ```python
-from infra.mails.default_smtp import MailMessage, send_mail, create_send_mail_callback
+from src.inframails.default_smtp import MailMessage, send_mail, create_send_mail_callback
 from src._enums.mail import MailStatus
 
 # Envoi avec statut (template auto-généré)
@@ -400,7 +400,7 @@ send_mail(message)
 ### Callbacks Airflow
 
 ```python
-from infra.mails.default_smtp import create_send_mail_callback
+from src.inframails.default_smtp import create_send_mail_callback
 from src._enums.mail import MailStatus
 
 # Création de callbacks pour notifications automatiques
@@ -425,8 +425,8 @@ Toujours utiliser les factory fonctions (`create_db_handler`, `create_file_handl
 Capturer les exceptions spécifiques à chaque module plutôt que les exceptions génériques.
 
 ```python
-from infra.database.exceptions import DatabaseError
-from infra.file_system.exceptions import FileHandlerError
+from src.infradatabase.exceptions import DatabaseError
+from src.infrafile_system.exceptions import FileHandlerError
 
 try:
     db.execute("INSERT INTO...")
@@ -449,7 +449,7 @@ Chaque handler peut être mocké facilement grâce aux interfaces abstraites :
 
 ```python
 from unittest.mock import Mock
-from infra.database.base import DBInterface
+from src.infradatabase.base import DBInterface
 
 # Mock pour les tests
 mock_db = Mock(spec=DBInterface)

@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from infra.http_client.types import HTTPResponse
+from src.infrahttp_client.types import HTTPResponse
 import pandas as pd
 
 

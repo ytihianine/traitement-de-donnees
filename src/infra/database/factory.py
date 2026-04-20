@@ -1,9 +1,9 @@
 """Factory for creating database handlers."""
 
-from infra.database.base import DBInterface
-from infra.database.postgres import PgAdapter
-from infra.database.sqlite import SQLiteAdapter
-from infra.database.trino import TrinoAdapter
+from src.infradatabase.base import DBInterface
+from src.infradatabase.postgres import PgAdapter
+from src.infradatabase.sqlite import SQLiteAdapter
+from src.infradatabase.trino import TrinoAdapter
 
 from src._enums.database import DatabaseType
 

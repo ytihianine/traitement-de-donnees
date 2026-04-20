@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from infra.http_client.base import HttpInterface
+from src.infrahttp_client.base import HttpInterface
 from src.utils.process.text import normalize_whitespace_columns
 
 
