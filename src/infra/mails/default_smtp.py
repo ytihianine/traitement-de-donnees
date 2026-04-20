@@ -3,18 +3,18 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
 from jinja2 import Environment, FileSystemLoader
 
-from airflow.utils.email import send_email_smtp
+from airflow.src.utils.email import send_email_smtp
 
-from utils.config.dag_params import (
+from src.utils.config.dag_params import (
     get_dag_status,
     get_execution_date,
     get_feature_flags,
     get_project_name,
 )
-from _types.dags import DagStatus
-from _enums.mail import MailPriority, MailStatus
-from utils.config.tasks import get_list_contact, get_list_documentation
-from constants import (
+from src._types.dags import DagStatus
+from src._enums.mail import MailPriority, MailStatus
+from src.utils.config.tasks import get_list_contact, get_list_documentation
+from src.constants import (
     FF_MAIL_DISABLED_MSG,
     get_root_folder,
     DEFAULT_SMTP_CONN_ID,

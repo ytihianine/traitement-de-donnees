@@ -2,7 +2,7 @@ import pandas as pd
 from airflow.sdk import Variable
 
 from infra.http_client.adapters import HttpxClient, ClientConfig
-from constants import AGENT, PROXY
+from src.constants import AGENT, PROXY
 
 from dags.sg.siep.mmsi.api_operat.config import BASE_URL, ID_STRUCTURES
 

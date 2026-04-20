@@ -13,22 +13,22 @@ from infra.mails.default_smtp import (
 )
 from infra.file_system.factory import create_default_s3_handler
 from infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
-from utils.config.dag_params import (
+from src.utils.config.dag_params import (
     create_default_args,
     create_dag_params,
     get_db_info,
 )
-from utils.config.tasks import get_list_source_fichier
-from _types.dags import DBParams, FeatureFlagsEnable
-from _types.projet import SelecteurConfig
-from _enums.dags import DagStatus
-from _enums.filesystem import IcebergTableStatus
+from src.utils.config.tasks import get_list_source_fichier
+from src._types.dags import DBParams, FeatureFlagsEnable
+from src._types.projet import SelecteurConfig
+from src._enums.dags import DagStatus
+from src._enums.filesystem import IcebergTableStatus
 
-from common_tasks.sql import get_projet_snapshot  # , import_files_to_db
-from common_tasks.projet import config_projet_group, get_selecteur_config
-from common_tasks.s3 import del_iceberg_staging_table
+from src.common_tasks.sql import get_projet_snapshot  # , import_files_to_db
+from src.common_tasks.projet import config_projet_group, get_selecteur_config
+from src.common_tasks.s3 import del_iceberg_staging_table
 
-from constants import (
+from src.constants import (
     DEFAULT_POLARIS_HOST,
     DEFAULT_S3_CONN_ID,
     DEFAULT_POLARIS_CATALOG,

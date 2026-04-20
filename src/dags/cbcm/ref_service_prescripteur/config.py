@@ -1,7 +1,7 @@
-from _types.projet import (
+from src._types.projet import (
     SelecteurStorageOptions,
 )
-from _enums.database import LoadStrategy
+from src._enums.database import LoadStrategy
 
 selecteur_options = {
     "delai_global_paiement_sp_manuel": SelecteurStorageOptions(

@@ -1,8 +1,8 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from _types.dags import ETLStep, TaskConfig
-from common_tasks.etl import create_task
+from src._types.dags import ETLStep, TaskConfig
+from src.common_tasks.etl import create_task
 
 from dags.commun.code_geographique import actions
 

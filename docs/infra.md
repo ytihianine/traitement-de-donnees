@@ -121,7 +121,7 @@ Implémentation en lecture seule pour Trino. Les opérations d'écriture (`inser
 
 ```python
 from infra.database.factory import create_db_handler
-from _enums.database import DatabaseType
+from src._enums.database import DatabaseType
 
 # PostgreSQL (par défaut)
 db = create_db_handler(connection_id="my_postgres_conn_id", db_type=DatabaseType.POSTGRES)
@@ -181,7 +181,7 @@ Gestion des fichiers sur S3/MinIO utilisant Airflow S3Hook ou un client boto3. S
 
 ```python
 from infra.file_system.factory import create_file_handler, create_default_s3_handler, create_local_handler
-from _enums.filesystem import FileHandlerType
+from src._enums.filesystem import FileHandlerType
 
 # Fichiers locaux
 local_handler = create_file_handler(handler_type=FileHandlerType.LOCAL, base_path="/tmp")
@@ -264,7 +264,7 @@ Configuration du client HTTP :
 ```python
 from infra.http_client.factory import create_http_client
 from infra.http_client.config import ClientConfig
-from _enums.http import HttpHandlerType
+from src._enums.http import HttpHandlerType
 
 config = ClientConfig(
     timeout=30,
@@ -316,7 +316,7 @@ Client pour les opérations Grist :
 from infra.grist.client import GristAPI
 from infra.http_client.factory import create_http_client
 from infra.http_client.config import ClientConfig
-from _enums.http import HttpHandlerType
+from src._enums.http import HttpHandlerType
 
 config = ClientConfig(timeout=30)
 http_client = create_http_client(client_type=HttpHandlerType.REQUEST, config=config)
@@ -372,7 +372,7 @@ Crée une fonction callback Airflow pour les notifications automatiques de pipel
 
 ```python
 from infra.mails.default_smtp import MailMessage, send_mail, create_send_mail_callback
-from _enums.mail import MailStatus
+from src._enums.mail import MailStatus
 
 # Envoi avec statut (template auto-généré)
 message = MailMessage(
@@ -401,7 +401,7 @@ send_mail(message)
 
 ```python
 from infra.mails.default_smtp import create_send_mail_callback
-from _enums.mail import MailStatus
+from src._enums.mail import MailStatus
 
 # Création de callbacks pour notifications automatiques
 on_failure = create_send_mail_callback(MailStatus.ERROR)

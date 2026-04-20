@@ -5,7 +5,7 @@ import pandas as pd
 
 from infra.grist.client import GristAPI
 from infra.database.factory import create_db_handler
-from constants import (
+from src.constants import (
     AGENT,
     DEFAULT_GRIST_HOST,
     DEFAULT_PG_DATA_CONN_ID,

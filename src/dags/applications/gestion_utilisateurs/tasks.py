@@ -1,11 +1,11 @@
 # from datetime import datetime
 # from airflow.sdk import task
 
-# from utils.api_client.base import AbstractApiClient
+# from src.utils.api_client.base import AbstractApiClient
 # from airflow.providers.common.sql.hooks.sql import DbApiHook
 
 
-# from utils.dataframe import df_info
+# from src.utils.dataframe import df_info
 
 # from dags.applications.gestion_utilisateurs.process import process_user_info
 

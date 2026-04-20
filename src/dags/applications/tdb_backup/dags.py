@@ -2,7 +2,7 @@
 
 # from airflow.sdk import dag
 # from airflow.sdk.bases.operator import chain
-# from airflow.utils.dates import days_ago
+# from airflow.src.utils.dates import days_ago
 
 # from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 

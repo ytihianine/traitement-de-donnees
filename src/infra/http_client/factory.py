@@ -1,6 +1,6 @@
 """Factory for creating HTTP clients."""
 
-from _enums.http import HttpHandlerType
+from src._enums.http import HttpHandlerType
 
 from infra.http_client.adapters import HttpxClient, RequestsClient
 from infra.http_client.base import HttpInterface

@@ -2,12 +2,12 @@ from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
 from dags.dge.carto_rem.grist import actions
-from common_tasks.etl import (
+from src.common_tasks.etl import (
     create_grist_etl_task,
     create_task,
 )
-from _types.dags import TaskConfig, ETLStep
-from utils.process.structures import normalize_grist_dataframe
+from src._types.dags import TaskConfig, ETLStep
+from src.utils.process.structures import normalize_grist_dataframe
 
 from dags.dge.carto_rem.grist import process
 

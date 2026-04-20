@@ -5,7 +5,7 @@ from infra.database.postgres import PgAdapter
 from infra.database.sqlite import SQLiteAdapter
 from infra.database.trino import TrinoAdapter
 
-from _enums.database import DatabaseType
+from src._enums.database import DatabaseType
 
 
 def _check_required_params(db_type: DatabaseType, **db_config: dict) -> None:

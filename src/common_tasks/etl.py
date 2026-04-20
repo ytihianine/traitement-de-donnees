@@ -15,18 +15,18 @@ from infra.file_system.factory import (
 )
 from infra.database.factory import create_db_handler
 from infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
-from _enums.filesystem import IcebergTableStatus
-from utils.process.structures import remove_grist_internal_cols
-from utils.logs import df_info
-from utils.config.tasks import (
+from src._enums.filesystem import IcebergTableStatus
+from src.utils.process.structures import remove_grist_internal_cols
+from src.utils.logs import df_info
+from src.utils.config.tasks import (
     get_selecteur_storage_info,
     column_mapping_dataframe,
     column_mapping_dict,
 )
-from utils.config.dag_params import get_execution_date, get_project_name
-from _types.dags import ETLStep, TaskConfig
-from _enums.database import DatabaseType
-from constants import DEFAULT_POLARIS_HOST, DEFAULT_POLARIS_CATALOG
+from src.utils.config.dag_params import get_execution_date, get_project_name
+from src._types.dags import ETLStep, TaskConfig
+from src._enums.database import DatabaseType
+from src.constants import DEFAULT_POLARIS_HOST, DEFAULT_POLARIS_CATALOG
 
 
 def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:

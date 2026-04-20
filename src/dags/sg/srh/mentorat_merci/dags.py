@@ -6,14 +6,14 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
-from _enums.dags import DagStatus
+from src._enums.dags import DagStatus
 
-from _types.dags import FeatureFlagsEnable
-from utils.config.dag_params import create_default_args, create_dag_params
+from src._types.dags import FeatureFlagsEnable
+from src.utils.config.dag_params import create_default_args, create_dag_params
 
-from utils.config.tasks import get_list_source_fichier
-from common_tasks.validation import validate_dag_parameters
-from common_tasks.s3 import copy_s3_files, del_s3_files
+from src.utils.config.tasks import get_list_source_fichier
+from src.common_tasks.validation import validate_dag_parameters
+from src.common_tasks.s3 import copy_s3_files, del_s3_files
 
 from dags.sg.srh.mentorat_merci.tasks import (
     agent_inscrit,

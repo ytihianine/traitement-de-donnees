@@ -6,9 +6,9 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
-from _enums.dags import DagStatus
-from _types.dags import DBParams, FeatureFlagsEnable
-from common_tasks.sql import (
+from src._enums.dags import DagStatus
+from src._types.dags import DBParams, FeatureFlagsEnable
+from src.common_tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
     copy_tmp_table_to_real_table,
@@ -17,15 +17,15 @@ from common_tasks.sql import (
     create_projet_snapshot,
     get_projet_snapshot,
 )
-from common_tasks.s3 import (
+from src.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from common_tasks.projet import get_selecteur_config
-from utils.config.dag_params import create_default_args, create_dag_params
-from utils.config.tasks import get_list_source_fichier
+from src.common_tasks.projet import get_selecteur_config
+from src.utils.config.dag_params import create_default_args, create_dag_params
+from src.utils.config.tasks import get_list_source_fichier
 
-from common_tasks.validation import validate_dag_parameters
+from src.common_tasks.validation import validate_dag_parameters
 from dags.cbcm.donnee_comptable.tasks import (
     source_files,
     datasets_additionnels,

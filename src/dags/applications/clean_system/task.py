@@ -3,7 +3,7 @@ from airflow.sdk import task
 import pandas as pd
 
 from infra.file_system.factory import create_default_s3_handler
-from constants import (
+from src.constants import (
     DEFAULT_S3_CONN_ID,
 )
 

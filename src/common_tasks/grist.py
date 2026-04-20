@@ -6,12 +6,12 @@ from infra.file_system.factory import create_file_handler
 from infra.http_client.adapters import RequestsClient
 from infra.http_client.config import ClientConfig
 from infra.grist.client import GristAPI
-from utils.config.dag_params import get_project_name, should_skip_task
-from _enums.dags import FeatureFlags
-from utils.config.tasks import get_selecteur_storage_info
+from src.utils.config.dag_params import get_project_name, should_skip_task
+from src._enums.dags import FeatureFlags
+from src.utils.config.tasks import get_selecteur_storage_info
 
-from _enums.filesystem import FileHandlerType
-from constants import (
+from src._enums.filesystem import FileHandlerType
+from src.constants import (
     DEFAULT_GRIST_HOST,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_CONN_ID,

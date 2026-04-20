@@ -2,9 +2,9 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
-from _enums.dags import DagStatus
-from _types.dags import DBParams, FeatureFlagsEnable
-from common_tasks.sql import (
+from src._enums.dags import DagStatus
+from src._types.dags import DBParams, FeatureFlagsEnable
+from src.common_tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
     copy_tmp_table_to_real_table,
@@ -12,11 +12,11 @@ from common_tasks.sql import (
     create_projet_snapshot,
     get_projet_snapshot,
 )
-from utils.config.dag_params import create_default_args, create_dag_params
+from src.utils.config.dag_params import create_default_args, create_dag_params
 
-from common_tasks.validation import validate_dag_parameters
-from common_tasks.grist import download_grist_doc_to_s3
-from common_tasks.projet import get_selecteur_config
+from src.common_tasks.validation import validate_dag_parameters
+from src.common_tasks.grist import download_grist_doc_to_s3
+from src.common_tasks.projet import get_selecteur_config
 from dags.sg.sircom.tdb_interne.tasks import (
     abonnes_visites,
     budget,

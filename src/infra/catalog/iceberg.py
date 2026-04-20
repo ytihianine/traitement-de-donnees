@@ -9,7 +9,7 @@ from pyiceberg.table import Table
 from airflow.sdk import Variable
 import pandas as pd
 from pyiceberg.typedef import Identifier
-from _enums.filesystem import IcebergTableStatus
+from src._enums.filesystem import IcebergTableStatus
 
 
 def generate_catalog_properties(

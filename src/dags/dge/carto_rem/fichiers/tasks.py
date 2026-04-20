@@ -1,7 +1,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from common_tasks.etl import (
+from src.common_tasks.etl import (
     create_file_etl_task,
 )
 

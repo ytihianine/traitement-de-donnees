@@ -4,14 +4,14 @@ import pandas as pd
 
 from infra.http_client.adapters import ClientConfig
 from infra.http_client.factory import create_http_client
-from _enums.http import HttpHandlerType
-from constants import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
+from src._enums.http import HttpHandlerType
+from src.constants import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
 from infra.database.factory import create_db_handler
 
 from dags.sg.siep.mmsi.eligibilite_fcu.process import (
     get_eligibilite_fcu,
 )
-from utils.logs import df_info
+from src.utils.logs import df_info
 
 
 def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:

@@ -7,9 +7,9 @@ from dags.applications.tdb_backup.process import convert_str_to_ascii_str
 from infra.file_system.factory import create_file_handler
 from infra.http_client.config import ClientConfig
 from infra.http_client.adapters import RequestsClient
-from utils.config.tasks import get_projet_s3_info
-from _enums.filesystem import FileHandlerType
-from constants import (
+from src.utils.config.tasks import get_projet_s3_info
+from src._enums.filesystem import FileHandlerType
+from src.constants import (
     get_root_folder,
     AGENT,
     PROXY,

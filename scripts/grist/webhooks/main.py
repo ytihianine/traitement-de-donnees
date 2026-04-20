@@ -2,10 +2,10 @@ from typing import Iterable, Sequence
 
 from infra.http_client.config import ClientConfig
 from infra.http_client.factory import create_http_client
-from constants import custom_logger
+from src.constants import custom_logger
 from scripts.settings import get_settings
 
-from _enums.http import HttpHandlerType
+from src._enums.http import HttpHandlerType
 
 EVENT_TYPES = ["add", "update"]
 TBL_TO_EXCLUDE = ("test", "onglet", "doc")

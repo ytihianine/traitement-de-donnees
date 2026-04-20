@@ -2,19 +2,19 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
-from _types.dags import DBParams, FeatureFlagsEnable
-from utils.config.dag_params import create_dag_params, create_default_args
+from src._types.dags import DBParams, FeatureFlagsEnable
+from src.utils.config.dag_params import create_dag_params, create_default_args
 
-# from utils.tasks.s3 import copy_s3_files, del_s3_files
+# from src.utils.tasks.s3 import copy_s3_files, del_s3_files
 
-from common_tasks.validation import validate_dag_parameters
+from src.common_tasks.validation import validate_dag_parameters
 from dags.applications.catalogue.update.tasks import (
     source_database,
     update_grist_catalogue,
     # update_catalogue,
     # update_dictionnaire,
 )
-from _enums.dags import DagStatus
+from src._enums.dags import DagStatus
 
 nom_projet = "Catalogue - Update"
 

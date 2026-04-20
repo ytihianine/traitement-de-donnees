@@ -1,8 +1,8 @@
-from _types.dags import (
+from src._types.dags import (
     ETLStep,
     TaskConfig,
 )
-from common_tasks.etl import create_task
+from src.common_tasks.etl import create_task
 
 from dags.applications.db_backup import actions
 

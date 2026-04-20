@@ -2,11 +2,11 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
-from _types.dags import FeatureFlagsEnable
-from _enums.dags import DagStatus
+from src._types.dags import FeatureFlagsEnable
+from src._enums.dags import DagStatus
 
-from common_tasks.validation import validate_dag_parameters
-from utils.config.dag_params import create_dag_params, create_default_args
+from src.common_tasks.validation import validate_dag_parameters
+from src.utils.config.dag_params import create_dag_params, create_default_args
 
 from dags.applications.clean_system.task import (
     delete_tmp_keys,

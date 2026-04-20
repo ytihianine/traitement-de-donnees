@@ -22,8 +22,8 @@ import logging
 
 from airflow.sdk import task
 
-from utils.exceptions import ConfigError
-from _enums.dags import DagStatus
+from src.utils.exceptions import ConfigError
+from src._enums.dags import DagStatus
 
 
 def _is_missing(value: Any) -> bool:

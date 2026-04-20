@@ -13,7 +13,7 @@ from tenacity import (
 )
 import pandas as pd
 
-from _types.projet import (
+from src._types.projet import (
     Contact,
     Documentation,
     ProjetS3,
@@ -21,11 +21,11 @@ from _types.projet import (
     SelecteurStorageOptions,
     SelecteurConfig,
 )
-from utils.exceptions import ConfigError
+from src.utils.exceptions import ConfigError
 from infra.database.base import DBInterface
 from infra.database.exceptions import DatabaseError
 from infra.database.factory import create_db_handler
-from constants import DEFAULT_PG_CONFIG_CONN_ID
+from src.constants import DEFAULT_PG_CONFIG_CONN_ID
 
 CONF_SCHEMA = "conf_projets"
 logger = logging.getLogger(name=__name__)

@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-from utils.process.dates import convert_grist_date_to_date
-from utils.process.structures import handle_grist_null_references
-from utils.process.text import normalize_whitespace_columns
+from src.utils.process.dates import convert_grist_date_to_date
+from src.utils.process.structures import handle_grist_null_references
+from src.utils.process.text import normalize_whitespace_columns
 
 """
     Functions de processing des référentiels

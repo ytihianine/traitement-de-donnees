@@ -1,8 +1,8 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from common_tasks.etl import create_grist_etl_task
-from utils.process.structures import normalize_grist_dataframe
+from src.common_tasks.etl import create_grist_etl_task
+from src.utils.process.structures import normalize_grist_dataframe
 
 
 from dags.sg.sircom.tdb_interne import process

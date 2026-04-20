@@ -3,10 +3,10 @@ from airflow.sdk.bases.operator import chain
 
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
-from _types.dags import DBParams, FeatureFlagsEnable
-from utils.config.dag_params import create_dag_params, create_default_args
-from _enums.dags import DagStatus
-from common_tasks.sql import (
+from src._types.dags import DBParams, FeatureFlagsEnable
+from src.utils.config.dag_params import create_dag_params, create_default_args
+from src._enums.dags import DagStatus
+from src.common_tasks.sql import (
     create_tmp_tables,
     copy_tmp_table_to_real_table,
     ensure_partition,
@@ -14,12 +14,12 @@ from common_tasks.sql import (
     import_file_to_db,
 )
 
-from common_tasks.validation import validate_dag_parameters
-from common_tasks.s3 import (
+from src.common_tasks.validation import validate_dag_parameters
+from src.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from common_tasks.projet import get_selecteur_config
+from src.common_tasks.projet import get_selecteur_config
 from dags.sg.siep.mmsi.georisques.task import georisques_group
 from dags.sg.siep.mmsi.georisques.config import selecteur_options
 

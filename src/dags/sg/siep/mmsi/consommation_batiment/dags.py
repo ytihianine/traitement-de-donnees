@@ -6,10 +6,10 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
-from _types.dags import DBParams, FeatureFlagsEnable
-from utils.config.dag_params import create_dag_params, create_default_args
-from _enums.dags import DagStatus
-from common_tasks.sql import (
+from src._types.dags import DBParams, FeatureFlagsEnable
+from src.utils.config.dag_params import create_dag_params, create_default_args
+from src._enums.dags import DagStatus
+from src.common_tasks.sql import (
     create_tmp_tables,
     import_file_to_db,
     copy_tmp_table_to_real_table,
@@ -18,14 +18,14 @@ from common_tasks.sql import (
     get_projet_snapshot,
     refresh_views,
 )
-from common_tasks.s3 import (
+from src.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from common_tasks.projet import get_selecteur_config
+from src.common_tasks.projet import get_selecteur_config
 
-from utils.config.tasks import get_list_source_fichier
-from common_tasks.validation import validate_dag_parameters
+from src.utils.config.tasks import get_list_source_fichier
+from src.common_tasks.validation import validate_dag_parameters
 from dags.sg.siep.mmsi.consommation_batiment.tasks import (
     conso_mens_parquet,
     source_files,

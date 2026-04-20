@@ -1,12 +1,12 @@
-from _enums.dags import TypeDocumentation
+from src._enums.dags import TypeDocumentation
 import pandas as pd
-from utils.process.dates import convert_grist_date_to_date
-from utils.process.structures import (
+from src.utils.process.dates import convert_grist_date_to_date
+from src.utils.process.structures import (
     handle_grist_boolean_columns,
     handle_grist_null_references,
     validate_enum_column,
 )
-from utils.process.text import normalize_whitespace_columns
+from src.utils.process.text import normalize_whitespace_columns
 
 
 def replace_values(

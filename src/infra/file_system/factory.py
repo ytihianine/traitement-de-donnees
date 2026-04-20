@@ -3,7 +3,7 @@
 from typing import Optional, Union
 from pathlib import Path
 
-from _enums.filesystem import FileHandlerType
+from src._enums.filesystem import FileHandlerType
 
 from .base import FSInterface
 from .local import LocalFS

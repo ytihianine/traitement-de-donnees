@@ -2,22 +2,22 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
 from infra.mails.default_smtp import create_send_mail_callback, MailStatus
-from _types.dags import DBParams, FeatureFlagsEnable
-from utils.config.dag_params import create_dag_params, create_default_args
-from _enums.dags import DagStatus
-from common_tasks.grist import download_grist_doc_to_s3
+from src._types.dags import DBParams, FeatureFlagsEnable
+from src.utils.config.dag_params import create_dag_params, create_default_args
+from src._enums.dags import DagStatus
+from src.common_tasks.grist import download_grist_doc_to_s3
 
-from common_tasks.sql import get_projet_snapshot
-from common_tasks.s3 import (
+from src.common_tasks.sql import get_projet_snapshot
+from src.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
     import_file_to_iceberg,
     copy_staging_to_prod,
     del_iceberg_staging_table,
 )
-from common_tasks.projet import get_selecteur_config
+from src.common_tasks.projet import get_selecteur_config
 
-from common_tasks.validation import validate_dag_parameters
+from src.common_tasks.validation import validate_dag_parameters
 from dags.dge.carto_rem.grist.tasks import (
     referentiels,
     source_grist,

@@ -3,7 +3,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-from utils.process.text import (
+from src.utils.process.text import (
     normalize_whitespace_columns,
     convert_str_cols_to_date,
 )

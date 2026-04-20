@@ -4,9 +4,9 @@ from typing import Any, Mapping
 from airflow.sdk import chain, task, task_group
 from dataclasses import asdict
 
-from _types.projet import SelecteurStorageOptions, custom_asdict_factory
-from utils.config.dag_params import get_project_name
-from utils.config.tasks import (
+from src._types.projet import SelecteurStorageOptions, custom_asdict_factory
+from src.utils.config.dag_params import get_project_name
+from src.utils.config.tasks import (
     get_list_documentation,
     get_list_contact,
     get_list_selecteur_storage_info,

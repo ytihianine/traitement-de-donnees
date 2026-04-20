@@ -7,25 +7,25 @@ from collections.abc import Mapping
 
 from airflow.sdk import get_current_context, task
 
-from _types.projet import SelecteurConfig, SelecteurStorageOptions
+from src._types.projet import SelecteurConfig, SelecteurStorageOptions
 from infra.file_system.dataframe import read_dataframe
 from infra.file_system.exceptions import FileHandlerError
 from infra.file_system.factory import create_default_s3_handler
 from infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
-from utils.config.dag_params import (
+from src.utils.config.dag_params import (
     get_execution_date,
     get_project_name,
     should_skip_task,
 )
-from _enums.dags import FeatureFlags
-from utils.config.tasks import (
+from src._enums.dags import FeatureFlags
+from src.utils.config.tasks import (
     get_list_selecteur_storage_info,
     get_projet_s3_info,
     merge_selecteur_config,
 )
-from _enums.dags import TypeSource
-from _enums.filesystem import IcebergTableStatus
-from constants import (
+from src._enums.dags import TypeSource
+from src._enums.filesystem import IcebergTableStatus
+from src.constants import (
     DEFAULT_POLARIS_HOST,
     DEFAULT_POLARIS_CATALOG,
     DEFAULT_S3_CONN_ID,

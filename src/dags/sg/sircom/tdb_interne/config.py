@@ -1,4 +1,4 @@
-from _types.projet import SelecteurStorageOptions
+from src._types.projet import SelecteurStorageOptions
 
 selecteur_options = {
     "abonnes_lettres": SelecteurStorageOptions(),
