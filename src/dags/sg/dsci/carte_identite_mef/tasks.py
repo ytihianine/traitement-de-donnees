@@ -4,7 +4,7 @@ from airflow.sdk.bases.operator import chain
 from src.common_tasks.etl import create_grist_etl_task
 from src.utils.process.structures import normalize_grist_dataframe
 
-from dags.sg.dsci.carte_identite_mef import process
+from src.dags.sg.dsci.carte_identite_mef import process
 
 
 @task_group()

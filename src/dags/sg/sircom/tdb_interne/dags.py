@@ -17,14 +17,14 @@ from src.utils.config.dag_params import create_default_args, create_dag_params
 from src.common_tasks.validation import validate_dag_parameters
 from src.common_tasks.grist import download_grist_doc_to_s3
 from src.common_tasks.projet import get_selecteur_config
-from dags.sg.sircom.tdb_interne.tasks import (
+from src.dags.sg.sircom.tdb_interne.tasks import (
     abonnes_visites,
     budget,
     enquetes,
     metiers,
     ressources_humaines,
 )
-from dags.sg.sircom.tdb_interne.config import (
+from src.dags.sg.sircom.tdb_interne.config import (
     selecteur_options,
 )
 

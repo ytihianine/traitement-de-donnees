@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `api_operat_dags.py`     |
+| Fichier source     | `api_operat_src.dags.py`     |
 | Description | Ce traitement permet de récupérer les déclarations réalisées auprès de l'ADEME |
 | Fréquence de mise à jour | Quotidienne |
 | Fonctionnement | Automatisé |

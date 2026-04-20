@@ -28,15 +28,15 @@ from src.common_tasks.s3 import (
 from src.common_tasks.projet import get_selecteur_config
 
 from src.common_tasks.validation import validate_dag_parameters
-from dags.sg.siep.mmsi.oad.caracteristiques.tasks import (
+from src.dags.sg.siep.mmsi.oad.caracteristiques.tasks import (
     oad_carac_to_parquet,
     tasks_oad_caracteristiques,
 )
-from dags.sg.siep.mmsi.oad.indicateurs.tasks import (
+from src.dags.sg.siep.mmsi.oad.indicateurs.tasks import (
     oad_indic_to_parquet,
     tasks_oad_indicateurs,
 )
-from dags.sg.siep.mmsi.oad.config import selecteur_options
+from src.dags.sg.siep.mmsi.oad.config import selecteur_options
 
 # Mails
 nom_projet = "Outil aide diagnostic"

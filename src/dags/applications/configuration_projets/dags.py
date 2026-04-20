@@ -24,10 +24,10 @@ from src.common_tasks.s3 import (
     del_s3_files,
     del_iceberg_staging_table,
 )
-from dags.applications.configuration_projets.tasks import (
+from src.dags.applications.configuration_projets.tasks import (
     process_data,
 )
-from dags.applications.configuration_projets.config import (
+from src.dags.applications.configuration_projets.config import (
     selecteur_options,
 )
 

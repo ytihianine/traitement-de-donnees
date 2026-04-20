@@ -16,7 +16,7 @@ from src.common_tasks.sql import (
 )
 from src.common_tasks.s3 import copy_s3_files, del_s3_files
 
-from dags.applications.catalogue.grist.tasks import (
+from src.dags.applications.catalogue.grist.tasks import (
     referentiels_grist,
     source_grist,
 )

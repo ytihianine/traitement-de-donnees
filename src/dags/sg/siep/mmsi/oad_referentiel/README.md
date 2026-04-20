@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `oad_refentiel_dags.py`     |
+| Fichier source     | `oad_refentiel_src.dags.py`     |
 | Description | Ce traitement permet d'actualiser les référentiels propres à l'OAD. |
 | Fréquence d'exécution' | To define |
 | Fonctionnement | Semi-automatisé |

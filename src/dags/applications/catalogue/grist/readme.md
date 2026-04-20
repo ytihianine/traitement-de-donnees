@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `dags.py`     |
+| Fichier source     | `src.dags.py`     |
 | Description | Synchronisation entre le catalogue disponible dans Grist et celui stocké en base |
 | Fréquence de mise à jour | Quotidien |
 | Fonctionnement | Automatisé |

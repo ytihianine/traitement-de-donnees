@@ -8,7 +8,7 @@ from src._enums.dags import DagStatus
 from src.common_tasks.validation import validate_dag_parameters
 from src.utils.config.dag_params import create_dag_params, create_default_args
 
-from dags.applications.clean_system.task import (
+from src.dags.applications.clean_system.task import (
     delete_tmp_keys,
     delete_keys_with_date,
     delete_airflow_keys,

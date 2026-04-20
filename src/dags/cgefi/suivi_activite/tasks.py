@@ -5,7 +5,7 @@ from src.utils.process.structures import normalize_grist_dataframe
 from src.common_tasks.etl import create_grist_etl_task
 
 
-from dags.cgefi.suivi_activite import process
+from src.dags.cgefi.suivi_activite import process
 
 
 @task_group

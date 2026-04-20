@@ -19,10 +19,10 @@ from src.common_tasks.s3 import (
 from src.common_tasks.projet import get_selecteur_config
 from src.utils.config.tasks import get_list_source_fichier
 from src.common_tasks.validation import validate_dag_parameters
-from dags.dge.carto_rem.fichiers.tasks import (
+from src.dags.dge.carto_rem.fichiers.tasks import (
     source_files,
 )
-from dags.dge.carto_rem.fichiers.config import selecteur_options
+from src.dags.dge.carto_rem.fichiers.config import selecteur_options
 
 # Mails
 nom_projet = "Cartographie rémunération"

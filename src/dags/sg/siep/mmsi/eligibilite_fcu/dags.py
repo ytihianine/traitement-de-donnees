@@ -21,11 +21,11 @@ from src.common_tasks.s3 import (
 )
 from src.common_tasks.projet import get_selecteur_config
 
-from dags.sg.siep.mmsi.eligibilite_fcu.task import (
+from src.dags.sg.siep.mmsi.eligibilite_fcu.task import (
     get_eligibilite_fcu,
     process_fcu_result,
 )
-from dags.sg.siep.mmsi.eligibilite_fcu.config import selecteur_options
+from src.dags.sg.siep.mmsi.eligibilite_fcu.config import selecteur_options
 
 nom_projet = "France Chaleur Urbaine (FCU)"
 

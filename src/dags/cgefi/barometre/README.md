@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `barometre_dags.py`     |
+| Fichier source     | `barometre_src.dags.py`     |
 | Description | Ce traitement permet de suivre la publication des rapports. |
 | Fréquence de mise à jour | Ad-hoc |
 | Fonctionnement | Semi-automatisé |

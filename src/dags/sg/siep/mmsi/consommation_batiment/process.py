@@ -6,7 +6,7 @@ from src.utils.process.text import (
     convert_str_cols_to_date,
     normalize_whitespace_columns,
 )
-from dags.sg.siep.mmsi.consommation_batiment.enums import Statuts, TypeEnergie
+from src.dags.sg.siep.mmsi.consommation_batiment.enums import Statuts, TypeEnergie
 
 
 # ======================================================

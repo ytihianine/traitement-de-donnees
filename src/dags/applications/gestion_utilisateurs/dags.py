@@ -6,7 +6,7 @@
 
 # from src.utils.api_client.base import AbstractApiClient
 
-# from dags.applications.gestion_utilisateurs.tasks import (
+# from src.dags.applications.gestion_utilisateurs.tasks import (
 #     get_user_infos,
 #     create_user_on_chartsgouv,
 #     create_user_on_depot_fichier,
@@ -15,7 +15,7 @@
 #     get_depot_fichier_access_token,
 # )
 
-# from dags.applications.gestion_utilisateurs.config import (
+# from src.dags.applications.gestion_utilisateurs.config import (
 #     DEPOT_FICHIER_DB_HOOK,
 #     CHARTSGOUV_DB_HOOK,
 #     httpx_rie_client,

@@ -129,7 +129,7 @@ def should_skip_task(
 def create_default_args(
     retries: int = 0, retry_delay: timedelta | None = None, **kwargs
 ) -> dict:
-    """Create standard default_args for DAGs."""
+    """Create standard default_args for src.dags."""
     args = {
         "owner": DEFAULT_OWNER,
         "depends_on_past": False,
@@ -150,7 +150,7 @@ def create_dag_params(
     db_params: DBParams | None,
     feature_flags: FeatureFlagsEnable,
 ) -> dict:
-    """Create standard params for DAGs."""
+    """Create standard params for src.dags."""
     # Using DagParams for type checking
     dag_params = DagParams(
         nom_projet=nom_projet,

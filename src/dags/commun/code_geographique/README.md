@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `oad_dags.py`     |
+| Fichier source     | `oad_src.dags.py`     |
 | Description | Cette pipeline permet de récupérer les codes géographiques (communes, départements, régions). |
 | Fréquence d'exécution' | Tous les 6 du mois |
 | Fonctionnement | Automatisé |

@@ -5,7 +5,7 @@ from src.common_tasks.etl import (
     create_file_etl_task,
 )
 
-from dags.dge.carto_rem.fichiers import process
+from src.dags.dge.carto_rem.fichiers import process
 
 
 @task_group

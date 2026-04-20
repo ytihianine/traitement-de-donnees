@@ -14,13 +14,13 @@ from src.common_tasks.projet import get_selecteur_config
 
 from src.common_tasks.grist import download_grist_doc_to_s3
 from src.common_tasks.validation import validate_dag_parameters
-from dags.sg.dsci.carte_identite_mef.tasks import (
+from src.dags.sg.dsci.carte_identite_mef.tasks import (
     effectif,
     budget,
     taux_agent,
     plafond,
 )
-from dags.sg.dsci.carte_identite_mef.config import (
+from src.dags.sg.dsci.carte_identite_mef.config import (
     selecteur_options,
 )
 

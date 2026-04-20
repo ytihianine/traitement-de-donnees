@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `oad_dags.py`     |
+| Fichier source     | `oad_src.dags.py`     |
 | Description | Ce traitement permet de définir les caractéristiques principales d'un biens. |
 | Fréquence d'exécution' | To define |
 | Fonctionnement | Semi-automatisé |

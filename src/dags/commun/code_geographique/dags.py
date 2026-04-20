@@ -16,7 +16,7 @@ from src.common_tasks.sql import (
     # set_dataset_last_update_date,
 )
 from src.common_tasks.validation import validate_dag_parameters
-from dags.commun.code_geographique.tasks import code_geographique, geojson, code_iso
+from src.dags.commun.code_geographique.tasks import code_geographique, geojson, code_iso
 
 nom_projet = "Code géographique"
 

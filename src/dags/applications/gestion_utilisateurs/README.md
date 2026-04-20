@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `sync_users_dags.py.py`     |
+| Fichier source     | `sync_users_src.dags.py.py`     |
 | Description | Ce traitement permet de garder une synchronisation entre Grist et la base de données |
 | Fréquence d'exécution | Toutes les 10 minutes du lundi au vendredi |
 | Fonctionnement | Automatisé |

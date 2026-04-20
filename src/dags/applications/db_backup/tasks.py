@@ -4,7 +4,7 @@ from src._types.dags import (
 )
 from src.common_tasks.etl import create_task
 
-from dags.applications.db_backup import actions
+from src.dags.applications.db_backup import actions
 
 dump_databases = create_task(
     task_config=TaskConfig(task_id="db_backup"),

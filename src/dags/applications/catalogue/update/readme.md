@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `dags.py`     |
+| Fichier source     | `src.dags.py`     |
 | Description | Ce traitement permet de mettre à jour le catalogue de données |
 | Fréquence de mise à jour | Quotidien |
 | Fonctionnement | Automatisé |

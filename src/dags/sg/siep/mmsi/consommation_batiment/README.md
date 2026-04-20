@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `mmsi_dags.py`     |
+| Fichier source     | `mmsi_src.dags.py`     |
 | Description | Ce traitement permet de suivre la consommation des bâtiments du MEF |
 | Fréquence de mise à jour | Mensuelle |
 | Fonctionnement | Semi-automatisé |

@@ -25,8 +25,8 @@ from src.common_tasks.s3 import (
 from src.utils.config.tasks import get_list_source_fichier
 
 from src.common_tasks.validation import validate_dag_parameters
-from dags.sg.snum.certificats_igc.tasks import source_files, output_files
-from dags.sg.snum.certificats_igc.config import selecteur_options
+from src.dags.sg.snum.certificats_igc.tasks import source_files, output_files
+from src.dags.sg.snum.certificats_igc.config import selecteur_options
 
 nom_projet = "Certificat IGC"
 

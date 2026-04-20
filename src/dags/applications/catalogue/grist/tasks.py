@@ -14,7 +14,7 @@ from src.common_tasks.etl import (
 )
 from src.utils.process.structures import normalize_grist_dataframe
 
-from dags.applications.catalogue.grist import process
+from src.dags.applications.catalogue.grist import process
 
 
 @task_group()

@@ -4,7 +4,7 @@ from airflow.sdk import Variable
 from src.infra.http_client.adapters import HttpxClient, ClientConfig
 from src.constants import AGENT, PROXY
 
-from dags.sg.siep.mmsi.api_operat.config import BASE_URL, ID_STRUCTURES
+from src.dags.sg.siep.mmsi.api_operat.config import BASE_URL, ID_STRUCTURES
 
 
 # ================

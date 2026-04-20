@@ -13,7 +13,7 @@
 # from src.utils.tasks.etl import create_task
 # from src.utils.tasks.validation import create_validate_params_task
 
-# from dags.applications.tdb_backup import actions
+# from src.dags.applications.tdb_backup import actions
 
 
 # validate_params = create_validate_params_task(

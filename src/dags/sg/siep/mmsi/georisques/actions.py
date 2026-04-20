@@ -19,7 +19,7 @@ from src.utils.config.dag_params import get_db_info
 from src._enums.http import HttpHandlerType
 from src.constants import AGENT, PROXY, DEFAULT_PG_DATA_CONN_ID
 
-from dags.sg.siep.mmsi.georisques.process import (
+from src.dags.sg.siep.mmsi.georisques.process import (
     format_query_param,
     format_risque_results,
 )

@@ -34,7 +34,7 @@ from src.constants import (
     DEFAULT_POLARIS_CATALOG,
     DEFAULT_TRINO_HOST,
 )
-from dags.dag_standard.config import selecteur_mapping
+from src.dags.dag_standard.config import selecteur_mapping
 
 nom_projet = "Configuration des projets"
 

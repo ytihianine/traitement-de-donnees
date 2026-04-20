@@ -20,7 +20,7 @@ from src.common_tasks.s3 import (
     del_s3_files,
 )
 
-from dags.sg.siep.mmsi.api_operat.task import source, output
+from src.dags.sg.siep.mmsi.api_operat.task import source, output
 
 nom_projet = "API Opera"
 

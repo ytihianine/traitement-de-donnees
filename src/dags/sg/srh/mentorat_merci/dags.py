@@ -15,11 +15,11 @@ from src.utils.config.tasks import get_list_source_fichier
 from src.common_tasks.validation import validate_dag_parameters
 from src.common_tasks.s3 import copy_s3_files, del_s3_files
 
-from dags.sg.srh.mentorat_merci.tasks import (
+from src.dags.sg.srh.mentorat_merci.tasks import (
     agent_inscrit,
     generer_binomes,
 )
-from dags.sg.srh.mentorat_merci.config import (
+from src.dags.sg.srh.mentorat_merci.config import (
     selecteur_options,
 )
 

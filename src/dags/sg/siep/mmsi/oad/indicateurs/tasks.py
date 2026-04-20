@@ -5,7 +5,7 @@ from src._types.dags import ETLStep, TaskConfig
 from src.common_tasks.file import create_parquet_converter_task
 from src.common_tasks.etl import create_task
 
-from dags.sg.siep.mmsi.oad.indicateurs import process
+from src.dags.sg.siep.mmsi.oad.indicateurs import process
 
 oad_indic_to_parquet = create_parquet_converter_task(
     selecteur="oad_indic",

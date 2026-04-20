@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any
 from airflow.sdk import Variable
 
-from dags.applications.tdb_backup.process import convert_str_to_ascii_str
+from src.dags.applications.tdb_backup.process import convert_str_to_ascii_str
 from src.infra.file_system.factory import create_file_handler
 from src.infra.http_client.config import ClientConfig
 from src.infra.http_client.adapters import RequestsClient

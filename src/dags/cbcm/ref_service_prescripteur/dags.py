@@ -21,12 +21,12 @@ from src.common_tasks.s3 import (
 from src.common_tasks.projet import get_selecteur_config
 
 from src.common_tasks.validation import validate_dag_parameters
-from dags.cbcm.ref_service_prescripteur.tasks import (
+from src.dags.cbcm.ref_service_prescripteur.tasks import (
     grist_source,
     fetch_from_db,
     load_to_grist,
 )
-from dags.cbcm.ref_service_prescripteur.config import selecteur_options
+from src.dags.cbcm.ref_service_prescripteur.config import selecteur_options
 
 # Variables
 nom_projet = "Données comptable - référentiel"

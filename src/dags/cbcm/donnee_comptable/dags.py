@@ -26,11 +26,11 @@ from src.utils.config.dag_params import create_default_args, create_dag_params
 from src.utils.config.tasks import get_list_source_fichier
 
 from src.common_tasks.validation import validate_dag_parameters
-from dags.cbcm.donnee_comptable.tasks import (
+from src.dags.cbcm.donnee_comptable.tasks import (
     source_files,
     datasets_additionnels,
 )
-from dags.cbcm.donnee_comptable.config import (
+from src.dags.cbcm.donnee_comptable.config import (
     selecteur_options,
 )
 

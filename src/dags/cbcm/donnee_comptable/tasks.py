@@ -7,7 +7,7 @@ from src.common_tasks.etl import (
     create_file_etl_task,
 )
 
-from dags.cbcm.donnee_comptable import process
+from src.dags.cbcm.donnee_comptable import process
 
 
 @task_group(group_id="source_files")

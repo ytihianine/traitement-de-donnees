@@ -9,7 +9,7 @@ from src.constants import AGENT, DEFAULT_GRIST_HOST, PROXY
 from src.utils.logs import df_info
 
 
-from dags.commun.code_geographique import process
+from src.dags.commun.code_geographique import process
 
 # Données COG
 PAGE_SIZE = "?page_size=0"  # get all data at once

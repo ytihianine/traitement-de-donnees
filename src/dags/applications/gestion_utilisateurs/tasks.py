@@ -7,9 +7,9 @@
 
 # from src.utils.dataframe import df_info
 
-# from dags.applications.gestion_utilisateurs.process import process_user_info
+# from src.dags.applications.gestion_utilisateurs.process import process_user_info
 
-# from dags.applications.gestion_utilisateurs.config import grist_api, TBL_USER
+# from src.dags.applications.gestion_utilisateurs.config import grist_api, TBL_USER
 
 
 # def get_token(

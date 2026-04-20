@@ -6,7 +6,7 @@
 
 # from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
-# from dags.applications.tdb_backup.tasks import (
+# from src.dags.applications.tdb_backup.tasks import (
 #     validate_params,
 #     tdb_backup_task_group,
 # )

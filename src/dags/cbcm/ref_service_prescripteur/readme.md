@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `dags.py`     |
+| Fichier source     | `src.dags.py`     |
 | Description | Récupérer le référentiel des services prescripteurs depuis Grist |
 | Fréquence de mise à jour | Toutes les 8 minutes |
 | Fonctionnement | Automatisé |

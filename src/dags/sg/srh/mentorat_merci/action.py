@@ -9,7 +9,7 @@ from src.utils.config.dag_params import get_execution_date, get_project_name
 from src.infra.mails.default_smtp import MailMessage, render_template, send_mail
 from src.utils.config.tasks import get_list_contact
 
-from dags.sg.srh.mentorat_merci import process
+from src.dags.sg.srh.mentorat_merci import process
 
 
 def trouver_meilleurs_binomes(df: pd.DataFrame) -> Mapping[str, pd.DataFrame]:

@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `carte_identite_dags.py`     |
+| Fichier source     | `carte_identite_src.dags.py`     |
 | Description | Ce traitement permet de récupérer les données propre à la carte d'identité des MEF |
 | Fréquence de mise à jour | Quotidienne |
 | Fonctionnement | Automatisé |

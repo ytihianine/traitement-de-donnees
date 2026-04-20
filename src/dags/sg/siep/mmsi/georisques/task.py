@@ -6,7 +6,7 @@ from src.common_tasks.etl import (
     create_task,
 )
 
-from dags.sg.siep.mmsi.georisques import actions
+from src.dags.sg.siep.mmsi.georisques import actions
 
 
 @task_group

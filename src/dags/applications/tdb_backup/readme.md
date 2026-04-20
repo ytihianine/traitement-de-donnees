@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `dags.py`     |
+| Fichier source     | `src.dags.py`     |
 | Description | Sauvegarde automatisée des tableaux de bord de l'instance Chartsgouv. |
 | Fréquence de mise à jour | Quotidienne |
 | Fonctionnement | Automatisé |

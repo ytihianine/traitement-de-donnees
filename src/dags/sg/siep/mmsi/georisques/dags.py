@@ -20,8 +20,8 @@ from src.common_tasks.s3 import (
     del_s3_files,
 )
 from src.common_tasks.projet import get_selecteur_config
-from dags.sg.siep.mmsi.georisques.task import georisques_group
-from dags.sg.siep.mmsi.georisques.config import selecteur_options
+from src.dags.sg.siep.mmsi.georisques.task import georisques_group
+from src.dags.sg.siep.mmsi.georisques.config import selecteur_options
 
 # Mails
 nom_projet = "Géorisques"

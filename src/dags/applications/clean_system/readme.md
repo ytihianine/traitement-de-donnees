@@ -20,7 +20,7 @@ Pour les mois précédents, on ne conserve que le dernier fichier disponible du 
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `dags.py`     |
+| Fichier source     | `src.dags.py`     |
 | Description | Ce traitement permet de nettoyer les logs des systèmes externes (db, s3, Airflow ...) |
 | Fréquence de mise à jour | Quotidien |
 | Fonctionnement | Automatisé |

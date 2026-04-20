@@ -1,8 +1,8 @@
 from src._types.dags import ETLStep, TaskConfig
 from src.common_tasks.etl import create_task, create_file_etl_task
 
-from dags.sg.srh.mentorat_merci import action
-from dags.sg.srh.mentorat_merci import process
+from src.dags.sg.srh.mentorat_merci import action
+from src.dags.sg.srh.mentorat_merci import process
 
 agent_inscrit = create_file_etl_task(
     selecteur="agent_inscrit",

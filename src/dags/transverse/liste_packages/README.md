@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `packages_dags.py`     |
+| Fichier source     | `packages_src.dags.py`     |
 | Description | Ce dag liste tous les packages disponibles dans l'instance. |
 | Fréquence de mise à jour | Unique |
 | Fonctionnement | Automatisé |

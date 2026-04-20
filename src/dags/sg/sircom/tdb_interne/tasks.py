@@ -5,7 +5,7 @@ from src.common_tasks.etl import create_grist_etl_task
 from src.utils.process.structures import normalize_grist_dataframe
 
 
-from dags.sg.sircom.tdb_interne import process
+from src.dags.sg.sircom.tdb_interne import process
 
 version = "v1"
 

@@ -18,12 +18,12 @@ from src.common_tasks.s3 import (
 from src.common_tasks.projet import get_selecteur_config
 
 from src.common_tasks.validation import validate_dag_parameters
-from dags.dge.carto_rem.grist.tasks import (
+from src.dags.dge.carto_rem.grist.tasks import (
     referentiels,
     source_grist,
     # load_to_grist,
 )
-from dags.dge.carto_rem.grist.config import selecteur_options
+from src.dags.dge.carto_rem.grist.config import selecteur_options
 
 # Mails
 nom_projet = "Cartographie rémunération - Grist"

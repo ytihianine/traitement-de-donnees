@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import Any, List, Mapping, Tuple
 
-from dags.sg.srh.mentorat_merci.enums import ChoixDirection
+from src.dags.sg.srh.mentorat_merci.enums import ChoixDirection
 
 correspondance_objectifs = {
     "Transmettre ma culture administrative et ministérielle": "Améliorer ma culture administrative et ministérielle",  # noqa

@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `tdb_interne_dags.py`     |
+| Fichier source     | `tdb_interne_src.dags.py`     |
 | Description | Ce traitement permet d'actualiser les données du tableau de bord interne du SIRCOM |
 | Fréquence d'exécution | Toutes les 8 minutes de 7-13h et de 14-19h du lundi au vendredi |
 | Fréquence de mise à jour | Multiples |

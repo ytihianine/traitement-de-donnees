@@ -8,7 +8,7 @@ from src._enums.http import HttpHandlerType
 from src.constants import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
 from src.infra.database.factory import create_db_handler
 
-from dags.sg.siep.mmsi.eligibilite_fcu.process import (
+from src.dags.sg.siep.mmsi.eligibilite_fcu.process import (
     get_eligibilite_fcu,
 )
 from src.utils.logs import df_info

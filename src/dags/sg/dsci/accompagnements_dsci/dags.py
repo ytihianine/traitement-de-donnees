@@ -15,7 +15,7 @@ from src.common_tasks.projet import get_selecteur_config
 from src.utils.config.dag_params import create_dag_params, create_default_args
 
 from src.common_tasks.validation import validate_dag_parameters
-from dags.sg.dsci.accompagnements_dsci.tasks import (
+from src.dags.sg.dsci.accompagnements_dsci.tasks import (
     referentiels,
     bilaterales,
     correspondant,
@@ -23,7 +23,7 @@ from dags.sg.dsci.accompagnements_dsci.tasks import (
     dsci,
     conseil_interne,
 )
-from dags.sg.dsci.accompagnements_dsci.config import (
+from src.dags.sg.dsci.accompagnements_dsci.config import (
     selecteur_options,
 )
 

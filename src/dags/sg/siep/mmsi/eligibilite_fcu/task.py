@@ -3,8 +3,8 @@ from src.common_tasks.etl import (
     create_task,
 )
 
-from dags.sg.siep.mmsi.eligibilite_fcu import actions
-from dags.sg.siep.mmsi.eligibilite_fcu import process
+from src.dags.sg.siep.mmsi.eligibilite_fcu import actions
+from src.dags.sg.siep.mmsi.eligibilite_fcu import process
 
 get_eligibilite_fcu = create_task(
     task_config=TaskConfig(task_id="eligibilite_fcu_to_file"),

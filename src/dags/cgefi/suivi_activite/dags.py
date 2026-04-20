@@ -17,7 +17,7 @@ from src.utils.config.dag_params import create_dag_params, create_default_args
 from src.common_tasks.grist import download_grist_doc_to_s3
 from src.common_tasks.s3 import del_s3_files
 
-from dags.cgefi.suivi_activite.tasks import (
+from src.dags.cgefi.suivi_activite.tasks import (
     referentiels,
     informations_generales,
     processus_4,

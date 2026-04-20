@@ -2,7 +2,7 @@
 ### Informations générales
 | Information | Valeur |
 | -------- | -------- |
-| Fichier source     | `dags.py`     |
+| Fichier source     | `src.dags.py`     |
 | Description | Ce traitement permet de récupérer la configuration des projets depuis Grist. |
 | Fréquence d'exécution | Quotidienne |
 | Fonctionnement | Automatisé |

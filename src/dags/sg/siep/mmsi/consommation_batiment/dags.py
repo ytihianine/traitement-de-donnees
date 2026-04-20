@@ -26,12 +26,12 @@ from src.common_tasks.projet import get_selecteur_config
 
 from src.utils.config.tasks import get_list_source_fichier
 from src.common_tasks.validation import validate_dag_parameters
-from dags.sg.siep.mmsi.consommation_batiment.tasks import (
+from src.dags.sg.siep.mmsi.consommation_batiment.tasks import (
     conso_mens_parquet,
     source_files,
     additionnal_files,
 )
-from dags.sg.siep.mmsi.consommation_batiment.config import selecteur_options
+from src.dags.sg.siep.mmsi.consommation_batiment.config import selecteur_options
 
 # Mails
 nom_projet = "Consommation des bâtiments"

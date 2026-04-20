@@ -25,7 +25,7 @@ from src.common_tasks.s3 import (
 from src.utils.config.tasks import get_list_source_fichier
 from src.common_tasks.projet import get_selecteur_config
 
-from dags.sg.siep.mmsi.oad_referentiel.tasks import bien_typologie
+from src.dags.sg.siep.mmsi.oad_referentiel.tasks import bien_typologie
 
 # Mails
 nom_projet = "Outil aide diagnostic - référentiel"

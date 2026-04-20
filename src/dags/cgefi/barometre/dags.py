@@ -24,7 +24,7 @@ from src.common_tasks.s3 import (
 )
 from src.common_tasks.projet import get_selecteur_config, get_list_source_fichier
 
-from dags.cgefi.barometre.tasks import (
+from src.dags.cgefi.barometre.tasks import (
     source_files,
 )
 
