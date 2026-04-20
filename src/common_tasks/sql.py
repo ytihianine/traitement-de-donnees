@@ -248,20 +248,26 @@ def ensure_partition(
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
+    tbl_name = config.selecteur_info.tbl_name
+    is_partitioned = config.options.is_partitioned
+    partition_period = config.options.partition_period
+
+    if config.options.write_to_db is False:
+        logging.info(
+            msg=f"write_to_db is set to False for selecteur {config.selecteur_info.selecteur} ... skipping"
+        )
+        return
+
+    if not is_partitioned:
+        logging.info(msg=f"{tbl_name} is not partitioned ... skipping")
+        return
+
     execution_date = get_execution_date(context=context)
     db_info = get_db_info(context=context)
     prod_schema = db_info.prod_schema
 
     # Hook
     db = create_db_handler(connection_id=pg_conn_id)
-
-    tbl_name = config.selecteur_info.tbl_name
-    is_partitioned = config.options.is_partitioned
-    partition_period = config.options.partition_period
-
-    if not is_partitioned:
-        logging.info(msg=f"{tbl_name} is not partitioned ... skipping")
-        return
 
     # Get partition period range
     from_date, to_date = determine_partition_period(
