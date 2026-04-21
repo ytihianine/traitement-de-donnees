@@ -422,6 +422,10 @@ def copy_tmp_table_to_real_table(
     selecteur_config = merge_selecteur_config(
         storage_info=storage_info, storage_options=storage_options
     )
+    # Sort by tbl_order to handle foreign key dependencies
+    selecteur_config = sorted(
+        selecteur_config, key=lambda x: x.storage_options.tbl_order
+    )
     logging.info(msg=f"Nombre de tables à copier: {len(selecteur_config)}")
 
     try:
