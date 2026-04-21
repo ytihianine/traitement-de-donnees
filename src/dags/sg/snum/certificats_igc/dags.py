@@ -43,10 +43,10 @@ nom_projet = "Certificat IGC"
     default_args=create_default_args(retries=0),
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.DEV,
+        dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="certificat_igc"),
         feature_flags=FeatureFlagsEnable(
-            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
+            db=True, mail=False, s3=False, convert_files=False, download_grist_doc=False
         ),
     ),
     on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
