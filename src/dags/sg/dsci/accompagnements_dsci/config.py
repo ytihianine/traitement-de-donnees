@@ -22,7 +22,8 @@ storage_options = {
         tbl_order=5,
     ),
     "accompagnement_dsci_typologie": SelecteurStorageOptions(
-        load_strategy=LoadStrategy.INCREMENTAL
+        load_strategy=LoadStrategy.INCREMENTAL,
+        tbl_order=5,
     ),
     "accompagnement_mi": SelecteurStorageOptions(
         load_strategy=LoadStrategy.INCREMENTAL
