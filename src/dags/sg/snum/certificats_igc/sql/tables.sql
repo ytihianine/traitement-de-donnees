@@ -5,7 +5,7 @@ CREATE TABLE certificat_igc.aip (
     id SERIAL,
     aip_mail TEXT,
     aip_balf_mail TEXT,
-    aip_direction TEXT,
+    aip_direction_geree TEXT,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
     snapshot_id TEXT
@@ -55,6 +55,7 @@ CREATE TABLE certificat_igc.mandataire (
     libelle TEXT,
     sigle TEXT,
     structure TEXT,
+    date DATE,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
     snapshot_id TEXT

@@ -479,11 +479,9 @@ def map_agent_direction(
     return valeur_indeterminee_dir
 
 
-"""
-    Fonctions de processing des fichiers sources
-"""
-
-
+# ===============================================
+# Fonctions de processing des fichiers sources
+# ===============================================
 def process_agent(df: pd.DataFrame) -> pd.DataFrame:
     # Normaliser les données textuelles
     txt_cols = ["structure", "agent_mail"]
@@ -528,6 +526,9 @@ def process_aip(df: pd.DataFrame) -> pd.DataFrame:
     # Déterminer la direction que gère l'AIP
     df["aip_direction_geree"] = list(map(determiner_aip_direction, df["structure"]))
 
+    # Drop colonnes non nécessaires
+    df = df.drop(columns=["structure"])
+
     return df
 
 
@@ -564,11 +565,9 @@ def process_mandataire(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-"""
-    Fonctions de processing des fichiers finaux
-"""
-
-
+# ===============================================
+# Fonctions de processing des fichiers finaux
+# ===============================================
 def process_liste_certificat(
     df_certificat: pd.DataFrame, df_agent: pd.DataFrame
 ) -> pd.DataFrame:
@@ -593,6 +592,26 @@ def process_liste_certificat(
     df["certificat_direction"] = df["certificat_direction"].fillna(
         valeur_indeterminee_dir
     )
-    df = df.drop(columns=["agent_direction", "agent_mail"])
+
+    # Conserver uniquement les colonnes nécessaires
+    cols_to_keep = [
+        "dn",
+        "subjectid",
+        "contact",
+        "email",
+        "date_debut_validite",
+        "date_fin_validite",
+        "profile",
+        "status",
+        "date_revocation",
+        "certificat_direction",
+        "ac",
+        "type_offre",
+        "supports",
+        "etat",
+        "version",
+        "version_serveur",
+    ]
+    df = df.loc[:, cols_to_keep]
 
     return df
