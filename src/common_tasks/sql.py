@@ -429,8 +429,8 @@ def copy_tmp_table_to_real_table(
     logging.info(msg=f"Nombre de tables à copier: {len(selecteur_config)}")
 
     try:
-        db_handler.execute(query="SET session_replication_role = replica;")
-        logging.info(msg="Désactivation des triggers de réplication")
+        # db_handler.execute(query="SET session_replication_role = replica;")
+        # logging.info(msg="Désactivation des triggers de réplication")
         queries = []
         for config in selecteur_config:
             if not config.should_write_to_db():
@@ -491,11 +491,11 @@ def copy_tmp_table_to_real_table(
         else:
             logging.info(msg="No query to execute")
     except Exception as e:
-        db_handler.execute(query="SET session_replication_role = DEFAULT;")
-        logging.info(msg="Réactivation des triggers de réplication")
+        # db_handler.execute(query="SET session_replication_role = DEFAULT;")
+        # logging.info(msg="Réactivation des triggers de réplication")
         raise e
-    db_handler.execute(query="SET session_replication_role = DEFAULT;")
-    logging.info(msg="Réactivation des triggers de réplication")
+    # db_handler.execute(query="SET session_replication_role = DEFAULT;")
+    # logging.info(msg="Réactivation des triggers de réplication")
 
 
 def sort_db_colnames(
