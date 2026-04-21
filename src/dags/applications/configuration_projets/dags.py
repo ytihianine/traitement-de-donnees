@@ -28,7 +28,7 @@ from src.dags.applications.configuration_projets.tasks import (
     process_data,
 )
 from src.dags.applications.configuration_projets.config import (
-    selecteur_options,
+    storage_options,
 )
 
 nom_projet = "Configuration des projets"
@@ -58,7 +58,7 @@ nom_projet = "Configuration des projets"
 def configuration_projets() -> None:
     """Tasks order"""
 
-    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
 
     chain(
         validate_dag_parameters(),
@@ -71,10 +71,10 @@ def configuration_projets() -> None:
         get_projet_snapshot(),
         process_data(),
         delete_tmp_tables(
-            selecteur_options=selecteur_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
+            storage_options=storage_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
         ),
         create_tmp_tables(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
             pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID,
             reset_id_seq=False,
         ),
@@ -82,16 +82,16 @@ def configuration_projets() -> None:
             selecteur_config=selecteur_configs
         ),
         copy_tmp_table_to_real_table(
-            selecteur_options=selecteur_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
+            storage_options=storage_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
         ),
         copy_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
         del_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
         delete_tmp_tables(
-            selecteur_options=selecteur_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
+            storage_options=storage_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
         ),
         copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
         del_iceberg_staging_table(),

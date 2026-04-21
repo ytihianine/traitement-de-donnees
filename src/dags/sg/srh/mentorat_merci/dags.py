@@ -20,7 +20,7 @@ from src.dags.sg.srh.mentorat_merci.tasks import (
     generer_binomes,
 )
 from src.dags.sg.srh.mentorat_merci.config import (
-    selecteur_options,
+    storage_options,
 )
 
 # Mails
@@ -73,10 +73,10 @@ def mentorat_merci() -> None:
         agent_inscrit(),
         generer_binomes(),
         copy_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
         del_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
     )
 

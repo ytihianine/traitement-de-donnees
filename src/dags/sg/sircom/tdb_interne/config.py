@@ -1,6 +1,6 @@
 from src._types.projet import SelecteurStorageOptions
 
-selecteur_options = {
+storage_options = {
     "abonnes_lettres": SelecteurStorageOptions(),
     "collab_inter_structure": SelecteurStorageOptions(),
     "communique_presse": SelecteurStorageOptions(),

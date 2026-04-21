@@ -166,10 +166,10 @@ def dag_verification() -> None:
         print(f"Received selecteur_config: {selecteur_config}")
         print(type(selecteur_config))
         config = SelecteurConfig.from_dict(data=selecteur_config)
-        print(f"Selecteur config: {config.selecteur_info.selecteur}")
+        print(f"Selecteur config: {config.storage_info.selecteur}")
 
         context = get_current_context()
-        context["import_task_name"] = config.selecteur_info.selecteur  # type: ignore
+        context["import_task_name"] = config.storage_info.selecteur  # type: ignore
 
     # Ordre des tâches
     chain(
@@ -184,7 +184,7 @@ def dag_verification() -> None:
                 nom_projet=nom_projet, selecteur_mapping=selecteur_mapping
             ),
             # import_files_to_db(
-            #     nom_projet=nom_projet, selecteur_options=selecteur_mapping
+            #     nom_projet=nom_projet, storage_options=selecteur_mapping
             # ),
             iceberg_task(),
             check_liste_source_fichier(),

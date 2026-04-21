@@ -21,7 +21,7 @@ from src.common_tasks.s3 import (
 )
 from src.common_tasks.projet import get_selecteur_config
 from src.dags.sg.siep.mmsi.georisques.task import georisques_group
-from src.dags.sg.siep.mmsi.georisques.config import selecteur_options
+from src.dags.sg.siep.mmsi.georisques.config import storage_options
 
 # Mails
 nom_projet = "Géorisques"
@@ -53,18 +53,18 @@ nom_projet = "Géorisques"
 def bien_georisques() -> None:
     """Task order"""
 
-    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
 
     chain(
         validate_dag_parameters(),
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         georisques_group(),
-        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        create_tmp_tables(storage_options=storage_options, reset_id_seq=False),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
         ensure_partition.expand(selecteur_config=selecteur_configs),
-        copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
-        copy_s3_files(selecteur_options=selecteur_options),
-        del_s3_files(selecteur_options=selecteur_options),
+        copy_tmp_table_to_real_table(storage_options=storage_options),
+        copy_s3_files(storage_options=storage_options),
+        del_s3_files(storage_options=storage_options),
     )
 
 

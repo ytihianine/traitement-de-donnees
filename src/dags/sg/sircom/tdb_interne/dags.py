@@ -25,7 +25,7 @@ from src.dags.sg.sircom.tdb_interne.tasks import (
     ressources_humaines,
 )
 from src.dags.sg.sircom.tdb_interne.config import (
-    selecteur_options,
+    storage_options,
 )
 
 # Mails
@@ -57,7 +57,7 @@ nom_projet = "TdB interne - SIRCOM"
 )
 def tdb_sircom() -> None:
     """Task order"""
-    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
 
     chain(
         validate_dag_parameters(),

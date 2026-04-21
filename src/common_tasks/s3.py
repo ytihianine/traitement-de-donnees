@@ -34,14 +34,14 @@ from src.constants import (
 
 @task
 def copy_s3_files(
-    selecteur_options: Mapping[str, SelecteurStorageOptions] = {},
+    storage_options: Mapping[str, SelecteurStorageOptions] = {},
     connection_id: str = DEFAULT_S3_CONN_ID,
     **context: Mapping[str, Any],
 ) -> None:
     """Copy files from one place to another in S3 storage.
 
     Args:
-        selecteur_options: Mapping of selecteur options
+        storage_options: Mapping of selecteur options
         connection_id: S3 connection ID
         context: Airflow context
 
@@ -64,27 +64,27 @@ def copy_s3_files(
     )
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
+    storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
-        selecteur_info=selecteur_info, options_map=selecteur_options
+        storage_info=storage_info, storage_options=storage_options
     )
 
     # Copier la liste des sources dans le dossier final
     for config in selecteur_config:
         if not config.should_write_to_s3():
             logging.info(
-                msg=f"Skipping S3 copy for selecteur <{config.selecteur_info.selecteur}>"
+                msg=f"Skipping S3 copy for selecteur <{config.storage_info.selecteur}>"
             )
             continue
 
         logging.info(
-            msg=f"Processing copy to S3 for selecteur <{config.selecteur_info.selecteur}> with type source <{config.selecteur_info.type_source}> ..."  # noqa
+            msg=f"Processing copy to S3 for selecteur <{config.storage_info.selecteur}> with type source <{config.storage_info.type_source}> ..."  # noqa
         )
 
-        target_key = f"{config.selecteur_info.s3_key}/{curr_day}/{curr_time}/{config.selecteur_info.filename}"
+        target_key = f"{config.storage_info.s3_key}/{curr_day}/{curr_time}/{config.storage_info.filename}"
         try:
             # Copy tmp file if exists
-            key = config.selecteur_info.get_full_s3_key(
+            key = config.storage_info.get_full_s3_key(
                 with_tmp_segment=True, use_id_source=False
             )
             logging.info(msg=f"Copying {key} to {target_key}")
@@ -100,14 +100,14 @@ def copy_s3_files(
 
 @task
 def del_s3_files(
-    selecteur_options: Mapping[str, SelecteurStorageOptions] = {},
+    storage_options: Mapping[str, SelecteurStorageOptions] = {},
     s3_conn_id: str = DEFAULT_S3_CONN_ID,
     **context: Mapping[str, Any],
 ) -> None:
     """Delete files from MinIO/S3 storage.
 
     Args:
-        selecteur_options: Mapping of selecteur options
+        storage_options: Mapping of selecteur options
         s3_conn_id: S3 connection ID
         context: Airflow context
 
@@ -127,15 +127,15 @@ def del_s3_files(
     )
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
+    storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
-        selecteur_info=selecteur_info, options_map=selecteur_options
+        storage_info=storage_info, storage_options=storage_options
     )
 
     for config in selecteur_config:
         logging.info(msg=f"{config}")
-        if config.selecteur_info.type_source == TypeSource.FILE:
-            s3_key_source = config.selecteur_info.get_full_s3_key(use_id_source=True)
+        if config.storage_info.type_source == TypeSource.FILE:
+            s3_key_source = config.storage_info.get_full_s3_key(use_id_source=True)
             try:
                 logging.info(msg=f"Deleting source file {s3_key_source}")
                 s3_handler.delete_single(file_path=s3_key_source)
@@ -146,8 +146,8 @@ def del_s3_files(
                 )
                 raise
 
-        if config.options.write_to_s3 is True:
-            s3_key = config.selecteur_info.get_full_s3_key(with_tmp_segment=True)
+        if config.storage_options.write_to_s3 is True:
+            s3_key = config.storage_info.get_full_s3_key(with_tmp_segment=True)
             try:
                 logging.info(msg=f"Deleting {s3_key} source files")
                 s3_handler.delete_single(file_path=s3_key)
@@ -212,17 +212,17 @@ def copy_staging_to_prod(
     config = SelecteurConfig.from_dict(data=selecteur_config)
 
     context = get_current_context()
-    context["task_name"] = config.selecteur_info.selecteur  # type: ignore
+    context["task_name"] = config.storage_info.selecteur  # type: ignore
 
     if not config.should_write_to_iceberg():
         logging.info(
-            msg=f"Skipping Iceberg write for selecteur <{config.selecteur_info.selecteur}>"
+            msg=f"Skipping Iceberg write for selecteur <{config.storage_info.selecteur}>"
         )
         return
 
     # Dag info
-    namespace = config.selecteur_info.get_iceberg_namespace(with_bucket=False)
-    tbl_name = Path(config.selecteur_info.filename).stem
+    namespace = config.storage_info.get_iceberg_namespace(with_bucket=False)
+    tbl_name = Path(config.storage_info.filename).stem
 
     # Get catalog
     properties = generate_catalog_properties(
@@ -255,11 +255,11 @@ def import_file_to_iceberg(
     config = SelecteurConfig.from_dict(data=selecteur_config)
 
     context = get_current_context()
-    context["task_name"] = config.selecteur_info.selecteur  # type: ignore
+    context["task_name"] = config.storage_info.selecteur  # type: ignore
 
     if not config.should_write_to_iceberg():
         logging.info(
-            msg=f"Skipping Iceberg write for selecteur <{config.selecteur_info.selecteur}>"
+            msg=f"Skipping Iceberg write for selecteur <{config.storage_info.selecteur}>"
         )
         return
 
@@ -268,13 +268,13 @@ def import_file_to_iceberg(
     catalog = IcebergCatalog(name=catalog_name, properties=properties)
 
     # Dag info
-    namespace = config.selecteur_info.get_iceberg_namespace(with_bucket=False)
-    tbl_name = Path(config.selecteur_info.filename).stem
+    namespace = config.storage_info.get_iceberg_namespace(with_bucket=False)
+    tbl_name = Path(config.storage_info.filename).stem
 
     # Read tmp data
     df = read_dataframe(
         file_handler=s3_handler,
-        file_path=config.selecteur_info.get_full_s3_key(with_tmp_segment=True),
+        file_path=config.storage_info.get_full_s3_key(with_tmp_segment=True),
     )
 
     # Write prod table

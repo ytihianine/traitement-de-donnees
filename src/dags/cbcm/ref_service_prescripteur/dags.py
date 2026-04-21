@@ -26,7 +26,7 @@ from src.dags.cbcm.ref_service_prescripteur.tasks import (
     fetch_from_db,
     load_to_grist,
 )
-from src.dags.cbcm.ref_service_prescripteur.config import selecteur_options
+from src.dags.cbcm.ref_service_prescripteur.config import storage_options
 
 # Variables
 nom_projet = "Données comptable - référentiel"
@@ -56,7 +56,7 @@ nom_projet = "Données comptable - référentiel"
 )
 def chorus_service_prescripteur() -> None:
     """Task definition"""
-    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
 
     # Ordre des tâches
     chain(
@@ -69,14 +69,14 @@ def chorus_service_prescripteur() -> None:
         grist_source(),
         fetch_from_db(),
         load_to_grist(),
-        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        create_tmp_tables(storage_options=storage_options, reset_id_seq=False),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
-        copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
+        copy_tmp_table_to_real_table(storage_options=storage_options),
         copy_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
         del_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
         delete_tmp_tables(),
     )

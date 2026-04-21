@@ -31,7 +31,7 @@ from src.dags.cbcm.donnee_comptable.tasks import (
     datasets_additionnels,
 )
 from src.dags.cbcm.donnee_comptable.config import (
-    selecteur_options,
+    storage_options,
 )
 
 # Mails
@@ -78,7 +78,7 @@ def chorus_donnees_comptables() -> None:
         on_skipped_callback=create_send_mail_callback(mail_status=MailStatus.SKIP),
         on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
-    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
 
     # Ordre des tâches
     chain(
@@ -89,17 +89,17 @@ def chorus_donnees_comptables() -> None:
         get_projet_snapshot(nom_projet=nom_projet),
         source_files(),
         datasets_additionnels(),
-        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        create_tmp_tables(storage_options=storage_options, reset_id_seq=False),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
         ensure_partition.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
         copy_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
         del_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
         delete_tmp_tables(),
     )

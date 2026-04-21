@@ -243,18 +243,18 @@ def ensure_partition(
     config = SelecteurConfig.from_dict(data=selecteur_config)
 
     context = get_current_context()
-    context["import_task_name"] = config.selecteur_info.selecteur  # type: ignore
+    context["import_task_name"] = config.storage_info.selecteur  # type: ignore
 
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    tbl_name = config.selecteur_info.tbl_name
-    is_partitioned = config.options.is_partitioned
-    partition_period = config.options.partition_period
+    tbl_name = config.storage_info.tbl_name
+    is_partitioned = config.storage_options.is_partitioned
+    partition_period = config.storage_options.partition_period
 
-    if config.options.write_to_db is False:
+    if config.storage_options.write_to_db is False:
         logging.info(
-            msg=f"write_to_db is set to False for selecteur {config.selecteur_info.selecteur} ... skipping"
+            msg=f"write_to_db is set to False for selecteur {config.storage_info.selecteur} ... skipping"
         )
         return
 
@@ -297,7 +297,7 @@ def ensure_partition(
 @task(task_id="create_tmp_tables")
 def create_tmp_tables(
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
-    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
+    storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
     reset_id_seq: bool = True,
     **context,
 ) -> None:
@@ -318,9 +318,9 @@ def create_tmp_tables(
     db = create_db_handler(connection_id=pg_conn_id)
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
+    storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
-        selecteur_info=selecteur_info, options_map=selecteur_options
+        storage_info=storage_info, storage_options=storage_options
     )
 
     drop_queries = []
@@ -330,11 +330,11 @@ def create_tmp_tables(
     for config in selecteur_config:
         if not config.should_write_to_db():
             logging.info(
-                msg=f"Skipping DB tmp table creation for selecteur <{config.selecteur_info.selecteur}>"
+                msg=f"Skipping DB tmp table creation for selecteur <{config.storage_info.selecteur}>"
             )
             continue
 
-        tbl_name = config.selecteur_info.tbl_name
+        tbl_name = config.storage_info.tbl_name
 
         drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
         create_queries.append(f"""CREATE TABLE
@@ -358,7 +358,7 @@ def create_tmp_tables(
 @task(task_id="delete_tmp_tables")
 def delete_tmp_tables(
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
-    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
+    storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
     **context,
 ) -> None:
     """
@@ -370,9 +370,9 @@ def delete_tmp_tables(
     tmp_schema = db_info.tmp_schema
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
+    storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
-        selecteur_info=selecteur_info, options_map=selecteur_options
+        storage_info=storage_info, storage_options=storage_options
     )
 
     # Hook
@@ -381,18 +381,18 @@ def delete_tmp_tables(
     for config in selecteur_config:
         if not config.should_write_to_db():
             logging.info(
-                msg=f"Skipping DB tmp table deletion for selecteur <{config.selecteur_info.selecteur}>"
+                msg=f"Skipping DB tmp table deletion for selecteur <{config.storage_info.selecteur}>"
             )
             continue
 
-        tbl_name = config.selecteur_info.tbl_name
+        tbl_name = config.storage_info.tbl_name
 
         db.execute(query=f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
 
 
 @task(task_id="copy_tmp_table_to_real_table")
 def copy_tmp_table_to_real_table(
-    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
+    storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     merge_delete: bool = False,
     **context,
@@ -418,9 +418,9 @@ def copy_tmp_table_to_real_table(
     db_handler = create_db_handler(connection_id=pg_conn_id)
 
     # Get selecteur config
-    selecteur_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
+    storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
     selecteur_config = merge_selecteur_config(
-        selecteur_info=selecteur_info, options_map=selecteur_options
+        storage_info=storage_info, storage_options=storage_options
     )
     logging.info(msg=f"Nombre de tables à copier: {len(selecteur_config)}")
 
@@ -431,12 +431,12 @@ def copy_tmp_table_to_real_table(
         for config in selecteur_config:
             if not config.should_write_to_db():
                 logging.info(
-                    msg=f"Skipping DB copy to real table for selecteur <{config.selecteur_info.selecteur}>"
+                    msg=f"Skipping DB copy to real table for selecteur <{config.storage_info.selecteur}>"
                 )
                 continue
 
-            load_strategy = config.options.load_strategy
-            tbl_name = config.selecteur_info.tbl_name
+            load_strategy = config.storage_options.load_strategy
+            tbl_name = config.storage_info.tbl_name
             assert tbl_name is not None  # guaranteed by should_write_to_db()
             prod_table = f"{prod_schema}.{tbl_name}"
             tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
@@ -508,8 +508,8 @@ def sort_db_colnames(
     Returns:
         Sorted list of column names
     """
-    tbl_name = selecteur_config.selecteur_info.tbl_name
-    pg_conn_id = selecteur_config.options.db_conn_id
+    tbl_name = selecteur_config.storage_info.tbl_name
+    pg_conn_id = selecteur_config.storage_options.db_conn_id
 
     if tbl_name is None or tbl_name == "":
         return []  # noqa
@@ -568,22 +568,22 @@ def import_file_to_db(
 ) -> None:
     # Init selecteur_config to SelecteurConfig if it's a dict
     config = SelecteurConfig.from_dict(data=selecteur_config)
-    selecteur = config.selecteur_info.selecteur
+    selecteur = config.storage_info.selecteur
 
     db_info = get_db_info(context=context)
     context = get_current_context()
-    context["import_task_name"] = config.selecteur_info.selecteur  # type: ignore
+    context["import_task_name"] = config.storage_info.selecteur  # type: ignore
 
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    if config.options.write_to_db is False:
+    if config.storage_options.write_to_db is False:
         logging.info(
             msg=f"write_to_db option is set to False for selecteur <{selecteur}>. Skipping import to db ..."  # noqa
         )
         return
 
-    if config.options.use_prod_schema:
+    if config.storage_options.use_prod_schema:
         schema = db_info.prod_schema
     else:
         schema = db_info.tmp_schema
@@ -594,7 +594,7 @@ def import_file_to_db(
     local_handler = create_local_handler(base_path=None)
 
     # Variables
-    tbl_name = config.selecteur_info.tbl_name
+    tbl_name = config.storage_info.tbl_name
 
     if tbl_name is None or tbl_name == "":
         logging.info(
@@ -602,8 +602,8 @@ def import_file_to_db(
         )
     else:
         # Variables
-        local_filepath = config.selecteur_info.get_local_path()
-        s3_filepath = config.selecteur_info.get_full_s3_key(with_tmp_segment=True)
+        local_filepath = config.storage_info.get_local_path()
+        s3_filepath = config.storage_info.get_full_s3_key(with_tmp_segment=True)
 
         # Check if old file exists
         local_handler.delete(file_path=local_filepath)

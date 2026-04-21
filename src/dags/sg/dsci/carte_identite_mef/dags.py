@@ -21,7 +21,7 @@ from src.dags.sg.dsci.carte_identite_mef.tasks import (
     plafond,
 )
 from src.dags.sg.dsci.carte_identite_mef.config import (
-    selecteur_options,
+    storage_options,
 )
 
 nom_projet = "Carte_Identite_MEF"
@@ -45,7 +45,7 @@ nom_projet = "Carte_Identite_MEF"
 def carte_identite_mef_dag() -> None:
     """Tasks order"""
 
-    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
 
     chain(
         validate_dag_parameters(),
@@ -55,13 +55,13 @@ def carte_identite_mef_dag() -> None:
             workspace_id="dsci",
         ),
         [effectif(), budget(), taux_agent(), plafond()],
-        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        create_tmp_tables(storage_options=storage_options, reset_id_seq=False),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
         delete_tmp_tables(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
     )
 

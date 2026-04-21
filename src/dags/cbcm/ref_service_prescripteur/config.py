@@ -3,7 +3,7 @@ from src._types.projet import (
 )
 from src._enums.database import LoadStrategy
 
-selecteur_options = {
+storage_options = {
     "delai_global_paiement_sp_manuel": SelecteurStorageOptions(
         load_strategy=LoadStrategy.FULL_LOAD
     ),

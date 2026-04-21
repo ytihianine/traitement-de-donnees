@@ -25,7 +25,7 @@ from src.dags.sg.siep.mmsi.eligibilite_fcu.task import (
     get_eligibilite_fcu,
     process_fcu_result,
 )
-from src.dags.sg.siep.mmsi.eligibilite_fcu.config import selecteur_options
+from src.dags.sg.siep.mmsi.eligibilite_fcu.config import storage_options
 
 nom_projet = "France Chaleur Urbaine (FCU)"
 
@@ -55,20 +55,20 @@ nom_projet = "France Chaleur Urbaine (FCU)"
 )
 def eligibilite_fcu_dag() -> None:
 
-    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
 
     chain(
         validate_dag_parameters(),
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
         get_eligibilite_fcu(),
         process_fcu_result(),
-        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        create_tmp_tables(storage_options=storage_options, reset_id_seq=False),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
         ensure_partition.expand(selecteur_config=selecteur_configs),
-        copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
-        copy_s3_files(selecteur_options=selecteur_options),
-        del_s3_files(selecteur_options=selecteur_options),
-        delete_tmp_tables(selecteur_options=selecteur_options),
+        copy_tmp_table_to_real_table(storage_options=storage_options),
+        copy_s3_files(storage_options=storage_options),
+        del_s3_files(storage_options=storage_options),
+        delete_tmp_tables(storage_options=storage_options),
     )
 
 

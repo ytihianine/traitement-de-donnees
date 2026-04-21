@@ -4,7 +4,7 @@ from src._enums.database import LoadStrategy
 # Default NULL values
 DEFAULT_NULL_CC_CF = "Ind"
 
-selecteur_options = {
+storage_options = {
     "delai_global_paiement": SelecteurStorageOptions(
         is_partitioned=False,
         load_strategy=LoadStrategy.FULL_LOAD,

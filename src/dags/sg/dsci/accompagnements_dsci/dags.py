@@ -24,7 +24,7 @@ from src.dags.sg.dsci.accompagnements_dsci.tasks import (
     conseil_interne,
 )
 from src.dags.sg.dsci.accompagnements_dsci.config import (
-    selecteur_options,
+    storage_options,
 )
 
 # Variables
@@ -51,7 +51,7 @@ nom_projet = "Accompagnements DSCI"
     ),
 )
 def accompagnements_dsci_dag() -> None:
-    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
 
     # Ordre des tâches
     chain(
@@ -69,14 +69,14 @@ def accompagnements_dsci_dag() -> None:
             dsci(),
             conseil_interne(),
         ],
-        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        create_tmp_tables(storage_options=storage_options, reset_id_seq=False),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
             merge_delete=True,
         ),
         delete_tmp_tables(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
     )
 

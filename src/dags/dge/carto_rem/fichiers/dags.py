@@ -22,7 +22,7 @@ from src.common_tasks.validation import validate_dag_parameters
 from src.dags.dge.carto_rem.fichiers.tasks import (
     source_files,
 )
-from src.dags.dge.carto_rem.fichiers.config import selecteur_options
+from src.dags.dge.carto_rem.fichiers.config import storage_options
 
 # Mails
 nom_projet = "Cartographie rémunération"
@@ -66,7 +66,7 @@ def cartographie_remuneration() -> None:
         on_skipped_callback=create_send_mail_callback(mail_status=MailStatus.SKIP),
         on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
-    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
 
     """ Task order """
     chain(
@@ -80,10 +80,10 @@ def cartographie_remuneration() -> None:
         copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
         del_iceberg_staging_table(),
         copy_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
         del_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
     )
 

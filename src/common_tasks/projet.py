@@ -55,7 +55,7 @@ def show_selecteur_config(config: Mapping[str, Any]) -> None:
 @task()
 def get_selecteur_config(
     nom_projet: str | None = None,
-    selecteur_options: Mapping[str, SelecteurStorageOptions] | None = None,
+    storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
     **context
 ) -> list[dict[str, Any]]:
     """Task to fetch the project selecteur configurations."""
@@ -64,7 +64,7 @@ def get_selecteur_config(
 
     selecteurs = get_list_selecteur_storage_info(nom_projet=nom_projet)
     merged_config = merge_selecteur_config(
-        selecteur_info=selecteurs, options_map=selecteur_options
+        storage_info=selecteurs, storage_options=storage_options
     )
 
     configs = [
@@ -98,7 +98,7 @@ def config_projet_group(
             get_source_fichier_task(nom_projet=nom_projet, context=context),
             get_selecteur_config(
                 nom_projet=nom_projet,
-                selecteur_options=selecteur_mapping,
+                storage_options=selecteur_mapping,
             ),
         ]
     )

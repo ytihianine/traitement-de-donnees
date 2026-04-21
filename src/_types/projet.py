@@ -141,29 +141,31 @@ class SelecteurStorageOptions:
 
 @dataclass(frozen=True)
 class SelecteurConfig:
-    selecteur_info: SelecteurStorageInfo
-    options: SelecteurStorageOptions
+    storage_info: SelecteurStorageInfo
+    storage_options: SelecteurStorageOptions
 
     @classmethod
     def load(
-        cls, selecteur_info: SelecteurStorageInfo, options: SelecteurStorageOptions
+        cls,
+        storage_info: SelecteurStorageInfo,
+        storage_options: SelecteurStorageOptions,
     ) -> "SelecteurConfig":
         return cls(
-            selecteur_info=selecteur_info,
-            options=options,
+            storage_info=storage_info,
+            storage_options=storage_options,
         )
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "SelecteurConfig":
         return cls(
-            selecteur_info=SelecteurStorageInfo(**data["selecteur_info"]),
-            options=SelecteurStorageOptions(**data["options"]),
+            storage_info=SelecteurStorageInfo(**data["storage_info"]),
+            storage_options=SelecteurStorageOptions(**data["storage_options"]),
         )
 
     # Methods to early-exit tasks based on the configuration options
     def should_write_to_s3(self) -> bool:
         """Return True if this selecteur should be written to S3."""
-        return self.options.write_to_s3
+        return self.storage_options.write_to_s3
 
     def should_write_to_iceberg(self) -> bool:
         """Return True if this selecteur should be written to the Iceberg catalog.
@@ -172,8 +174,8 @@ class SelecteurConfig:
         write_to_s3_with_iceberg option is disabled.
         """
         return (
-            self.selecteur_info.selecteur != "grist_doc"
-            and self.options.write_to_s3_with_iceberg
+            self.storage_info.selecteur != "grist_doc"
+            and self.storage_options.write_to_s3_with_iceberg
         )
 
     def should_write_to_db(self) -> bool:
@@ -182,4 +184,4 @@ class SelecteurConfig:
         Returns False when the write_to_db option is disabled or when no
         tbl_name is defined for this selecteur.
         """
-        return self.options.write_to_db and bool(self.selecteur_info.tbl_name)
+        return self.storage_options.write_to_db and bool(self.storage_info.tbl_name)

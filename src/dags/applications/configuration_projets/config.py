@@ -2,7 +2,7 @@ from src._types.projet import SelecteurStorageOptions
 from src._enums.database import LoadStrategy
 from src.constants import DEFAULT_PG_CONFIG_CONN_ID
 
-selecteur_options = {
+storage_options = {
     "service": SelecteurStorageOptions(
         db_conn_id=DEFAULT_PG_CONFIG_CONN_ID,
         keep_file_id_col=False,

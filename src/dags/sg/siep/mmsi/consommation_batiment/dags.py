@@ -31,7 +31,7 @@ from src.dags.sg.siep.mmsi.consommation_batiment.tasks import (
     source_files,
     additionnal_files,
 )
-from src.dags.sg.siep.mmsi.consommation_batiment.config import selecteur_options
+from src.dags.sg.siep.mmsi.consommation_batiment.config import storage_options
 
 # Mails
 nom_projet = "Consommation des bâtiments"
@@ -74,7 +74,7 @@ def consommation_des_batiments() -> None:
         on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
 
-    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
 
     # Ordre des tâches
     chain(
@@ -84,14 +84,14 @@ def consommation_des_batiments() -> None:
         conso_mens_parquet(),
         source_files(),
         additionnal_files(),
-        create_tmp_tables(selecteur_options=selecteur_options, reset_id_seq=False),
+        create_tmp_tables(storage_options=storage_options, reset_id_seq=False),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
         ensure_partition.expand(selecteur_config=selecteur_configs),
-        copy_tmp_table_to_real_table(selecteur_options=selecteur_options),
+        copy_tmp_table_to_real_table(storage_options=storage_options),
         refresh_views(),
-        copy_s3_files(selecteur_options=selecteur_options),
-        del_s3_files(selecteur_options=selecteur_options),
-        delete_tmp_tables(selecteur_options=selecteur_options),
+        copy_s3_files(storage_options=storage_options),
+        del_s3_files(storage_options=storage_options),
+        delete_tmp_tables(storage_options=storage_options),
     )
 
 

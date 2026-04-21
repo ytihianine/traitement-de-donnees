@@ -23,7 +23,7 @@ from src.dags.dge.carto_rem.grist.tasks import (
     source_grist,
     # load_to_grist,
 )
-from src.dags.dge.carto_rem.grist.config import selecteur_options
+from src.dags.dge.carto_rem.grist.config import storage_options
 
 # Mails
 nom_projet = "Cartographie rémunération - Grist"
@@ -51,7 +51,7 @@ nom_projet = "Cartographie rémunération - Grist"
 )
 def cartographie_remuneration_grist() -> None:
     """Task order"""
-    selecteur_configs = get_selecteur_config(selecteur_mapping=selecteur_options)
+    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
 
     chain(
         validate_dag_parameters(),
@@ -68,10 +68,10 @@ def cartographie_remuneration_grist() -> None:
         copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
         del_iceberg_staging_table(),
         copy_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
         del_s3_files(
-            selecteur_options=selecteur_options,
+            storage_options=storage_options,
         ),
     )
 

@@ -179,34 +179,39 @@ def get_projet_s3_info(
 
 
 def merge_selecteur_config(
-    selecteur_info: List[SelecteurStorageInfo],
-    options_map: Mapping[str, SelecteurStorageOptions] | None = None,
+    storage_info: List[SelecteurStorageInfo],
+    storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
 ) -> List[SelecteurConfig]:
     """Merge SelecteurStorageInfo from DB with local SelecteurStorageOptions config.
 
-    Items like S3 paths and table names come from the DB (via ``selecteur_info``).
+    Items like S3 paths and table names come from the DB (via ``storage_info``).
     Per-selecteur behavioural options (write flags, load strategy, partition
     period …) are supplied locally as a plain Python dict so that callers can
     use Enum values directly.  Any selecteur that is not present in
-    ``options_map`` falls back to the ``SelecteurStorageOptions`` defaults.
+    ``storage_options`` falls back to the ``SelecteurStorageOptions`` defaults.
 
     Args:
-        selecteur_info: List of SelecteurStorageInfo objects retrieved from the DB.
-        options_map: Optional mapping of selecteur name → SelecteurStorageOptions.
+        storage_info: List of SelecteurStorageInfo objects retrieved from the DB.
+        storage_options: Optional mapping of selecteur name → SelecteurStorageOptions.
                      Selecteurs absent from the map receive default options.
 
     Returns:
         List of SelecteurConfig objects combining DB info with local options.
     """
-    if options_map is None:
-        options_map = {}
+    if storage_options is None:
+        logger.info(
+            msg="No storage_options provided to merge_selecteur_config, using empty defaults."
+        )
+        storage_options = {}
 
     return [
         SelecteurConfig.load(
-            selecteur_info=info,
-            options=options_map.get(info.selecteur, SelecteurStorageOptions()),
+            storage_info=info,
+            storage_options=storage_options.get(
+                info.selecteur, SelecteurStorageOptions()
+            ),
         )
-        for info in selecteur_info
+        for info in storage_info
     ]
 
 
