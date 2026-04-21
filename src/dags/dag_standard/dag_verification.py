@@ -34,7 +34,7 @@ from src.constants import (
     DEFAULT_POLARIS_CATALOG,
     DEFAULT_TRINO_HOST,
 )
-from src.dags.dag_standard.config import selecteur_mapping
+from src.dags.dag_standard.config import storage_options
 
 nom_projet = "Configuration des projets"
 
@@ -154,7 +154,7 @@ def dag_verification() -> None:
         print(lst_fichiers)
 
     selecteur_configs = get_selecteur_config(
-        nom_projet=nom_projet, selecteur_mapping=selecteur_mapping
+        nom_projet=nom_projet, storage_options=storage_options
     )
 
     @task(map_index_template="{{ import_task_name }}")
@@ -180,11 +180,9 @@ def dag_verification() -> None:
             send_simple_mail(),
             send_error_mail(),
             send_success_mail(),
-            config_projet_group(
-                nom_projet=nom_projet, selecteur_mapping=selecteur_mapping
-            ),
+            config_projet_group(nom_projet=nom_projet, storage_options=storage_options),
             # import_files_to_db(
-            #     nom_projet=nom_projet, storage_options=selecteur_mapping
+            #     nom_projet=nom_projet, storage_options=storage_options
             # ),
             iceberg_task(),
             check_liste_source_fichier(),

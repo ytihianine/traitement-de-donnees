@@ -54,7 +54,7 @@ nom_projet = "Baromètre"
 def barometre() -> None:
     """Tasks definition"""
 
-    selecteur_configs = get_selecteur_config(selecteur_mapping={})
+    selecteur_configs = get_selecteur_config(storage_options={})
 
     looking_for_files = S3KeySensor(
         task_id="looking_for_files",

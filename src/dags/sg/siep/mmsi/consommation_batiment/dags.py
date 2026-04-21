@@ -74,7 +74,7 @@ def consommation_des_batiments() -> None:
         on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
 
-    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
+    selecteur_configs = get_selecteur_config(storage_options=storage_options)
 
     # Ordre des tâches
     chain(

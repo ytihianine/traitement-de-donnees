@@ -51,7 +51,7 @@ nom_projet = "Emploi et formation"
 )
 def suivi_activite() -> None:
     """Task order"""
-    selecteur_configs = get_selecteur_config(selecteur_mapping={})
+    selecteur_configs = get_selecteur_config(storage_options={})
     chain(
         validate_dag_parameters(),
         selecteur_configs,

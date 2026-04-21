@@ -56,7 +56,7 @@ nom_projet = "Données comptable - référentiel"
 )
 def chorus_service_prescripteur() -> None:
     """Task definition"""
-    selecteur_configs = get_selecteur_config(selecteur_mapping=storage_options)
+    selecteur_configs = get_selecteur_config(storage_options=storage_options)
 
     # Ordre des tâches
     chain(

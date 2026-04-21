@@ -49,7 +49,7 @@ nom_projet = "API Opera"
     on_success_callback=create_send_mail_callback(mail_status=MailStatus.SUCCESS),
 )
 def api_operat_ademe() -> None:
-    selecteur_configs = get_selecteur_config(selecteur_mapping={})
+    selecteur_configs = get_selecteur_config(storage_options={})
 
     # Ordre des tâches
     chain(

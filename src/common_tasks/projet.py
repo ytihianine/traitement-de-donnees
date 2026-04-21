@@ -79,7 +79,7 @@ def get_selecteur_config(
 @task_group()
 def config_projet_group(
     nom_projet: str,
-    selecteur_mapping: Mapping[str, SelecteurStorageOptions] | None = None,
+    storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
     **context
 ) -> None:
     """
@@ -98,7 +98,7 @@ def config_projet_group(
             get_source_fichier_task(nom_projet=nom_projet, context=context),
             get_selecteur_config(
                 nom_projet=nom_projet,
-                storage_options=selecteur_mapping,
+                storage_options=storage_options,
             ),
         ]
     )
