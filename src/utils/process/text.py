@@ -52,6 +52,8 @@ def normalize_whitespace_columns(df: pd.DataFrame, columns: list[str]) -> pd.Dat
                 raise TypeError(
                     f"df[col] with column name {col} is of type {type(df[col])}. Must be a pd.Series."
                 )
+        else:
+            raise KeyError(f"Column {col} not found in DataFrame.")
     return df
 
 
