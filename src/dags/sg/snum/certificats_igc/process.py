@@ -149,6 +149,39 @@ mapping_direction = {
 }
 
 
+def get_direction_fom_nom_unite_geree(
+    nom_unite_geree: str, map_direction: dict = mapping_direction
+) -> str:
+    """
+    Déterminer la direction que gère l'AIP à partir du nom de l'unité gérée
+    """
+    direction = valeur_indeterminee_dir
+    if pd.isna(nom_unite_geree) or nom_unite_geree == "":
+        return direction
+
+    # Cas des antennes DGT
+    if nom_unite_geree.startswith("DGTRESOR"):
+        return "DG TRESOR"
+
+    nom_unite_geree_split = nom_unite_geree.split(sep="/")
+
+    # Retirer le suffixe "centrale" qui ne correspond pas à une direction
+    if nom_unite_geree_split[-1].lower() == "centrale":
+        nom_unite_geree_split = nom_unite_geree_split[:-1]
+
+    type_structure = map_direction.get(nom_unite_geree_split[-1], None)
+
+    if isinstance(type_structure, str):
+        direction = type_structure
+
+    if isinstance(type_structure, dict):
+        for k, v in type_structure.items():
+            if k in nom_unite_geree_split:
+                direction = v
+
+    return direction
+
+
 def determiner_aip_direction(aip_group: str) -> str:
     aip_dir = valeur_indeterminee_dir
     if pd.isna(aip_group) or aip_group == "":
@@ -488,7 +521,9 @@ def process_agent(df: pd.DataFrame) -> pd.DataFrame:
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     # Déterminer la direction de l'agent
-    df["agent_direction"] = list(map(map_agent_direction, df["structure"]))
+    df["agent_direction"] = list(
+        map(get_direction_fom_nom_unite_geree, df["structure"])
+    )
     return df
 
 
@@ -544,7 +579,9 @@ def process_historique_certificat(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Déterminer la direction de l'agent
-    df["agent_direction"] = list(map(map_agent_direction, df["agent_structure"]))
+    df["agent_direction"] = list(
+        map(get_direction_fom_nom_unite_geree, df["agent_structure"])
+    )
 
     return df
 

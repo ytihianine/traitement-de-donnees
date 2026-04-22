@@ -54,6 +54,7 @@ CREATE TABLE certificat_igc.mandataire (
     id SERIAL,
     libelle TEXT,
     sigle TEXT,
+    mail TEXT,
     structure TEXT,
     date DATE,
     import_timestamp TIMESTAMP NOT NULL,
