@@ -534,7 +534,7 @@ def process_aip(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_historique_certificat(df: pd.DataFrame) -> pd.DataFrame:
     # Normaliser les données textuelles
-    txt_cols = ["agent_structure", "cn", "statut", "agent_mail"]
+    txt_cols = ["agent_structure", "cn", "agent_mail"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     # Normaliser les dates
