@@ -7,8 +7,10 @@ storage_options = {
     "certificat": SelecteurStorageOptions(
         write_to_db=False,
     ),
-    "aip": SelecteurStorageOptions(load_strategy=LoadStrategy.APPEND),
-    "historique_certificat": SelecteurStorageOptions(load_strategy=LoadStrategy.APPEND),
-    "liste_certificat": SelecteurStorageOptions(load_strategy=LoadStrategy.APPEND),
-    "mandataire": SelecteurStorageOptions(load_strategy=LoadStrategy.APPEND),
+    "aip": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
+    "historique_certificat": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.FULL_LOAD
+    ),
+    "liste_certificat": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
+    "mandataire": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
 }
