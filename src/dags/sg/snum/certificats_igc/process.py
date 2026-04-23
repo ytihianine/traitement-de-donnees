@@ -548,9 +548,6 @@ def process_aip(df: pd.DataFrame) -> pd.DataFrame:
         map(get_direction_fom_nom_unite_geree, df["structure"])
     )
 
-    # Drop colonnes non nécessaires
-    df = df.drop(columns=["structure"])
-
     return df
 
 

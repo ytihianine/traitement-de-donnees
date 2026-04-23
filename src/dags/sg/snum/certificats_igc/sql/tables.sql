@@ -6,6 +6,7 @@ CREATE TABLE certificat_igc.aip (
     aip_mail TEXT,
     aip_balf_mail TEXT,
     aip_direction_geree TEXT,
+    structure TEXT,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
     snapshot_id TEXT
