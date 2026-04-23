@@ -8,9 +8,6 @@ from src.utils.process.text import (
     convert_str_cols_to_date,
 )
 
-valeur_indeterminee_dir = "DIR_ABSENT"
-valeur_indeterminee_autres = "ABSENT"
-
 mapping_direction = {
     "ASSOCIATION": {
         "AAF": "AAF",
@@ -151,11 +148,15 @@ mapping_direction = {
 
 def get_direction_fom_nom_unite_geree(
     nom_unite_geree: str, map_direction: dict = mapping_direction
-) -> str:
+) -> str | None:
     """
-    Déterminer la direction que gère l'AIP à partir du nom de l'unité gérée
+    Déterminer la direction que gère l'AIP à partir du nom de l'unité gérée.
+    Exemple de nom d'unité gérée :
+        "struct_A/struct_B/ASSOCIATION" -> direction = "struct_B"
+        "struc_D/struct_E/SEC GEN/SEC GEN" -> direction = "SG-struct_E"
+        "struc_f/struct_G/SEC GEN/SEC GEN/Centrale" -> direction = "SG-struct_G"
     """
-    direction = valeur_indeterminee_dir
+    direction = None
     if pd.isna(nom_unite_geree) or nom_unite_geree == "":
         return direction
 
@@ -182,29 +183,12 @@ def get_direction_fom_nom_unite_geree(
     return direction
 
 
-def determiner_aip_direction(aip_group: str) -> str:
-    aip_dir = valeur_indeterminee_dir
-    if pd.isna(aip_group) or aip_group == "":
-        return aip_dir
-
-    aip_dir_split = aip_group.split("_")
-
-    if "SEC_GEN" in aip_group:
-        sub_service = aip_dir_split[-1]
-        aip_dir = "SG_" + sub_service
-        return aip_dir
-    else:
-        if len(aip_dir_split) == 2:
-            aip_dir = aip_dir_split[-1]
-            return aip_dir
-
-    return aip_dir
-
-
 def find_certificat_dir_in_profile(profile: str) -> str | None:
     direction = None
+
     if pd.isna(profile):
         return direction
+
     profile = profile.upper()
     mapping = {
         # Autres structures
@@ -220,9 +204,12 @@ def find_certificat_dir_in_profile(profile: str) -> str | None:
     return direction
 
 
-def find_certificat_dir_in_dn(dn: str) -> str:
+def find_certificat_dir_in_dn(dn: str) -> str | None:
+    direction = None
+
     if pd.isna(dn):
-        return valeur_indeterminee_dir
+        return direction
+
     dn = dn.upper()
     mapping = {
         # Autres structures
@@ -236,14 +223,17 @@ def find_certificat_dir_in_dn(dn: str) -> str:
 
     for key, value in mapping.items():
         if key in dn:
-            return value
+            direction = value
 
-    return valeur_indeterminee_dir
+    return direction
 
 
-def find_certificat_dir_in_subjectid(subjectid: str) -> str:
+def find_certificat_dir_in_subjectid(subjectid: str) -> str | None:
+    direction = None
+
     if pd.isna(subjectid):
-        return valeur_indeterminee_dir
+        return direction
+
     subjectid = subjectid.upper()
     mapping = {
         # Autres structures
@@ -255,14 +245,18 @@ def find_certificat_dir_in_subjectid(subjectid: str) -> str:
 
     for key, value in mapping.items():
         if key in subjectid:
-            return value
+            direction = value
+            return direction
 
-    return valeur_indeterminee_dir
+    return direction
 
 
-def find_certificat_dir_in_contact(contact: str) -> str:
+def find_certificat_dir_in_contact(contact: str) -> str | None:
+    direction = None
+
     if pd.isna(contact):
-        return valeur_indeterminee_dir
+        return direction
+
     contact = contact.upper()
     mapping = {
         # Autres structures
@@ -290,14 +284,15 @@ def find_certificat_dir_in_contact(contact: str) -> str:
 
     for key, value in mapping.items():
         if key in contact:
-            return value
+            direction = value
+            return direction
 
-    return valeur_indeterminee_dir
+    return direction
 
 
-def find_certificat_dir_in_mail(mail: str) -> str:
+def find_certificat_dir_in_mail(mail: str) -> str | None:
     if pd.isna(mail):
-        return valeur_indeterminee_dir
+        return None
     mail = mail.upper()
     mapping = {
         # Autres structures
@@ -315,7 +310,7 @@ def find_certificat_dir_in_mail(mail: str) -> str:
         if key in mail:
             return value
 
-    return valeur_indeterminee_dir
+    return None
 
 
 def determiner_certificat_direction(df: pd.DataFrame) -> pd.DataFrame:
@@ -352,8 +347,8 @@ def determiner_certificat_direction(df: pd.DataFrame) -> pd.DataFrame:
 def _match_mapping(
     text: str,
     mapping: dict[str, str] | dict[tuple[str, ...], str],
-    default: str = valeur_indeterminee_dir,
-) -> str:
+    default: str | None = None,
+) -> str | None:
     """
     Matches `text` against keys in mapping.
     Keys can be a string (single condition) or a tuple (all substrings required).
@@ -372,7 +367,7 @@ def _match_mapping(
     return default
 
 
-def determiner_ac(profile: str) -> str:
+def determiner_ac(profile: str) -> str | None:
     mapping = {
         "SERVICE": "SERVICE",
         "SERVEUR": "SERVEURS",
@@ -386,12 +381,10 @@ def determiner_ac(profile: str) -> str:
         "": "IGC",
     }
 
-    return _match_mapping(
-        text=profile, mapping=mapping, default=valeur_indeterminee_autres
-    )
+    return _match_mapping(text=profile, mapping=mapping)
 
 
-def determiner_type_offre(profile: str) -> str:
+def determiner_type_offre(profile: str) -> str | None:
     # Key order is important
     mapping = {
         # Autres structures
@@ -412,12 +405,10 @@ def determiner_type_offre(profile: str) -> str:
         # "F_SERVEURS_3": "AUTHENTIFICATION SERVEUR",
         # "serveurs": "",
     }
-    return _match_mapping(
-        text=profile, mapping=mapping, default=valeur_indeterminee_autres
-    )
+    return _match_mapping(text=profile, mapping=mapping)
 
 
-def determiner_support(profile: str) -> str:
+def determiner_support(profile: str) -> str | None:
     # Key order is important
     mapping = {
         # Autres structures
@@ -430,9 +421,7 @@ def determiner_support(profile: str) -> str:
         "service": "SERVICE",
         "ac_adm_technique": "MATERIEL",
     }
-    return _match_mapping(
-        text=profile, mapping=mapping, default=valeur_indeterminee_autres
-    )
+    return _match_mapping(text=profile, mapping=mapping)
 
 
 def determiner_etat(
@@ -454,7 +443,7 @@ def determiner_etat(
     return "Autre"
 
 
-def determiner_version(profile: str) -> str:
+def determiner_version(profile: str) -> str | None:
     # Key order is important
     mapping = {
         ("SERVEURS", "_3"): "SERVEUR3",
@@ -465,12 +454,10 @@ def determiner_version(profile: str) -> str:
         ("service",): "SERVICE",
         ("FSG_",): "AC2",
     }
-    return _match_mapping(
-        text=profile, mapping=mapping, default=valeur_indeterminee_autres
-    )
+    return _match_mapping(text=profile, mapping=mapping)
 
 
-def determiner_version_serveur(profile: str) -> str:
+def determiner_version_serveur(profile: str) -> str | None:
     # Key order is important
     mapping = {
         ("3072",): "3072",
@@ -478,16 +465,14 @@ def determiner_version_serveur(profile: str) -> str:
         ("service", "_2"): "2048",
         ("_3",): "2048",
     }
-    return _match_mapping(
-        text=profile, mapping=mapping, default=valeur_indeterminee_autres
-    )
+    return _match_mapping(text=profile, mapping=mapping)
 
 
 def map_agent_direction(
     structure: str, mapping: dict = mapping_direction
 ) -> str | None:
     if pd.isna(structure):
-        return valeur_indeterminee_dir
+        return None
 
     structure = structure.strip().upper()
 
@@ -499,7 +484,7 @@ def map_agent_direction(
     direction = mapping.get(structure_split[-1], None)
 
     if direction is None:
-        return valeur_indeterminee_dir
+        return None
 
     if isinstance(direction, str):
         return direction.upper()
@@ -509,7 +494,7 @@ def map_agent_direction(
             if k in structure_split:
                 return v
 
-    return valeur_indeterminee_dir
+    return None
 
 
 # ===============================================
@@ -559,7 +544,9 @@ def process_aip(df: pd.DataFrame) -> pd.DataFrame:
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     # Déterminer la direction que gère l'AIP
-    df["aip_direction_geree"] = list(map(determiner_aip_direction, df["structure"]))
+    df["aip_direction_geree"] = list(
+        map(get_direction_fom_nom_unite_geree, df["structure"])
+    )
 
     # Drop colonnes non nécessaires
     df = df.drop(columns=["structure"])
@@ -622,12 +609,9 @@ def process_liste_certificat(
         right_on=["agent_mail"],
     )
     df["certificat_direction"] = np.where(
-        df["certificat_direction"] == valeur_indeterminee_dir,
+        df["certificat_direction"].isna(),
         df["agent_direction"],
         df["certificat_direction"],
-    )
-    df["certificat_direction"] = df["certificat_direction"].fillna(
-        valeur_indeterminee_dir
     )
 
     # Conserver uniquement les colonnes nécessaires
