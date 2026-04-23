@@ -300,7 +300,7 @@ def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
     df = handle_grist_null_references(df=df, columns=ref_cols)
 
     # Txt colonnes
-    txt_cols = ["tbl_name", "partition_period", "load_strategy"]
+    txt_cols = ["tbl_name"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     return df
