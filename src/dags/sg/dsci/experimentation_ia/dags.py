@@ -5,7 +5,6 @@ from src.infra.mails.default_smtp import MailStatus, create_send_mail_callback
 from src._enums.dags import DagStatus
 from src._types.dags import DBParams, FeatureFlagsEnable
 from src.common_tasks.s3 import (
-    import_file_to_db,
     copy_staging_to_prod,
     del_iceberg_staging_table,
 )
@@ -66,7 +65,6 @@ def experimentation_ia_dag() -> None:
             suivi_questionnaire_1(),
             suivi_questionnaire_2(),
         ],
-        import_file_to_db.expand(selecteur_config=selecteur_configs),
         copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
         del_iceberg_staging_table(),
     )
