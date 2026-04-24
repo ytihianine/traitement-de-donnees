@@ -509,6 +509,10 @@ def process_agent(df: pd.DataFrame) -> pd.DataFrame:
     df["agent_direction"] = list(
         map(get_direction_fom_nom_unite_geree, df["structure"])
     )
+
+    # Drop les duplicats
+    df = df.drop_duplicates(subset=["agent_mail"], keep="last")
+
     return df
 
 
@@ -601,6 +605,7 @@ def process_liste_certificat(
 ) -> pd.DataFrame:
     df_agents = df_agent[["agent_direction", "agent_mail"]].drop_duplicates()
 
+    df_certificat["contact"] = df_certificat.loc[:, "contact"].str.split(",")
     df_certificats_exp = df_certificat.copy().explode(
         column="contact", ignore_index=True
     )
