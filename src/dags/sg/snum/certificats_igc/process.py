@@ -535,6 +535,13 @@ def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
     )
     df["version"] = list(map(determiner_version, df["profile"]))
     df["version_serveur"] = list(map(determiner_version_serveur, df["profile"]))
+
+    # Créer un id unique pour chaque certificats
+    df["id_certificat"] = pd.util.hash_pandas_object(  # type: ignore
+        obj=df[["subjectid", "date_debut_validite", "date_fin_validite", "profile"]],
+        index=False,
+    ) % (2**63)
+
     return df
 
 
@@ -613,6 +620,7 @@ def process_liste_certificat(
 
     # Conserver uniquement les colonnes nécessaires
     cols_to_keep = [
+        "id_certificat",
         "dn",
         "subjectid",
         "contact",

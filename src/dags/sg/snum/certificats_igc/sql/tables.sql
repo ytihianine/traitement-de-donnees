@@ -15,6 +15,7 @@ CREATE TABLE certificat_igc.aip (
 
 CREATE TABLE certificat_igc.certificat (
     id SERIAL,
+    id_certificat BIGINT,
     dn TEXT,
     subjectid TEXT,
     contact TEXT,
