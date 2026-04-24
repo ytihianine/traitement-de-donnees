@@ -4,6 +4,11 @@ from airflow.sdk.bases.operator import chain
 from src.infra.mails.default_smtp import MailStatus, create_send_mail_callback
 from src._enums.dags import DagStatus
 from src._types.dags import DBParams, FeatureFlagsEnable
+from src.common_tasks.sql import (
+    create_projet_snapshot,
+    get_projet_snapshot,
+)
+
 from src.common_tasks.s3 import (
     copy_staging_to_prod,
     del_iceberg_staging_table,
@@ -58,6 +63,8 @@ def experimentation_ia_dag() -> None:
             selecteur="grist_doc",
             workspace_id="dsci",
         ),
+        create_projet_snapshot(),
+        get_projet_snapshot(),
         [
             referentiels(),
             repartition(),
