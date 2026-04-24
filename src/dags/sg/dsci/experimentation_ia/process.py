@@ -216,8 +216,8 @@ def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
         "cas_d_usages",
         "courriel_corrige",
         "connecte_",
-        "Reponse_au_questionnaire_1",
-        "Reponse_au_questionnaire_2",
+        "reponse_au_questionnaire_1",
+        "reponse_au_questionnaire_2",
     ]
     df = df.loc[:, cols_to_keep]
     txt_cols = [
@@ -681,8 +681,6 @@ def process_questionnaire2_observation_impact(df: pd.DataFrame) -> pd.DataFrame:
     ) % (2**63)
     return df
 
-    return df
-
 
 def process_questionnaire2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
@@ -698,9 +696,7 @@ def process_questionnaire2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
     ref_cols = ["id_questionnaire_2", "id_impacts_identifies_au_travail"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
-    df = convert_str_of_list_to_list(
-        df=df, col_to_convert="id_impacts_identifies_au_travail"
-    )
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_impacts_identifies_au_travail")
     df = df.explode(column="id_impacts_identifies_au_travail")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_impacts_identifies_au_travail"])
