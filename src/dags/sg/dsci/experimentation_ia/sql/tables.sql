@@ -318,7 +318,7 @@ CREATE TABLE assistant_ia."questionnaire2_typologie_erreurs" (
     FOREIGN KEY ("id_types_d_erreurs_frequentes2") REFERENCES assistant_ia."ref_q22_typologie_erreurs"("id")
 );
 
-CREATE TABLE assistant_ia."questionnaire2_observation_impact" (
+CREATE TABLE assistant_ia."questionnaire2_impact_observe" (
     "id" bigint PRIMARY KEY,
     "id_questionnaire_2" INTEGER,
     "id_observations_des_impacts" INTEGER,
