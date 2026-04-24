@@ -39,9 +39,9 @@ def process_ref_q5_domaine(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_q6_niveau_utilisation(df: pd.DataFrame) -> pd.DataFrame:
-    col_to_keep = ["niveau_d_appropriation"]
+    col_to_keep = ["id", "niveau_d_appropriation"]
     df = df.loc[:, col_to_keep]
-    df = normalize_whitespace_columns(df=df, columns=col_to_keep)
+    df = normalize_whitespace_columns(df=df, columns=["niveau_d_appropriation"])
     return df
 
 
@@ -207,6 +207,7 @@ Processing experimentateurs
 
 def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_keep = [
+        "id",
         "no_id",
         "entite",
         "nom_prenom",

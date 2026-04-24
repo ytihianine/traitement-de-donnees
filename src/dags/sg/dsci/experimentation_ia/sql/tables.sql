@@ -117,7 +117,7 @@ CREATE TABLE assistant_ia."experimentateurs"(
     "connecte_" text,
     "reponse_au_questionnaire_1" text,
     "reponse_au_questionnaire_2" text,
-    "nom_Prenom" text,
+    "nom_prenom" text,
     "parti" text,
     "service" text,
     "metier" text,
