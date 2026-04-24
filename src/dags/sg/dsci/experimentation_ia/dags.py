@@ -4,11 +4,10 @@ from airflow.sdk.bases.operator import chain
 from src.infra.mails.default_smtp import MailStatus, create_send_mail_callback
 from src._enums.dags import DagStatus
 from src._types.dags import DBParams, FeatureFlagsEnable
-from src.common_tasks.sql import (
-    create_tmp_tables,
-    copy_tmp_table_to_real_table,
-    delete_tmp_tables,
+from src.common_tasks.s3 import (
     import_file_to_db,
+    copy_staging_to_prod,
+    del_iceberg_staging_table,
 )
 from src.common_tasks.grist import download_grist_doc_to_s3
 from src.common_tasks.projet import get_selecteur_config
@@ -67,14 +66,9 @@ def experimentation_ia_dag() -> None:
             suivi_questionnaire_1(),
             suivi_questionnaire_2(),
         ],
-        create_tmp_tables(storage_options=storage_options, reset_id_seq=False),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
-        copy_tmp_table_to_real_table(
-            storage_options=storage_options,
-        ),
-        delete_tmp_tables(
-            storage_options=storage_options,
-        ),
+        copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
+        del_iceberg_staging_table(),
     )
 
 
