@@ -15,8 +15,7 @@ get_eligibilite_fcu = create_task(
             use_context=True,
         )
     ],
-    add_snapshot_id=False,
-    add_import_date=False,
+    add_metadata=False,
 )
 
 process_fcu_result = create_task(

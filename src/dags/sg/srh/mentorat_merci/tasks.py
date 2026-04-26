@@ -8,8 +8,7 @@ agent_inscrit = create_file_etl_task(
     selecteur="agent_inscrit",
     process_func=process.clean_data,
     apply_cols_mapping=False,
-    add_import_date=False,
-    add_snapshot_id=False,
+    add_metadata=False,
 )
 
 
@@ -21,7 +20,6 @@ generer_binomes = create_task(
         ETLStep(fn=action.trouver_meilleurs_binomes, read_data=True),
         ETLStep(fn=action.send_result, use_context=True, use_previous_output=True),
     ],
-    add_import_date=False,
-    add_snapshot_id=False,
+    add_metadata=False,
     export_output=False,
 )

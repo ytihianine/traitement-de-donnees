@@ -23,20 +23,10 @@ from src.utils.config.tasks import (
     column_mapping_dataframe,
     column_mapping_dict,
 )
-from src.utils.config.dag_params import get_execution_date, get_project_name
+from src.utils.config.dag_params import get_project_name
 from src._types.dags import ETLStep, TaskConfig
 from src._enums.database import DatabaseType
 from src.constants import DEFAULT_POLARIS_HOST, DEFAULT_POLARIS_CATALOG
-
-
-def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
-    """Add import timestamp and date columns."""
-    execution_date = get_execution_date(context=context)
-
-    dt_no_timezone = execution_date.replace(tzinfo=None)
-    df["import_timestamp"] = dt_no_timezone
-    df["import_date"] = dt_no_timezone.date()
-    return df
 
 
 def _add_snapshot_id_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
@@ -54,13 +44,10 @@ def _add_snapshot_id_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
 def _add_metadata(
     df: pd.DataFrame,
     context: dict,
-    add_import_date: bool = True,
-    add_snapshot_id: bool = True,
+    add_metadata: bool = True,
 ) -> pd.DataFrame:
-    """Add import timestamp, date and snapshot_id columns."""
-    if add_import_date:
-        df = _add_import_metadata(df=df, context=context)
-    if add_snapshot_id:
+    """Add metadata columns to the DataFrame."""
+    if add_metadata:
         df = _add_snapshot_id_metadata(df=df, context=context)
     return df
 
@@ -94,8 +81,7 @@ def create_grist_etl_task(
     doc_selecteur: Optional[str] = None,
     normalisation_process_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
     process_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
-    add_import_date: bool = False,
-    add_snapshot_id: bool = False,
+    add_metadata: bool = False,
     version: str = "v1",
 ) -> Callable[..., XComArg]:
     """
@@ -174,8 +160,7 @@ def create_grist_etl_task(
         _add_metadata(
             df=df,
             context=context,
-            add_import_date=add_import_date,
-            add_snapshot_id=add_snapshot_id,
+            add_metadata=add_metadata,
         )
 
         df_info(df=df, df_name=f"{selecteur} - After processing")
@@ -202,8 +187,7 @@ def create_file_etl_task(
     process_func: Optional[Callable[..., pd.DataFrame]] = None,
     read_options: Optional[dict[str, Any]] = None,
     apply_cols_mapping: bool = True,
-    add_import_date: bool = True,
-    add_snapshot_id: bool = True,
+    add_metadata: bool = True,
     version: str = "v1",
 ) -> Callable[..., XComArg]:
     """Create an ETL task for extracting, transforming and loading data from a file.
@@ -268,11 +252,8 @@ def create_file_etl_task(
             df_info(df=df, df_name=f"{selecteur} - After column mapping")
             df = process_func(df)
 
-        if add_import_date:
-            df = _add_import_metadata(df=df, context=context)
-
-        if add_snapshot_id:
-            df = _add_snapshot_id_metadata(df=df, context=context)
+        if add_metadata:
+            df = _add_metadata(df=df, context=context)
 
         df_info(df=df, df_name=f"{selecteur} - After processing")
 
@@ -338,8 +319,7 @@ def create_task(
     output_selecteur: str,
     steps: list[ETLStep],
     input_selecteurs: Optional[list[str]] = None,
-    add_import_date: bool = True,
-    add_snapshot_id: bool = True,
+    add_metadata: bool = True,
     export_output: bool = True,
     version: str = "v1",
 ) -> Callable[..., XComArg]:
@@ -351,8 +331,7 @@ def create_task(
         output_selecteur: Selector for the output configuration
         steps: List of ETL steps to execute
         input_selecteurs: (Optional) list of selectors for input data
-        add_import_date: Whether to add import date metadata to the output
-        add_snapshot_id: Whether to add snapshot ID metadata to the output
+        add_metadata: Whether to add metadata to the output
         export_output: Whether to export the final output to S3
 
     Returns:
@@ -417,11 +396,8 @@ def create_task(
             nom_projet=nom_projet, selecteur=output_selecteur
         )
 
-        if add_import_date:
-            result = _add_import_metadata(df=result, context=context)
-
-        if add_snapshot_id:
-            result = _add_snapshot_id_metadata(df=result, context=context)
+        if add_metadata:
+            result = _add_metadata(df=result, context=context)
 
         df_info(df=result, df_name=f"{output_selecteur} - df to export")
 

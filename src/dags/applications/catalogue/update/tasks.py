@@ -20,8 +20,7 @@ def source_database() -> None:
                 fn=actions.pg_info_scan,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
     pg_info_extract_catalogue = create_task(
         task_config=TaskConfig(task_id="pg_info_extract_catalogue"),
@@ -32,8 +31,7 @@ def source_database() -> None:
                 fn=process.pg_info_extract_catalogue,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
     pg_info_extract_dictionnaire = create_task(
         task_config=TaskConfig(task_id="pg_info_extract_dictionnaire"),
@@ -44,8 +42,7 @@ def source_database() -> None:
                 fn=process.pg_info_extract_dictionnaire,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
 
     """ Tasks order """
@@ -69,8 +66,7 @@ def update_grist_catalogue() -> None:
                 fn=actions.get_catalogue,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
     compare_catalogue = create_task(
         task_config=TaskConfig(task_id="compare_catalogue"),
@@ -81,8 +77,7 @@ def update_grist_catalogue() -> None:
                 fn=process.compare_catalogue,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
     process_catalogue = create_task(
         task_config=TaskConfig(task_id="process_catalogue"),
@@ -93,8 +88,7 @@ def update_grist_catalogue() -> None:
                 fn=process.process_catalogue,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
     load_catalogue = create_task(
         task_config=TaskConfig(task_id="load_catalogue"),
@@ -117,8 +111,7 @@ def update_grist_catalogue() -> None:
                 fn=actions.get_dictionnaire,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
     compare_dictionnaire = create_task(
         task_config=TaskConfig(task_id="compare_dictionnaire"),
@@ -129,8 +122,7 @@ def update_grist_catalogue() -> None:
                 fn=process.compare_dictionnaire,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
     process_dictionnaire = create_task(
         task_config=TaskConfig(task_id="process_dictionnaire"),
@@ -141,8 +133,7 @@ def update_grist_catalogue() -> None:
                 fn=process.process_dictionnaire,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
     load_dictionnaire = create_task(
         task_config=TaskConfig(task_id="load_dictionnaire"),

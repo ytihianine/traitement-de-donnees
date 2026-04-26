@@ -115,8 +115,7 @@ def fetch_from_db() -> None:
                 fn=actions.get_all_cf_cc,
             )
         ],
-        add_import_date=True,
-        add_snapshot_id=False,
+        add_metadata=True,
     )
     get_demande_achat = create_task(
         task_config=TaskConfig(task_id="get_demande_achat"),
@@ -126,8 +125,7 @@ def fetch_from_db() -> None:
                 fn=actions.get_demande_achat,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
     get_demande_paiement_complet = create_task(
         task_config=TaskConfig(task_id="get_demande_paiement_complet"),
@@ -137,8 +135,7 @@ def fetch_from_db() -> None:
                 fn=actions.get_demande_paiement_complet,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=True,
     )
     get_delai_global_paiement = create_task(
         task_config=TaskConfig(task_id="get_delai_global_paiement"),
@@ -148,8 +145,7 @@ def fetch_from_db() -> None:
                 fn=actions.get_delai_global_paiement,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
 
     get_engagement_juridique = create_task(
@@ -160,8 +156,7 @@ def fetch_from_db() -> None:
                 fn=actions.get_engagement_juridique,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
     )
 
     chain(
@@ -182,8 +177,7 @@ def load_to_grist() -> None:
         output_selecteur="load_new_cf_cc",
         input_selecteurs=["get_all_cf_cc", "sp"],
         steps=[ETLStep(fn=actions.load_new_cf_cc, read_data=True)],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
         export_output=False,
     )
 
@@ -197,8 +191,7 @@ def load_to_grist() -> None:
                 read_data=True,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
         export_output=False,
     )
 
@@ -215,8 +208,7 @@ def load_to_grist() -> None:
                 read_data=True,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
         export_output=False,
     )
 
@@ -233,8 +225,7 @@ def load_to_grist() -> None:
                 read_data=True,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
         export_output=False,
     )
 
@@ -248,8 +239,7 @@ def load_to_grist() -> None:
                 read_data=True,
             )
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
         export_output=False,
     )
 

@@ -19,8 +19,7 @@ def source() -> None:
                 use_context=True,
             ),
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
         export_output=True,
     )
     consommations = create_task(
@@ -32,8 +31,7 @@ def source() -> None:
                 use_context=True,
             ),
         ],
-        add_import_date=False,
-        add_snapshot_id=False,
+        add_metadata=False,
         export_output=True,
     )
 
