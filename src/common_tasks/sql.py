@@ -257,15 +257,17 @@ def ensure_partition(
     **context,
 ) -> None:
     """
-    Vérifie si une partition mensuelle existe pour une table partitionnée par date.
+    Vérifie si une partition existe pour une table partitionnée par snapshot_id.
     Si elle n'existe pas, la créer.
 
-    Args:
-        pg_conn_id: Connexion Postgres
-        partition_column: Colonne de partition (par défaut 'import_date')
+    La colonne de partition est ``snapshot_id`` (format ``%Y%m%d_%H:%M:%S``).
+    Les bornes de la partition sont calculées à partir de la période d'exécution
+    et exprimées dans ce même format texte (l'ordre lexicographique y est
+    identique à l'ordre chronologique).
 
-    Returns:
-        Le nom de la partition (créée ou existante)
+    Args:
+        selecteur_config: Configuration du sélecteur (sérialisée en dict).
+        pg_conn_id: Connexion Postgres.
     """
     # Init selecteur_config to SelecteurConfig if it's a dict
     config = SelecteurConfig.from_dict(data=selecteur_config)
@@ -300,14 +302,19 @@ def ensure_partition(
     # Nom de la partition : parenttable_YYYY_MM
     partition_name = f"{tbl_name}_{from_date.strftime(format='%Y%m%d')}_{to_date.strftime(format='%Y%m%d')}"  # noqa
 
+    # Boundaries use the snapshot_id text format (%Y%m%d_%H:%M:%S) so that
+    # range partitioning on the snapshot_id column works correctly via
+    # lexicographic ordering (which is identical to chronological order for
+    # this format).
+    from_bound = from_date.strftime(format="%Y%m%d_00:00:00")
+    to_bound = to_date.strftime(format="%Y%m%d_00:00:00")
+
     try:
         logging.info(msg=f"Creating partition {partition_name} for {tbl_name}.")
-        # Créer la partition
         create_sql = f"""
             CREATE TABLE IF NOT EXISTS {prod_schema}.{partition_name}
             PARTITION OF {prod_schema}.{tbl_name}
-            FOR VALUES FROM
-                ('{from_date.strftime(format="%Y-%m-%d")}') TO ('{to_date.strftime(format="%Y-%m-%d")}');
+            FOR VALUES FROM ('{from_bound}') TO ('{to_bound}');
         """
         db.execute(query=create_sql)
         logging.info(msg=f"Partition {partition_name} created successfully.")
