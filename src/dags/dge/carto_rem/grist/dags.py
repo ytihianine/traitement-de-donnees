@@ -7,7 +7,11 @@ from src.utils.config.dag_params import create_dag_params, create_default_args
 from src._enums.dags import DagStatus
 from src.common_tasks.grist import download_grist_doc_to_s3
 
-from src.common_tasks.sql import get_projet_snapshot
+from src.common_tasks.sql import (
+    create_projet_snapshot,
+    get_projet_snapshot,
+    get_source_projet_snapshot,
+)
 from src.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -55,7 +59,9 @@ def cartographie_remuneration_grist() -> None:
 
     chain(
         validate_dag_parameters(),
-        get_projet_snapshot(nom_projet="Cartographie rémunération"),
+        create_projet_snapshot(),
+        get_projet_snapshot(),
+        get_source_projet_snapshot(nom_projet="Cartographie rémunération"),
         del_iceberg_staging_table(),
         download_grist_doc_to_s3(
             selecteur="grist_doc",

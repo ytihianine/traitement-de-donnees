@@ -12,7 +12,9 @@ from src.common_tasks.sql import (
     import_file_to_db,
     copy_tmp_table_to_real_table,
     delete_tmp_tables,
+    create_projet_snapshot,
     get_projet_snapshot,
+    get_source_projet_snapshot,
 )
 from src.common_tasks.s3 import (
     copy_s3_files,
@@ -65,7 +67,9 @@ def chorus_service_prescripteur() -> None:
         download_grist_doc_to_s3(
             selecteur="grist_doc", workspace_id="dsci", doc_id_key="grist_doc_id_cbcm"
         ),
-        get_projet_snapshot(nom_projet="Données comptable"),
+        create_projet_snapshot(),
+        get_projet_snapshot(),
+        get_source_projet_snapshot(nom_projet="Données comptable"),
         grist_source(),
         fetch_from_db(),
         load_to_grist(),

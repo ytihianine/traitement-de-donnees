@@ -208,7 +208,7 @@ def get_projet_snapshot(
         pg_conn_id: Connexion Postgres. Valeur par défaut
 
     Returns:
-        None. Ajoute le snapshot_id dans le context du DAG
+        Le snapshot_id du projet
     """
     if nom_projet is None:
         nom_projet = get_project_name(context=context)
@@ -218,6 +218,34 @@ def get_projet_snapshot(
 
     snapshot_id = _get_snapshot_id(nom_projet=nom_projet, db_handler=db_handler)
     logging.info(msg=f"Adding snapshot_id {snapshot_id} to context")
+
+    return snapshot_id
+
+
+@task(task_id="get_source_projet_snapshot")
+def get_source_projet_snapshot(
+    nom_projet: str,
+    pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID,
+) -> str:
+    """
+    Récupérer le dernier snapshot_id d'un projet source (autre que le projet courant).
+
+    Ce snapshot est destiné à être ajouté aux DataFrames en tant que colonne
+    ``snapshot_id_source``, permettant de tracer l'origine des données d'un projet tiers.
+
+    Args:
+        nom_projet: Le nom du projet source dont on veut récupérer le snapshot_id.
+        pg_conn_id: Connexion Postgres. Valeur par défaut.
+
+    Returns:
+        Le snapshot_id du projet source.
+    """
+    db_handler = create_db_handler(connection_id=pg_conn_id)
+
+    snapshot_id = _get_snapshot_id(nom_projet=nom_projet, db_handler=db_handler)
+    logging.info(
+        msg=f"Retrieved source snapshot_id {snapshot_id!r} for project {nom_projet!r}"
+    )
 
     return snapshot_id
 

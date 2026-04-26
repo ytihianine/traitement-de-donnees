@@ -30,7 +30,7 @@ from src.constants import DEFAULT_POLARIS_HOST, DEFAULT_POLARIS_CATALOG
 
 
 def _add_snapshot_id_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
-    """Add snapshot_id column."""
+    """Add snapshot_id column sourced from the current DAG's own snapshot."""
     snapshot_id = context["ti"].xcom_pull(
         key="return_value", task_ids="get_projet_snapshot"
     )
@@ -41,14 +41,35 @@ def _add_snapshot_id_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
     return df
 
 
+def _add_source_snapshot_id_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
+    """Add snapshot_id_source column sourced from a different project's snapshot.
+
+    Requires a ``get_source_projet_snapshot`` task to be upstream in the same DAG run.
+    """
+    snapshot_id_source = context["ti"].xcom_pull(
+        key="return_value", task_ids="get_source_projet_snapshot"
+    )
+    if not snapshot_id_source:
+        raise ValueError(
+            "snapshot_id_source is not defined. "
+            "Ensure get_source_projet_snapshot is an upstream task."
+        )
+
+    df["snapshot_id_source"] = snapshot_id_source
+    return df
+
+
 def _add_metadata(
     df: pd.DataFrame,
     context: dict,
     add_metadata: bool = True,
+    add_source_snapshot_id: bool = False,
 ) -> pd.DataFrame:
     """Add metadata columns to the DataFrame."""
     if add_metadata:
         df = _add_snapshot_id_metadata(df=df, context=context)
+    if add_source_snapshot_id:
+        df = _add_source_snapshot_id_metadata(df=df, context=context)
     return df
 
 
@@ -82,6 +103,7 @@ def create_grist_etl_task(
     normalisation_process_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
     process_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
     add_metadata: bool = False,
+    add_source_snapshot_id: bool = False,
     version: str = "v1",
 ) -> Callable[..., XComArg]:
     """
@@ -161,6 +183,7 @@ def create_grist_etl_task(
             df=df,
             context=context,
             add_metadata=add_metadata,
+            add_source_snapshot_id=add_source_snapshot_id,
         )
 
         df_info(df=df, df_name=f"{selecteur} - After processing")
@@ -188,6 +211,7 @@ def create_file_etl_task(
     read_options: Optional[dict[str, Any]] = None,
     apply_cols_mapping: bool = True,
     add_metadata: bool = True,
+    add_source_snapshot_id: bool = False,
     version: str = "v1",
 ) -> Callable[..., XComArg]:
     """Create an ETL task for extracting, transforming and loading data from a file.
@@ -253,7 +277,11 @@ def create_file_etl_task(
             df = process_func(df)
 
         if add_metadata:
-            df = _add_metadata(df=df, context=context)
+            df = _add_metadata(
+                df=df,
+                context=context,
+                add_source_snapshot_id=add_source_snapshot_id,
+            )
 
         df_info(df=df, df_name=f"{selecteur} - After processing")
 
@@ -320,6 +348,7 @@ def create_task(
     steps: list[ETLStep],
     input_selecteurs: Optional[list[str]] = None,
     add_metadata: bool = True,
+    add_source_snapshot_id: bool = False,
     export_output: bool = True,
     version: str = "v1",
 ) -> Callable[..., XComArg]:
@@ -397,7 +426,11 @@ def create_task(
         )
 
         if add_metadata:
-            result = _add_metadata(df=result, context=context)
+            result = _add_metadata(
+                df=result,
+                context=context,
+                add_source_snapshot_id=add_source_snapshot_id,
+            )
 
         df_info(df=result, df_name=f"{output_selecteur} - df to export")
 
