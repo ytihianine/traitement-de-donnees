@@ -167,9 +167,11 @@ CREATE TABLE conf_projets."projet_snapshot"(
   "id_projet" int NOT NULL,
   "snapshot_id" text NOT NULL,
 	"creation_timestamp" timestamp NOT NULL,
+  "import_timestamp" TIMESTAMP NOT NULL,
+  "import_date" DATE NOT NULL,
   PRIMARY KEY ("id"),
   UNIQUE ("id_projet", "snapshot_id")
-)
+);
 
 
 -- Vue pour get_projet_s3_info()
