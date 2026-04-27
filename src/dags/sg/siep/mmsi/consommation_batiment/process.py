@@ -239,17 +239,18 @@ def process_source_bien_info_comp(df: pd.DataFrame) -> pd.DataFrame:
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     # Ajout des colonnes - backward compatibility
-    if not set(["date_entree_occupant", "date_sortie_occupant"]).issubset(
-        set(df.columns)
-    ):
-        df["date_entree_occupant"] = pd.NaT
-        df["date_sortie_occupant"] = pd.NaT
-
-    # Normaliser les dates
     date_cols = ["date_entree_occupant", "date_sortie_occupant"]
-    df = convert_str_cols_to_date(
-        df=df, columns=date_cols, str_date_format="%d-%m-%Y %H:%M:%S", errors="raise"
-    )
+    if not set(date_cols).issubset(set(df.columns)):
+        for col in date_cols:
+            df[col] = pd.NaT
+    else:
+        # Normaliser les dates
+        df = convert_str_cols_to_date(
+            df=df,
+            columns=date_cols,
+            str_date_format="%d-%m-%Y %H:%M:%S",
+            errors="raise",
+        )
 
     # Regroupement
     df_grouped = df.groupby(by=["code_bat_ter"], as_index=False)[
@@ -316,7 +317,7 @@ def process_conso_mensuelles(df: pd.DataFrame) -> pd.DataFrame:
     cols_conso = [
         col
         for col in df.columns
-        if col.startswith("conso_") and not col.endswith("_surfacique")
+        if col.startswith("conso_") and "_surfacique" not in col
     ]
     for col in cols_conso:
         colname = col.replace("conso_", "conso_presente_")

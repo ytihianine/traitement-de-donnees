@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS siep.bien_information_complementaire (
     indicateur_poste_occ_source DOUBLE PRECISION,
     indicateur_poste_occ DOUBLE PRECISION,
     indicateur_resident_occ DOUBLE PRECISION,
+    date_entree_occupant DATE,
+    date_sortie_occupant DATE,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
     snapshot_id TEXT,
