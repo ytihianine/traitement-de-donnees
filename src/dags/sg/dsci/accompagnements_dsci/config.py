@@ -11,7 +11,8 @@ storage_options = {
         tbl_order=5,
     ),
     "accompagnement_dsci": SelecteurStorageOptions(
-        load_strategy=LoadStrategy.FULL_LOAD
+        load_strategy=LoadStrategy.FULL_LOAD,
+        tbl_order=2,
     ),
     "accompagnement_dsci_equipe": SelecteurStorageOptions(
         load_strategy=LoadStrategy.FULL_LOAD,
@@ -25,7 +26,10 @@ storage_options = {
         load_strategy=LoadStrategy.FULL_LOAD,
         tbl_order=5,
     ),
-    "accompagnement_mi": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
+    "accompagnement_mi": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.FULL_LOAD,
+        tbl_order=2,
+    ),
     "accompagnement_mi_satisfaction": SelecteurStorageOptions(
         load_strategy=LoadStrategy.FULL_LOAD,
         tbl_order=5,
@@ -50,7 +54,10 @@ storage_options = {
         load_strategy=LoadStrategy.FULL_LOAD,
         tbl_order=5,
     ),
-    "bilaterale": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
+    "bilaterale": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.FULL_LOAD,
+        tbl_order=2,
+    ),
     "bilaterale_remontee": SelecteurStorageOptions(
         load_strategy=LoadStrategy.FULL_LOAD,
         tbl_order=5,
@@ -72,7 +79,10 @@ storage_options = {
         load_strategy=LoadStrategy.FULL_LOAD,
         tbl_order=5,
     ),
-    "effectif_dsci": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
+    "effectif_dsci": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.FULL_LOAD,
+        tbl_order=2,
+    ),
     "fac_hors_bercylab_quest_accompagnement": SelecteurStorageOptions(
         load_strategy=LoadStrategy.FULL_LOAD,
     ),
