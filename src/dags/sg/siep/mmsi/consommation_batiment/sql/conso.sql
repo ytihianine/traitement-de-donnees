@@ -265,7 +265,7 @@ CREATE TABLE IF NOT EXISTS siep.conso_statut_par_fluide (
     import_date DATE NOT NULL,
     snapshot_id TEXT,
     PRIMARY KEY (id, import_timestamp),
-    UNIQUE (snapshot_id, import_timestamp, code_bat_gestionnaire, type_fluide)
+    UNIQUE (snapshot_id, import_timestamp, annee, code_bat_gestionnaire, type_fluide)
 ) PARTITION BY RANGE (import_timestamp);
 
 DROP TABLE IF EXISTS siep.conso_avant_2019 CASCADE;
