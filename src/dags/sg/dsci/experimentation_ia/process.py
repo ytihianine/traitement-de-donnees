@@ -157,17 +157,6 @@ def process_ref_q7_accords(df: pd.DataFrame) -> pd.DataFrame:
 
 
 """
-Processing referenciel questionnaire2_bis : Jamais connecté à l'Assistant IA
-"""
-
-
-def process_ref_raisons_non_utilisation(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["raisons"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
-    return df
-
-
-"""
 Processing Entité
 """
 
@@ -226,7 +215,7 @@ def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
         "service",
         "metier",
         "cas_d_usages",
-        "courriel",
+        "courriel_corrige",
         "connecte_",
         "reponse_au_questionnaire_1",
         "reponse_au_questionnaire_2",
@@ -242,7 +231,7 @@ def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
         "cas_d_usages",
     ]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    df = df.drop_duplicates(subset="courriel", keep="last")
+    df = df.drop_duplicates(subset="courriel_corrige", keep="last")
     return df
 
 
@@ -263,7 +252,7 @@ def process_questionnaire_1(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = [
         "id",
-        "mail_professionnel",
+        "mail_corrige",
         "id_direction",
         "tranche_age",
         "categorie_emploi",
@@ -287,10 +276,10 @@ def process_questionnaire_1(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = df.loc[:, cols_to_keep]
     txt_cols = [
-        "mail_professionnel",
         "metier",
         "raisons_des_craintes",
         "attentes_experimentation",
+        "autres_cas_usage_transverse",
         "cas_d_usage_metier",
         "autres_cas_usage_transverse",
         "autre_formation_suivie",
@@ -305,7 +294,7 @@ def process_questionnaire_1(df: pd.DataFrame) -> pd.DataFrame:
         "id_niveau_d_utilisation_ia",
     ]
     df = handle_grist_null_references(df=df, columns=ref_cols)
-    df = df.drop_duplicates(subset="mail_professionnel", keep="last")
+    df = df.drop_duplicates(subset="mail_corrige", keep="last")
     return df
 
 
@@ -379,8 +368,8 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
     )
     col_to_keep = [
         "id",
-        "mail_professionnel",
-        # "direction",
+        "mail_corrige",
+        "direction",
         # "types_d_interactions_mef",
         "autres_types_d_interactions",
         "id_niveau_d_usage_ia_post_expe_",
@@ -433,7 +422,6 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
         "id_ia_favorise_relations_humaines_",
     ]
     txt_cols = [
-        "mail_professionnel",
         "autres_types_d_interactions",
         "autres_formation_ia",
         "raison_non_participation_rdv",
@@ -473,7 +461,7 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
         "id_ia_favorise_relations_humaines_",
     ]
     df = handle_grist_null_references(df=df, columns=ref_cols)
-    df = df.drop_duplicates(subset="mail_professionnel", keep="last")
+    df = df.drop_duplicates(subset="mail_corrige", keep="last")
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
     return df
 
@@ -609,6 +597,8 @@ def process_questionnaire2_facteurs_progression(df: pd.DataFrame) -> pd.DataFram
     ) % (2**63)
     return df
 
+    return df
+
 
 def process_questionnaire2_taches(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
@@ -707,62 +697,12 @@ def process_questionnaire2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
     ref_cols = ["id_questionnaire_2", "id_impacts_identifies_au_travail"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
-    df = convert_str_of_list_to_list(
-        df=df, col_to_convert="id_impacts_identifies_au_travail"
-    )
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_impacts_identifies_au_travail")
     df = df.explode(column="id_impacts_identifies_au_travail")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_impacts_identifies_au_travail"])
     # Nouvel ID unique
     df["id"] = pd.util.hash_pandas_object(
         obj=df[["id_questionnaire_2", "id_impacts_identifies_au_travail"]], index=False
-    ) % (2**63)
-    return df
-
-
-"""
-Processing du questionnaire2_bis : Les agents qui ne se sont jamais connectés
-"""
-
-
-def process_questionnaire2_bis(df: pd.DataFrame) -> pd.DataFrame:
-    # Renommage
-    df = df.rename(columns={"id": "id_questionnaire_2_bis"})
-    # Gestion des colonnes
-    cols_to_keep: list[str] = [
-        "id_questionnaire_2_bis",
-        "avez_vous_deja_utilise_l_assistant_ia_",
-        "autres_raisons",
-        "ajouter_quelque_chose",
-    ]
-    df = df.loc[:, cols_to_keep]
-    txt_col = ["autres_raisons", "ajouter_quelque_chose"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
-    return df
-
-
-def process_questionnaire2_bis_raisons_non_utilisation(
-    df: pd.DataFrame,
-) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["id", "raisons_non_utilisation_assistant_ia"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={
-            "id": "id_questionnaire_2_bis",
-            "raisons_non_utilisation_assistant_ia": "id_raisons_non_utilisation",
-        }
-    )
-    # Gestion des refs
-    ref_cols = ["id_questionnaire_2_bis", "id_raisons_non_utilisation"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
-    # Convertion
-    df = convert_str_of_list_to_list(df=df, col_to_convert="id_raisons_non_utilisation")
-    df = df.explode(column="id_raisons_non_utilisation")
-    # Nettoyage des lignes vides
-    df = df.dropna(subset=["id_raisons_non_utilisation"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_2_bis", "id_raisons_non_utilisation"]], index=False
     ) % (2**63)
     return df
