@@ -24,7 +24,6 @@ from src.dags.sg.dsci.experimentation_ia.tasks import (
     suivi_experimentateurs,
     suivi_questionnaire_1,
     suivi_questionnaire_2,
-    suivi_questionnaire_2_bis,
 )
 from src.dags.sg.dsci.experimentation_ia.config import (
     storage_options,
@@ -72,7 +71,6 @@ def experimentation_ia_dag() -> None:
             suivi_experimentateurs(),
             suivi_questionnaire_1(),
             suivi_questionnaire_2(),
-            suivi_questionnaire_2_bis(),
         ],
         copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
         del_iceberg_staging_table(),

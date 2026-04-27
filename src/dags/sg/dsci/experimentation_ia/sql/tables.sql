@@ -84,16 +84,6 @@ CREATE TABLE assistant_ia."ref_q7_accords" (
   "reponses" TEXT
 );
 
-
-/*
-   Référentiels questionnaire 2 bis
-*/
-
-CREATE TABLE assistant_ia."ref_raisons_non_utilisation" (
-  "id" INTEGER PRIMARY KEY,
-  "raisons" TEXT
-);
-
 /*
     Repartition par entité
 */
@@ -122,8 +112,8 @@ CREATE TABLE assistant_ia."experimentateurs"(
     "id" integer PRIMARY KEY,
     "no_id" text,
     "entite" text,
-    "courriel" text,
-    --"courriel_corrige" text,
+    --"courriel" text,
+    "courriel_corrige" text,
     "connecte_" text,
     "reponse_au_questionnaire_1" text,
     "reponse_au_questionnaire_2" text,
@@ -141,7 +131,7 @@ CREATE TABLE assistant_ia."experimentateurs"(
 DROP TABLE IF EXISTS assistant_ia."questionnaire_1" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_1"(
     "id" INTEGER PRIMARY KEY,
-    "mail_professionnel" TEXT,
+    "mail_corrige" TEXT,
     "id_direction" INTEGER,
     "tranche_age" TEXT,
     "categorie_emploi" TEXT,
@@ -196,8 +186,8 @@ CREATE TABLE assistant_ia."questionnaire_1_besoins_accompagnement" (
 DROP TABLE IF EXISTS assistant_ia."questionnaire_2" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_2" (
     "id" INTEGER PRIMARY KEY,
-    "mail_professionnel" TEXT,
-    -- "direction" TEXT,
+    "mail_corrige" TEXT,
+    "direction" TEXT,
     --"types_d_interactions_mef" TEXT,
     "autres_types_d_interactions" TEXT,
     "id_niveau_d_usage_ia_post_expe_" INTEGER,
@@ -344,27 +334,4 @@ CREATE TABLE assistant_ia."questionnaire2_impact_identifie" (
     UNIQUE ("id_questionnaire_2","id_impacts_identifies_au_travail" ),
     FOREIGN KEY ("id_questionnaire_2") REFERENCES assistant_ia."questionnaire_2"("id"),
     FOREIGN KEY ("id_impacts_identifies_au_travail" ) REFERENCES assistant_ia."ref_q24_impact_identifie"("id")
-);
-
-
-/*
-    Questionnaire 2_bis : Les agents jamais connectés
-*/
-
-DROP TABLE IF EXISTS assistant_ia."questionnaire_2_bis" CASCADE;
-CREATE TABLE assistant_ia."questionnaire_2_bis" (
-    "id" INTEGER PRIMARY KEY,
-    "avez_vous_deja_utilise_l_assistant_ia_" TEXT,
-    "autres_raisons" TEXT,
-    "ajouter_quelque_chose" TEXT
-);
--- table de liasion
-
-CREATE TABLE assistant_ia."questionnaire_2_bis_raisons_non_utilisation" (
-    "id" bigint PRIMARY KEY,
-    "id_questionnaire_2_bis" INTEGER,
-    "id_raisons_non_utilisation" INTEGER,
-    UNIQUE ("id_questionnaire_2_bis", "id_raisons_non_utilisation" ),
-    FOREIGN KEY ("id_questionnaire_2_bis") REFERENCES assistant_ia."questionnaire_2_bis"("id"),
-    FOREIGN KEY ( "id_raisons_non_utilisation") REFERENCES assistant_ia."ref_raisons_non_utilisation"("id")
 );
