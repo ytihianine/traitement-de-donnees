@@ -56,7 +56,10 @@ storage_options = {
         tbl_order=5,
     ),
     "charge_agent_cci": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
-    "correspondant": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
+    "correspondant": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.FULL_LOAD,
+        tbl_order=3,
+    ),
     "correspondant_competence_particuliere": SelecteurStorageOptions(
         load_strategy=LoadStrategy.FULL_LOAD,
         tbl_order=5,

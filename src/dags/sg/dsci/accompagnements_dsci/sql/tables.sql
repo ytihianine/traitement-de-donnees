@@ -47,14 +47,14 @@ CREATE TABLE activite_dsci."ref_pole" (
   "id" integer PRIMARY KEY,
   "id_bureau" int,
   "pole" text,
-	FOREIGN KEY ("id_bureau") REFERENCES activite_dsci."ref_bureau" ("id")
+	FOREIGN KEY ("id_bureau") REFERENCES activite_dsci."ref_bureau" ("id") ON DELETE SET NULL
 );
 
 CREATE TABLE activite_dsci."ref_type_accompagnement" (
   "id" integer PRIMARY KEY,
   "type_d_accompagnement" text,
   "id_pole" int,
-	FOREIGN KEY ("id_pole") REFERENCES activite_dsci."ref_pole" ("id")
+	FOREIGN KEY ("id_pole") REFERENCES activite_dsci."ref_pole" ("id") ON DELETE SET NULL
 );
 
 DROP TABLE activite_dsci."ref_semainier";
@@ -135,8 +135,8 @@ CREATE TABLE activite_dsci."accompagnement_dsci_typologie" (
   "id_accompagnement" integer,
   "id_typologie" integer,
   UNIQUE ("id_accompagnement", "id_typologie"),
-  FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id"),
-  FOREIGN KEY ("id_typologie") REFERENCES activite_dsci."ref_typologie_accompagnement" ("id")
+  FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id") ON DELETE SET NULL,
+  FOREIGN KEY ("id_typologie") REFERENCES activite_dsci."ref_typologie_accompagnement" ("id") ON DELETE SET NULL
 );
 
 -- Table liaison pour les équipes DSCI
@@ -145,8 +145,8 @@ CREATE TABLE activite_dsci."accompagnement_dsci_equipe" (
   "id" bigint PRIMARY KEY,
   "id_accompagnement" integer,
   "id_equipe_s_dsci" integer,
-  FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id"),
-  FOREIGN KEY ("id_equipe_s_dsci") REFERENCES activite_dsci."ref_bureau" ("id")
+  FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id") ON DELETE SET NULL,
+  FOREIGN KEY ("id_equipe_s_dsci") REFERENCES activite_dsci."ref_bureau" ("id") ON DELETE SET NULL
 );
 
 -- Table de liaison pour les porteurs DSCI
@@ -156,8 +156,8 @@ CREATE TABLE activite_dsci."accompagnement_dsci_porteur" (
   "id_accompagnement" integer,
   "id_porteur_dsci" integer,
   UNIQUE ("id_accompagnement", "id_porteur_dsci"),
-  FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id"),
-  FOREIGN KEY ("id_porteur_dsci") REFERENCES activite_dsci."effectif_dsci" ("id")
+  FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id") ON DELETE SET NULL,
+  FOREIGN KEY ("id_porteur_dsci") REFERENCES activite_dsci."effectif_dsci" ("id") ON DELETE SET NULL
 );
 
 
@@ -176,8 +176,8 @@ CREATE TABLE activite_dsci."bilaterale_remontee" (
 	"id_bureau" int,
 	"information_a_remonter" text,
 	-- "id_int_direction" int,
-	FOREIGN KEY ("id_bilaterale") REFERENCES activite_dsci."bilaterale" ("id"),
-	FOREIGN KEY ("id_bureau") REFERENCES activite_dsci."ref_bureau" ("id")
+	FOREIGN KEY ("id_bilaterale") REFERENCES activite_dsci."bilaterale" ("id") ON DELETE SET NULL,
+	FOREIGN KEY ("id_bureau") REFERENCES activite_dsci."ref_bureau" ("id") ON DELETE SET NULL
 );
 
 DROP TABLE activite_dsci."correspondant" CASCADE;
@@ -206,9 +206,9 @@ CREATE TABLE activite_dsci."correspondant" (
 	-- "check_mail" grist_any,
 	-- "poste" text,
 	-- "cause_inactivite" text,
-	FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id"),
-	FOREIGN KEY ("id_region") REFERENCES activite_dsci."ref_region" ("id"),
-	FOREIGN KEY ("id_promotion_fac") REFERENCES activite_dsci."accompagnement_mi" ("id")
+	FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id") ON DELETE SET NULL,
+	FOREIGN KEY ("id_region") REFERENCES activite_dsci."ref_region" ("id") ON DELETE SET NULL,
+	FOREIGN KEY ("id_promotion_fac") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL
 );
 
 DROP TABLE activite_dsci."correspondant_profil" CASCADE;
@@ -217,8 +217,8 @@ CREATE TABLE activite_dsci."correspondant_profil" (
 	"id_correspondant" integer,
 	"id_type_de_correspondant" int,
 	UNIQUE ("id_correspondant", "id_type_de_correspondant"),
-	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id"),
-	FOREIGN KEY ("id_type_de_correspondant") REFERENCES activite_dsci."ref_profil_correspondant" ("id")
+	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id") ON DELETE SET NULL,
+	FOREIGN KEY ("id_type_de_correspondant") REFERENCES activite_dsci."ref_profil_correspondant" ("id") ON DELETE SET NULL
 );
 
 CREATE TABLE activite_dsci."correspondant_competence_particuliere" (
@@ -226,8 +226,8 @@ CREATE TABLE activite_dsci."correspondant_competence_particuliere" (
 	"id_correspondant" integer,
 	"id_competence_particuliere" int,
 	UNIQUE ("id_correspondant", "id_competence_particuliere"),
-	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id"),
-	FOREIGN KEY ("id_competence_particuliere") REFERENCES activite_dsci."ref_competence_particuliere" ("id")
+	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id") ON DELETE SET NULL,
+	FOREIGN KEY ("id_competence_particuliere") REFERENCES activite_dsci."ref_competence_particuliere" ("id") ON DELETE SET NULL
 );
 
 CREATE TABLE activite_dsci."correspondant_connaissance_communaute" (
@@ -235,7 +235,7 @@ CREATE TABLE activite_dsci."correspondant_connaissance_communaute" (
 	"id_correspondant" integer,
 	"connaissance_communaute" text,
 	UNIQUE ("id_correspondant", "connaissance_communaute")
-	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id")
+	FOREIGN KEY ("id_correspondant") REFERENCES activite_dsci."correspondant" ("id") ON DELETE SET NULL
 );
 
 
@@ -271,9 +271,9 @@ CREATE TABLE activite_dsci."accompagnement_mi" (
 	"id_pole" int,
 	"id_type_d_accompagnement" int,
 	"informations_complementaires" text,
-	FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id"),
-	FOREIGN KEY ("id_pole") REFERENCES activite_dsci."ref_pole" ("id"),
-	FOREIGN KEY ("id_type_d_accompagnement") REFERENCES activite_dsci."ref_type_accompagnement" ("id")
+	FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id") ON DELETE SET NULL,
+	FOREIGN KEY ("id_pole") REFERENCES activite_dsci."ref_pole" ("id") ON DELETE SET NULL,
+	FOREIGN KEY ("id_type_d_accompagnement") REFERENCES activite_dsci."ref_type_accompagnement" ("id") ON DELETE SET NULL
 );
 
 
@@ -286,8 +286,8 @@ CREATE TABLE activite_dsci."accompagnement_mi_satisfaction" (
 	"note_moyenne_de_satisfaction" numeric,
 	"unite" text,
 	"id_type_d_accompagnement" int,
-	FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id"),
-	FOREIGN KEY ("id_type_d_accompagnement") REFERENCES activite_dsci."ref_type_accompagnement" ("id")
+	FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL,
+	FOREIGN KEY ("id_type_d_accompagnement") REFERENCES activite_dsci."ref_type_accompagnement" ("id") ON DELETE SET NULL
 );
 
 CREATE TABLE activite_dsci."animateur_interne" (
@@ -295,23 +295,23 @@ CREATE TABLE activite_dsci."animateur_interne" (
   "id_accompagnement" int,
   "id_animateur" int
 );
-ALTER TABLE "animateur_interne" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id");
-ALTER TABLE "animateur_interne" ADD FOREIGN KEY ("id_animateur") REFERENCES activite_dsci."effectif_dsci" ("id");
+ALTER TABLE "animateur_interne" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
+ALTER TABLE "animateur_interne" ADD FOREIGN KEY ("id_animateur") REFERENCES activite_dsci."effectif_dsci" ("id") ON DELETE SET NULL;
 
 CREATE TABLE activite_dsci."animateur_externe" (
   "id" integer PRIMARY KEY,
   "id_accompagnement" int,
   "animateur" text
 );
-ALTER TABLE "animateur_externe" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id");
+ALTER TABLE "animateur_externe" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
 
 CREATE TABLE activite_dsci."animateur_fac" (
   "id" integer PRIMARY KEY,
   "id_accompagnement" int,
   "id_animateur" int
 );
-ALTER TABLE "animateur_fac" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id");
-ALTER TABLE "animateur_fac" ADD FOREIGN KEY ("id_animateur") REFERENCES activite_dsci."correspondant" ("id");
+ALTER TABLE "animateur_fac" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
+ALTER TABLE "animateur_fac" ADD FOREIGN KEY ("id_animateur") REFERENCES activite_dsci."correspondant" ("id") ON DELETE SET NULL;
 
 -- Table de liaison pour les certifications_souhaitées
 DROP TABLE IF EXISTS activite_dsci."animateur_fac_certification" CASCADE;
@@ -320,8 +320,8 @@ CREATE TABLE activite_dsci."animateur_fac_certification" (
   "id_animateur_fac" integer,
   "id_certifications_souhaitees" integer,
   UNIQUE ("id_animateur_fac", "id_certifications_souhaitees"),
-  FOREIGN KEY ("id_animateur_fac") REFERENCES activite_dsci."animateur_fac" ("id"),
-  FOREIGN KEY ("id_certifications_souhaitees") REFERENCES activite_dsci."ref_certification" ("id")
+  FOREIGN KEY ("id_animateur_fac") REFERENCES activite_dsci."animateur_fac" ("id") ON DELETE SET NULL,
+  FOREIGN KEY ("id_certifications_souhaitees") REFERENCES activite_dsci."ref_certification" ("id") ON DELETE SET NULL
 );
 
 -- Table de liaison pour les certifications_validées
@@ -331,8 +331,8 @@ CREATE TABLE activite_dsci."animateur_fac_certification_valide" (
   "id_animateur_fac" integer,
   "id_certifications_validees" integer,
   UNIQUE ("id_animateur_fac", "id_certifications_validees"),
-  FOREIGN KEY ("id_animateur_fac") REFERENCES activite_dsci."animateur_fac" ("id"),
-  FOREIGN KEY ("id_certifications_validees") REFERENCES activite_dsci."ref_certification" ("id")
+  FOREIGN KEY ("id_animateur_fac") REFERENCES activite_dsci."animateur_fac" ("id") ON DELETE SET NULL,
+  FOREIGN KEY ("id_certifications_validees") REFERENCES activite_dsci."ref_certification" ("id") ON DELETE SET NULL
 );
 
 
@@ -342,8 +342,8 @@ CREATE TABLE activite_dsci."laboratoires_territoriaux" (
 	"id_direction" int,
 	"id_region" int
 );
-ALTER TABLE "laboratoires_territoriaux" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id");
-ALTER TABLE "laboratoires_territoriaux" ADD FOREIGN KEY ("id_region") REFERENCES activite_dsci."ref_region" ("id");
+ALTER TABLE "laboratoires_territoriaux" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id") ON DELETE SET NULL;
+ALTER TABLE "laboratoires_territoriaux" ADD FOREIGN KEY ("id_region") REFERENCES activite_dsci."ref_region" ("id") ON DELETE SET NULL;
 
 ------------------------------------- questionnaires mi -------------------------------
 
@@ -355,9 +355,9 @@ CREATE TABLE activite_dsci."pleniere_quest_inscription" (
 	"id_pleniere" int,
 	"id_id_accompagnement" int
 );
-ALTER TABLE "pleniere_quest_inscription" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id");
-ALTER TABLE "pleniere_quest_inscription" ADD FOREIGN KEY ("id_pleniere") REFERENCES activite_dsci."accompagnement_mi" ("id");
-ALTER TABLE "pleniere_quest_inscription" ADD FOREIGN KEY ("id_id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id");
+ALTER TABLE "pleniere_quest_inscription" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id") ON DELETE SET NULL;
+ALTER TABLE "pleniere_quest_inscription" ADD FOREIGN KEY ("id_pleniere") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
+ALTER TABLE "pleniere_quest_inscription" ADD FOREIGN KEY ("id_id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
 
 CREATE TABLE activite_dsci."pleniere_quest_satisfaction"(
 	"id" integer PRIMARY key,
@@ -378,10 +378,10 @@ CREATE TABLE activite_dsci."passinnov_quest_inscription" (
 	"id_id_accompagnement" int,
 	"role" text
 );
-ALTER TABLE "passinnov_quest_inscription" ADD FOREIGN KEY ("id_region") REFERENCES activite_dsci."ref_region" ("id");
-ALTER TABLE "passinnov_quest_inscription" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id");
-ALTER TABLE "passinnov_quest_inscription" ADD FOREIGN KEY ("id_passinnov") REFERENCES activite_dsci."accompagnement_mi" ("id");
-ALTER TABLE "passinnov_quest_inscription" ADD FOREIGN KEY ("id_id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id");
+ALTER TABLE "passinnov_quest_inscription" ADD FOREIGN KEY ("id_region") REFERENCES activite_dsci."ref_region" ("id") ON DELETE SET NULL;
+ALTER TABLE "passinnov_quest_inscription" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id") ON DELETE SET NULL;
+ALTER TABLE "passinnov_quest_inscription" ADD FOREIGN KEY ("id_passinnov") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
+ALTER TABLE "passinnov_quest_inscription" ADD FOREIGN KEY ("id_id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
 
 
 CREATE TABLE activite_dsci."passinnov_quest_satisfaction" (
@@ -393,8 +393,8 @@ CREATE TABLE activite_dsci."passinnov_quest_satisfaction" (
 	"id_quest_passinnov" int,
 	"note_globale" text
 );
-ALTER TABLE "passinnov_quest_satisfaction" ADD FOREIGN KEY ("id_id_passinnov") REFERENCES activite_dsci."accompagnement_mi" ("id");
-ALTER TABLE "passinnov_quest_satisfaction" ADD FOREIGN KEY ("id_quest_passinnov") REFERENCES activite_dsci."accompagnement_mi" ("id");
+ALTER TABLE "passinnov_quest_satisfaction" ADD FOREIGN KEY ("id_id_passinnov") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
+ALTER TABLE "passinnov_quest_satisfaction" ADD FOREIGN KEY ("id_quest_passinnov") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
 
 
 CREATE TABLE activite_dsci."formation_codev_quest_inscription"(
@@ -410,9 +410,9 @@ CREATE TABLE activite_dsci."formation_codev_quest_inscription"(
 	--"is_duplicate" int,
 	"id_id_accompagnement" int
 );
-ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id");
-ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id");
-ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_session_formation_codev") REFERENCES activite_dsci."accompagnement_mi" ("id");
+ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_id_accompagnement") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
+ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id") ON DELETE SET NULL;
+ALTER TABLE "formation_codev_quest_inscription" ADD FOREIGN KEY ("id_session_formation_codev") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
 
 DROP TABLE IF EXISTS activite_dsci."formation_fac_quest_satisfaction" CASCADE;
 CREATE TABLE activite_dsci."formation_fac_quest_satisfaction"(
@@ -431,9 +431,9 @@ CREATE TABLE activite_dsci."formation_fac_quest_satisfaction"(
 	"besoin" text,
 	"id_id_formation" int
 );
-ALTER TABLE "formation_fac_quest_satisfaction" ADD FOREIGN KEY ("id_promotion") REFERENCES activite_dsci."ref_promotion_fac" ("id");
-ALTER TABLE "formation_fac_quest_satisfaction" ADD FOREIGN KEY ("id_quest_formation") REFERENCES activite_dsci."accompagnement_mi" ("id");
-ALTER TABLE "formation_fac_quest_satisfaction" ADD FOREIGN KEY ("id_id_formation") REFERENCES activite_dsci."accompagnement_mi" ("id");
+ALTER TABLE "formation_fac_quest_satisfaction" ADD FOREIGN KEY ("id_promotion") REFERENCES activite_dsci."ref_promotion_fac" ("id") ON DELETE SET NULL;
+ALTER TABLE "formation_fac_quest_satisfaction" ADD FOREIGN KEY ("id_quest_formation") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
+ALTER TABLE "formation_fac_quest_satisfaction" ADD FOREIGN KEY ("id_id_formation") REFERENCES activite_dsci."accompagnement_mi" ("id") ON DELETE SET NULL;
 
 -- Nouvelle table de liaison pour les envies_pour_la_suite
 DROP TABLE IF EXISTS activite_dsci."formation_fac_envie_suite_quest_satisfaction" CASCADE;
@@ -457,12 +457,12 @@ CREATE TABLE activite_dsci."fac_hors_bercylab_quest_accompagnement" (
 	"intitule_de_l_accompagnement" text,
 	"statut" text
 );
-ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateur_1") REFERENCES activite_dsci."correspondant" ("id");
-ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateur_2") REFERENCES activite_dsci."correspondant" ("id");
-ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateur_3") REFERENCES activite_dsci."correspondant" ("id");
---ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateurs") REFERENCES activite_dsci."correspondant" ("id");
-ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id");
-ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_region") REFERENCES activite_dsci."ref_region" ("id");
+ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateur_1") REFERENCES activite_dsci."correspondant" ("id") ON DELETE SET NULL;
+ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateur_2") REFERENCES activite_dsci."correspondant" ("id") ON DELETE SET NULL;
+ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateur_3") REFERENCES activite_dsci."correspondant" ("id") ON DELETE SET NULL;
+--ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_facilitateurs") REFERENCES activite_dsci."correspondant" ("id") ON DELETE SET NULL;
+ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_direction") REFERENCES activite_dsci."ref_direction" ("id") ON DELETE SET NULL;
+ALTER TABLE "fac_hors_bercylab_quest_accompagnement" ADD FOREIGN KEY ("id_region") REFERENCES activite_dsci."ref_region" ("id") ON DELETE SET NULL;
 
 
 -- Table de liaison pour les facilitateurs
@@ -472,8 +472,8 @@ CREATE TABLE activite_dsci."fac_hors_bercylab_quest_accompagnement_facilitateurs
     "id_formation_fac_hors_bercylab" integer,
     "id_facilitateurs" integer,
     UNIQUE ("id_formation_fac_hors_bercylab", "id_facilitateurs"),
-    FOREIGN KEY ("id_formation_fac_hors_bercylab") REFERENCES activite_dsci."fac_hors_bercylab_quest_accompagnement" ("id"),
-    FOREIGN KEY ("id_facilitateurs") REFERENCES activite_dsci."correspondant" ("id")
+    FOREIGN KEY ("id_formation_fac_hors_bercylab") REFERENCES activite_dsci."fac_hors_bercylab_quest_accompagnement" ("id") ON DELETE SET NULL,
+    FOREIGN KEY ("id_facilitateurs") REFERENCES activite_dsci."correspondant" ("id") ON DELETE SET NULL
 );
 
 -- Table de liaison pour le type d'accompagnement
@@ -483,7 +483,7 @@ CREATE TABLE activite_dsci."fac_hors_bercylab_quest_type_accompagnement" (
     "id_formation_fac_hors_bercylab" integer,
     "type_d_accompagnement" text,
     UNIQUE ("id_formation_fac_hors_bercylab", "type_d_accompagnement"),
-    FOREIGN KEY ("id_formation_fac_hors_bercylab") REFERENCES activite_dsci."fac_hors_bercylab_quest_accompagnement" ("id")
+    FOREIGN KEY ("id_formation_fac_hors_bercylab") REFERENCES activite_dsci."fac_hors_bercylab_quest_accompagnement" ("id") ON DELETE SET NULL
 );
 
 -- 4. Table de liaison pour les participants
@@ -493,7 +493,7 @@ CREATE TABLE activite_dsci."fac_hors_bercylab_quest_accompagnement_participants"
     "id_formation_fac_hors_bercylab" integer,
     "participants" text,
     UNIQUE ("id_formation_fac_hors_bercylab", "participants"),
-    FOREIGN KEY ("id_formation_fac_hors_bercylab") REFERENCES activite_dsci."fac_hors_bercylab_quest_accompagnement" ("id")
+    FOREIGN KEY ("id_formation_fac_hors_bercylab") REFERENCES activite_dsci."fac_hors_bercylab_quest_accompagnement" ("id") ON DELETE SET NULL
 );
 
 
@@ -516,9 +516,9 @@ CREATE TABLE activite_dsci."charge_agent_cci" (
 	"taux_de_charge" numeric,
 	"annee" int
 );
-ALTER TABLE "charge_agent_cci" ADD FOREIGN KEY ("id_missions") REFERENCES activite_dsci."accompagnement_dsci" ("id");
-ALTER TABLE "charge_agent_cci" ADD FOREIGN KEY ("id_semaine") REFERENCES activite_dsci."ref_semainier" ("id");
-ALTER TABLE "charge_agent_cci" ADD FOREIGN KEY ("id_agent_e_") REFERENCES activite_dsci."effectif_dsci" ("id");
+ALTER TABLE "charge_agent_cci" ADD FOREIGN KEY ("id_missions") REFERENCES activite_dsci."accompagnement_dsci" ("id") ON DELETE SET NULL;
+ALTER TABLE "charge_agent_cci" ADD FOREIGN KEY ("id_semaine") REFERENCES activite_dsci."ref_semainier" ("id") ON DELETE SET NULL;
+ALTER TABLE "charge_agent_cci" ADD FOREIGN KEY ("id_agent_e_") REFERENCES activite_dsci."effectif_dsci" ("id") ON DELETE SET NULL;
 
 CREATE TABLE activite_dsci."accompagnement_cci_opportunite" (
 	"id" integer PRIMARY KEY,
@@ -535,7 +535,7 @@ CREATE TABLE activite_dsci."accompagnement_cci_opportunite" (
 	"precision_canal" text,
 	"proposition_d_accompagnement_transmise" boolean
 );
-ALTER TABLE "accompagnement_cci_opportunite" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id");
+ALTER TABLE "accompagnement_cci_opportunite" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id") ON DELETE SET NULL;
 
 ------------------------------------- questionnaires cci -------------------------------
 
@@ -560,14 +560,14 @@ CREATE TABLE activite_dsci."accompagnement_cci_quest_satisfaction" (
 	"id_accompagnement" int
 );
 
-ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_adaptabilite") REFERENCES activite_dsci."ref_qualite_service" ("id");
-ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_formulaire_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id");
-ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_relationnel_client") REFERENCES activite_dsci."ref_qualite_service" ("id");
-ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_qualite_des_livrables") REFERENCES activite_dsci."ref_qualite_service" ("id");
-ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_atteinte_objectifs") REFERENCES activite_dsci."ref_qualite_service" ("id");
-ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_pilotage_et_suivi") REFERENCES activite_dsci."ref_qualite_service" ("id");
-ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_etape_de_cadrage") REFERENCES activite_dsci."ref_qualite_service" ("id");
-ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_aide_methodologique") REFERENCES activite_dsci."ref_qualite_service" ("id");
-ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_reactivite") REFERENCES activite_dsci."ref_qualite_service" ("id");
-ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_respect_calendrier") REFERENCES activite_dsci."ref_qualite_service" ("id");
-ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id");
+ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_adaptabilite") REFERENCES activite_dsci."ref_qualite_service" ("id") ON DELETE SET NULL;
+ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_formulaire_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id") ON DELETE SET NULL;
+ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_relationnel_client") REFERENCES activite_dsci."ref_qualite_service" ("id") ON DELETE SET NULL;
+ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_qualite_des_livrables") REFERENCES activite_dsci."ref_qualite_service" ("id") ON DELETE SET NULL;
+ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_atteinte_objectifs") REFERENCES activite_dsci."ref_qualite_service" ("id") ON DELETE SET NULL;
+ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_pilotage_et_suivi") REFERENCES activite_dsci."ref_qualite_service" ("id") ON DELETE SET NULL;
+ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_etape_de_cadrage") REFERENCES activite_dsci."ref_qualite_service" ("id") ON DELETE SET NULL;
+ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_aide_methodologique") REFERENCES activite_dsci."ref_qualite_service" ("id") ON DELETE SET NULL;
+ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_reactivite") REFERENCES activite_dsci."ref_qualite_service" ("id") ON DELETE SET NULL;
+ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_respect_calendrier") REFERENCES activite_dsci."ref_qualite_service" ("id") ON DELETE SET NULL;
+ALTER TABLE "accompagnement_cci_quest_satisfaction" ADD FOREIGN KEY ("id_accompagnement") REFERENCES activite_dsci."accompagnement_dsci" ("id") ON DELETE SET NULL;
