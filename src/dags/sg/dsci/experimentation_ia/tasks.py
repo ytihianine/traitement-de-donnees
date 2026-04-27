@@ -163,6 +163,17 @@ def referentiels() -> None:
         add_import_date=True,
         add_snapshot_id=True,
     )
+    # ==============================
+    # referentiels du questionnaire2_bis
+    # ==============================
+    ref_raisons_non_utilisation = create_grist_etl_task(
+        selecteur="ref_raisons_non_utilisation",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_raisons_non_utilisation,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
 
     # Ordre des tâches
     chain(
@@ -185,6 +196,7 @@ def referentiels() -> None:
             ref_q5_formation_suivie(),
             ref_q3_niveau_2(),
             ref_q7_accords(),
+            ref_raisons_non_utilisation(),
         ]
     )
 
@@ -358,5 +370,33 @@ def suivi_questionnaire_2() -> None:
             questionnaire2_typologie_erreurs(),
             questionnaire2_impact_observe(),
             questionnaire2_impact_identifie(),
+        ]
+    )
+
+
+@task_group
+def suivi_questionnaire_2_bis() -> None:
+    version = "v2"
+    questionnaire_2_bis = create_grist_etl_task(
+        selecteur="questionnaire_2_bis",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_questionnaire2_bis,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    questionnaire_2_bis_raisons_non_utilisation = create_grist_etl_task(
+        selecteur="questionnaire_2_bis_raisons_non_utilisation",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_questionnaire2_bis_raisons_non_utilisation,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    # Ordre des tâches
+    chain(
+        [
+            questionnaire_2_bis(),
+            questionnaire_2_bis_raisons_non_utilisation(),
         ]
     )
