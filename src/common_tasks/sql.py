@@ -258,6 +258,12 @@ def ensure_partition(
         )
         return
 
+    if tbl_name is None or tbl_name == "":
+        logging.warning(
+            msg=f"No table name specified for selecteur {config.storage_info.selecteur} ... skipping partition creation"
+        )
+        return
+
     if not is_partitioned:
         logging.info(msg=f"{tbl_name} is not partitioned ... skipping")
         return
