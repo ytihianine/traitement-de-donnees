@@ -238,6 +238,13 @@ def process_source_bien_info_comp(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
+    # Ajout des colonnes - backward compatibility
+    if not set(["date_entree_occupant", "date_sortie_occupant"]).issubset(
+        set(df.columns)
+    ):
+        df["date_entree_occupant"] = pd.NaT
+        df["date_sortie_occupant"] = pd.NaT
+
     # Normaliser les dates
     date_cols = ["date_entree_occupant", "date_sortie_occupant"]
     df = convert_str_cols_to_date(
@@ -306,7 +313,11 @@ def process_conso_mensuelles(df: pd.DataFrame) -> pd.DataFrame:
 
     df["ligne_avec_conso"] = np.where(df["date_conso"].notna(), True, False)
 
-    cols_conso = [col for col in df.columns if col.startswith("conso_")]
+    cols_conso = [
+        col
+        for col in df.columns
+        if col.startswith("conso_") and not col.endswith("_surfacique")
+    ]
     for col in cols_conso:
         colname = col.replace("conso_", "conso_presente_")
         df[colname] = np.where(df[col].notna(), 1, 0)
