@@ -52,4 +52,12 @@ storage_options = {
         load_strategy=LoadStrategy.INCREMENTAL,
         tbl_order=5,
     ),
+    # Questionnaire_2_bis
+    "questionnaire_2_bis": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.INCREMENTAL
+    ),
+    "questionnaire_2_bis_raisons_non_utilisation": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.INCREMENTAL,
+        tbl_order=5,
+    ),
 }
