@@ -361,7 +361,7 @@ def process_conso_annuelle(df: pd.DataFrame) -> pd.DataFrame:
         "degres_jours_de_refroidissement",
         "ratio_electricite",
         "ratio_autres_fluides",
-        "import_date",
+        "ligne_avec_conso" "import_date",
         "import_timestamp",
     ]
 
@@ -597,7 +597,7 @@ def process_conso_statut_par_fluide(df: pd.DataFrame) -> pd.DataFrame:
         value_vars=cols_conso_presente,
         var_name="type_fluide",
         value_name="conso_presente",
-    ).reset_index()
+    ).reset_index(drop=True)
 
     # Déterminer le statut de chaque fluide
     df["statut_du_fluide"] = np.where(
