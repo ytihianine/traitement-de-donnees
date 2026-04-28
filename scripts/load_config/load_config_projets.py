@@ -11,7 +11,7 @@ from src.utils.process.structures import normalize_grist_dataframe
 from src.utils.logs import df_info
 from scripts.settings import get_settings
 
-from dags.applications.configuration_projets import process
+from src.dags.applications.configuration_projets import process
 
 register_adapter(typ=np.int64, callable=AsIs)
 
