@@ -1,0 +1,27 @@
+[
+   {
+      "publisher":"samuelcolvin",
+      "name":"jinjahtml",
+      "version":"0.20.0"
+   },
+   {
+      "publisher":"ms-python",
+      "name":"debugpy",
+      "version":"2026.5.11171013"
+   },
+   {
+      "publisher":"ms-python",
+      "name":"python",
+      "version":"2026.4.0"
+   },
+   {
+      "publisher":"detachhead",
+      "name":"basedpyright",
+      "version":"1.39.3"
+   },
+   {
+      "publisher":"GitHub",
+      "name":"copilot-chat",
+      "version":"0.43.2026040705"
+   }
+]

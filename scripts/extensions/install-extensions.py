@@ -2,6 +2,9 @@ import subprocess
 import os
 import json
 
+DIR = os.path.dirname(os.path.realpath(__file__))
+EXT_FILE = f"{DIR}/extensions.json"
+
 
 def download_and_install_vsix(publisher: str, extension: str, version: str) -> None:
     """Download and install a VSIX extension."""
@@ -56,26 +59,9 @@ def apply_settings(settings: dict, settings_path: str | None = None) -> None:
 
 def main() -> None:
     # Python extensions
-    extensions = [
-        {
-            "publisher": "samuelcolvin",
-            "name": "jinjahtml",
-            "version": "0.20.0",
-        },
-        {
-            "publisher": "ms-python",
-            "name": "debugpy",
-            "version": "2025.19.2026022301",
-        },
-        {
-            "publisher": "ms-python",
-            "name": "python",
-            "version": "2026.2.0",
-        },
-        {"publisher": "detachhead", "name": "basedpyright", "version": "1.38.1"},
-        {"publisher": "GitHub", "name": "copilot", "version": "1.388.0"},
-        {"publisher": "GitHub", "name": "copilot-chat", "version": "0.37.8"},
-    ]
+
+    with open(file=EXT_FILE, mode="r") as file:
+        extensions = json.load(fp=file)
 
     print("Installing Python extensions...")
     for ext in extensions:
