@@ -258,9 +258,8 @@ CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
     sbic.annee_reference as annee_reference,
     sbic.efa as efa,
     -- siep.conso_statut_batiment scsb
-    scsb.statut_conso_avant_2019 as statut_conso_avant_2019,
-    scsb.statut_fluide_global as statut_fluide_global,
-    scsb.statut_batiment as statut_batiment,
+    -- scsb.statut_fluide_global as statut_fluide_global,
+    -- scsb.statut_batiment as statut_batiment,
     -- Date d'import
     ct.oad_import_timestamp,
     ct.osfi_import_timestamp
@@ -301,10 +300,10 @@ CREATE MATERIALIZED VIEW siep.bien_caracteristiques_complet_gestionnaire_vw AS
         ON sbic.snapshot_id = cte_bgoo.snapshot_id
         AND sbic.import_timestamp = ct.osfi_import_timestamp
         AND sbic.code_bat_gestionnaire = cte_bgoo.code_bat_gestionnaire
-    LEFT JOIN siep.conso_statut_batiment scsb
-        ON scsb.snapshot_id = cte_bgoo.snapshot_id
-        AND scsb.import_timestamp = ct.osfi_import_timestamp
-        AND scsb.code_bat_gestionnaire = cte_bgoo.code_bat_gestionnaire
+    -- LEFT JOIN siep.conso_statut_batiment scsb
+    --    ON scsb.snapshot_id = cte_bgoo.snapshot_id
+    --    AND scsb.import_timestamp = ct.osfi_import_timestamp
+    --    AND scsb.code_bat_gestionnaire = cte_bgoo.code_bat_gestionnaire
     -- Jointure avec ref_typologie basée sur usage_detaille_du_bien coalescé
     LEFT JOIN siep.ref_typologie srt
         -- ON srt.snapshot_id = cte_bgoo.snapshot_id
