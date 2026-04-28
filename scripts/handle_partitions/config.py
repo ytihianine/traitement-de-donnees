@@ -5,7 +5,7 @@ from scripts.handle_partitions.commun import Actions
 
 # Database
 schema = "siep"
-tbl_to_keep = ("bien",)
+tbl_to_keep = ("conso_", "facture_", "bien_information_complementaire")
 action = Actions.UPDATE_SNAPSHOT
 dry_run = False
 
@@ -21,20 +21,20 @@ drop_from_date = None
 
 
 # Si Actions.CREATE
-str_date = "01/11/2025"
+str_date = "01/03/2026"
 create_from_date = datetime.strptime(str_date, "%d/%m/%Y")
 to_date = create_from_date + timedelta(days=1)
 custom_logger.info(msg=create_from_date)
 custom_logger.info(msg=to_date)
 
 # Si Actions.UPDATE_TIMESTAMP
-curr_import_timestamp = datetime.strptime("2026-03-13 16:04:55", "%Y-%m-%d %H:%M:%S")
-new_import_timestamp = datetime.strptime("2025-02-01 12:00:00", "%Y-%m-%d %H:%M:%S")
+curr_import_timestamp = datetime.strptime("2026-04-27 18:45:00", "%Y-%m-%d %H:%M:%S")
+new_import_timestamp = datetime.strptime("2026-03-01 13:00:00", "%Y-%m-%d %H:%M:%S")
 custom_logger.info(msg=curr_import_timestamp)
 custom_logger.info(msg=new_import_timestamp)
 
 # Si Actions.UPDATE_SNAPSHOT
-current_snapshot_id = "20260313_16:04:55"
-new_snapshot_id = "20250201_12:00:00"
+current_snapshot_id = "20260427_12:15:00"
+new_snapshot_id = "20260301_12:00:00"
 custom_logger.info(msg=current_snapshot_id)
 custom_logger.info(msg=new_snapshot_id)
