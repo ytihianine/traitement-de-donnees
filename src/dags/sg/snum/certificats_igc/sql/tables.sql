@@ -43,6 +43,16 @@ CREATE TABLE certificat_igc.certificat (
 ) PARTITION BY RANGE (import_date);
 
 
+CREATE TABLE certificat_igc.certificat_contact (
+    id SERIAL,
+    id_certificat BIGINT,
+    contact TEXT,
+    import_timestamp TIMESTAMP NOT NULL,
+    import_date DATE NOT NULL,
+    snapshot_id TEXT
+) PARTITION BY RANGE (import_date);
+
+
 CREATE TABLE certificat_igc.historique_certificat (
     id SERIAL,
     agent_mail TEXT,

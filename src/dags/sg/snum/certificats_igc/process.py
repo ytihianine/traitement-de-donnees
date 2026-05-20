@@ -547,6 +547,9 @@ def process_certificat_contact(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_keep = ["id_certificat", "contact"]
     df = df.loc[:, cols_to_keep]
 
+    # Drop les duplicats
+    df = df.drop_duplicates(subset=["id_certificat", "contact"], keep="last")
+
     return df
 
 
