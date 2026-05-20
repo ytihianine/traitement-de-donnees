@@ -35,7 +35,7 @@ def additionnal_tasks() -> None:
     certificat_contact = create_task(
         task_config=TaskConfig(task_id="certificat_contact"),
         output_selecteur="certificat_contact",
-        input_selecteurs=["certificat"],
+        input_selecteurs=["certificat", "agent"],
         steps=[ETLStep(fn=process.process_certificat_contact, read_data=True)],
     )
 

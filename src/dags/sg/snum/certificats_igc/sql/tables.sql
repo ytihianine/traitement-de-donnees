@@ -47,6 +47,7 @@ CREATE TABLE certificat_igc.certificat_contact (
     id SERIAL,
     id_certificat BIGINT,
     contact TEXT,
+    agent_direction TEXT,
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
     snapshot_id TEXT

@@ -542,23 +542,32 @@ def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_certificat_contact(df: pd.DataFrame) -> pd.DataFrame:
+def process_certificat_contact(df_certificat: pd.DataFrame, df_agent: pd.DataFrame) -> pd.DataFrame:
     # Normaliser les données textuelles
     txt_cols = ["contact"]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    df_certificat = normalize_whitespace_columns(df=df_certificat, columns=txt_cols)
 
     # Unpivot the contact column to have one contact per row
-    df["contact"] = df["contact"].str.split(",")
-    df = df.copy().explode(
+    df_certificat["contact"] = df_certificat["contact"].str.split(",")
+    df_certificat = df_certificat.copy().explode(
         column="contact", ignore_index=True
     )
 
     # Conserver uniquement les colonnes nécessaires
     cols_to_keep = ["id_certificat", "contact"]
-    df = df.loc[:, cols_to_keep]
+    df_certificat = df_certificat.loc[:, cols_to_keep]
 
     # Drop les duplicats
-    df = df.drop_duplicates(subset=["id_certificat", "contact"], keep="last")
+    df_certificat = df_certificat.drop_duplicates(subset=["id_certificat", "contact"], keep="last")
+
+    # Merge les deux dataframes
+    df = pd.merge(
+        left=df_certificat,
+        right=df_agent[["agent_mail", "agent_direction"]],
+        how="left",
+        left_on="contact",
+        right_on="agent_mail",
+    )
 
     return df
 
