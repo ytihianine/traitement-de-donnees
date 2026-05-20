@@ -543,13 +543,15 @@ def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_certificat_contact(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy().explode(
-        column="contact", ignore_index=True
-    )
-
     # Normaliser les données textuelles
     txt_cols = ["contact"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Unpivot the contact column to have one contact per row
+    df["contact"] = df["contact"].str.split(",")
+    df = df.copy().explode(
+        column="contact", ignore_index=True
+    )
 
     # Conserver uniquement les colonnes nécessaires
     cols_to_keep = ["id_certificat", "contact"]
