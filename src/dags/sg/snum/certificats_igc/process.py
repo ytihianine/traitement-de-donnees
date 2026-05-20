@@ -1,7 +1,6 @@
 from functools import partial
 from datetime import datetime
 import pandas as pd
-import numpy as np
 
 from src.utils.process.text import (
     normalize_whitespace_columns,
@@ -582,58 +581,3 @@ def process_mandataire(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-
-# ===============================================
-# Fonctions de processing des fichiers finaux
-# ===============================================
-def process_liste_certificat(
-    df_certificat: pd.DataFrame, df_agent: pd.DataFrame
-) -> pd.DataFrame:
-    df_agents = df_agent[["agent_direction", "agent_mail"]].drop_duplicates()
-
-    df_certificat["contact"] = df_certificat.loc[:, "contact"].str.split(",")
-    df_certificats_exp = df_certificat.copy().explode(
-        column="contact", ignore_index=True
-    )
-
-    df = pd.merge(
-        left=df_certificats_exp,
-        right=df_agents,
-        how="left",
-        left_on=["contact"],
-        right_on=["agent_mail"],
-    )
-    df["certificat_direction"] = np.where(
-        df["certificat_direction"].isna(),
-        df["agent_direction"],
-        df["certificat_direction"],
-    )
-
-    # Conserver uniquement les colonnes nécessaires
-    cols_to_keep = [
-        "id_certificat",
-        "dn",
-        "subjectid",
-        "contact",
-        "email",
-        "date_debut_validite",
-        "date_fin_validite",
-        "profile",
-        "status",
-        "date_revocation",
-        "certif_dir_profile",
-        "certif_dir_dn",
-        "certif_dir_subjectid",
-        "certif_dir_contact",
-        "certif_dir_mail",
-        "certificat_direction",
-        "ac",
-        "type_offre",
-        "supports",
-        "etat",
-        "version",
-        "version_serveur",
-    ]
-    df = df.loc[:, cols_to_keep]
-
-    return df

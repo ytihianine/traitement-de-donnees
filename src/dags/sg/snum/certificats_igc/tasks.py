@@ -1,8 +1,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src._types.dags import ETLStep, TaskConfig
-from src.common_tasks.etl import create_file_etl_task, create_task
+from src.common_tasks.etl import create_file_etl_task
 
 from src.dags.sg.snum.certificats_igc import process
 
@@ -27,16 +26,3 @@ def source_files() -> None:
 
     # ordre des tâches
     chain([agent(), aip(), certificat(), historique_certificat(), mandataire()])
-
-
-@task_group
-def output_files() -> None:
-    liste_certificat = create_task(
-        task_config=TaskConfig(task_id="liste_certificat"),
-        output_selecteur="liste_certificat",
-        input_selecteurs=["certificat", "agent"],
-        steps=[ETLStep(fn=process.process_liste_certificat, read_data=True)],
-    )
-
-    # ordre des tâches
-    chain([liste_certificat()])
