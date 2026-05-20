@@ -568,6 +568,8 @@ def process_certificat_contact(df_certificat: pd.DataFrame, df_agent: pd.DataFra
         left_on="contact",
         right_on="agent_mail",
     )
+    cols_to_keep = ["id_certificat", "contact", "agent_direction"]
+    df = df.loc[:, cols_to_keep]
 
     return df
 
