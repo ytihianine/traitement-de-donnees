@@ -513,7 +513,7 @@ def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Normaliser les colonnes textuelles
-    txt_cols = ["profile", "dn", "subjectid", "contact", "mail"]
+    txt_cols = ["profile", "dn", "subjectid", "contact", "email"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     # Ajout des colonnes additionnelles
