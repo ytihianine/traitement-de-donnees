@@ -326,20 +326,6 @@ def determiner_certificat_direction(df: pd.DataFrame) -> pd.DataFrame:
     df["certif_dir_subjectid"] = list(
         map(find_certificat_dir_in_subjectid, df["subjectid"])
     )
-    # A partir du contact
-    df["certif_dir_contact"] = list(map(find_certificat_dir_in_contact, df["contact"]))
-    # A partir du mail
-    df["certif_dir_mail"] = list(map(find_certificat_dir_in_mail, df["email"]))
-
-    # Déterminer la direction du certificat
-    cols_sorted_by_priority = [
-        "certif_dir_profile",
-        "certif_dir_dn",
-        "certif_dir_subjectid",
-        "certif_dir_contact",
-        "certif_dir_mail",
-    ]
-    df["certificat_direction"] = df[cols_sorted_by_priority].bfill(axis=1).iloc[:, 0]
 
     return df
 
