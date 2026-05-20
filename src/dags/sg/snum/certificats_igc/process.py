@@ -534,6 +534,22 @@ def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def process_certificat_contact(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy().explode(
+        column="contact", ignore_index=True
+    )
+
+    # Normaliser les données textuelles
+    txt_cols = ["contact"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
+    # Conserver uniquement les colonnes nécessaires
+    cols_to_keep = ["id_certificat", "contact"]
+    df = df.loc[:, cols_to_keep]
+
+    return df
+
+
 def process_aip(df: pd.DataFrame) -> pd.DataFrame:
     # Normaliser les données textuelles
     txt_cols = ["structure", "aip_mail", "aip_balf_mail"]
