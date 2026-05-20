@@ -508,6 +508,10 @@ def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
         df=df, columns=date_cols, str_date_format="%Y-%m-%d %H:%M:%S", errors="raise"
     )
 
+    # Normaliser les colonnes textuelles
+    txt_cols = ["profile", "dn", "subjectid", "contact", "mail"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
     # Ajout des colonnes additionnelles
     df = determiner_certificat_direction(df=df)
     date_ajd = datetime.now()
