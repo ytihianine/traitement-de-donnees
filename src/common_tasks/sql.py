@@ -83,10 +83,18 @@ def _get_table_columns(schema: str, table: str, db_handler: DBInterface) -> list
 
 
 def _create_snapshot_id(
-    nom_projet: str, execution_date: datetime, db_handler: DBInterface
+    nom_projet: str, execution_date: datetime
 ) -> None:
+    """
+        Créer un snapshot_id pour un projet donné et l'insérer dans la table conf_projets.projet_snapshot.
+        Une insertion est également faite dans la table versioning.snapshot_id.
+        Actuellement dans une phase de migration. L'insertion dans conf_projets.projet_snapshot sera supprimée à terme
+    """
+    old_db_client = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
 
     snapshot_id = execution_date.strftime(format="%Y%m%d_%H:%M:%S")
+
+    # Insert snapshot_id into conf_projets.projet_snapshot and versioning.snapshot_id
     query = """
         INSERT INTO conf_projets.projet_snapshot (id_projet, snapshot_id, creation_timestamp)
         SELECT
@@ -107,7 +115,28 @@ def _create_snapshot_id(
     }
 
     # Exécution de la requête
-    db_handler.execute(query, parameters=params)
+    old_db_client.execute(query, parameters=params)
+
+    # Insert snapshot_id into versioning.snapshot_id
+    db_client = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
+
+    # Get project id
+    id_projet = old_db_client.fetch_one(
+        query="SELECT id_projet FROM conf_projets.projet WHERE projet = %(nom_projet)s;",
+        parameters={"nom_projet": nom_projet},
+    )
+    query = """
+        INSERT INTO versioning.snapshot_id (id_projet, import_timestamp, import_date)
+        VALUES (%(id_projet)s, %(import_timestamp)s, %(import_date)s);
+    """
+    params = {
+        "id_projet": id_projet,
+        "snapshot_id": snapshot_id,
+        "import_timestamp": execution_date.replace(tzinfo=None),
+        "import_date": execution_date.date(),
+    }
+    # Exécution de la requête
+    db_client.execute(query, parameters=params)
 
 
 def _get_snapshot_id(nom_projet: str, db_handler: DBInterface) -> str:
@@ -172,8 +201,6 @@ def determine_partition_period(
 # ------------------------------------------------------------------------------
 # SQL tasks
 # ------------------------------------------------------------------------------
-
-
 @task
 def create_projet_snapshot(
     pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID, **context
@@ -186,10 +213,10 @@ def create_projet_snapshot(
     execution_date = get_execution_date(context=context)
 
     # Hook
-    db_handler = create_db_handler(connection_id=pg_conn_id)
+    # db_client = create_db_handler(connection_id=pg_conn_id)
 
     _create_snapshot_id(
-        nom_projet=nom_projet, execution_date=execution_date, db_handler=db_handler
+        nom_projet=nom_projet, execution_date=execution_date
     )
 
 
@@ -213,6 +240,12 @@ def get_projet_snapshot(
     if nom_projet is None:
         nom_projet = get_project_name(context=context)
 
+    if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
+        # Generate a dev snapshot_id based on execution date for local testing
+        execution_date = get_execution_date(context=context)
+        snapshot_id = execution_date.strftime(format="dev_%Y%m%d_%H:%M:%S")
+        return snapshot_id
+
     # Hook
     db_handler = create_db_handler(connection_id=pg_conn_id)
 
@@ -220,6 +253,59 @@ def get_projet_snapshot(
     logging.info(msg=f"Adding snapshot_id {snapshot_id} to context")
 
     return snapshot_id
+
+
+@task
+def update_projet_snapshot_status(
+    nom_projet: str | None = None,
+    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    **context,
+) -> None:
+    """
+    Lorsque le DAG est complété, mettre à jour le statut du snapshot_id du projet à TRUE 
+    dans la table versioning.snapshot_id.
+
+    Args:
+        nom_projet (optionnel): Le nom du projet. A spécifier lorsque le nom du projet
+            dans le DAG est différent de celui qui génère le snapshot_id,
+        pg_conn_id: Connexion Postgres. Valeur par défaut
+
+    Returns:
+        None.
+    """
+    if nom_projet is None:
+        nom_projet = get_project_name(context=context)
+
+    if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
+        return
+
+    # Hook
+    old_db_client = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+    db_client = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
+
+    # Get project id
+    id_projet = old_db_client.fetch_one(
+        query="SELECT id_projet FROM conf_projets.projet WHERE projet = %(nom_projet)s;",
+        parameters={"nom_projet": nom_projet},
+    )
+    if id_projet is None:
+        raise ValueError(f"No project found with name {nom_projet}")
+
+    # Update is_dag_completed to True for the snapshot_id
+    query = """
+        UPDATE versioning.snapshot_id
+        SET is_dag_completed = TRUE
+        WHERE id_projet = %(id_projet)s
+        AND snapshot_id = (
+            SELECT MAX(snapshot_id) FROM versioning.snapshot_id WHERE id_projet = %(id_projet)s
+        );
+    """
+    params = {
+        "id_projet": id_projet,
+    }
+
+    db_client.execute(query, parameters=params)
+    logging.info(msg="Updated latest snapshot_id. Set is_dag_completed to True")
 
 
 @task(map_index_template="{{ import_task_name }}")
