@@ -131,11 +131,12 @@ def _create_snapshot_id(nom_projet: str, execution_date: datetime) -> None:
         raise ValueError(f"No id_projet found for project {nom_projet}")
 
     query = """
-        INSERT INTO versioning.snapshot (id_projet, import_timestamp, import_date)
-        VALUES (%(id_projet)s, %(import_timestamp)s, %(import_date)s);
+        INSERT INTO versioning.snapshot (id_projet, snapshot_id, import_timestamp, import_date)
+        VALUES (%(id_projet)s, %(snapshot_id)s, %(import_timestamp)s, %(import_date)s);
     """
     params = {
         "id_projet": id_projet,
+        "snapshot_id": snapshot_id,
         "import_timestamp": execution_date.replace(tzinfo=None),
         "import_date": execution_date.date(),
     }
@@ -303,7 +304,7 @@ def update_projet_snapshot_status(
         SET is_dag_completed = TRUE
         WHERE id_projet = %(id_projet)s
         AND snapshot_id = (
-            SELECT MAX(snapshot_id) FROM versioning.snapshot_id WHERE id_projet = %(id_projet)s
+            SELECT MAX(snapshot_id) FROM versioning.snapshot WHERE id_projet = %(id_projet)s
         );
     """
     params = {
