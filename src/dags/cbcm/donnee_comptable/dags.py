@@ -54,7 +54,7 @@ nom_projet = "Données comptable"
         db_params=DBParams(prod_schema="donnee_comptable"),
         feature_flags=FeatureFlagsEnable(
             db=True,
-            mail=False,
+            mail=True,
             s3=True,
             convert_files=False,
             download_grist_doc=False,
