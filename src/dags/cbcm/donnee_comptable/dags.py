@@ -55,7 +55,7 @@ nom_projet = "Données comptable"
         feature_flags=FeatureFlagsEnable(
             db=True,
             mail=False,
-            s3=False,
+            s3=True,
             convert_files=False,
             download_grist_doc=False,
         ),
