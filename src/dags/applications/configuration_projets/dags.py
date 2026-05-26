@@ -11,6 +11,7 @@ from src.common_tasks.sql import (
     delete_tmp_tables,
     create_projet_snapshot,
     get_projet_snapshot,
+    update_projet_snapshot_status,
     import_file_to_db,
 )
 from src.common_tasks.grist import download_grist_doc_to_s3
@@ -95,6 +96,7 @@ def configuration_projets() -> None:
         ),
         copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
         del_iceberg_staging_table(),
+        update_projet_snapshot_status(),
     )
 
 
