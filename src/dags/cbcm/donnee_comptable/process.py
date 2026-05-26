@@ -324,7 +324,6 @@ def process_demande_paiement_carte_achat(df: pd.DataFrame) -> pd.DataFrame:
     txt_cols = [
         "societe",
         "statut_dp_carte_achat",
-        "type_flux",
         "automatisation_wf_cpt",
     ]
     df = normalize_whitespace_columns(df, columns=txt_cols)
