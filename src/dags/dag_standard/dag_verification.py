@@ -55,7 +55,7 @@ nom_projet = "Configuration des projets"
         db_params=DBParams(prod_schema="iceberg"),
         feature_flags=FeatureFlagsEnable(
             db=True,
-            mail=False,
+            mail=True,
             s3=True,
             convert_files=True,
             download_grist_doc=True,
