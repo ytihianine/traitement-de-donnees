@@ -2,9 +2,10 @@
 
 # Load env vars from centralised .env
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYTHON_ENV="$SCRIPT_DIR/../../env/bin/python3"
 set -a
 source "$SCRIPT_DIR/../.env"
 set +a
 
 # Execute python script
-python3 "$SCRIPT_DIR/iceberg.py"
+"$PYTHON_ENV" "$SCRIPT_DIR/iceberg.py"
