@@ -26,8 +26,12 @@ def generate_catalog_properties(
     if client_secret is None:
         client_secret = Variable.get(key="iceberg_client_secret")
 
+    normalized_uri = uri.rstrip("/")
+    if not normalized_uri.endswith("/api/catalog"):
+        normalized_uri = f"{normalized_uri}/api/catalog"
+
     properties = {
-        "uri": f"{uri}/api/catalog",
+        "uri": normalized_uri,
         "warehouse": warehouse,
         "credential": f"{client_id}:{client_secret}",
         "scope": "PRINCIPAL_ROLE:ALL",
