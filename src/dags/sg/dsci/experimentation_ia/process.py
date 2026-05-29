@@ -6,11 +6,10 @@ from src.utils.process.structures import (
 )
 from src.utils.process.text import normalize_whitespace_columns
 
-"""
-    Fonction de processing des référentiels du questionnaire 1
-"""
 
-
+# =============================================================
+# Fonction de processing des référentiels du questionnaire 1
+# =============================================================
 def process_ref_q1_direction(df: pd.DataFrame) -> pd.DataFrame:
     txt_col = ["direction"]
     df = normalize_whitespace_columns(df=df, columns=txt_col)
@@ -65,11 +64,10 @@ def process_ref_q9_cas_usage(df: pd.DataFrame) -> pd.DataFrame:
 #   logging.info(msg=NO_PROCESS_MSG)
 #    return df
 
-"""
-Processing des referenciels questionnaire 2
-"""
 
-
+# =============================================================
+# Processing des referenciels questionnaire 2
+# =============================================================
 def process_ref_q28_raisons_perte(df: pd.DataFrame) -> pd.DataFrame:
     txt_col = ["raisons"]
     df = normalize_whitespace_columns(df=df, columns=txt_col)
@@ -156,22 +154,18 @@ def process_ref_q7_accords(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-"""
-Processing referenciel questionnaire2_bis : Jamais connecté à l'Assistant IA
-"""
-
-
+# =============================================================
+# Processing référentiel questionnaire2_bis : Jamais connecté à l'Assistant IA
+# =============================================================
 def process_ref_raisons_non_utilisation(df: pd.DataFrame) -> pd.DataFrame:
     txt_col = ["raisons"]
     df = normalize_whitespace_columns(df=df, columns=txt_col)
     return df
 
 
-"""
-Processing Entité
-"""
-
-
+# =============================================================
+# Processing Entité
+# =============================================================
 def process_quota_entite(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     df = df.rename(
@@ -195,6 +189,8 @@ def process_quota_entite(df: pd.DataFrame) -> pd.DataFrame:
         "courriel",
     ]
     df = df.loc[:, cols_to_keep]
+
+    # Normaliser les colonnes textuelles
     txt_cols = [
         "code",
         "relance_dsci",
@@ -203,19 +199,18 @@ def process_quota_entite(df: pd.DataFrame) -> pd.DataFrame:
         "courriel",
     ]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    # Gestion des values
-    col_values = ["nbre_d_acces_previsionnels", "nbre_connexion_effective"]
-    for col in col_values:
-        df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
+
+    # Normaliser les colonnes numériques
+    num_col = ["nbre_d_acces_previsionnels", "nbre_connexion_effective"]
+    for col in num_col:
+        df[col] = pd.to_numeric(arg=df[col], errors="coerce").astype("Int64")
     df = df.drop_duplicates(subset="courriel", keep="last")
     return df
 
 
-"""
-Processing experimentateurs
-"""
-
-
+# =============================================================
+# Processing experimentateurs
+# =============================================================
 def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_keep = [
         "id",
@@ -232,6 +227,8 @@ def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
         "reponse_au_questionnaire_2",
     ]
     df = df.loc[:, cols_to_keep]
+
+    # Normaliser les colonnes textuelles
     txt_cols = [
         "no_id",
         "entite",
@@ -246,12 +243,9 @@ def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-"""
-Processing Questionnaire 1 : profil des expérimentateurs
-
-"""
-
-
+# =============================================================
+# Processing Questionnaire 1 : profil des expérimentateurs
+# =============================================================
 def process_questionnaire_1(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(
         columns={
@@ -354,12 +348,9 @@ def process_questionnaire_1_besoins_accompagnement(df: pd.DataFrame) -> pd.DataF
     return df
 
 
-"""
-Processing Questionnaire 2 : Retour sur l'utiliation de l'assistant ia
-
-"""
-
-
+# =============================================================
+# Processing Questionnaire 2 : Retour sur l'utiliation de l'assistant ia
+# =============================================================
 def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(
         columns={
@@ -720,11 +711,9 @@ def process_questionnaire2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-"""
-Processing du questionnaire2_bis : Les agents qui ne se sont jamais connectés
-"""
-
-
+# =============================================================
+# Processing du questionnaire2_bis : Les agents qui ne se sont jamais connectés
+# =============================================================
 def process_questionnaire2_bis(df: pd.DataFrame) -> pd.DataFrame:
     # Renommage
     df = df.rename(columns={"id": "id_questionnaire_2_bis"})
