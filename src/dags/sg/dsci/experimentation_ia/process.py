@@ -258,6 +258,7 @@ def process_questionnaire_1(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_keep = [
         "id",
         "mail_professionnel",
+        "mail_corrige",
         "id_direction",
         "tranche_age",
         "categorie_emploi",
@@ -282,6 +283,7 @@ def process_questionnaire_1(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[:, cols_to_keep]
     txt_cols = [
         "mail_professionnel",
+        "mail_corrige",
         "metier",
         "raisons_des_craintes",
         "attentes_experimentation",
@@ -371,6 +373,7 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
     col_to_keep = [
         "id",
         "mail_professionnel",
+        "mail_corrige",
         # "direction",
         # "types_d_interactions_mef",
         "autres_types_d_interactions",
@@ -425,6 +428,7 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
     ]
     txt_cols = [
         "mail_professionnel",
+        "mail_corrige",
         "autres_types_d_interactions",
         "autres_formation_ia",
         "raison_non_participation_rdv",
