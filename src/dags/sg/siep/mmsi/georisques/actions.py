@@ -65,7 +65,7 @@ def _should_retry_response(response: Optional[HTTPResponse]) -> bool:
     """Determine if response should trigger a retry."""
     if response is None:
         return True
-    retry_status_codes = {400, 404, 429, 500, 502, 503, 504}
+    retry_status_codes = {429, 500, 502, 503, 504}
     return response.status_code in retry_status_codes
 
 
