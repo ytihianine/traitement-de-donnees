@@ -70,8 +70,8 @@ def _should_retry_response(response: Optional[HTTPResponse]) -> bool:
 
 
 @retry(
-    stop=stop_after_attempt(max_attempt_number=3),
-    wait=wait_exponential(multiplier=3, min=1, max=10),
+    stop=stop_after_attempt(max_attempt_number=5),
+    wait=wait_exponential(multiplier=3, min=1, max=60),
     retry=(
         retry_if_exception_type(exception_types=Exception)
         | retry_if_result(predicate=_should_retry_response)
