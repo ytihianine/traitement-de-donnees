@@ -32,8 +32,9 @@ def get_bien_from_db(context: dict) -> pd.DataFrame:
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
     schema = get_db_info(context=context).prod_schema
     snapshot_id = context["ti"].xcom_pull(
-        key="snapshot_id", task_ids="get_projet_snapshot"
+        key="return_value", task_ids="get_projet_snapshot"
     )
+    logging.info(msg=f"Snapshot ID récupéré : {snapshot_id}")
 
     # Retrieve data
     df = db_handler.fetch_df(
@@ -52,6 +53,10 @@ def get_bien_from_db(context: dict) -> pd.DataFrame:
         """,
         parameters=(snapshot_id, snapshot_id),
     )
+
+    if df.empty:
+        logging.error(msg=f"Aucun bien trouvé pour le snapshot_id {snapshot_id}.")
+        raise ValueError(f"Aucun bien trouvé pour le snapshot_id {snapshot_id}.")
 
     return df
 
