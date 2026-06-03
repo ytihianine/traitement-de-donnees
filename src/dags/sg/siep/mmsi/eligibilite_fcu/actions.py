@@ -46,6 +46,9 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
         """,
         parameters=(snapshot_id, snapshot_id),
     )
+    if df_oad.empty:
+        logging.warning(msg="Le DataFrame df_oad est vide. Fin du processus.")
+        raise ValueError("Aucune données disponible dans df_oad.")
 
     api_host = "https://france-chaleur-urbaine.beta.gouv.fr"
     api_endpoint = "api/v1/eligibility"
@@ -53,6 +56,7 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
 
     api_results = []
     nb_rows = len(df_oad)
+    logging.info(msg=f"Nombre de bâtiments à traiter : {nb_rows}")
     for row in df_oad.itertuples():
         logging.info(msg=f"{row.Index}/{nb_rows}")
         api_result = get_eligibilite_fcu(
