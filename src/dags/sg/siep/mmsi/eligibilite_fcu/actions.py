@@ -26,8 +26,9 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
 
     # Storage paths
     snapshot_id = context["ti"].xcom_pull(
-        key="snapshot_id", task_ids="get_projet_snapshot"
+        key="return_value", task_ids="get_projet_snapshot"
     )
+    logging.info(msg=f"Snapshot ID récupéré : {snapshot_id}")
     df_oad = db_hook.fetch_df(
         query="""
         SELECT
