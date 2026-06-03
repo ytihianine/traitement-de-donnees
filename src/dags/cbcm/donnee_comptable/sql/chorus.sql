@@ -38,8 +38,7 @@ CREATE TABLE donnee_comptable.demande_paiement_carte_achat (
 	id_dp text,
 	import_timestamp timestamp not null,
 	import_date date not null,
-	snapshot_id text not null,
-	PRIMARY KEY ("id_dp")
+	snapshot_id text not null
 );
 
 -- Table générée depuis: infdep56.parquet
@@ -115,8 +114,7 @@ CREATE TABLE donnee_comptable.demande_paiement_sfp (
 	id_dp text,
 	import_timestamp timestamp not null,
 	import_date date not null,
-	snapshot_id text not null,
-	PRIMARY KEY ("id_dp")
+	snapshot_id text not null
 );
 
 
@@ -142,8 +140,7 @@ CREATE TABLE donnee_comptable.engagement_juridique (
 	type_ej_nom text,
 	import_timestamp timestamp not null,
 	import_date date not null,
-	snapshot_id text,
-	PRIMARY KEY ("id_ej")
+	snapshot_id text
 );
 
 DROP TABLE donnee_comptable."demande_paiement" CASCADE;
