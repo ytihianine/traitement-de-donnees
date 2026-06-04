@@ -5,7 +5,7 @@ from tenacity import (
     retry,
     stop_after_attempt,
     wait_exponential,
-    retry_if_exception_type,
+    retry_if_exception,
     retry_if_result,
     before_sleep_log,
 )
@@ -15,6 +15,7 @@ import pandas as pd
 from src.infra.database.factory import create_db_handler
 from src.infra.http_client.factory import create_http_client
 from src.infra.http_client.config import ClientConfig
+from src.infra.http_client.exceptions import HTTPClientError
 from src.utils.config.dag_params import get_db_info
 from src._enums.http import HttpHandlerType
 from src.constants import AGENT, PROXY, DEFAULT_PG_DATA_CONN_ID
@@ -69,11 +70,22 @@ def _should_retry_response(response: Optional[HTTPResponse]) -> bool:
     return response.status_code in retry_status_codes
 
 
+def _should_retry_exception(exception: BaseException) -> bool:
+    """Retry only transient HTTP client failures."""
+    if not isinstance(exception, HTTPClientError):
+        return False
+
+    if exception.status_code is None:
+        return True
+
+    return exception.status_code in {429, 500, 502, 503, 504}
+
+
 @retry(
     stop=stop_after_attempt(max_attempt_number=5),
     wait=wait_exponential(multiplier=3, min=1, max=60),
     retry=(
-        retry_if_exception_type(exception_types=Exception)
+        retry_if_exception(predicate=_should_retry_exception)
         | retry_if_result(predicate=_should_retry_response)
     ),
     before_sleep=before_sleep_log(logger, log_level=logging.WARNING),
@@ -101,7 +113,11 @@ def get_risque(http_client, url: str, query_param: str) -> Optional[HTTPResponse
     # If response has retryable status code, trigger retry
     if response and response.status_code in {429, 500, 502, 503, 504}:
         logger.warning(msg=f"⚠️ Erreur {response.status_code}, nouvelle tentative...")
-        raise Exception(f"Retryable status code: {response.status_code}")
+        raise HTTPClientError(
+            message=f"Retryable status code: {response.status_code}",
+            status_code=response.status_code,
+            response=response,
+        )
 
     # For other errors, return response without retry
     return response
