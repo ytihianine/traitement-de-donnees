@@ -52,7 +52,6 @@ install-packages: ## Installer les packages python complémentaires
 	$(VENV_BIN)/python -m pip install uv
 	$(UV_PIP) -e .
 	$(UV_PIP) -r requirements.txt --prerelease=allow
-	$(UV_PIP) -r requirements_dev.txt --prerelease=allow
 
 install-pre-commit: ## Installer les pre-commits
 	@echo "Installation des pre-commits"
