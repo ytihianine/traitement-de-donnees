@@ -29,6 +29,7 @@ class HttpInterface(ABC):
         json: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
         timeout: int | None = None,
+        check_response_statut: bool = True,
         **kwargs,
     ) -> HTTPResponse:
         """Make an HTTP request."""
