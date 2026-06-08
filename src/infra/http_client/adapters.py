@@ -25,12 +25,12 @@ from src.infra.http_client.exceptions import (
 class HttpxClient(HttpInterface):
     """HTTPX-based HTTP client implementation."""
 
-    def __init__(self, config: ClientConfig):
+    def __init__(self, config: ClientConfig) -> None:
         super().__init__(config)
         self._last_request_time = 0
         self._setup_client()
 
-    def _setup_client(self):
+    def _setup_client(self) -> None:
         limits = httpx.Limits(
             max_keepalive_connections=5,
             max_connections=10,
@@ -50,31 +50,33 @@ class HttpxClient(HttpInterface):
             status = e.response.status_code
             if status == 401:
                 raise AuthenticationError(
-                    "Authentication failed", status_code=401, response=response
+                    message="Authentication failed", status_code=401, response=response
                 )
             if status == 403:
                 raise AuthorizationError(
-                    "Authorization failed", status_code=403, response=response
+                    message="Authorization failed", status_code=403, response=response
                 )
             if status == 429:
                 raise RateLimitError(
-                    "Rate limit exceeded", status_code=429, response=response
+                    message="Rate limit exceeded", status_code=429, response=response
                 )
             if 400 <= status < 500:
                 raise RequestError(
-                    f"Client error: {e}", status_code=status, response=response
+                    message=f"Client error: {e}", status_code=status, response=response
                 )
             if 500 <= status < 600:
                 raise APIError(
-                    f"Server error: {e}", status_code=status, response=response
+                    message=f"Server error: {e}", status_code=status, response=response
                 )
             raise ResponseError(
-                f"HTTP error occurred: {e}", status_code=status, response=response
+                message=f"HTTP error occurred: {e}",
+                status_code=status,
+                response=response,
             )
 
-        return HTTPResponse(response)
+        return HTTPResponse(raw=response)
 
-    def _handle_rate_limit(self):
+    def _handle_rate_limit(self) -> None:
         if self.config.rate_limit:
             current_time = time.time()
             time_since_last = current_time - self._last_request_time
@@ -91,6 +93,7 @@ class HttpxClient(HttpInterface):
         json: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
         timeout: int | None = None,
+        check_response_statut: bool = True,
         **kwargs,
     ) -> HTTPResponse:
         url = self._build_url(endpoint)
@@ -107,16 +110,19 @@ class HttpxClient(HttpInterface):
                 timeout=timeout or self.config.timeout,
                 **kwargs,
             )
-            return self._handle_response(response)
+            if check_response_statut:
+                return self._handle_response(response)
+            else:
+                return HTTPResponse(raw=response)
 
         except httpx.TimeoutException as e:
-            raise TimeoutError(f"Request timed out: {e}")
+            raise TimeoutError(message=f"Request timed out: {e}")
         except httpx.NetworkError as e:
-            raise ConnectionError(f"Network error occurred: {e}")
+            raise ConnectionError(message=f"Network error occurred: {e}")
         except httpx.HTTPError as e:
-            raise HTTPClientError(f"HTTP error occurred: {e}")
+            raise HTTPClientError(message=f"HTTP error occurred: {e}")
         except Exception as e:
-            raise HTTPClientError(f"An unexpected error occurred: {e}")
+            raise HTTPClientError(message=f"An unexpected error occurred: {e}")
 
     def close(self) -> None:
         if self._session:
@@ -146,29 +152,31 @@ class RequestsClient(HttpInterface):
             status = response.status_code
             if status == 401:
                 raise AuthenticationError(
-                    "Authentication failed", status_code=401, response=response
+                    message="Authentication failed", status_code=401, response=response
                 )
             if status == 403:
                 raise AuthorizationError(
-                    "Authorization failed", status_code=403, response=response
+                    message="Authorization failed", status_code=403, response=response
                 )
             if status == 429:
                 raise RateLimitError(
-                    "Rate limit exceeded", status_code=429, response=response
+                    message="Rate limit exceeded", status_code=429, response=response
                 )
             if 400 <= status < 500:
                 raise RequestError(
-                    f"Client error: {e}", status_code=status, response=response
+                    message=f"Client error: {e}", status_code=status, response=response
                 )
             if 500 <= status < 600:
                 raise APIError(
-                    f"Server error: {e}", status_code=status, response=response
+                    message=f"Server error: {e}", status_code=status, response=response
                 )
             raise ResponseError(
-                f"HTTP error occurred: {e}", status_code=status, response=response
+                message=f"HTTP error occurred: {e}",
+                status_code=status,
+                response=response,
             )
 
-        return HTTPResponse(response)
+        return HTTPResponse(raw=response)
 
     def request(
         self,
@@ -179,6 +187,7 @@ class RequestsClient(HttpInterface):
         json: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
         timeout: int | None = None,
+        check_response_statut: bool = True,
         **kwargs,
     ) -> HTTPResponse:
         url = self._build_url(endpoint)
@@ -195,16 +204,19 @@ class RequestsClient(HttpInterface):
                 verify=self.config.verify_ssl,
                 **kwargs,
             )
-            return self._handle_response(response)
+            if check_response_statut:
+                return self._handle_response(response)
+            else:
+                return HTTPResponse(raw=response)
 
         except requests.Timeout as e:
-            raise TimeoutError(f"Request timed out: {e}") from e
+            raise TimeoutError(message=f"Request timed out: {e}") from e
         except requests.ConnectionError as e:
-            raise ConnectionError(f"Connection error occurred: {e}") from e
+            raise ConnectionError(message=f"Connection error occurred: {e}") from e
         except requests.RequestException as e:
-            raise HTTPClientError(f"HTTP error occurred: {e}") from e
+            raise HTTPClientError(message=f"HTTP error occurred: {e}") from e
         except Exception as e:
-            raise HTTPClientError(f"An unexpected error occurred: {e}") from e
+            raise HTTPClientError(message=f"An unexpected error occurred: {e}") from e
 
     def close(self) -> None:
         if self._session:
