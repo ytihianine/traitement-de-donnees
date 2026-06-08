@@ -14,6 +14,7 @@ import pandas as pd
 
 from src.infra.database.factory import create_db_handler
 from src.infra.http_client.factory import create_http_client
+from src.infra.http_client.base import HttpInterface
 from src.infra.http_client.config import ClientConfig
 from src.infra.http_client.exceptions import HTTPClientError
 from src.utils.config.dag_params import get_db_info
@@ -91,7 +92,9 @@ def _should_retry_exception(exception: BaseException) -> bool:
     before_sleep=before_sleep_log(logger, log_level=logging.WARNING),
     reraise=False,
 )
-def get_risque(http_client, url: str, query_param: str) -> Optional[HTTPResponse]:
+def get_risque(
+    http_client: HttpInterface, url: str, query_param: str
+) -> Optional[HTTPResponse]:
     """
     Effectue une requête avec retry en cas d'erreur.
 
@@ -104,7 +107,9 @@ def get_risque(http_client, url: str, query_param: str) -> Optional[HTTPResponse
         HTTPResponse ou None en cas d'échec après tous les retries
     """
     full_url = f"{url}?{query_param}"
-    response = http_client.get(endpoint=full_url, timeout=180)
+    response = http_client.get(
+        endpoint=full_url, timeout=180, check_response_statut=False
+    )
 
     # Return response if successful (200) or non-retryable error
     if response and response.status_code == 200:
