@@ -16,7 +16,7 @@ endif
 UV_PIP := $(VENV_BIN)/uv pip install --python $(VENV_BIN)/python
 
 .PHONY: help install-sys-packages create-py-env install-airflow install-packages \
-        install-pre-commit install-extensions setup-git setup-dev-env init-env-files clean
+        install-pre-commit setup-git setup-dev-env init-env-files clean
 
 help: ## Afficher l'aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}'
@@ -56,11 +56,6 @@ install-packages: ## Installer les packages python complémentaires
 install-pre-commit: ## Installer les pre-commits
 	@echo "Installation des pre-commits"
 	$(VENV_BIN)/pre-commit install
-
-install-extensions: ## Installer les extensions code-server & les settings
-	@echo "Installation des extensions"
-	$(VENV_BIN)/python scripts/extensions/install-extensions.py
-	@echo "Rechargez votre page pour prendre en compte toutes les modifications"
 
 setup-git: ## Initialiser la configuration git
 	@echo "Init git config"
