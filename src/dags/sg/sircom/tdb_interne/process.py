@@ -64,6 +64,7 @@ def process_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
             "linkedin_mef",
             "instagram",
             "linkedin_sg",
+            "tiktok_mef",
         ],
         var_name="reseaux_sociaux",
         value_name="abonnes",
@@ -76,6 +77,7 @@ def process_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
             "linkedin_mef": "LinkedIn MEF",
             "linkedin_sg": "LinkedIn SG",
             "instagram": "Instagram",
+            "tiktok_mef": "Tiktok MEF",
         },
         inplace=True,
     )
