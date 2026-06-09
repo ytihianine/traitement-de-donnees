@@ -127,7 +127,6 @@ def get_risque(
 def get_georisques(df: pd.DataFrame) -> pd.DataFrame:
     # Http client
     http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
-    logger.info(msg=f"proxy = {http_config.proxy} // agent = {http_config.user_agent}")
     http_internet_client = create_http_client(
         client_type=HttpHandlerType.REQUEST, config=http_config
     )
