@@ -1,10 +1,11 @@
 """HTTP client implementations."""
 
 import time
-from typing import Any
+from typing import Any, cast
 
 import httpx
 import requests
+from requests.adapters import HTTPAdapter
 
 from src.infra.http_client.base import HttpInterface
 from src.infra.http_client.config import ClientConfig
@@ -36,10 +37,27 @@ class HttpxClient(HttpInterface):
             max_connections=10,
             keepalive_expiry=5.0,
         )
+
+        proxy_mounts = {}
+        if self.config.proxy:
+            proxy_headers = {}
+            if self.config.user_agent:
+                proxy_headers["User-Agent"] = self.config.user_agent
+
+            proxy = httpx.Proxy(
+                url=self.config.http_proxy,
+                headers=proxy_headers or None,
+            )
+            proxy_mounts = {
+                "http://": httpx.HTTPTransport(proxy=proxy),
+                "https://": httpx.HTTPTransport(proxy=proxy),
+            }
+
         self._session = httpx.Client(
             headers=self.config.default_headers,
             timeout=self.config.timeout,
             verify=self.config.verify_ssl,
+            mounts=proxy_mounts,
             limits=limits,
         )
 
@@ -140,10 +158,19 @@ class RequestsClient(HttpInterface):
         self._session = requests.Session()
         if self.config.default_headers:
             self._session.headers.update(self.config.default_headers)
+            print(self._session.headers)
 
         if self.config.proxy:
             proxies = {"http": self.config.proxy, "https": self.config.proxy}
             self._session.proxies.update(proxies)
+            if self.config.user_agent:
+                https_adapter = cast(
+                    HTTPAdapter,
+                    self._session.get_adapter(url="https://"),
+                )
+                https_adapter.proxy_manager_for(self.config.http_proxy).proxy_headers[
+                    "User-Agent"
+                ] = self.config.user_agent
 
     def _handle_response(self, response: requests.Response) -> HTTPResponse:
         try:

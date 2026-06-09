@@ -44,8 +44,14 @@ class ClientConfig:
 
         # Process proxy
         if self.proxy:
-            if not self.proxy.startswith(("http://", "https://")):
-                self.proxy = f"http://{self.proxy}"
+            proxy_value = self.proxy
+            if not proxy_value.startswith(("http://", "https://")):
+                proxy_value = f"http://{proxy_value}"
+
+            self.proxy = proxy_value
+            self.http_proxy = proxy_value
+            # For CONNECT proxies, HTTPS targets still generally use an HTTP proxy URL.
+            self.https_proxy = proxy_value
 
         # Process headers
         if self.user_agent:
@@ -62,7 +68,7 @@ class ClientConfig:
         """Get proxy configuration dictionary."""
         if not self.proxy:
             return {}
-        return {"http": self.proxy, "https": self.proxy}
+        return {"http": self.http_proxy, "https": self.https_proxy}
 
     def with_updates(self, **kwargs) -> "ClientConfig":
         """Create a new config with updated values."""
