@@ -1,4 +1,4 @@
-BASE_URL = "https://prd-x-ademe-externe-api.de-c1.eu1.cloudhub.io"
+BASE_URL = "https://api-externe.ademe.fr"
 ID_STRUCTURES = [
     "ETAT_MIN_EF",
     # "ETAT_REG_ARA",
