@@ -5,6 +5,7 @@ from tenacity import (
     retry,
     stop_after_attempt,
     wait_exponential,
+    retry_if_exception,
     retry_if_result,
     before_sleep_log,
 )
@@ -84,7 +85,10 @@ def _should_retry_exception(exception: BaseException) -> bool:
 @retry(
     stop=stop_after_attempt(max_attempt_number=5),
     wait=wait_exponential(multiplier=3, min=1, max=60),
-    retry=retry_if_result(predicate=_should_retry_response),
+    retry=(
+        retry_if_exception(predicate=_should_retry_exception)
+        | retry_if_result(predicate=_should_retry_response)
+    ),
     before_sleep=before_sleep_log(logger, log_level=logging.WARNING),
     reraise=False,
 )
