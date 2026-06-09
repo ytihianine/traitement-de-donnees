@@ -133,7 +133,7 @@ def get_georisques(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Get result from API
-    api_host = "https://www.georisques.gouv.fr"
+    api_host = "https://georisques.gouv.fr"
     api_endpoint = "api/v1/resultats_rapport_risque"
     url = "/".join([api_host, api_endpoint])
 
