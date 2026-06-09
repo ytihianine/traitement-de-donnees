@@ -16,7 +16,7 @@ def source() -> None:
         steps=[
             ETLStep(
                 fn=actions.liste_declaration,
-                use_context=True,
+                use_context=False,
             ),
         ],
         add_import_date=False,
@@ -26,10 +26,12 @@ def source() -> None:
     consommations = create_task(
         task_config=TaskConfig(task_id="consommation_by_id"),
         output_selecteur="consommations",
+        input_selecteurs=["declarations"],
         steps=[
             ETLStep(
                 fn=actions.consommation_by_id,
-                use_context=True,
+                use_context=False,
+                read_data=True,
             ),
         ],
         add_import_date=False,
@@ -52,7 +54,7 @@ def output() -> None:
         steps=[
             ETLStep(
                 fn=actions.liste_declaration,
-                use_context=True,
+                use_context=False,
                 read_data=True,
             ),
         ],
@@ -65,7 +67,7 @@ def output() -> None:
         steps=[
             ETLStep(
                 fn=actions.liste_declaration,
-                use_context=True,
+                use_context=False,
                 read_data=True,
             ),
         ],
@@ -78,7 +80,7 @@ def output() -> None:
         steps=[
             ETLStep(
                 fn=process.process_detail_conso_activite,
-                use_context=True,
+                use_context=False,
                 read_data=True,
             ),
         ],
@@ -91,7 +93,7 @@ def output() -> None:
         steps=[
             ETLStep(
                 fn=process.process_detail_conso_indicateur,
-                use_context=True,
+                use_context=False,
                 read_data=True,
             ),
         ],
@@ -104,7 +106,7 @@ def output() -> None:
         steps=[
             ETLStep(
                 fn=process.process_detail_conso,
-                use_context=True,
+                use_context=False,
                 read_data=True,
             ),
         ],

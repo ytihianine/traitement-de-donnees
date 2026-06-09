@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 from airflow.sdk import Variable
 
@@ -64,8 +65,8 @@ def liste_declaration() -> list[dict]:
     # Main part
     api_result = []
     for idx, id_structure in enumerate(ID_STRUCTURES):
-        print(
-            f"({idx+1}/{len(ID_STRUCTURES)}) Récupération des déclarations pour la structure {id_structure}"
+        logging.info(
+            msg=f"({idx+1}/{len(ID_STRUCTURES)}) Récupération des déclarations pour la structure {id_structure}"
         )
         token = get_token(
             api_client=httpx_internet_client,
@@ -80,7 +81,7 @@ def liste_declaration() -> list[dict]:
     return api_result
 
 
-def consommation_by_id(df_declarations: pd.DataFrame) -> list[dict]:
+def consommation_by_id(df: pd.DataFrame) -> list[dict]:
     # Http client
     client_config = ClientConfig(user_agent=AGENT, proxy=PROXY)
     httpx_internet_client = HttpxClient(config=client_config)
@@ -88,8 +89,8 @@ def consommation_by_id(df_declarations: pd.DataFrame) -> list[dict]:
     # Main part
     api_result = []
     for idx, id_structure in enumerate(ID_STRUCTURES):
-        print(
-            f"({idx+1}/{len(ID_STRUCTURES)}) Récupération des déclarations pour la structure {id_structure}"
+        logging.info(
+            msg=f"({idx+1}/{len(ID_STRUCTURES)}) Récupération des déclarations pour la structure {id_structure}"
         )
         token = get_token(
             api_client=httpx_internet_client,
@@ -97,7 +98,7 @@ def consommation_by_id(df_declarations: pd.DataFrame) -> list[dict]:
             id_structure_assujettie=id_structure,
         )
 
-        conso_ids = df_declarations["id_consommation"]
+        conso_ids = df["id_consommation"]
         for id_conso in conso_ids:
             detail_conso = get_consommation_by_id(
                 api_client=httpx_internet_client,
