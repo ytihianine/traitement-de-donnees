@@ -83,8 +83,8 @@ def _should_retry_exception(exception: BaseException) -> bool:
 
 
 @retry(
-    stop=stop_after_attempt(max_attempt_number=5),
-    wait=wait_exponential(multiplier=3, min=1, max=60),
+    stop=stop_after_attempt(max_attempt_number=30),
+    wait=wait_exponential(multiplier=1, min=1, max=30),
     retry=(
         retry_if_exception(predicate=_should_retry_exception)
         | retry_if_result(predicate=_should_retry_response)
