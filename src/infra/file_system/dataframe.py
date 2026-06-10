@@ -1,20 +1,36 @@
 """DataFrame utilities for file handling."""
 
-import io
 import logging
-from typing import Optional, Union
 from pathlib import Path
 import pandas as pd
 
 from .base import FSInterface
+from .data_serializer import (
+    DataSerializer,
+    CSVSerializer,
+    ParquetSerializer,
+    ExcelSerializer,
+    JSONSerializer,
+)
+from src._enums.filesystem import FileFormat
+
+_serializer_registry: dict[FileFormat, DataSerializer] = {
+    FileFormat.CSV: CSVSerializer(),
+    FileFormat.PARQUET: ParquetSerializer(),
+    FileFormat.EXCEL: ExcelSerializer(),
+    FileFormat.JSON: JSONSerializer(),
+}
+
+
+def detect_file_extension(filepath: str | Path) -> FileFormat:
+    ext = Path(filepath).suffix.lower()
+    return FileFormat(value=ext[1:])
 
 
 def read_dataframe(
     file_handler: FSInterface,
-    file_path: Union[str, Path],
-    file_format: str = "auto",
-    read_options: Optional[dict] = None,
-    **kwargs,
+    file_path: str | Path,
+    read_options: dict | None = None,
 ) -> pd.DataFrame:
     """
     Read a file into a pandas DataFrame using the provided file handler.
@@ -22,63 +38,24 @@ def read_dataframe(
     Args:
         file_handler: Instance of FSInterface
         file_path: Path to the file to read
-        file_format: Format of the file ('csv', 'excel', 'parquet', 'json', or 'auto')
-        **kwargs: Additional arguments passed to the pandas read function
+        read_options: Additional arguments passed to the serializer load function
 
     Returns:
         pd.DataFrame: The loaded DataFrame
-
-    Example:
-        ```python
-        # Create a file handler for S3
-        handler = create_file_handler(
-            's3',
-            connection_id='minio_bucket',
-            bucket='your-bucket'
-        )
-
-        # Read a CSV file
-        df = read_dataframe(handler, 'path/to/file.csv', file_format='csv', sep=';')
-
-        # Read a parquet file
-        df = read_dataframe(handler, 'path/to/file.parquet')
-        ```
     """
-    # If format is auto, try to detect from file extension
-    if file_format == "auto":
-        ext = Path(file_path).suffix.lower()
-        format_map = {
-            ".csv": "csv",
-            ".xlsx": "excel",
-            ".xls": "excel",
-            ".parquet": "parquet",
-            ".json": "json",
-        }
-        file_format = format_map.get(ext, "csv")  # Default to CSV if unknown
+    file_extension = detect_file_extension(filepath=file_path)
+
     if read_options is None:
         read_options = {}
-    # Read the file content
 
     logging.info(msg=f"Read data from {file_path}")
-    logging.info(msg=f"File format: {file_format}")
+    logging.info(msg=f"File format: {file_extension}")
     logging.info(msg=f"read_options: \n{read_options}")
-    with file_handler.read(file_path) as file_obj:
-        # Different handling based on format
-        if file_format == "parquet":
-            # For parquet, we need to write to a temporary BytesIO first
-            buffer = io.BytesIO(file_obj.read())
-            return pd.read_parquet(buffer, **read_options, **kwargs)
 
-        elif file_format == "excel":
-            buffer = io.BytesIO(file_obj.read())
-            return pd.read_excel(buffer, **read_options, **kwargs)
+    # Fetch bytes from S3
+    data_bytes = file_handler.read(file_path=file_path)
 
-        elif file_format == "json":
-            return pd.read_json(
-                io.StringIO(file_obj.read().decode("utf-8")), **read_options, **kwargs
-            )
-
-        else:  # csv
-            return pd.read_csv(
-                io.StringIO(file_obj.read().decode("utf-8")), **read_options, **kwargs
-            )
+    # Convert bytes to DataFrame
+    serializer = _serializer_registry[file_extension]
+    df = serializer.load(buffer=data_bytes, **read_options)  # type: ignore
+    return df
