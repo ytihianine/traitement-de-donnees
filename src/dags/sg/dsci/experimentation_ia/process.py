@@ -164,8 +164,91 @@ def process_ref_raisons_non_utilisation(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # =============================================================
+# Processing référentiel questionnaire 3 : Usage et ressentis face à l'Assistant IA
+# =============================================================
+
+
+def process_ref_q6_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
+    txt_col = ["formation"]
+    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    return df
+
+
+def process_ref_q7_particip_programme(df: pd.DataFrame) -> pd.DataFrame:
+    txt_col = ["participation"]
+    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    return df
+
+
+def process_ref_q8_raisons_non_participation(df: pd.DataFrame) -> pd.DataFrame:
+    txt_col = ["raisons"]
+    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    return df
+
+
+def process_ref_q11_leviers_progressions(df: pd.DataFrame) -> pd.DataFrame:
+    txt_col = ["leviers"]
+    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    return df
+
+
+def process_ref_q12_impacts_taches_pro(df: pd.DataFrame) -> pd.DataFrame:
+    txt_col = ["impacts"]
+    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    return df
+
+
+def process_ref_q14_taches_rebarbativ(df: pd.DataFrame) -> pd.DataFrame:
+    txt_col = ["taches_rebarbatives"]
+    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    return df
+
+
+def process_ref_q17_autres_outils(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
+    col_to_keep = ["id", "autres_outils"]
+    df = df.loc[:, col_to_keep]
+    df = normalize_whitespace_columns(df=df, columns=["autres_outils"])
+    return df
+
+
+def process_ref_q17_satisfaction_autre_outil(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
+    col_to_keep = ["id", "satisfaction_autres_outils"]
+    df = df.loc[:, col_to_keep]
+    df = normalize_whitespace_columns(df=df, columns=["satisfaction_autres_outils"])
+    return df
+
+
+def process_ref_q18_comparaisons(df: pd.DataFrame) -> pd.DataFrame:
+    txt_col = ["comparaisons"]
+    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    return df
+
+
+def process_ref_q19_fonctionnalites(df: pd.DataFrame) -> pd.DataFrame:
+    txt_col = ["fonctionnalites"]
+    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    return df
+
+
+def process_ref_q21_risques_identifies(df: pd.DataFrame) -> pd.DataFrame:
+    txt_col = ["risques"]
+    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    return df
+
+
+def process_ref_q25_besoins(df: pd.DataFrame) -> pd.DataFrame:
+    txt_col = ["besoins"]
+    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    return df
+
+
+# =============================================================
 # Processing Entité
 # =============================================================
+
+
 def process_quota_entite(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     df = df.rename(
@@ -216,27 +299,29 @@ def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
         "id",
         "no_id",
         "entite",
-        "nom_prenom",
+        # "nom_prenom",
         "parti",
-        "service",
-        "metier",
-        "cas_d_usages",
+        # "service",
+        # "metier",
+        # "cas_d_usages",
         "courriel",
         "connecte_",
         "reponse_au_questionnaire_1",
         "reponse_au_questionnaire_2",
+        "reponse_au_questionnaire_3",
     ]
     df = df.loc[:, cols_to_keep]
 
     # Normaliser les colonnes textuelles
     txt_cols = [
         "no_id",
-        "entite",
-        "nom_prenom",
+        # "entite",
+        # "nom_prenom",
         "parti",
-        "service",
-        "metier",
-        "cas_d_usages",
+        # "service",
+        # "metier",
+        # "cas_d_usages",
+        "courriel"
     ]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
     df = df.drop_duplicates(subset="courriel", keep="last")
@@ -473,7 +558,7 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_questionnaire2_typologie_interaction(df: pd.DataFrame) -> pd.DataFrame:
+def process_questionnaire_2_typologie_interaction(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = ["id", "types_d_interactions_mef"]
     df = df.loc[:, cols_to_keep]
@@ -493,7 +578,7 @@ def process_questionnaire2_typologie_interaction(df: pd.DataFrame) -> pd.DataFra
     return df
 
 
-def process_questionnaire2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
+def process_questionnaire_2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = ["id", "formation_ia_suivie_post_expe_"]
     df = df.loc[:, cols_to_keep]
@@ -522,7 +607,7 @@ def process_questionnaire2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_questionnaire2_participation(df: pd.DataFrame) -> pd.DataFrame:
+def process_questionnaire_2_participation(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = ["id", "participation_programme_rdv"]
     df = df.loc[:, cols_to_keep]
@@ -551,7 +636,7 @@ def process_questionnaire2_participation(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_questionnaire2_freins(df: pd.DataFrame) -> pd.DataFrame:
+def process_questionnaire_2_freins(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = ["id", "freins_a_l_utilisation"]
     df = df.loc[:, cols_to_keep]
@@ -578,7 +663,7 @@ def process_questionnaire2_freins(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_questionnaire2_facteurs_progression(df: pd.DataFrame) -> pd.DataFrame:
+def process_questionnaire_2_facteurs_progression(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = ["id", "facteurs_de_progression"]
     df = df.loc[:, cols_to_keep]
@@ -605,7 +690,7 @@ def process_questionnaire2_facteurs_progression(df: pd.DataFrame) -> pd.DataFram
     return df
 
 
-def process_questionnaire2_taches(df: pd.DataFrame) -> pd.DataFrame:
+def process_questionnaire_2_taches(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = ["id", "taches_realisees_avec_ia"]
     df = df.loc[:, cols_to_keep]
@@ -632,7 +717,7 @@ def process_questionnaire2_taches(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_questionnaire2_typologie_erreurs(df: pd.DataFrame) -> pd.DataFrame:
+def process_questionnaire_2_typologie_erreurs(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = ["id", "types_d_erreurs_frequentes2"]
     df = df.loc[:, cols_to_keep]
@@ -661,7 +746,7 @@ def process_questionnaire2_typologie_erreurs(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_questionnaire2_observation_impact(df: pd.DataFrame) -> pd.DataFrame:
+def process_questionnaire_2_observation_impact(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = ["id", "observations_des_impacts"]
     df = df.loc[:, cols_to_keep]
@@ -688,7 +773,7 @@ def process_questionnaire2_observation_impact(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_questionnaire2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
+def process_questionnaire_2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = ["id", "impacts_identifies_au_travail"]
     df = df.loc[:, cols_to_keep]
@@ -718,7 +803,7 @@ def process_questionnaire2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
 # =============================================================
 # Processing du questionnaire2_bis : Les agents qui ne se sont jamais connectés
 # =============================================================
-def process_questionnaire2_bis(df: pd.DataFrame) -> pd.DataFrame:
+def process_questionnaire_2_bis(df: pd.DataFrame) -> pd.DataFrame:
     # Renommage
     df = df.rename(columns={"id": "id_questionnaire_2_bis"})
     # Gestion des colonnes
@@ -734,7 +819,7 @@ def process_questionnaire2_bis(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_questionnaire2_bis_raisons_non_utilisation(
+def process_questionnaire_2_bis_raisons_non_utilisation(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
     # Gestion des colonnes
@@ -757,5 +842,252 @@ def process_questionnaire2_bis_raisons_non_utilisation(
     # Nouvel ID unique
     df["id"] = pd.util.hash_pandas_object(
         obj=df[["id_questionnaire_2_bis", "id_raisons_non_utilisation"]], index=False
+    ) % (2**63)
+    return df
+
+
+# =============================================================
+# Processing du questionnaire 3 : Usages et ressentis face à l’Assistant IA, en fin de phase de test
+# =============================================================
+
+
+def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
+    # Renommage des colonnes référentielles simples
+    df = df.rename(columns={
+        "raisons_non_participation": "id_raisons_non_participation",
+        "impacts_taches_pro": "id_impacts_taches_pro",
+        "impacts_taches_rebarbatives": "id_impacts_taches_rebarbatives",
+        "autres_outils": "id_autres_outils",
+        "satisfaction_autre_outil": "id_satisfaction_autre_outil",
+        "comparaison_autres_ia": "id_comparaison_autres_ia"
+        }
+    )
+    cols_to_keep: list[str] = [
+        "id",
+        "no_id",
+        "mail_professionnel",
+        "mail_corrige",
+        "temps_fonction_exercee",
+        "genre",
+        "frequence_utilisation",
+        "evolution_usage",
+        "quelles_raisons_facons",
+        # "formation_suivie",
+        # "programme_de_rdv",
+        "id_raisons_non_participation",
+        "autres",
+        "evaluation_niveau_acculturation",
+        "evolution_sentiment",
+        "autres_leviers",
+        "id_impacts_taches_pro",
+        "temps_gagnes",
+        "id_impacts_taches_rebarbatives",
+        "impact_perception",
+        "sentiment_de_fierte",
+        "experimentation_interne",
+        "id_autres_outils",
+        "id_satisfaction_autre_outil",
+        "id_comparaison_autres_ia",
+        "autres_fonctionnalites",
+        "utilisation_moindre",
+        "autres_risques",
+        "recommandations",
+        "etre_ambassadeur",
+        "bonnes_pratiques",
+        "autres_besoins_importants",
+        "autres_besoins_moindres",
+        "ameliorations",
+        "aspects_a_ameliorer",
+        "interface",
+        "contenu",
+        "connexions",
+        "autre_retour_libre",
+        "retours_libres"
+    ]
+    txt_cols = [
+        "mail_professionnel",
+        "quelles_raisons_facons",
+        "autres",
+        "autres_leviers",
+        "autres_fonctionnalites",
+        "autres_risques",
+        "bonnes_pratiques",
+        "autres_besoins_importants",
+        "autres_besoins_moindres",
+        "ameliorations",
+        "aspects_a_ameliorer",
+        "interface",
+        "contenu",
+        "connexions",
+        "autre_retour_libre",
+        "retours_libres"
+    ]
+    df = df.loc[:, cols_to_keep]
+    # Gestions des refs simples
+    ref_cols = [
+        "id_raisons_non_participation",
+        "id_impacts_taches_pro",
+        "id_impacts_taches_rebarbatives",
+        "id_autres_outils",
+        "id_satisfaction_autre_outil",
+        "id_comparaison_autres_ia"
+    ]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+    df = df.drop_duplicates(subset="mail_professionnel", keep="last")
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    return df
+
+
+def process_questionnaire_3_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
+    cols_to_keep = ["id", "formation_suivie"]
+    df = df.loc[:, cols_to_keep]
+    df = df.rename(columns={
+        "id": "id_questionnaire_3",
+        "formation_suivie": "id_formation_suivie"})
+    # Gestion des refs
+    ref_cols = ["id_questionnaire_3", "id_formation_suivie"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+    # Convertion
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_formation_suivie")
+    df = df.explode(column="id_formation_suivie")
+    # Nettoyage des lignes vides
+    df = df.dropna(subset=["id_formation_suivie"])
+    # Nouvel ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_questionnaire_3", "id_formation_suivie"]], index=False
+    ) % (2**63)
+    return df
+
+
+def process_questionnaire_3_programme_rdv(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnes
+    cols_to_keep = ["id", "programme_de_rdv"]
+    df = df.loc[:, cols_to_keep]
+    df = df.rename(columns={
+        "id": "id_questionnaire_3",
+        "programme_de_rdv": "id_Programme_de_rdv"}
+        )
+    # Gestion des refs
+    ref_cols = ["id_questionnaire_3", "id_Programme_de_rdv"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+    # Convertion
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_Programme_de_rdv")
+    df = df.explode(column="id_Programme_de_rdv")
+    # Nettoyage des lignes vides
+    df = df.dropna(subset=["id_Programme_de_rdv"])
+    # Nouvel ID unique
+    df["id"] = pd.util.hash_pandas_object(
+        obj=df[["id_questionnaire_3", "id_Programme_de_rdv"]], index=False
+    ) % (2**63)
+    return df
+
+
+def process_questionnaire_3_leviers_progression(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnnes
+    cols_to_keep = ["id", "leviers_progression"]
+    df = df.loc[:, cols_to_keep]
+    df = df.rename(columns={
+        "id": "id_questionnaire_3",
+        "leviers_progression": "id_leviers_progression"}
+    )
+    ref_cols = ["id_questionnaire_3", "id_leviers_progression"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+    # Conversion
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_leviers_progression")
+    df = df.explode(column="id_leviers_progression")
+    # Nettoyage
+    df = df.dropna(subset=["id_leviers_progression"])
+    # Gestion nouvel ID
+    df["id"] = pd.util.hash_pandas_object(
+         obj=df[["id_questionnaire_3", "id_leviers_progression"]], index=False
+    ) % (2**63)
+    return df
+
+
+def process_questionnaire_3_fonctionnalites(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnnes
+    cols_to_keep = ["id", "fonctionnalites"]
+    df = df.loc[:, cols_to_keep]
+    df = df.rename(columns={
+        "id": "id_questionnaire_3",
+        "fonctionnalites": "id_fonctionnalites"}
+    )
+    ref_cols = ["id_questionnaire_3", "id_fonctionnalites"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+    # Conversion
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_fonctionnalites")
+    df = df.explode(column="id_fonctionnalites")
+    # Nettoyage
+    df = df.dropna(subset=["id_fonctionnalites"])
+    # Gestion nouvel ID
+    df["id"] = pd.util.hash_pandas_object(
+         obj=df[["id_questionnaire_3", "id_fonctionnalites"]], index=False
+    ) % (2**63)
+    return df
+
+
+def process_questionnaire_3_risques_identifies(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnnes
+    cols_to_keep = ["id", "risques_identifies"]
+    df = df.loc[:, cols_to_keep]
+    df = df.rename(columns={
+        "id": "id_questionnaire_3",
+        "risques_identifies": "id_risques_identifies"}
+    )
+    ref_cols = ["id_questionnaire_3", "id_risques_identifies"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+    # Conversion
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_risques_identifies")
+    df = df.explode(column="id_risques_identifies")
+    # Nettoyage
+    df = df.dropna(subset=["id_risques_identifies"])
+    # Gestion nouvel ID
+    df["id"] = pd.util.hash_pandas_object(
+         obj=df[["id_questionnaire_3", "id_risques_identifies"]], index=False
+    ) % (2**63)
+    return df
+
+
+def process_questionnaire_3_besoins_prioritaires(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnnes
+    cols_to_keep = ["id", "besoins_prioritaires"]
+    df = df.loc[:, cols_to_keep]
+    df = df.rename(columns={
+        "id": "id_questionnaire_3",
+        "besoins_prioritaires": "id_besoins_prioritaires"}
+    )
+    ref_cols = ["id_questionnaire_3", "id_besoins_prioritaires"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+    # Conversion
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_besoins_prioritaires")
+    df = df.explode(column="id_besoins_prioritaires")
+    # Nettoyage
+    df = df.dropna(subset=["id_besoins_prioritaires"])
+    # Gestion nouvel ID
+    df["id"] = pd.util.hash_pandas_object(
+         obj=df[["id_questionnaire_3", "id_besoins_prioritaires"]], index=False
+    ) % (2**63)
+    return df
+
+
+def process_questionnaire_3_besoins_moindres(df: pd.DataFrame) -> pd.DataFrame:
+    # Gestion des colonnnes
+    cols_to_keep = ["id", "besoins_moindres"]
+    df = df.loc[:, cols_to_keep]
+    df = df.rename(columns={
+        "id": "id_questionnaire_3",
+        "besoins_moindres": "id_besoins_moindres"}
+    )
+    ref_cols = ["id_questionnaire_3", "id_besoins_moindres"]
+    df = handle_grist_null_references(df=df, columns=ref_cols)
+    # Conversion
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_besoins_moindres")
+    df = df.explode(column="id_besoins_moindres")
+    # Nettoyage
+    df = df.dropna(subset=["id_besoins_moindres"])
+    # Gestion nouvel ID
+    df["id"] = pd.util.hash_pandas_object(
+         obj=df[["id_questionnaire_3", "id_besoins_moindres"]], index=False
     ) % (2**63)
     return df
