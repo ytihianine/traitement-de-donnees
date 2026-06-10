@@ -59,3 +59,34 @@ def read_dataframe(
     serializer = _serializer_registry[file_extension]
     df = serializer.load(buffer=data_bytes, **read_options)  # type: ignore
     return df
+
+
+def write_dataframe(
+    df: pd.DataFrame,
+    file_handler: FSInterface,
+    file_path: str | Path,
+    write_options: dict | None = None,
+) -> None:
+    """
+    Read a file into a pandas DataFrame using the provided file handler.
+
+    Args:
+        file_handler: Instance of FSInterface
+        file_path: Path to the file to read
+        file_format: Format of the file ('csv', 'excel', 'parquet', 'json', or 'auto')
+        **kwargs: Additional arguments passed to the pandas read function
+
+    Returns:
+        None
+    """
+    file_extension = detect_file_extension(filepath=file_path)
+
+    if write_options is None:
+        write_options = {}
+
+    # Convert DataFrame to bytes
+    serializer = _serializer_registry[file_extension]
+    file_content = serializer.dump(data=df, **write_options)
+
+    # Write the file content
+    file_handler.write(file_path=file_path, content=file_content)
