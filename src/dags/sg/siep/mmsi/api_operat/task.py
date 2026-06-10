@@ -12,7 +12,7 @@ from src.dags.sg.siep.mmsi.api_operat import process
 def source() -> None:
     declarations = create_task(
         task_config=TaskConfig(task_id="declarations"),
-        output_selecteur="declaration_ademe",
+        output_selecteur="declarations",
         steps=[
             ETLStep(
                 fn=actions.liste_declaration,
