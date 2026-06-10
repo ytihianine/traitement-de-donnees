@@ -3,15 +3,15 @@ from airflow.sdk.bases.operator import chain
 
 from src.utils.process.structures import normalize_grist_dataframe
 from src.common_tasks.etl import create_grist_etl_task
-
 from src.dags.sg.dsci.experimentation_ia import process
 
-# Création des tâches
+# Creation des taches
 
 
 @task_group
 def referentiels() -> None:
     version = "v2"
+
     ref_q1_direction = create_grist_etl_task(
         selecteur="ref_q1_direction",
         normalisation_process_func=normalize_grist_dataframe,
@@ -103,7 +103,6 @@ def referentiels() -> None:
         add_import_date=True,
         add_snapshot_id=True,
     )
-
     ref_q14_evolution_craintes = create_grist_etl_task(
         selecteur="ref_q14_evolution_craintes",
         normalisation_process_func=normalize_grist_dataframe,
@@ -112,7 +111,6 @@ def referentiels() -> None:
         add_import_date=True,
         add_snapshot_id=True,
     )
-
     ref_q13_facteurs_progression = create_grist_etl_task(
         selecteur="ref_q13_facteurs_progression",
         normalisation_process_func=normalize_grist_dataframe,
@@ -121,7 +119,6 @@ def referentiels() -> None:
         add_import_date=True,
         add_snapshot_id=True,
     )
-
     ref_q10_principaux_freins = create_grist_etl_task(
         selecteur="ref_q10_principaux_freins",
         normalisation_process_func=normalize_grist_dataframe,
@@ -130,7 +127,6 @@ def referentiels() -> None:
         add_import_date=True,
         add_snapshot_id=True,
     )
-
     ref_q6_participation_programme = create_grist_etl_task(
         selecteur="ref_q6_participation_programme",
         normalisation_process_func=normalize_grist_dataframe,
@@ -174,6 +170,105 @@ def referentiels() -> None:
         add_import_date=True,
         add_snapshot_id=True,
     )
+    # ==============================
+    # Référentiels du questionnaire_3
+    # ==============================
+    ref_q6_formation_suivie = create_grist_etl_task(
+        selecteur="ref_q6_formation_suivie",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q6_formation_suivie,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    ref_q7_particip_programme = create_grist_etl_task(
+        selecteur="ref_q7_particip_programme",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q7_particip_programme,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    ref_q8_raisons_non_participation = create_grist_etl_task(
+        selecteur="ref_q8_raisons_non_participation",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q8_raisons_non_participation,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    ref_q11_leviers_progressions = create_grist_etl_task(
+        selecteur="ref_q11_leviers_progressions",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q11_leviers_progressions,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    ref_q12_impacts_taches_pro = create_grist_etl_task(
+        selecteur="ref_q12_impacts_taches_pro",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q12_impacts_taches_pro,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    ref_q14_taches_rebarbativ = create_grist_etl_task(
+        selecteur="ref_q14_taches_rebarbativ",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q14_taches_rebarbativ,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    ref_q17_autres_outils = create_grist_etl_task(
+        selecteur="ref_q17_autres_outils",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q17_autres_outils,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    ref_q17_satisfaction_autre_outil = create_grist_etl_task(
+        selecteur="ref_q17_satisfaction_autre_outil",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q17_satisfaction_autre_outil,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    ref_q18_comparaisons = create_grist_etl_task(
+        selecteur="ref_q18_comparaisons",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q18_comparaisons,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    ref_q19_fonctionnalites = create_grist_etl_task(
+        selecteur="ref_q19_fonctionnalites",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q19_fonctionnalites,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    ref_q21_risques_identifies = create_grist_etl_task(
+        selecteur="ref_q21_risques_identifies",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q21_risques_identifies,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    ref_q25_besoins = create_grist_etl_task(
+        selecteur="ref_q25_besoins",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_ref_q25_besoins,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
 
     # Ordre des tâches
     chain(
@@ -197,6 +292,18 @@ def referentiels() -> None:
             ref_q3_niveau_2(),
             ref_q7_accords(),
             ref_raisons_non_utilisation(),
+            ref_q6_formation_suivie(),
+            ref_q7_particip_programme(),
+            ref_q8_raisons_non_participation(),
+            ref_q11_leviers_progressions(),
+            ref_q12_impacts_taches_pro(),
+            ref_q14_taches_rebarbativ(),
+            ref_q17_autres_outils(),
+            ref_q17_satisfaction_autre_outil(),
+            ref_q18_comparaisons(),
+            ref_q19_fonctionnalites(),
+            ref_q21_risques_identifies(),
+            ref_q25_besoins(),
         ]
     )
 
@@ -228,11 +335,7 @@ def suivi_experimentateurs() -> None:
         add_snapshot_id=True,
     )
     # Ordre des tâches
-    chain(
-        [
-            experimentateurs(),
-        ]
-    )
+    chain([experimentateurs()])
 
 
 @task_group
@@ -263,7 +366,7 @@ def suivi_questionnaire_1() -> None:
         add_snapshot_id=True,
     )
 
-    # Ordre des tâches
+    # Ordre de tâches
     chain(
         [
             questionnaire_1(),
@@ -284,74 +387,74 @@ def suivi_questionnaire_2() -> None:
         add_import_date=True,
         add_snapshot_id=True,
     )
-    questionnaire2_typologie_interaction = create_grist_etl_task(
-        selecteur="questionnaire2_typologie_interaction",
+    questionnaire_2_typologie_interaction = create_grist_etl_task(
+        selecteur="questionnaire_2_typologie_interaction",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_questionnaire2_typologie_interaction,
+        process_func=process.process_questionnaire_2_typologie_interaction,
         version=version,
         add_import_date=True,
         add_snapshot_id=True,
     )
-    questionnaire2_formation_suivie = create_grist_etl_task(
-        selecteur="questionnaire2_formation_suivie",
+    questionnaire_2_formation_suivie = create_grist_etl_task(
+        selecteur="questionnaire_2_formation_suivie",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_questionnaire2_formation_suivie,
+        process_func=process.process_questionnaire_2_formation_suivie,
         version=version,
         add_import_date=True,
         add_snapshot_id=True,
     )
-    questionnaire2_participation = create_grist_etl_task(
-        selecteur="questionnaire2_participation",
+    questionnaire_2_participation = create_grist_etl_task(
+        selecteur="questionnaire_2_participation",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_questionnaire2_participation,
+        process_func=process.process_questionnaire_2_participation,
         version=version,
         add_import_date=True,
         add_snapshot_id=True,
     )
-    questionnaire2_freins = create_grist_etl_task(
-        selecteur="questionnaire2_freins",
+    questionnaire_2_freins = create_grist_etl_task(
+        selecteur="questionnaire_2_freins",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_questionnaire2_freins,
+        process_func=process.process_questionnaire_2_freins,
         version=version,
         add_import_date=True,
         add_snapshot_id=True,
     )
-    questionnaire2_facteurs_progression = create_grist_etl_task(
-        selecteur="questionnaire2_facteurs_progression",
+    questionnaire_2_facteurs_progression = create_grist_etl_task(
+        selecteur="questionnaire_2_facteurs_progression",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_questionnaire2_facteurs_progression,
+        process_func=process.process_questionnaire_2_facteurs_progression,
         version=version,
         add_import_date=True,
         add_snapshot_id=True,
     )
-    questionnaire2_taches = create_grist_etl_task(
-        selecteur="questionnaire2_taches",
+    questionnaire_2_taches = create_grist_etl_task(
+        selecteur="questionnaire_2_taches",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_questionnaire2_taches,
+        process_func=process.process_questionnaire_2_taches,
         version=version,
         add_import_date=True,
         add_snapshot_id=True,
     )
-    questionnaire2_typologie_erreurs = create_grist_etl_task(
-        selecteur="questionnaire2_typologie_erreurs",
+    questionnaire_2_typologie_erreurs = create_grist_etl_task(
+        selecteur="questionnaire_2_typologie_erreurs",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_questionnaire2_typologie_erreurs,
+        process_func=process.process_questionnaire_2_typologie_erreurs,
         version=version,
         add_import_date=True,
         add_snapshot_id=True,
     )
-    questionnaire2_impact_observe = create_grist_etl_task(
-        selecteur="questionnaire2_impact_observe",
+    questionnaire_2_impact_observe = create_grist_etl_task(
+        selecteur="questionnaire_2_impact_observe",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_questionnaire2_observation_impact,
+        process_func=process.process_questionnaire_2_observation_impact,
         version=version,
         add_import_date=True,
         add_snapshot_id=True,
     )
-    questionnaire2_impact_identifie = create_grist_etl_task(
-        selecteur="questionnaire2_impact_identifie",
+    questionnaire_2_impact_identifie = create_grist_etl_task(
+        selecteur="questionnaire_2_impact_identifie",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_questionnaire2_impact_identifie,
+        process_func=process.process_questionnaire_2_impact_identifie,
         version=version,
         add_import_date=True,
         add_snapshot_id=True,
@@ -361,15 +464,15 @@ def suivi_questionnaire_2() -> None:
     chain(
         [
             questionnaire_2(),
-            questionnaire2_typologie_interaction(),
-            questionnaire2_formation_suivie(),
-            questionnaire2_participation(),
-            questionnaire2_freins(),
-            questionnaire2_facteurs_progression(),
-            questionnaire2_taches(),
-            questionnaire2_typologie_erreurs(),
-            questionnaire2_impact_observe(),
-            questionnaire2_impact_identifie(),
+            questionnaire_2_typologie_interaction(),
+            questionnaire_2_formation_suivie(),
+            questionnaire_2_participation(),
+            questionnaire_2_freins(),
+            questionnaire_2_facteurs_progression(),
+            questionnaire_2_taches(),
+            questionnaire_2_typologie_erreurs(),
+            questionnaire_2_impact_observe(),
+            questionnaire_2_impact_identifie(),
         ]
     )
 
@@ -380,7 +483,7 @@ def suivi_questionnaire_2_bis() -> None:
     questionnaire_2_bis = create_grist_etl_task(
         selecteur="questionnaire_2_bis",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_questionnaire2_bis,
+        process_func=process.process_questionnaire_2_bis,
         version=version,
         add_import_date=True,
         add_snapshot_id=True,
@@ -388,7 +491,7 @@ def suivi_questionnaire_2_bis() -> None:
     questionnaire_2_bis_raisons_non_utilisation = create_grist_etl_task(
         selecteur="questionnaire_2_bis_raisons_non_utilisation",
         normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_questionnaire2_bis_raisons_non_utilisation,
+        process_func=process.process_questionnaire_2_bis_raisons_non_utilisation,
         version=version,
         add_import_date=True,
         add_snapshot_id=True,
@@ -398,5 +501,87 @@ def suivi_questionnaire_2_bis() -> None:
         [
             questionnaire_2_bis(),
             questionnaire_2_bis_raisons_non_utilisation(),
+        ]
+    )
+
+
+@task_group
+def suivi_questionnaire_3() -> None:
+    version = "v2"
+    questionnaire_3 = create_grist_etl_task(
+        selecteur="questionnaire_3",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_questionnaire_3,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    questionnaire_3_formation_suivie = create_grist_etl_task(
+        selecteur="questionnaire_3_formation_suivie",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_questionnaire_3_formation_suivie,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    questionnaire_3_programme_rdv = create_grist_etl_task(
+        selecteur="questionnaire_3_programme_rdv",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_questionnaire_3_programme_rdv,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    questionnaire_3_leviers_progression = create_grist_etl_task(
+        selecteur="questionnaire_3_leviers_progression",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_questionnaire_3_leviers_progression,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    questionnaire_3_fonctionnalites = create_grist_etl_task(
+        selecteur="questionnaire_3_fonctionnalites",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_questionnaire_3_fonctionnalites,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    questionnaire_3_risques_identifies = create_grist_etl_task(
+        selecteur="questionnaire_3_risques_identifies",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_questionnaire_3_risques_identifies,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    questionnaire_3_besoins_prioritaires = create_grist_etl_task(
+        selecteur="questionnaire_3_besoins_prioritaires",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_questionnaire_3_besoins_prioritaires,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    questionnaire_3_besoins_moindres = create_grist_etl_task(
+        selecteur="questionnaire_3_besoins_moindres",
+        normalisation_process_func=normalize_grist_dataframe,
+        process_func=process.process_questionnaire_3_besoins_moindres,
+        version=version,
+        add_import_date=True,
+        add_snapshot_id=True,
+    )
+    # Ordre des tâches
+    chain(
+        [
+            questionnaire_3(),
+            questionnaire_3_formation_suivie(),
+            questionnaire_3_programme_rdv(),
+            questionnaire_3_leviers_progression(),
+            questionnaire_3_fonctionnalites(),
+            questionnaire_3_risques_identifies(),
+            questionnaire_3_besoins_prioritaires(),
+            questionnaire_3_besoins_moindres(),
         ]
     )
