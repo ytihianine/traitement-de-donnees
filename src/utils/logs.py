@@ -16,6 +16,11 @@ def df_info(
         df_name (str): The title you want to show at top of the log.
         sample_size (int): Number of rows to show as a sample (default is 5).
     """
+    if not isinstance(df, pd.DataFrame):
+        logging.warning(
+            msg=f"{df_name} is not of type pd.DataFrame. It is of type {type(df)}"
+        )
+
     col_names = list(df.columns)
     nb_none = len([x for x in col_names if x is None])
     if nb_none > 0:
