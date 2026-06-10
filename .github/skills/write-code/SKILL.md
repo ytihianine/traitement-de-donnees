@@ -30,9 +30,9 @@ Implement a feature or fix a bug following this project's architecture, code sta
 
 | Folder | Purpose |
 |--------|---------|
-| `src/app/` | Application logic (use cases, orchestration) |
+| `src/dags/` | Application logic (use cases, orchestration) |
 | `src/utils/` | Pure utility functions, helpers |
-| `src/infra/io` | Infrastructure: file systems |
+| `src/infra/file_system` | Infrastructure: file systems |
 | `src/infra/database` | Infrastructure: databases |
 | `src/infra/http` | Infrastructure: HTTP requests, APIs |
 | `tests/` | All tests (mirror `src/` structure) |
@@ -49,6 +49,7 @@ Follow these standards strictly:
 
 ### 4. Write Tests
 
+- Only write test for `src/infra` folder else skip
 - Create or update test files in `tests/`, mirroring the `src/` structure.
   - Code in `src/app/feature.py` → tests in `tests/app/test_feature.py`
   - Code in `src/utils/helpers.py` → tests in `tests/utils/test_helpers.py`
@@ -60,18 +61,7 @@ Follow these standards strictly:
 make test
 ```
 
-### 5. Type Check with MyPy
-
-Run mypy through pre-commit to ensure type compliance:
-
-```bash
-pre-commit run mypy --all-files
-```
-
-- Fix all mypy errors before considering the task done.
-- If mypy reports errors in files you did not modify, flag them to the user but do not fix unrelated code.
-
-### 6. Run Full Pre-commit
+### 5. Run Full Pre-commit
 
 Run all pre-commit hooks to catch formatting and linting issues:
 
@@ -82,7 +72,7 @@ pre-commit run --all-files
 - Fix any errors reported by ruff or ruff-format.
 - Re-run until all hooks pass.
 
-### 7. Update Documentation
+### 6. Update Documentation
 
 - If the change is user-facing, create or update relevant files in `docs/`.
 - Ensure new public functions have docstrings.
