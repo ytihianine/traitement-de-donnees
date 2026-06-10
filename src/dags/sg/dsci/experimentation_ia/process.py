@@ -863,6 +863,7 @@ def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     cols_to_keep: list[str] = [
+        "id",
         "no_id",
         "mail_professionnel",
         "mail_corrige",
