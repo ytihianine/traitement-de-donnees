@@ -15,6 +15,7 @@ class FileFormat(Enum):
     EXCEL = "excel"
     PARQUET = "parquet"
     JSON = "json"
+    AUTO = "auto"
 
 
 class IcebergTableStatus(Enum):
