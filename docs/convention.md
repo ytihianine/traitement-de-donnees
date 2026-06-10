@@ -15,7 +15,7 @@
 Tous les dags doivent êtres organisés de la façon suivante:
 ```
 .
-├── dags
+├── src/dags
 │   ├── projet_X
 │   │   ├── grist
 │   │   │   ├── sql   # Contient les scripts sql

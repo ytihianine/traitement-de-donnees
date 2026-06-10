@@ -2,7 +2,7 @@
 
 Ce repo contient des scripts et dags permettant de traiter des données.
 
-## Organisation du repo
+## Organisation du projet
 
 ```
 .
@@ -40,19 +40,16 @@ L'ensemble de la documentation se trouve dans le dossier `docs/`.
 
 ## Mise en place de l'infrastructure
 
-Pour déployer l'infrastructure, voir le repo [https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/deploiement-applications](https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/deploiement-applications)
+Le déploiement de l'infrastructure est en cours d'évolution. Les travaux sont disponibles sur ce [https://github.com/ytihianine/la-suite-donnee](https://github.com/ytihianine/la-suite-donnee)
 
 
 ## Environnement de développement
 
+Si vous travaillez depuis Nubonyxia, je vous invite à suivre ce [guide](https://forge.dgfip.finances.rie.gouv.fr/sg/dsci/lt/environnement-nubonyxia) dans un premier temps.
+
 Pour installer l'environnement python et les pre-commits
 ```bash
 make setup-dev-env
-```
-
-Pour installer les extensions code-server
-```bash
-make install-extensions
 ```
 
 Pour d'autres commandes
