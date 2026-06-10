@@ -853,7 +853,7 @@ def process_questionnaire_2_bis_raisons_non_utilisation(
 
 def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
     # Renommage des colonnes référentielles simples
-    df.rename(columns={
+    df = df.rename(columns={
         "raisons_non_participation": "id_raisons_non_participation",
         "impacts_taches_pro": "id_impacts_taches_pro",
         "impacts_taches_rebarbatives": "id_impacts_taches_rebarbatives",
