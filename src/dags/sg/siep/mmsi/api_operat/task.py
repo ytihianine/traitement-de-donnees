@@ -12,7 +12,7 @@ from src.dags.sg.siep.mmsi.api_operat import process
 def source() -> None:
     declarations = create_task(
         task_config=TaskConfig(task_id="liste_declaration"),
-        output_selecteur="declarations",
+        output_selecteur="declaration_ademe",
         steps=[
             ETLStep(
                 fn=actions.liste_declaration,
@@ -26,7 +26,7 @@ def source() -> None:
     consommations = create_task(
         task_config=TaskConfig(task_id="consommation_by_id"),
         output_selecteur="consommations",
-        input_selecteurs=["declarations"],
+        input_selecteurs=["declaration_ademe"],
         steps=[
             ETLStep(
                 fn=actions.consommation_by_id,
@@ -61,7 +61,7 @@ def output() -> None:
         export_output=True,
     )
     adresses_efa = create_task(
-        task_config=TaskConfig(task_id="liste_declaration"),
+        task_config=TaskConfig(task_id="adresse_efa"),
         input_selecteurs=["declarations"],
         output_selecteur="adresses_efa",
         steps=[
@@ -74,7 +74,7 @@ def output() -> None:
         export_output=True,
     )
     activite = create_task(
-        task_config=TaskConfig(task_id="liste_declaration"),
+        task_config=TaskConfig(task_id="activite"),
         input_selecteurs=["consommations"],
         output_selecteur="declarations",
         steps=[
@@ -88,7 +88,7 @@ def output() -> None:
     )
     indicateur = create_task(
         task_config=TaskConfig(task_id="liste_declaration"),
-        input_selecteurs=["consommations"],
+        input_selecteurs=["indicateur"],
         output_selecteur="declarations",
         steps=[
             ETLStep(
@@ -100,7 +100,7 @@ def output() -> None:
         export_output=True,
     )
     detail = create_task(
-        task_config=TaskConfig(task_id="liste_declaration"),
+        task_config=TaskConfig(task_id="detail"),
         input_selecteurs=["consommations"],
         output_selecteur="declarations",
         steps=[
