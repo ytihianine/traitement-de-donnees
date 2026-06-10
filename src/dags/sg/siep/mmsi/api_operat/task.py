@@ -11,7 +11,7 @@ from src.dags.sg.siep.mmsi.api_operat import process
 @task_group
 def source() -> None:
     declarations = create_task(
-        task_config=TaskConfig(task_id="liste_declaration"),
+        task_config=TaskConfig(task_id="declarations"),
         output_selecteur="declaration_ademe",
         steps=[
             ETLStep(
@@ -48,9 +48,9 @@ def source() -> None:
 @task_group
 def output() -> None:
     declarations = create_task(
-        task_config=TaskConfig(task_id="liste_declaration"),
+        task_config=TaskConfig(task_id="declaration_ademe"),
         input_selecteurs=["declarations"],
-        output_selecteur="declarations",
+        output_selecteur="declaration_ademe",
         steps=[
             ETLStep(
                 fn=actions.liste_declaration,
