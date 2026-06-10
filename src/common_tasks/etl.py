@@ -8,7 +8,7 @@ import pandas as pd
 from airflow.sdk import task, XComArg
 
 
-from src.infra.file_system.dataframe import read_dataframe
+from src.infra.file_system.dataframe import read_dataframe, write_dataframe
 from src.infra.file_system.factory import (
     create_default_s3_handler,
     create_local_handler,
@@ -407,11 +407,6 @@ def create_task(
         if not export_output:
             return
 
-        if not isinstance(result, pd.DataFrame):
-            raise ValueError(
-                "Final output must be a pandas DataFrame when export_output=True"
-            )
-
         # Resolve configs
         output_config = get_selecteur_storage_info(
             nom_projet=nom_projet, selecteur=output_selecteur
@@ -425,9 +420,12 @@ def create_task(
 
         df_info(df=result, df_name=f"{output_selecteur} - df to export")
 
-        s3_handler.write(
-            file_path=str(output_config.get_full_s3_key(with_tmp_segment=True)),
-            content=result.to_parquet(path=None, index=False),
+        # Export result to s3
+        write_dataframe(
+            df=result,
+            file_handler=s3_handler,
+            file_path=output_config.get_full_s3_key(with_tmp_segment=True),
+            write_options=None,
         )
 
         if version == "v2":
