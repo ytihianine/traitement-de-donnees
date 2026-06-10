@@ -2,35 +2,21 @@
 
 import io
 from abc import ABC, abstractmethod
-from enum import Enum
-from typing import TypeVar, Generic
 
 import pandas as pd
 
-T = TypeVar(name="T")
 
-
-class SerializationFormat(str, Enum):
-    """Supported serialization formats."""
-
-    CSV = "csv"
-    JSON = "json"
-    PARQUET = "parquet"
-    EXCEL = "excel"
-    AUTO = "auto"
-
-
-class DataSerializer(ABC, Generic[T]):
+class DataSerializer(ABC):
     """Abstract base class for data serialization."""
 
     @abstractmethod
-    def load(self, buffer: io.BytesIO, **kwargs) -> T: ...
+    def load(self, buffer: io.BytesIO, **kwargs) -> pd.DataFrame: ...
 
     @abstractmethod
-    def dump(self, data: T, **kwargs) -> bytes: ...
+    def dump(self, data: pd.DataFrame, **kwargs) -> bytes: ...
 
 
-class CSVSerializer(DataSerializer[pd.DataFrame]):
+class CSVSerializer(DataSerializer):
     """Serializer for converting CSV bytes / DataFrame."""
 
     def load(self, buffer: io.BytesIO, **kwargs) -> pd.DataFrame:
@@ -42,7 +28,7 @@ class CSVSerializer(DataSerializer[pd.DataFrame]):
         return buf.getvalue().encode(encoding="utf-8")
 
 
-class ParquetSerializer(DataSerializer[pd.DataFrame]):
+class ParquetSerializer(DataSerializer):
     """Serializer for converting PARQUET bytes / DataFrame."""
 
     def load(self, buffer: io.BytesIO, **kwargs) -> pd.DataFrame:
@@ -54,7 +40,7 @@ class ParquetSerializer(DataSerializer[pd.DataFrame]):
         return buf.getvalue()
 
 
-class ExcelSerializer(DataSerializer[pd.DataFrame]):
+class ExcelSerializer(DataSerializer):
     """Serializer for converting EXCEL bytes / DataFrame."""
 
     def load(self, buffer: io.BytesIO, **kwargs) -> pd.DataFrame:
@@ -68,7 +54,7 @@ class ExcelSerializer(DataSerializer[pd.DataFrame]):
         return buf.getvalue()
 
 
-class JSONSerializer(DataSerializer[pd.DataFrame]):
+class JSONSerializer(DataSerializer):
     """Serializer for converting JSON bytes / DataFrame."""
 
     def load(self, buffer: io.BytesIO, **kwargs) -> pd.DataFrame:
