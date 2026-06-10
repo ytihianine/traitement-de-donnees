@@ -20,6 +20,7 @@ def df_info(
         logging.warning(
             msg=f"{df_name} is not of type pd.DataFrame. It is of type {type(df)}"
         )
+        return
 
     col_names = list(df.columns)
     nb_none = len([x for x in col_names if x is None])
