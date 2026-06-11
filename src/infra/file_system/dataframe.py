@@ -26,8 +26,17 @@ _serializer_registry: dict[FileFormat, DataSerializer] = {
 
 
 def detect_file_extension(filepath: str | Path) -> FileFormat:
-    ext = Path(filepath).suffix.lower()
-    return FileFormat(value=ext[1:])
+    ext = Path(filepath).suffix
+    if not ext:
+        raise ValueError(f"No file extension found in path: {filepath}")
+
+    format_name = ext[1:].upper()
+    try:
+        return FileFormat[format_name]
+    except KeyError as exc:
+        raise ValueError(
+            f"Unsupported file extension '{ext}' for path: {filepath}"
+        ) from exc
 
 
 def read_dataframe(
