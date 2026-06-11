@@ -11,14 +11,14 @@ class FileHandlerType(Enum):
 class FileFormat(Enum):
     """Supported file formats for ETL operations."""
 
-    CSV = "csv"
-    EXCEL = "excel"
-    XLSX = "excel"
-    XLS = "excel"
-    XLSB = "excel"
-    PARQUET = "parquet"
-    JSON = "json"
-    AUTO = "auto"
+    CSV = auto()
+    EXCEL = auto()
+    XLSX = auto()
+    XLS = auto()
+    XLSB = auto()
+    PARQUET = auto()
+    JSON = auto()
+    AUTO = auto()
 
 
 class IcebergTableStatus(Enum):
