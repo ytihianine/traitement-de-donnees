@@ -75,6 +75,7 @@ def _get_table_columns(schema: str, table: str, db_handler: DBInterface) -> list
                 isc.table_schema = %s
                 AND isc.table_name = %s
                 AND isc.column_default IS NULL
+                AND isc.is_identity = 'NO'
             ORDER BY table_schema ASC, table_name ASC, column_name ASC;
         """,
         parameters=(schema, table),
