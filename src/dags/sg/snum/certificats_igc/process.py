@@ -539,6 +539,9 @@ def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
         index=False,
     ) % (2**63)
 
+    # Conserver uniquement les lignes dont la date de début de validité est supérieure à 01/2022
+    df = df.query("date_debut_validite > '2022-01-01'").copy()
+
     return df
 
 
