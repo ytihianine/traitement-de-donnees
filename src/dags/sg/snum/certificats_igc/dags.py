@@ -25,7 +25,7 @@ from src.common_tasks.s3 import (
 from src.utils.config.tasks import get_list_source_fichier
 
 from src.common_tasks.validation import validate_dag_parameters
-from src.dags.sg.snum.certificats_igc.tasks import source_files, additionnal_tasks
+from src.dags.sg.snum.certificats_igc.tasks import source_files
 from src.dags.sg.snum.certificats_igc.config import storage_options
 
 nom_projet = "Certificat IGC"
@@ -76,7 +76,6 @@ def certificats_igc() -> None:
         create_projet_snapshot(),
         get_projet_snapshot(),
         source_files(),
-        additionnal_tasks(),
         ensure_partition.expand(selecteur_config=selecteur_configs),
         create_tmp_tables(storage_options=storage_options),
         import_file_to_db.expand(selecteur_config=selecteur_configs),

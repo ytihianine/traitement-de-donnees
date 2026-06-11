@@ -491,13 +491,13 @@ def map_agent_direction(
 # ===============================================
 def process_agent(df: pd.DataFrame) -> pd.DataFrame:
     # Normaliser les données textuelles
-    txt_cols = ["structure", "agent_mail"]
+    txt_cols = [
+        "nom_prenom",
+        "agent_direction",
+        "agent_mail",
+        "agent_groupe_gestionnaire",
+    ]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
-    # Déterminer la direction de l'agent
-    df["agent_direction"] = list(
-        map(get_direction_fom_nom_unite_geree, df["structure"])
-    )
 
     # Drop les duplicats
     df = df.drop_duplicates(subset=["agent_mail"], keep="last")
@@ -542,82 +542,18 @@ def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_certificat_contact(df_certificat: pd.DataFrame, df_agent: pd.DataFrame) -> pd.DataFrame:
-    # Normaliser les données textuelles
-    txt_cols = ["contact"]
-    df_certificat = normalize_whitespace_columns(df=df_certificat, columns=txt_cols)
-
-    # Unpivot the contact column to have one contact per row
-    df_certificat["contact"] = df_certificat["contact"].str.split(",")
-    df_certificat = df_certificat.copy().explode(
-        column="contact", ignore_index=True
-    )
-
-    # Conserver uniquement les colonnes nécessaires
-    cols_to_keep = ["id_certificat", "contact"]
-    df_certificat = df_certificat.loc[:, cols_to_keep]
-
-    # Drop les duplicats
-    df_certificat = df_certificat.drop_duplicates(subset=["id_certificat", "contact"], keep="last")
-
-    # Merge les deux dataframes
-    df = pd.merge(
-        left=df_certificat,
-        right=df_agent[["agent_mail", "agent_direction"]],
-        how="left",
-        left_on="contact",
-        right_on="agent_mail",
-    )
-    cols_to_keep = ["id_certificat", "contact", "agent_direction"]
-    df = df.loc[:, cols_to_keep]
-
-    return df
-
-
-def process_aip(df: pd.DataFrame) -> pd.DataFrame:
-    # Normaliser les données textuelles
-    txt_cols = ["structure", "aip_mail", "aip_balf_mail"]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
-    # Déterminer la direction que gère l'AIP
-    df["aip_direction_geree"] = list(
-        map(get_direction_fom_nom_unite_geree, df["structure"])
-    )
-
-    return df
-
-
-def process_historique_certificat(df: pd.DataFrame) -> pd.DataFrame:
-    # Normaliser les données textuelles
-    txt_cols = ["agent_structure", "cn", "agent_mail"]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
-    # Normaliser les dates
-    date_cols = ["date_debut_validite", "date_fin_validite"]
-    df = convert_str_cols_to_date(
-        df=df, columns=date_cols, str_date_format="%d.%m.%Y", errors="raise"
-    )
-
-    # Déterminer la direction de l'agent
-    df["agent_direction"] = list(
-        map(get_direction_fom_nom_unite_geree, df["agent_structure"])
-    )
-
-    return df
-
-
 def process_mandataire(df: pd.DataFrame) -> pd.DataFrame:
     # Normaliser les données textuelles
     txt_cols = ["structure", "sigle", "libelle", "mail"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
     # Normaliser les dates
     date_cols = ["date"]
     df = convert_str_cols_to_date(
         df=df, columns=date_cols, str_date_format="%d/%m/%Y", errors="coerce"
     )
 
-    # Corriger les sigles
+    # Normaliser les sigles
     df["sigle"] = df["sigle"].str.replace("/", "", regex=False)
 
     return df
-
