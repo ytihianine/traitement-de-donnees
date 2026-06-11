@@ -13,6 +13,9 @@ class FileFormat(Enum):
 
     CSV = "csv"
     EXCEL = "excel"
+    XLSX = "excel"
+    XLS = "excel"
+    XLSB = "excel"
     PARQUET = "parquet"
     JSON = "json"
     AUTO = "auto"
