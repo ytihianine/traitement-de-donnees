@@ -276,10 +276,12 @@ def create_file_etl_task(
 
         df_info(df=df, df_name=f"{selecteur} - After processing")
 
-        # Export
-        s3_handler.write(
-            file_path=str(task_config.get_full_s3_key(with_tmp_segment=True)),
-            content=df.to_parquet(path=None, index=False),
+        # Export result to s3
+        write_dataframe(
+            df=df,
+            file_handler=s3_handler,
+            file_path=task_config.get_full_s3_key(with_tmp_segment=True),
+            write_options=None,
         )
 
         if version == "v2":
