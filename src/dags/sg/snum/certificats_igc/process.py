@@ -1,4 +1,3 @@
-from functools import partial
 from datetime import datetime
 import pandas as pd
 
@@ -507,29 +506,20 @@ def process_agent(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
     # df = df.fillna(np.nan).replace([np.nan], [None])
-    date_cols = ["date_debut_validite", "date_fin_validite", "date_revocation"]
+    date_cols = ["date_debut_validite", "date_fin_validite"]
     df = convert_str_cols_to_date(
         df=df, columns=date_cols, str_date_format="%Y-%m-%d %H:%M:%S", errors="raise"
     )
 
     # Normaliser les colonnes textuelles
-    txt_cols = ["profile", "dn", "subjectid", "contact", "email"]
+    txt_cols = ["profile", "subjectid", "contact", "email"]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     # Ajout des colonnes additionnelles
     df = determiner_certificat_direction(df=df)
-    date_ajd = datetime.now()
     df["ac"] = list(map(determiner_ac, df["profile"]))
     df["type_offre"] = list(map(determiner_type_offre, df["profile"]))
     df["supports"] = list(map(determiner_support, df["profile"]))
-    df["etat"] = list(
-        map(
-            partial(determiner_etat, date_ajd=date_ajd),
-            df["date_debut_validite"],
-            df["date_fin_validite"],
-            df["date_revocation"],
-        )
-    )
     df["version"] = list(map(determiner_version, df["profile"]))
     df["version_serveur"] = list(map(determiner_version_serveur, df["profile"]))
 
