@@ -2,7 +2,7 @@ DROP SCHEMA certificat_igc CASCADE;
 CREATE SCHEMA certificat_igc;
 
 CREATE TABLE certificat_igc.certificat (
-    id GENERATED ALWAYS AS IDENTITY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY,
     id_certificat BIGINT,
     dn TEXT,
     subjectid TEXT,
@@ -27,12 +27,12 @@ CREATE TABLE certificat_igc.certificat (
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
     snapshot_id TEXT,
-    PRIMARY KEY(id)
+    PRIMARY KEY(id, import_date)
 ) PARTITION BY RANGE (import_date);
 
 
 CREATE TABLE certificat_igc.mandataire (
-    id GENERATED ALWAYS AS IDENTITY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY,
     libelle TEXT,
     sigle TEXT,
     mail TEXT,
@@ -41,12 +41,12 @@ CREATE TABLE certificat_igc.mandataire (
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
     snapshot_id TEXT,
-    PRIMARY KEY(id)
+    PRIMARY KEY(id, import_date)
 ) PARTITION BY RANGE (import_date);
 
 
 CREATE TABLE certificat_igc.agent (
-    id GENERATED ALWAYS AS IDENTITY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY,
     nom_prenom TEXT,
     agent_direction TEXT,
     agent_mail TEXT,
@@ -54,5 +54,5 @@ CREATE TABLE certificat_igc.agent (
     import_timestamp TIMESTAMP NOT NULL,
     import_date DATE NOT NULL,
     snapshot_id TEXT,
-    PRIMARY KEY(id)
+    PRIMARY KEY(id, import_date)
 ) PARTITION BY RANGE (import_date);
