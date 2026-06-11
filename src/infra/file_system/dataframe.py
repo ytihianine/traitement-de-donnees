@@ -18,6 +18,9 @@ _serializer_registry: dict[FileFormat, DataSerializer] = {
     FileFormat.CSV: CSVSerializer(),
     FileFormat.PARQUET: ParquetSerializer(),
     FileFormat.EXCEL: ExcelSerializer(),
+    FileFormat.XLSX: ExcelSerializer(),
+    FileFormat.XLS: ExcelSerializer(),
+    FileFormat.XLSB: ExcelSerializer(),
     FileFormat.JSON: JSONSerializer(),
 }
 
