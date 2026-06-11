@@ -8,7 +8,11 @@ from src.dags.sg.snum.certificats_igc import process
 
 @task_group
 def source_files() -> None:
-    agent = create_file_etl_task(selecteur="agent", process_func=process.process_agent)
+    agent = create_file_etl_task(
+        selecteur="agent",
+        process_func=process.process_agent,
+        read_options={"sep": ","},
+    )
     certificat = create_file_etl_task(
         selecteur="certificat",
         process_func=process.process_certificat,
