@@ -516,7 +516,7 @@ def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
 
     # Ajout des colonnes additionnelles
-    df = determiner_certificat_direction(df=df)
+    # df = determiner_certificat_direction(df=df)
     df["ac"] = list(map(determiner_ac, df["profile"]))
     df["type_offre"] = list(map(determiner_type_offre, df["profile"]))
     df["supports"] = list(map(determiner_support, df["profile"]))
