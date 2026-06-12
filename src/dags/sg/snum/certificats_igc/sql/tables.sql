@@ -2,7 +2,7 @@ DROP SCHEMA certificat_igc CASCADE;
 CREATE SCHEMA certificat_igc;
 
 CREATE TABLE certificat_igc.certificat (
-    id BIGINT GENERATED ALWAYS AS IDENTITY,
+    id SERIAL,
     id_certificat BIGINT,
     subjectid TEXT,
     contact TEXT,
@@ -10,11 +10,9 @@ CREATE TABLE certificat_igc.certificat (
     date_debut_validite DATE,
     date_fin_validite DATE,
     profile TEXT,
-    status  TEXT,
     ac TEXT,
     type_offre TEXT,
     supports TEXT,
-    etat TEXT,
     version TEXT,
     version_serveur TEXT,
     import_timestamp TIMESTAMP NOT NULL,
@@ -25,7 +23,7 @@ CREATE TABLE certificat_igc.certificat (
 
 
 CREATE TABLE certificat_igc.mandataire (
-    id BIGINT GENERATED ALWAYS AS IDENTITY,
+    id SERIAL,
     libelle TEXT,
     sigle TEXT,
     mail TEXT,
@@ -39,7 +37,7 @@ CREATE TABLE certificat_igc.mandataire (
 
 
 CREATE TABLE certificat_igc.agent (
-    id BIGINT GENERATED ALWAYS AS IDENTITY,
+    id SERIAL,
     nom_prenom TEXT,
     agent_direction TEXT,
     agent_mail TEXT,
