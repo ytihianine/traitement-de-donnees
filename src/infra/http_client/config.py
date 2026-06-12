@@ -1,7 +1,6 @@
 """Configuration for HTTP client."""
 
 from dataclasses import dataclass, field
-from typing import Dict, Optional
 from urllib.parse import urlparse
 
 
@@ -10,21 +9,22 @@ class ClientConfig:
     """Configuration for HTTP client."""
 
     # Basic settings
-    base_url: Optional[str] = None
+    base_url: str | None = None
     timeout: int = 30
     verify_ssl: bool = True
 
     # Authentication
-    auth_token: Optional[str] = None
+    auth_token: str | None = None
     auth_type: str = "Bearer"  # 'Bearer', 'Basic', etc.
 
     # Headers
-    default_headers: Dict[str, str] = field(default_factory=dict)
-    user_agent: Optional[str] = None
+    default_headers: dict[str, str] = field(default_factory=dict)
+    user_agent: str | None = None
 
     # Proxy configuration
-    proxy: Optional[str] = None
-    proxy_auth: Optional[tuple] = None
+    proxy_trust_env: bool = True
+    proxy: str | None = None
+    proxy_auth: tuple | None = None
 
     # Retry configuration
     max_retries: int = 3
@@ -32,7 +32,7 @@ class ClientConfig:
     retry_methods: tuple = ("GET", "HEAD", "PUT", "DELETE", "OPTIONS", "TRACE")
 
     # Rate limiting
-    rate_limit: Optional[int] = None  # requests per second
+    rate_limit: int | None = None  # requests per second
 
     def __post_init__(self) -> None:
         """Validate and process the configuration after initialization."""
@@ -64,7 +64,7 @@ class ClientConfig:
             )
 
     @property
-    def proxies(self) -> Dict[str, str]:
+    def proxies(self) -> dict[str, str]:
         """Get proxy configuration dictionary."""
         if not self.proxy:
             return {}

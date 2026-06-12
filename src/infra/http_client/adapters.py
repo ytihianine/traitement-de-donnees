@@ -58,6 +58,7 @@ class HttpxClient(HttpInterface):
             timeout=self.config.timeout,
             verify=self.config.verify_ssl,
             mounts=proxy_mounts,
+            trust_env=self.config.proxy_trust_env,
             limits=limits,
         )
 
@@ -156,9 +157,10 @@ class RequestsClient(HttpInterface):
 
     def _setup_client(self) -> None:
         self._session = requests.Session()
+        self._session.trust_env = self.config.proxy_trust_env
+
         if self.config.default_headers:
             self._session.headers.update(self.config.default_headers)
-            print(self._session.headers)
 
         if self.config.proxy:
             proxies = {"http": self.config.proxy, "https": self.config.proxy}
