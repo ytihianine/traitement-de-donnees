@@ -165,6 +165,7 @@ CREATE TABLE assistant_ia."quota_par_entite" (
   "nbre_connexion_effective" int,
   "nb_de_reponses_au_questionnaire" int,
   "nb_reponse_q2" int,
+  "nb_reponse_q3"int,
   "relance_dsci" text,
   "appel_a_candidature_dsci" text,
   "referent_ia" text,
