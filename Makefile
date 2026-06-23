@@ -1,7 +1,7 @@
 
 # Variables
 PYTHON_VERSION := 3.13
-AIRFLOW_VERSION := 3.1.8
+AIRFLOW_VERSION := 3.2.2
 ENV_NAME := env
 
 # OS detection
