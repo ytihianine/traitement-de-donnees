@@ -1,6 +1,6 @@
 apache-airflow==3.2.1
 apache-airflow-core==3.2.1
-apache-airflow-providers-amazon==9.28.0
+apache-airflow-providers-amazon==9.31.0
 apache-airflow-providers-celery==3.19.0
 # apache-airflow-providers-cncf-kubernetes==10.11.0
 # apache-airflow-providers-common-compat==1.10.0
