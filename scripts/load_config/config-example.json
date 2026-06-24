@@ -1,0 +1,15 @@
+{
+    "dry_run": true,
+    "grist":
+        {
+            "doc_path": "/home/onyxia/work/Configuration - interne.grist"
+        },
+    "db": {
+        "host": "",
+        "port": "5432",
+        "name": "",
+        "user": "",
+        "password": "",
+        "dest_schema": ""
+    }
+}
