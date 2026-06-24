@@ -266,6 +266,7 @@ def process_quota_entite(df: pd.DataFrame) -> pd.DataFrame:
         "nbre_connexion_effective",
         "nb_de_reponses_au_questionnaire",
         "nb_reponse_q2",
+        "nb_reponse_q3",
         "relance_dsci",
         "appel_a_candidature_dsci",
         "referent_ia",
