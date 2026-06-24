@@ -2,7 +2,7 @@
 CREATE SCHEMA IF NOT EXISTS conf_projets;
 
 
-DROP TABLE conf_projets."ref_direction" CASCADE;
+DROP TABLE IF EXISTS conf_projets."ref_direction" CASCADE;
 CREATE TABLE conf_projets."ref_direction" (
   "id" serial,
   "id_direction" int,
@@ -14,7 +14,7 @@ CREATE TABLE conf_projets."ref_direction" (
   UNIQUE ("id_direction", "import_timestamp")
 );
 
-DROP TABLE conf_projets."ref_service" CASCADE;
+DROP TABLE IF EXISTS conf_projets."ref_service" CASCADE;
 CREATE TABLE conf_projets."ref_service" (
   "id" serial,
   "id_service" int,
@@ -28,7 +28,7 @@ CREATE TABLE conf_projets."ref_service" (
 );
 
 
-DROP TABLE conf_projets."projet" CASCADE;
+DROP TABLE IF EXISTS conf_projets."projet" CASCADE;
 CREATE TABLE conf_projets."projet" (
   "id" serial,
   "id_projet" int,
@@ -43,7 +43,7 @@ CREATE TABLE conf_projets."projet" (
 );
 
 
-DROP TABLE conf_projets."projet_documentation" CASCADE;
+DROP TABLE IF EXISTS conf_projets."projet_documentation" CASCADE;
 CREATE TABLE conf_projets."projet_documentation" (
   "id" serial,
   "id_projet" int,
@@ -56,7 +56,7 @@ CREATE TABLE conf_projets."projet_documentation" (
   UNIQUE ("id_projet", "type_documentation", "import_timestamp")
 );
 
-DROP TABLE conf_projets."projet_s3" CASCADE;
+DROP TABLE IF EXISTS conf_projets."projet_s3" CASCADE;
 CREATE TABLE conf_projets."projet_s3" (
   "id" serial,
   "id_projet" int,
@@ -71,7 +71,7 @@ CREATE TABLE conf_projets."projet_s3" (
 );
 
 
-DROP TABLE conf_projets."projet_contact" CASCADE;
+DROP TABLE IF EXISTS conf_projets."projet_contact" CASCADE;
 CREATE TABLE conf_projets."projet_contact" (
   "id" serial,
   "id_contact" int,
@@ -85,7 +85,7 @@ CREATE TABLE conf_projets."projet_contact" (
   UNIQUE ("id_projet", "id_contact", "import_timestamp")
 );
 
-DROP TABLE conf_projets."projet_selecteur" CASCADE;
+DROP TABLE IF EXISTS conf_projets."projet_selecteur" CASCADE;
 CREATE TABLE conf_projets."projet_selecteur" (
   "id" serial,
   "id_selecteur" int,
@@ -99,7 +99,7 @@ CREATE TABLE conf_projets."projet_selecteur" (
   UNIQUE ("id_projet", "id_selecteur", "import_timestamp")
 );
 
-DROP TABLE conf_projets."selecteur_source" CASCADE;
+DROP TABLE IF EXISTS conf_projets."selecteur_source" CASCADE;
 CREATE TABLE conf_projets."selecteur_source" (
   "id" serial,
   "id_projet" int,
@@ -114,7 +114,7 @@ CREATE TABLE conf_projets."selecteur_source" (
 );
 
 
-DROP TABLE conf_projets."selecteur_s3" CASCADE;
+DROP TABLE IF EXISTS conf_projets."selecteur_s3" CASCADE;
 CREATE TABLE conf_projets."selecteur_s3" (
   "id" serial,
   "id_projet" int,
@@ -129,7 +129,7 @@ CREATE TABLE conf_projets."selecteur_s3" (
 );
 
 
-DROP TABLE conf_projets."selecteur_database" CASCADE;
+DROP TABLE IF EXISTS conf_projets."selecteur_database" CASCADE;
 CREATE TABLE conf_projets."selecteur_database" (
   "id" serial,
   "id_projet" int,
@@ -143,7 +143,7 @@ CREATE TABLE conf_projets."selecteur_database" (
 );
 
 
-DROP TABLE conf_projets."selecteur_column_mapping" CASCADE;
+DROP TABLE IF EXISTS conf_projets."selecteur_column_mapping" CASCADE;
 CREATE TABLE conf_projets."selecteur_column_mapping" (
   "id" serial,
   "id_col_mapping" int,
@@ -161,19 +161,8 @@ CREATE TABLE conf_projets."selecteur_column_mapping" (
 );
 
 
-DROP TABLE conf_projets."projet_snapshot";
-CREATE TABLE conf_projets."projet_snapshot"(
-  "id" bigserial,
-  "id_projet" int NOT NULL,
-  "snapshot_id" text NOT NULL,
-	"creation_timestamp" timestamp NOT NULL,
-  PRIMARY KEY ("id"),
-  UNIQUE ("id_projet", "snapshot_id")
-)
-
-
 -- Vue pour get_projet_s3_info()
-DROP VIEW conf_projets.projet_s3_vw;
+DROP VIEW IF EXISTS conf_projets.projet_s3_vw;
 CREATE OR REPLACE VIEW conf_projets.projet_s3_vw AS
 SELECT
     cpp.projet,
@@ -190,7 +179,7 @@ INNER JOIN conf_projets.projet_s3 cpps ON cpp.id_projet = cpps.id_projet
 
 
 -- Vue pour column_mapping_dataframe()
-DROP VIEW conf_projets.cols_mapping_vw;
+DROP VIEW IF EXISTS conf_projets.cols_mapping_vw;
 CREATE OR REPLACE VIEW conf_projets.cols_mapping_vw AS
 SELECT
     cpp.projet,
@@ -212,7 +201,7 @@ WHERE scm.to_keep = true;
 
 
 -- Vue pour get_list_documentation()
-DROP VIEW conf_projets.projet_documentation_vw;
+DROP VIEW IF EXISTS conf_projets.projet_documentation_vw;
 CREATE OR REPLACE VIEW conf_projets.projet_documentation_vw AS
 SELECT
     cpp.projet,
@@ -227,7 +216,7 @@ INNER JOIN conf_projets.projet_documentation cppd ON cpp.id_projet = cppd.id_pro
   AND cpp.import_timestamp = cppd.import_timestamp;
 
 -- Vue pour get_list_contact()
-DROP VIEW conf_projets.projet_contact_vw;
+DROP VIEW IF EXISTS conf_projets.projet_contact_vw;
 create or replace
 view conf_projets.projet_contact_vw as
 select
@@ -247,7 +236,7 @@ inner join conf_projets.projet_contact cppc on
 
 
 -- Vue pour _get_selecteur_storage_info()
-DROP VIEW conf_projets.selecteur_s3_db_vw;
+DROP VIEW IF EXISTS conf_projets.selecteur_s3_db_vw;
 CREATE OR REPLACE VIEW conf_projets.selecteur_s3_db_vw AS
 SELECT
     cpp.projet,
@@ -289,7 +278,7 @@ LEFT JOIN conf_projets.selecteur_database cpsd
 ;
 
 -- Vue pour _get_snapshot_id()
-DROP VIEW conf_projets.projet_snapshot_vw;
+DROP VIEW IF EXISTS conf_projets.projet_snapshot_vw;
 CREATE OR REPLACE VIEW conf_projets.projet_snapshot_vw AS
   WITH latest_projet AS (
     SELECT id_projet, projet, import_timestamp,
@@ -302,21 +291,21 @@ CREATE OR REPLACE VIEW conf_projets.projet_snapshot_vw AS
   SELECT
     cte_projet.id_projet,
     cte_projet.projet,
-    cppsnap.creation_timestamp,
-    cppsnap.snapshot_id,
+    ver_snap.import_timestamp,
+    ver_snap.snapshot_id,
     DENSE_RANK() OVER (
         PARTITION BY cte_projet.id_projet
-        ORDER BY cppsnap.creation_timestamp DESC
-    ) as rang
-  FROM conf_projets.projet_snapshot cppsnap
+        ORDER BY ver_snap.import_timestamp DESC
+    ) as rang,
+    ver_snap.created_at
+  FROM versioning.snapshot ver_snap
   INNER JOIN latest_projet cte_projet
-    ON cte_projet.id_projet = cppsnap.id_projet
+    ON cte_projet.id_projet = ver_snap.id_projet
   WHERE cte_projet.rang = 1
-  ORDER BY id_projet, creation_timestamp;
+  ORDER BY id_projet, import_timestamp;
 
 -- [TO REFACTOR] vue_source pour l'interface de dépôt de fichier
-drop view conf_projets.vue_source;
-
+drop view IF EXISTS conf_projets.vue_source;
 create or replace
 view conf_projets.vue_source
 as
