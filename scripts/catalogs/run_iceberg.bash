@@ -8,4 +8,5 @@ source "$SCRIPT_DIR/../.env"
 set +a
 
 # Execute python script
-"$PYTHON_ENV" "$SCRIPT_DIR/iceberg.py"
+PYTHON_BIN="$SCRIPT_DIR/../../env/bin/python"
+$PYTHON_BIN "$SCRIPT_DIR/iceberg.py"

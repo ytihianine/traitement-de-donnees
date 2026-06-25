@@ -7,4 +7,5 @@ source "$SCRIPT_DIR/../.env"
 set +a
 
 # Execute python script
-python3 "$SCRIPT_DIR/polaris.py"
+PYTHON_BIN="$SCRIPT_DIR/../../env/bin/python"
+$PYTHON_BIN "$SCRIPT_DIR/polaris.py"
