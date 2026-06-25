@@ -25,7 +25,7 @@ from src.utils.exceptions import ConfigError
 from src.infra.database.base import DBInterface
 from src.infra.database.exceptions import DatabaseError
 from src.infra.database.factory import create_db_handler
-from src.constants import DEFAULT_PG_CONFIG_CONN_ID
+from src.constants import DEFAULT_PG_DATA_CONN_ID
 
 CONF_SCHEMA = "conf_projets"
 logger = logging.getLogger(name=__name__)
@@ -35,7 +35,7 @@ def _get_db(db: DBInterface | None = None) -> DBInterface:
     """Return the provided db handler or create the default one."""
     if db is not None:
         return db
-    return create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+    return create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
 
 
 # Configuration du retry decorator

@@ -40,7 +40,6 @@ from src.utils.process.structures import are_lists_egal
 from src.constants import (
     DEFAULT_TMP_SCHEMA,
     DEFAULT_PG_DATA_CONN_ID,
-    DEFAULT_PG_CONFIG_CONN_ID,
     DEFAULT_S3_CONN_ID,
 )
 
@@ -89,7 +88,7 @@ def _create_snapshot_id(nom_projet: str, execution_date: datetime) -> None:
     Une insertion est également faite dans la table versioning.snapshot_id.
     Actuellement dans une phase de migration. L'insertion dans conf_projets.projet_snapshot sera supprimée à terme
     """
-    old_db_client = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+    old_db_client = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
 
     snapshot_id = execution_date.strftime(format="%Y%m%d_%H:%M:%S")
 
@@ -209,7 +208,7 @@ def determine_partition_period(
 # ------------------------------------------------------------------------------
 @task
 def create_projet_snapshot(
-    pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID, **context
+    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context
 ) -> None:
     """ """
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
@@ -227,7 +226,7 @@ def create_projet_snapshot(
 @task
 def get_projet_snapshot(
     nom_projet: Optional[str] = None,
-    pg_conn_id: str = DEFAULT_PG_CONFIG_CONN_ID,
+    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     **context,
 ) -> str:
     """
@@ -284,7 +283,7 @@ def update_projet_snapshot_status(
         return
 
     # Hook
-    old_db_client = create_db_handler(connection_id=DEFAULT_PG_CONFIG_CONN_ID)
+    old_db_client = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
     db_client = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
 
     # Get project id

@@ -15,7 +15,6 @@ from src.common_tasks.sql import (
     import_file_to_db,
 )
 from src.common_tasks.grist import download_grist_doc_to_s3
-from src.constants import DEFAULT_PG_CONFIG_CONN_ID
 
 from src.common_tasks.validation import validate_dag_parameters
 from src.common_tasks.projet import get_selecteur_config
@@ -71,29 +70,20 @@ def configuration_projets() -> None:
         create_projet_snapshot(),
         get_projet_snapshot(),
         process_data(),
-        delete_tmp_tables(
-            storage_options=storage_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
-        ),
+        delete_tmp_tables(storage_options=storage_options),
         create_tmp_tables(
             storage_options=storage_options,
-            pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID,
             reset_id_seq=False,
         ),
-        import_file_to_db.partial(pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID).expand(
-            selecteur_config=selecteur_configs
-        ),
-        copy_tmp_table_to_real_table(
-            storage_options=storage_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
-        ),
+        import_file_to_db.expand(selecteur_config=selecteur_configs),
+        copy_tmp_table_to_real_table(storage_options=storage_options),
         copy_s3_files(
             storage_options=storage_options,
         ),
         del_s3_files(
             storage_options=storage_options,
         ),
-        delete_tmp_tables(
-            storage_options=storage_options, pg_conn_id=DEFAULT_PG_CONFIG_CONN_ID
-        ),
+        delete_tmp_tables(storage_options=storage_options),
         copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
         del_iceberg_staging_table(),
         update_projet_snapshot_status(),
