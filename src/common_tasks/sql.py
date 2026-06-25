@@ -88,38 +88,11 @@ def _create_snapshot_id(nom_projet: str, execution_date: datetime) -> None:
     Une insertion est également faite dans la table versioning.snapshot_id.
     Actuellement dans une phase de migration. L'insertion dans conf_projets.projet_snapshot sera supprimée à terme
     """
-    old_db_client = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
-
-    snapshot_id = execution_date.strftime(format="%Y%m%d_%H:%M:%S")
-
-    # Insert snapshot_id into conf_projets.projet_snapshot and versioning.snapshot_id
-    query = """
-        INSERT INTO conf_projets.projet_snapshot (id_projet, snapshot_id, creation_timestamp)
-        SELECT
-            cpp.id_projet,
-            %(snapshot_id)s,
-            %(creation_timestamp)s
-        FROM conf_projets.projet cpp
-        WHERE cpp.projet = %(nom_projet)s
-        AND EXISTS (SELECT 1 FROM conf_projets.projet WHERE projet = %(nom_projet)s)
-        LIMIT 1;
-    """
-
-    # Paramètres pour la requête
-    params = {
-        "nom_projet": nom_projet,
-        "snapshot_id": snapshot_id,
-        "creation_timestamp": execution_date.replace(tzinfo=None),
-    }
-
-    # Exécution de la requête
-    old_db_client.execute(query, parameters=params)
-
     # Insert snapshot_id into versioning.snapshot_id
     db_client = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
 
     # Get project id
-    id_projet_result = old_db_client.fetch_one(
+    id_projet_result = db_client.fetch_one(
         query="SELECT id_projet FROM conf_projets.projet WHERE projet = %(nom_projet)s;",
         parameters={"nom_projet": nom_projet},
     )
@@ -136,7 +109,7 @@ def _create_snapshot_id(nom_projet: str, execution_date: datetime) -> None:
     """
     params = {
         "id_projet": id_projet,
-        "snapshot_id": snapshot_id,
+        "snapshot_id": execution_date.strftime(format="%Y%m%d_%H:%M:%S"),
         "import_timestamp": execution_date.replace(tzinfo=None),
         "import_date": execution_date.date(),
     }
