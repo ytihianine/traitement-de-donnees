@@ -28,9 +28,18 @@ apache-airflow-providers-postgres==6.6.3
 apache-airflow-providers-smtp==2.4.5
 # apache-airflow-providers-snowflake==6.7.0
 # apache-airflow-providers-ssh==4.2.0
-# apache-airflow-providers-standard==1.11.1
+apache-airflow-providers-standard==1.12.3
 apache-airflow-task-sdk==1.2.1
 psycopg2-binary==2.9.12
 pandas==2.3.3
 pytest==9.0.3
 pre-commit==4.6.0
+pyxlsb==1.0.10
+openpyxl==3.1.5
+# boto3==1.35.99 # To solve Nubonyxia MinIO issue
+xlrd==2.0.2
+tenacity==9.1.2
+pydantic-settings==2.13.1
+# Version 0.11.0 has some pydantic issues
+pyiceberg[s3fs,pandas,pyarrow,sql-postgres]==0.11.1
+trino==0.337.0
