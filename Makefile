@@ -1,6 +1,6 @@
 
 # Variables
-PYTHON_VERSION := 3.13
+PYTHON_VERSION := 3.12
 AIRFLOW_VERSION := 3.2.2
 ENV_NAME := env
 
