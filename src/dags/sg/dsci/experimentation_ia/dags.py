@@ -5,13 +5,18 @@ from src.infra.mails.default_smtp import MailStatus, create_send_mail_callback
 from src._enums.dags import DagStatus
 from src._types.dags import DBParams, FeatureFlagsEnable
 from src.common_tasks.sql import (
+    create_tmp_tables,
+    copy_tmp_table_to_real_table,
+    delete_tmp_tables,
     create_projet_snapshot,
     get_projet_snapshot,
+    update_projet_snapshot_status,
+    import_file_to_db,
 )
 
 from src.common_tasks.s3 import (
-    copy_staging_to_prod,
-    del_iceberg_staging_table,
+    copy_s3_files,
+    del_s3_files,
 )
 from src.common_tasks.grist import download_grist_doc_to_s3
 from src.common_tasks.projet import get_selecteur_config
@@ -76,8 +81,20 @@ def experimentation_ia_dag() -> None:
             suivi_questionnaire_2_bis(),
             suivi_questionnaire_3(),
         ],
-        copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
-        del_iceberg_staging_table(),
+        create_tmp_tables(
+            storage_options=storage_options,
+            reset_id_seq=False,
+        ),
+        import_file_to_db.expand(selecteur_config=selecteur_configs),
+        copy_tmp_table_to_real_table(storage_options=storage_options),
+        copy_s3_files(
+            storage_options=storage_options,
+        ),
+        del_s3_files(
+            storage_options=storage_options,
+        ),
+        delete_tmp_tables(storage_options=storage_options),
+        update_projet_snapshot_status(),
     )
 
 

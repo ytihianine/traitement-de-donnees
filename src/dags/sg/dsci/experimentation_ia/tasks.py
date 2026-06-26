@@ -10,7 +10,7 @@ from src.dags.sg.dsci.experimentation_ia import process
 
 @task_group
 def referentiels() -> None:
-    version = "v2"
+    version = "v1"
 
     ref_q1_direction = create_grist_etl_task(
         selecteur="ref_q1_direction",

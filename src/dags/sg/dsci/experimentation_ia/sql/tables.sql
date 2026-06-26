@@ -96,7 +96,7 @@ CREATE TABLE assistant_ia."ref_raisons_non_utilisation" (
 
 
 /*
-   Référentiels questionnaire 3 
+   Référentiels questionnaire 3
 */
 
 CREATE TABLE assistant_ia."ref_q6_formation_suivie"(
@@ -187,7 +187,7 @@ CREATE TABLE assistant_ia."experimentateurs"(
     "reponse_au_questionnaire_2" text,
     "reponse_au_questionnaire_3" text,
     --"nom_prenom" text,
-    "parti" text,
+    "parti" text
     --"service" text,
     --"metier" text,
     --"cas_d_usages" text
@@ -428,8 +428,8 @@ CREATE TABLE assistant_ia."questionnaire_2_bis_raisons_non_utilisation" (
     FOREIGN KEY ( "id_raisons_non_utilisation") REFERENCES assistant_ia."ref_raisons_non_utilisation"("id")
 );
 
-/* 
-   Questionnaire 3 : usages et ressentis 
+/*
+   Questionnaire 3 : usages et ressentis
 */
 
 DROP TABLE IF EXISTS assistant_ia."questionnaire_3" CASCADE;
@@ -501,7 +501,7 @@ CREATE TABLE assistant_ia."questionnaire_3_programme_rdv" (
     "id_Programme_de_rdv" INTEGER,
     UNIQUE ("id_questionnaire_3", "id_Programme_de_rdv"),
     FOREIGN KEY ("id_questionnaire_3") REFERENCES assistant_ia."questionnaire_3"("id"),
-    FOREIGN KEY ("id_Programme_de_rdv") REFERENCES assistant_ia."ref_q7_particip_programme"("id") 
+    FOREIGN KEY ("id_Programme_de_rdv") REFERENCES assistant_ia."ref_q7_particip_programme"("id")
 );
 CREATE TABLE assistant_ia."questionnaire_3_leviers_progression" (
     "id" bigint PRIMARY KEY,
