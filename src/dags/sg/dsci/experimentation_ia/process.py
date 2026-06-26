@@ -378,7 +378,7 @@ def process_questionnaire_1(df: pd.DataFrame) -> pd.DataFrame:
         "id_niveau_d_utilisation_ia",
     ]
     df = handle_grist_null_references(df=df, columns=ref_cols)
-    df = df.drop_duplicates(subset="mail_professionnel", keep="last")
+    df = df.drop_duplicates(subset="no_id", keep="last")
     return df
 
 
@@ -624,7 +624,7 @@ def process_questionnaire_2_participation(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_questionnaire_2_freins(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "freins_a_l_utilisation"]
+    cols_to_keep = ["no_id", "freins_a_l_utilisation"]
     df = df.loc[:, cols_to_keep]
 
     # Renommage
@@ -914,7 +914,7 @@ def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
         "id_comparaison_autres_ia",
     ]
     df = handle_grist_null_references(df=df, columns=ref_cols)
-    df = df.drop_duplicates(subset="mail_professionnel", keep="last")
+    df = df.drop_duplicates(subset="no_id", keep="last")
     return df
 
 
@@ -994,7 +994,7 @@ def process_questionnaire_3_fonctionnalites(df: pd.DataFrame) -> pd.DataFrame:
         "no_id",
     ]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    ref_cols = ["id_questionnaire_3", "id_fonctionnalites"]
+    ref_cols = ["id_fonctionnalites"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Conversion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_fonctionnalites")

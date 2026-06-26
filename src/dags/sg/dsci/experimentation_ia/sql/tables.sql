@@ -318,14 +318,14 @@ CREATE TABLE assistant_ia."questionnaire_2_typologie_interaction" (
 
 CREATE TABLE assistant_ia."questionnaire_2_participation" (
     "id" bigint PRIMARY KEY,
-    "no_id" INTEGER,
+    "no_id" text,
     "id_participation_programme_rdv" INTEGER,
     UNIQUE ("no_id","id_participation_programme_rdv")
 );
 
 CREATE TABLE assistant_ia."questionnaire_2_freins" (
     "id" bigint PRIMARY KEY,
-    "no_id" INTEGER,
+    "no_id" text,
     "id_freins_a_l_utilisation" INTEGER,
     UNIQUE ("no_id","id_freins_a_l_utilisation")
 );
