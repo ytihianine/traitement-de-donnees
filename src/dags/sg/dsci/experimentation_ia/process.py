@@ -300,12 +300,9 @@ def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
         "id",
         "no_id",
         "entite",
-        # "nom_prenom",
         "parti",
-        # "service",
-        # "metier",
-        # "cas_d_usages",
         "courriel",
+        "courriel_corrige",
         "connecte_",
         "reponse_au_questionnaire_1",
         "reponse_au_questionnaire_2",
@@ -316,13 +313,9 @@ def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
     # Normaliser les colonnes textuelles
     txt_cols = [
         "no_id",
-        # "entite",
-        # "nom_prenom",
         "parti",
-        # "service",
-        # "metier",
-        # "cas_d_usages",
         "courriel",
+        "courriel_corrige",
     ]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
     df = df.drop_duplicates(subset="courriel", keep="last")
@@ -343,8 +336,7 @@ def process_questionnaire_1(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = [
         "id",
-        "mail_professionnel",
-        "mail_corrige",
+        "no_id",
         "id_direction",
         "tranche_age",
         "categorie_emploi",
@@ -368,8 +360,7 @@ def process_questionnaire_1(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = df.loc[:, cols_to_keep]
     txt_cols = [
-        "mail_professionnel",
-        "mail_corrige",
+        "no_id",
         "metier",
         "raisons_des_craintes",
         "attentes_experimentation",
@@ -395,44 +386,45 @@ def process_questionnaire_1_cas_usage(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     df = df.rename(
         columns={
-            "id": "id_questionnaire_1",
             "cas_d_usage_envisages": "id_cas_d_usage_envisages",
         }
     )
-    cols_to_keep = ["id_questionnaire_1", "id_cas_d_usage_envisages"]
+    cols_to_keep = ["no_id", "id_cas_d_usage_envisages"]
     df = df.loc[:, cols_to_keep]
+
+    # Txt normalisation
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
     # Gestion des refs
-    ref_cols = ["id_questionnaire_1", "id_cas_d_usage_envisages"]
+    ref_cols = ["id_cas_d_usage_envisages"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
-    # Convertion et Explode
+    # Convertion, Explode et dropna
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_cas_d_usage_envisages")
     df = df.explode(column="id_cas_d_usage_envisages")
-    # Nettoyage des lignes vides
     df = df.dropna(subset=["id_cas_d_usage_envisages"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_1", "id_cas_d_usage_envisages"]], index=False
-    ) % (2**63)
+
     return df
 
 
 def process_questionnaire_1_besoins_accompagnement(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "besoin_accompagnement"]
+    cols_to_keep = ["no_id", "besoin_accompagnement"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={"id": "id_questionnaire_1"})
-    # Gestion des references
-    ref_cols = ["id_questionnaire_1"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
+    # Txt normalisation
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
     # Convertion et Explode
     df = convert_str_of_list_to_list(df=df, col_to_convert="besoin_accompagnement")
     df = df.explode(column="besoin_accompagnement")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["besoin_accompagnement"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_1", "besoin_accompagnement"]], index=False
-    ) % (2**63)
+
     return df
 
 
@@ -457,12 +449,7 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     col_to_keep = [
-        "id",
-        "mail_professionnel",
-        "mail_corrige",
         "no_id",
-        # "direction",
-        # "types_d_interactions_mef",
         "autres_types_d_interactions",
         "id_niveau_d_usage_ia_post_expe_",
         "frequence_d_usage_assistant_ia",
@@ -513,9 +500,10 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
         "autres_raisons",
         "id_ia_favorise_relations_humaines_",
     ]
+    df = df.loc[:, col_to_keep]
+
     txt_cols = [
-        "mail_professionnel",
-        "mail_corrige",
+        "no_id",
         "autres_types_d_interactions",
         "autres_formation_ia",
         "raison_non_participation_rdv",
@@ -538,7 +526,8 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
         "autres_impacts_observes",
         "autres_raisons",
     ]
-    df = df.loc[:, col_to_keep]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
     # Gestion des references simples
     ref_cols = [
         "id_niveau_d_usage_ia_post_expe_",
@@ -555,28 +544,25 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
         "id_ia_favorise_relations_humaines_",
     ]
     df = handle_grist_null_references(df=df, columns=ref_cols)
-    df = df.drop_duplicates(subset="mail_professionnel", keep="last")
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    df = df.drop_duplicates(subset="no_id", keep="last")
+
     return df
 
 
 def process_questionnaire_2_typologie_interaction(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "types_d_interactions_mef"]
+    cols_to_keep = ["no_id", "types_d_interactions_mef"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={"id": "id_questionnaire_2"})
-    # Gestion des references
-    ref_cols = ["id_questionnaire_2"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Convertion et Explode
     df = convert_str_of_list_to_list(df=df, col_to_convert="types_d_interactions_mef")
     df = df.explode(column="types_d_interactions_mef")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["types_d_interactions_mef"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_2", "types_d_interactions_mef"]], index=False
-    ) % (2**63)
+
     return df
 
 
@@ -593,6 +579,10 @@ def process_questionnaire_2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
             "formation_ia_suivie_post_expe_": "id_formation_ia_suivie_post_expe_",
         }
     )
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Convertion
     df = convert_str_of_list_to_list(
         df=df, col_to_convert="id_formation_ia_suivie_post_expe_"
@@ -605,18 +595,21 @@ def process_questionnaire_2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_questionnaire_2_participation(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "participation_programme_rdv"]
+    cols_to_keep = ["no_id", "participation_programme_rdv"]
     df = df.loc[:, cols_to_keep]
 
     # Renommage
     df = df.rename(
         columns={
-            "id": "id_questionnaire_2",
             "participation_programme_rdv": "id_participation_programme_rdv",
         }
     )
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Gestion des refs
-    ref_cols = ["id_questionnaire_2", "id_participation_programme_rdv"]
+    ref_cols = ["id_participation_programme_rdv"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(
@@ -625,10 +618,7 @@ def process_questionnaire_2_participation(df: pd.DataFrame) -> pd.DataFrame:
     df = df.explode(column="id_participation_programme_rdv")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_participation_programme_rdv"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_2", "id_participation_programme_rdv"]], index=False
-    ) % (2**63)
+
     return df
 
 
@@ -640,22 +630,22 @@ def process_questionnaire_2_freins(df: pd.DataFrame) -> pd.DataFrame:
     # Renommage
     df = df.rename(
         columns={
-            "id": "id_questionnaire_2",
             "freins_a_l_utilisation": "id_freins_a_l_utilisation",
         }
     )
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Gestion des refs
-    ref_cols = ["id_questionnaire_2", "id_freins_a_l_utilisation"]
+    ref_cols = ["id_freins_a_l_utilisation"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_freins_a_l_utilisation")
     df = df.explode(column="id_freins_a_l_utilisation")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_freins_a_l_utilisation"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_2", "id_freins_a_l_utilisation"]], index=False
-    ) % (2**63)
+
     return df
 
 
@@ -670,6 +660,10 @@ def process_questionnaire_2_facteurs_progression(df: pd.DataFrame) -> pd.DataFra
             "facteurs_de_progression": "id_facteurs_de_progression",
         }
     )
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Gestion des refs
     ref_cols = ["id_facteurs_de_progression"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
@@ -684,16 +678,19 @@ def process_questionnaire_2_facteurs_progression(df: pd.DataFrame) -> pd.DataFra
 
 def process_questionnaire_2_taches(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "taches_realisees_avec_ia"]
+    cols_to_keep = ["no_id", "taches_realisees_avec_ia"]
     df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
-            "id": "id_questionnaire_2",
             "taches_realisees_avec_ia": "id_taches_realisees_avec_ia",
         }
     )
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Gestion des refs
-    ref_cols = ["id_questionnaire_2", "id_taches_realisees_avec_ia"]
+    ref_cols = ["id_taches_realisees_avec_ia"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(
@@ -702,26 +699,26 @@ def process_questionnaire_2_taches(df: pd.DataFrame) -> pd.DataFrame:
     df = df.explode(column="id_taches_realisees_avec_ia")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_taches_realisees_avec_ia"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_2", "id_taches_realisees_avec_ia"]], index=False
-    ) % (2**63)
+
     return df
 
 
 def process_questionnaire_2_typologie_erreurs(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "types_d_erreurs_frequentes2"]
+    cols_to_keep = ["no_id", "types_d_erreurs_frequentes2"]
     df = df.loc[:, cols_to_keep]
     # Renommage
     df = df.rename(
         columns={
-            "id": "id_questionnaire_2",
             "types_d_erreurs_frequentes2": "id_types_d_erreurs_frequentes2",
         }
     )
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Gestion des refs
-    ref_cols = ["id_questionnaire_2", "id_types_d_erreurs_frequentes2"]
+    ref_cols = ["id_types_d_erreurs_frequentes2"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(
@@ -730,26 +727,25 @@ def process_questionnaire_2_typologie_erreurs(df: pd.DataFrame) -> pd.DataFrame:
     df = df.explode(column="id_types_d_erreurs_frequentes2")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_types_d_erreurs_frequentes2"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_2", "id_types_d_erreurs_frequentes2"]], index=False
-    ) % (2**63)
 
     return df
 
 
 def process_questionnaire_2_observation_impact(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "observations_des_impacts"]
+    cols_to_keep = ["no_id", "observations_des_impacts"]
     df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
-            "id": "id_questionnaire_2",
             "observations_des_impacts": "id_observations_des_impacts",
         }
     )
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Gestion des refs
-    ref_cols = ["id_questionnaire_2", "id_observations_des_impacts"]
+    ref_cols = ["id_observations_des_impacts"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(
@@ -758,25 +754,25 @@ def process_questionnaire_2_observation_impact(df: pd.DataFrame) -> pd.DataFrame
     df = df.explode(column="id_observations_des_impacts")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_observations_des_impacts"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_2", "id_observations_des_impacts"]], index=False
-    ) % (2**63)
+
     return df
 
 
 def process_questionnaire_2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "impacts_identifies_au_travail"]
+    cols_to_keep = ["no_id", "impacts_identifies_au_travail"]
     df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
-            "id": "id_questionnaire_2",
             "impacts_identifies_au_travail": "id_impacts_identifies_au_travail",
         }
     )
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Gestion des refs
-    ref_cols = ["id_questionnaire_2", "id_impacts_identifies_au_travail"]
+    ref_cols = ["id_impacts_identifies_au_travail"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(
@@ -785,10 +781,7 @@ def process_questionnaire_2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
     df = df.explode(column="id_impacts_identifies_au_travail")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_impacts_identifies_au_travail"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_2", "id_impacts_identifies_au_travail"]], index=False
-    ) % (2**63)
+
     return df
 
 
@@ -796,17 +789,15 @@ def process_questionnaire_2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
 # Processing du questionnaire2_bis : Les agents qui ne se sont jamais connectés
 # =============================================================
 def process_questionnaire_2_bis(df: pd.DataFrame) -> pd.DataFrame:
-    # Renommage
-    df = df.rename(columns={"id": "id_questionnaire_2_bis"})
     # Gestion des colonnes
     cols_to_keep: list[str] = [
-        "id_questionnaire_2_bis",
+        "courriel",
         "avez_vous_deja_utilise_l_assistant_ia_",
         "autres_raisons",
         "ajouter_quelque_chose",
     ]
     df = df.loc[:, cols_to_keep]
-    txt_col = ["autres_raisons", "ajouter_quelque_chose"]
+    txt_col = ["courriel", "autres_raisons", "ajouter_quelque_chose"]
     df = normalize_whitespace_columns(df=df, columns=txt_col)
     return df
 
@@ -815,26 +806,24 @@ def process_questionnaire_2_bis_raisons_non_utilisation(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "raisons_non_utilisation_assistant_ia"]
+    cols_to_keep = ["courriel", "raisons_non_utilisation_assistant_ia"]
     df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
-            "id": "id_questionnaire_2_bis",
             "raisons_non_utilisation_assistant_ia": "id_raisons_non_utilisation",
         }
     )
+    txt_col = ["courriel"]
+    df = normalize_whitespace_columns(df=df, columns=txt_col)
     # Gestion des refs
-    ref_cols = ["id_questionnaire_2_bis", "id_raisons_non_utilisation"]
+    ref_cols = ["id_raisons_non_utilisation"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_raisons_non_utilisation")
     df = df.explode(column="id_raisons_non_utilisation")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_raisons_non_utilisation"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_2_bis", "id_raisons_non_utilisation"]], index=False
-    ) % (2**63)
+
     return df
 
 
@@ -858,8 +847,6 @@ def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_keep: list[str] = [
         "id",
         "no_id",
-        "mail_professionnel",
-        "mail_corrige",
         "temps_fonction_exercee",
         "genre",
         "frequence_utilisation",
@@ -897,8 +884,9 @@ def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
         "autre_retour_libre",
         "retours_libres",
     ]
+    df = df.loc[:, cols_to_keep]
     txt_cols = [
-        "mail_professionnel",
+        "no_id",
         "quelles_raisons_facons",
         "autres",
         "autres_leviers",
@@ -915,7 +903,7 @@ def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
         "autre_retour_libre",
         "retours_libres",
     ]
-    df = df.loc[:, cols_to_keep]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Gestions des refs simples
     ref_cols = [
         "id_raisons_non_participation",
@@ -927,85 +915,85 @@ def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     df = df.drop_duplicates(subset="mail_professionnel", keep="last")
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     return df
 
 
 def process_questionnaire_3_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "formation_suivie"]
+    cols_to_keep = ["no_id", "formation_suivie"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={"id": "id_questionnaire_3", "formation_suivie": "id_formation_suivie"}
-    )
+    df = df.rename(columns={"formation_suivie": "id_formation_suivie"})
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Gestion des refs
-    ref_cols = ["id_questionnaire_3", "id_formation_suivie"]
+    ref_cols = ["id_formation_suivie"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_formation_suivie")
     df = df.explode(column="id_formation_suivie")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_formation_suivie"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_3", "id_formation_suivie"]], index=False
-    ) % (2**63)
+
     return df
 
 
 def process_questionnaire_3_programme_rdv(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "programme_de_rdv"]
+    cols_to_keep = ["no_id", "programme_de_rdv"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={"id": "id_questionnaire_3", "programme_de_rdv": "id_programme_de_rdv"}
-    )
+    df = df.rename(columns={"programme_de_rdv": "id_programme_de_rdv"})
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Gestion des refs
-    ref_cols = ["id_questionnaire_3", "id_programme_de_rdv"]
+    ref_cols = ["id_programme_de_rdv"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_programme_de_rdv")
     df = df.explode(column="id_programme_de_rdv")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_programme_de_rdv"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_3", "id_programme_de_rdv"]], index=False
-    ) % (2**63)
+
     return df
 
 
 def process_questionnaire_3_leviers_progression(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnnes
-    cols_to_keep = ["id", "leviers_progression"]
+    cols_to_keep = ["no_id", "leviers_progression"]
     df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
-            "id": "id_questionnaire_3",
             "leviers_progression": "id_leviers_progression",
         }
     )
-    ref_cols = ["id_questionnaire_3", "id_leviers_progression"]
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    ref_cols = ["id_leviers_progression"]
+    # Gestion des refs
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Conversion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_leviers_progression")
     df = df.explode(column="id_leviers_progression")
     # Nettoyage
     df = df.dropna(subset=["id_leviers_progression"])
-    # Gestion nouvel ID
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_3", "id_leviers_progression"]], index=False
-    ) % (2**63)
+
     return df
 
 
 def process_questionnaire_3_fonctionnalites(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnnes
-    cols_to_keep = ["id", "fonctionnalites"]
+    cols_to_keep = ["no_id", "fonctionnalites"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={"id": "id_questionnaire_3", "fonctionnalites": "id_fonctionnalites"}
-    )
+    df = df.rename(columns={"fonctionnalites": "id_fonctionnalites"})
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     ref_cols = ["id_questionnaire_3", "id_fonctionnalites"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Conversion
@@ -1013,77 +1001,73 @@ def process_questionnaire_3_fonctionnalites(df: pd.DataFrame) -> pd.DataFrame:
     df = df.explode(column="id_fonctionnalites")
     # Nettoyage
     df = df.dropna(subset=["id_fonctionnalites"])
-    # Gestion nouvel ID
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_3", "id_fonctionnalites"]], index=False
-    ) % (2**63)
+
     return df
 
 
 def process_questionnaire_3_risques_identifies(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnnes
-    cols_to_keep = ["id", "risques_identifies"]
+    cols_to_keep = ["no_id", "risques_identifies"]
     df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
-            "id": "id_questionnaire_3",
             "risques_identifies": "id_risques_identifies",
         }
     )
-    ref_cols = ["id_questionnaire_3", "id_risques_identifies"]
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    ref_cols = ["id_risques_identifies"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Conversion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_risques_identifies")
     df = df.explode(column="id_risques_identifies")
     # Nettoyage
     df = df.dropna(subset=["id_risques_identifies"])
-    # Gestion nouvel ID
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_3", "id_risques_identifies"]], index=False
-    ) % (2**63)
+
     return df
 
 
 def process_questionnaire_3_besoins_prioritaires(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnnes
-    cols_to_keep = ["id", "besoins_prioritaires"]
+    cols_to_keep = ["no_id", "besoins_prioritaires"]
     df = df.loc[:, cols_to_keep]
     df = df.rename(
         columns={
-            "id": "id_questionnaire_3",
             "besoins_prioritaires": "id_besoins_prioritaires",
         }
     )
-    ref_cols = ["id_questionnaire_3", "id_besoins_prioritaires"]
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    ref_cols = ["id_besoins_prioritaires"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Conversion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_besoins_prioritaires")
     df = df.explode(column="id_besoins_prioritaires")
     # Nettoyage
     df = df.dropna(subset=["id_besoins_prioritaires"])
-    # Gestion nouvel ID
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_3", "id_besoins_prioritaires"]], index=False
-    ) % (2**63)
+
     return df
 
 
 def process_questionnaire_3_besoins_moindres(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnnes
-    cols_to_keep = ["id", "besoins_moindres"]
+    cols_to_keep = ["no_id", "besoins_moindres"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={"id": "id_questionnaire_3", "besoins_moindres": "id_besoins_moindres"}
-    )
-    ref_cols = ["id_questionnaire_3", "id_besoins_moindres"]
+    df = df.rename(columns={"besoins_moindres": "id_besoins_moindres"})
+    txt_cols = [
+        "no_id",
+    ]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    ref_cols = ["id_besoins_moindres"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Conversion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_besoins_moindres")
     df = df.explode(column="id_besoins_moindres")
     # Nettoyage
     df = df.dropna(subset=["id_besoins_moindres"])
-    # Gestion nouvel ID
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_3", "id_besoins_moindres"]], index=False
-    ) % (2**63)
+
     return df

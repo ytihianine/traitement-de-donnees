@@ -181,16 +181,12 @@ CREATE TABLE assistant_ia."experimentateurs"(
     "no_id" text,
     "entite" text,
     "courriel" text,
-    --"courriel_corrige" text,
+    "courriel_corrige" text,
     "connecte_" text,
     "reponse_au_questionnaire_1" text,
     "reponse_au_questionnaire_2" text,
     "reponse_au_questionnaire_3" text,
-    --"nom_prenom" text,
     "parti" text
-    --"service" text,
-    --"metier" text,
-    --"cas_d_usages" text
 );
 
 
@@ -200,8 +196,7 @@ CREATE TABLE assistant_ia."experimentateurs"(
 DROP TABLE IF EXISTS assistant_ia."questionnaire_1" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_1"(
     "id" INTEGER PRIMARY KEY,
-    "mail_professionnel" TEXT,
-    "mail_corrige" TEXT,
+    "no_id" TEXT,
     "id_direction" INTEGER,
     "tranche_age" TEXT,
     "categorie_emploi" TEXT,
@@ -225,27 +220,21 @@ CREATE TABLE assistant_ia."questionnaire_1"(
     "autre_besoin_accompagnement" TEXT,
     "besoin_acculturation_encadrement" TEXT
 );
-ALTER TABLE assistant_ia."questionnaire_1" ADD FOREIGN KEY ("id_direction") REFERENCES assistant_ia."ref_q1_direction" ("id");
-ALTER TABLE assistant_ia."questionnaire_1" ADD FOREIGN KEY ("id_domaine_professionnel") REFERENCES assistant_ia."ref_q5_domaine" ("id");
-ALTER TABLE assistant_ia."questionnaire_1" ADD FOREIGN KEY ("id_niveau_d_utilisation_ia") REFERENCES assistant_ia."ref_q6_niveau_utilisation"("id");
 
 ----  Table de liaison  cas d'usage envisagés--------------
 DROP TABLE IF EXISTS assistant_ia."questionnaire_1_cas_usage" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_1_cas_usage"(
-    "id" bigint PRIMARY KEY,
-    "id_questionnaire_1" INTEGER,
-    "id_cas_d_usage_envisages" INTEGER,
-  UNIQUE ("id_questionnaire_1", "id_cas_d_usage_envisages"),
-  FOREIGN KEY ("id_questionnaire_1") REFERENCES assistant_ia."questionnaire_1"("id"),
-  FOREIGN KEY ("id_cas_d_usage_envisages") REFERENCES assistant_ia."ref_q9_cas_usage"("id")
+  "id" bigint PRIMARY KEY,
+  "no_id" text,
+  "id_cas_d_usage_envisages" INTEGER,
+  UNIQUE ("no_id", "id_cas_d_usage_envisages")
 );
 
 CREATE TABLE assistant_ia."questionnaire_1_besoins_accompagnement" (
 	"id" bigint PRIMARY KEY,
-	"id_questionnaire_1" integer,
+  "no_id" text,
 	"besoin_accompagnement" text,
-	UNIQUE ("id_questionnaire_1", "besoin_accompagnement"),
-	FOREIGN KEY ("id_questionnaire_1") REFERENCES assistant_ia."questionnaire_1"("id")
+	UNIQUE ("no_id", "besoin_accompagnement")
 );
 
 
@@ -256,11 +245,7 @@ CREATE TABLE assistant_ia."questionnaire_1_besoins_accompagnement" (
 DROP TABLE IF EXISTS assistant_ia."questionnaire_2" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_2" (
     "id" INTEGER PRIMARY KEY,
-    "mail_professionnel" TEXT,
-    "mail_corrige" TEXT,
-    "no_id" BIGINT,
-    -- "direction" TEXT,
-    --"types_d_interactions_mef" TEXT,
+    "no_id" text,
     "autres_types_d_interactions" TEXT,
     "id_niveau_d_usage_ia_post_expe_" INTEGER,
     "frequence_d_usage_assistant_ia" TEXT,
@@ -319,82 +304,65 @@ CREATE TABLE assistant_ia."questionnaire_2" (
 DROP TABLE IF EXISTS assistant_ia."questionnaire_2_formation_suivie" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_2_formation_suivie" (
     "id" bigint PRIMARY KEY,
-    "no_id" BIGINT,
+    "no_id" text,
     "id_formation_ia_suivie_post_expe_" INTEGER,
-    UNIQUE ("no_id", "id_formation_ia_suivie_post_expe_" ),
-    FOREIGN KEY ("no_id") REFERENCES assistant_ia."questionnaire_2"("no_id"),
-    FOREIGN KEY ("id_formation_ia_suivie_post_expe_") REFERENCES assistant_ia."ref_q5_formation_suivie"("id")
+    UNIQUE ("no_id", "id_formation_ia_suivie_post_expe_" )
 );
 
 CREATE TABLE assistant_ia."questionnaire_2_typologie_interaction" (
 	"id" bigint PRIMARY KEY,
-	"id_questionnaire_2" integer,
+	"no_id" text,
 	"types_d_interactions_mef" text,
-	UNIQUE ("id_questionnaire_2", "types_d_interactions_mef"),
-	FOREIGN KEY ("id_questionnaire_2") REFERENCES assistant_ia."questionnaire_2"("id")
+	UNIQUE ("no_id", "types_d_interactions_mef")
 );
 
 CREATE TABLE assistant_ia."questionnaire_2_participation" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_2" INTEGER,
+    "no_id" INTEGER,
     "id_participation_programme_rdv" INTEGER,
-    UNIQUE ("id_questionnaire_2","id_participation_programme_rdv"),
-    FOREIGN KEY ("id_questionnaire_2") REFERENCES assistant_ia."questionnaire_2"("id"),
-    FOREIGN KEY ("id_participation_programme_rdv") REFERENCES assistant_ia."ref_q6_participation_programme"("id")
+    UNIQUE ("no_id","id_participation_programme_rdv")
 );
 
 CREATE TABLE assistant_ia."questionnaire_2_freins" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_2" INTEGER,
+    "no_id" INTEGER,
     "id_freins_a_l_utilisation" INTEGER,
-    UNIQUE ("id_questionnaire_2","id_freins_a_l_utilisation"),
-    FOREIGN KEY ("id_questionnaire_2") REFERENCES assistant_ia."questionnaire_2"("id"),
-    FOREIGN KEY ("id_freins_a_l_utilisation") REFERENCES assistant_ia."ref_q10_principaux_freins"("id")
+    UNIQUE ("no_id","id_freins_a_l_utilisation")
 );
 
 CREATE TABLE assistant_ia."questionnaire_2_facteurs_progression" (
     "id" bigserial PRIMARY KEY,
-    "no_id" bigint,
+    "no_id" text,
     "id_facteurs_de_progression" INTEGER,
-    UNIQUE ("no_id","id_facteurs_de_progression"),
-    FOREIGN KEY ("no_id") REFERENCES assistant_ia."questionnaire_2"("no_id"),
-    FOREIGN KEY ("id_facteurs_de_progression") REFERENCES assistant_ia."ref_q13_facteurs_progression"("id")
+    UNIQUE ("no_id","id_facteurs_de_progression")
 );
 
 CREATE TABLE assistant_ia."questionnaire_2_taches" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_2" INTEGER,
+    "no_id" text,
     "id_taches_realisees_avec_ia" INTEGER,
-    UNIQUE ("id_questionnaire_2","id_taches_realisees_avec_ia"),
-    FOREIGN KEY ("id_questionnaire_2") REFERENCES assistant_ia."questionnaire_2"("id"),
-    FOREIGN KEY ("id_taches_realisees_avec_ia") REFERENCES assistant_ia."ref_q16_taches"("id")
+    UNIQUE ("no_id","id_taches_realisees_avec_ia")
 );
 
 CREATE TABLE assistant_ia."questionnaire_2_typologie_erreurs" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_2" INTEGER,
+    "no_id" text,
     "id_types_d_erreurs_frequentes2" INTEGER,
-    UNIQUE ("id_questionnaire_2","id_types_d_erreurs_frequentes2"),
-    FOREIGN KEY ("id_questionnaire_2") REFERENCES assistant_ia."questionnaire_2"("id"),
-    FOREIGN KEY ("id_types_d_erreurs_frequentes2") REFERENCES assistant_ia."ref_q22_typologie_erreurs"("id")
+    UNIQUE ("no_id","id_types_d_erreurs_frequentes2")
 );
 
 CREATE TABLE assistant_ia."questionnaire_2_impact_observe" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_2" INTEGER,
+    "no_id" text,
     "id_observations_des_impacts" INTEGER,
-    UNIQUE ("id_questionnaire_2","id_observations_des_impacts"),
-    FOREIGN KEY ("id_questionnaire_2") REFERENCES assistant_ia."questionnaire_2"("id"),
-    FOREIGN KEY ("id_observations_des_impacts") REFERENCES assistant_ia."ref_q25_impact_observe"("id")
+    UNIQUE ("no_id","id_observations_des_impacts")
 );
 
 CREATE TABLE assistant_ia."questionnaire_2_impact_identifie" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_2" INTEGER,
+    "no_id" text,
     "id_impacts_identifies_au_travail" INTEGER,
-    UNIQUE ("id_questionnaire_2","id_impacts_identifies_au_travail" ),
-    FOREIGN KEY ("id_questionnaire_2") REFERENCES assistant_ia."questionnaire_2"("id"),
-    FOREIGN KEY ("id_impacts_identifies_au_travail" ) REFERENCES assistant_ia."ref_q24_impact_identifie"("id")
+    UNIQUE ("id_impacts_identifies_au_travail" )
 );
 
 
@@ -404,7 +372,7 @@ CREATE TABLE assistant_ia."questionnaire_2_impact_identifie" (
 
 DROP TABLE IF EXISTS assistant_ia."questionnaire_2_bis" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_2_bis" (
-    "id_questionnaire_2_bis" INTEGER PRIMARY KEY,
+    "courriel" TEXT PRIMARY KEY,
     "avez_vous_deja_utilise_l_assistant_ia_" TEXT,
     "autres_raisons" TEXT,
     "ajouter_quelque_chose" TEXT
@@ -413,9 +381,9 @@ CREATE TABLE assistant_ia."questionnaire_2_bis" (
 
 CREATE TABLE assistant_ia."questionnaire_2_bis_raisons_non_utilisation" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_2_bis" INTEGER,
+    "courriel" TEXT,
     "id_raisons_non_utilisation" INTEGER,
-    UNIQUE ("id_questionnaire_2_bis", "id_raisons_non_utilisation" )
+    UNIQUE ("courriel", "id_raisons_non_utilisation" )
 );
 
 /*
@@ -425,9 +393,7 @@ CREATE TABLE assistant_ia."questionnaire_2_bis_raisons_non_utilisation" (
 DROP TABLE IF EXISTS assistant_ia."questionnaire_3" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_3" (
     "id" INTEGER PRIMARY KEY,
-    "no_id" BIGINT,
-    "mail_professionnel" TEXT,
-    "mail_corrige" TEXT,
+    "no_id" text,
     "temps_fonction_exercee" TEXT,
     "genre" TEXT,
     "frequence_utilisation" TEXT,
@@ -466,70 +432,53 @@ CREATE TABLE assistant_ia."questionnaire_3" (
     "retours_libres" TEXT
 );
 
--- Contraintes de clés étrangères
-ALTER TABLE assistant_ia."questionnaire_3" ADD FOREIGN KEY ("id_raisons_non_participation") REFERENCES assistant_ia."ref_q8_raisons_non_participation"("id");
-ALTER TABLE assistant_ia."questionnaire_3" ADD FOREIGN KEY ("id_impacts_taches_pro") REFERENCES assistant_ia."ref_q12_impacts_taches_pro"("id");
-ALTER TABLE assistant_ia."questionnaire_3" ADD FOREIGN KEY ("id_impacts_taches_rebarbatives") REFERENCES assistant_ia."ref_q14_taches_rebarbativ"("id");
-ALTER TABLE assistant_ia."questionnaire_3" ADD FOREIGN KEY ("id_autres_outils") REFERENCES assistant_ia."ref_q17_autres_outils"("id");
-ALTER TABLE assistant_ia."questionnaire_3" ADD FOREIGN KEY ("id_satisfaction_autre_outil") REFERENCES assistant_ia."ref_q17_satisfaction_autre_outil"("id");
-ALTER TABLE assistant_ia."questionnaire_3" ADD FOREIGN KEY ("id_comparaison_autres_ia") REFERENCES assistant_ia."ref_q18_comparaisons"("id");
-
 ----- Tables de liaisons questionnaire_3
 
-DROP TABLE IF EXISTS assistant_ia."questionnaire_3_formation_suivie" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_3_formation_suivie" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_3" INTEGER,
+    "no_id" text,
     "id_formation_suivie" INTEGER,
-    UNIQUE ("id_questionnaire_3", "id_formation_suivie" ),
-    FOREIGN KEY ("id_questionnaire_3") REFERENCES assistant_ia."questionnaire_3"("id"),
-    FOREIGN KEY ("id_formation_suivie") REFERENCES assistant_ia."ref_q6_formation_suivie"("id")
+    UNIQUE ("no_id", "id_formation_suivie" )
 );
+
 CREATE TABLE assistant_ia."questionnaire_3_programme_rdv" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_3" INTEGER,
+    "no_id" text,
     "id_programme_de_rdv" INTEGER,
-    UNIQUE ("id_questionnaire_3", "id_programme_de_rdv"),
-    FOREIGN KEY ("id_questionnaire_3") REFERENCES assistant_ia."questionnaire_3"("id"),
-    FOREIGN KEY ("id_programme_de_rdv") REFERENCES assistant_ia."ref_q7_particip_programme"("id")
+    UNIQUE ("no_id", "id_programme_de_rdv")
 );
+
 CREATE TABLE assistant_ia."questionnaire_3_leviers_progression" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_3" INTEGER,
+    "no_id" text,
     "id_leviers_progression" INTEGER,
-    UNIQUE ("id_questionnaire_3", "id_leviers_progression"),
-    FOREIGN KEY ("id_questionnaire_3") REFERENCES assistant_ia."questionnaire_3"("id"),
-    FOREIGN KEY ("id_leviers_progression") REFERENCES assistant_ia."ref_q11_leviers_progressions"("id")
+    UNIQUE ("no_id", "id_leviers_progression")
 );
+
 CREATE TABLE assistant_ia."questionnaire_3_fonctionnalites" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_3" INTEGER,
+    "no_id" text,
     "id_fonctionnalites" INTEGER,
-    UNIQUE ("id_questionnaire_3", "id_fonctionnalites" ),
-    FOREIGN KEY ("id_questionnaire_3") REFERENCES assistant_ia."questionnaire_3"("id"),
-    FOREIGN KEY ("id_fonctionnalites") REFERENCES assistant_ia."ref_q19_fonctionnalites"("id")
+    UNIQUE ("no_id", "id_fonctionnalites" )
 );
+
 CREATE TABLE assistant_ia."questionnaire_3_risques_identifies" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_3" INTEGER,
+    "no_id" text,
     "id_risques_identifies" INTEGER,
-    UNIQUE ("id_questionnaire_3", "id_risques_identifies" ),
-    FOREIGN KEY ("id_questionnaire_3") REFERENCES assistant_ia."questionnaire_3"("id"),
-    FOREIGN KEY ("id_risques_identifies") REFERENCES assistant_ia."ref_q21_risques_identifies"("id")
+    UNIQUE ("no_id", "id_risques_identifies" )
 );
+
 CREATE TABLE assistant_ia."questionnaire_3_besoins_prioritaires" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_3" INTEGER,
+    "no_id" text,
     "id_besoins_prioritaires" INTEGER,
-    UNIQUE ("id_questionnaire_3", "id_besoins_prioritaires" ),
-    FOREIGN KEY ("id_questionnaire_3") REFERENCES assistant_ia."questionnaire_3"("id"),
-    FOREIGN KEY ("id_besoins_prioritaires") REFERENCES assistant_ia."ref_q25_besoins"("id")
+    UNIQUE ("no_id", "id_besoins_prioritaires" )
 );
+
 CREATE TABLE assistant_ia."questionnaire_3_besoins_moindres" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_3" INTEGER,
+    "no_id" text,
     "id_besoins_moindres" INTEGER,
-    UNIQUE ("id_questionnaire_3", "id_besoins_moindres" ),
-    FOREIGN KEY ("id_questionnaire_3") REFERENCES assistant_ia."questionnaire_3"("id"),
-    FOREIGN KEY ("id_besoins_moindres") REFERENCES assistant_ia."ref_q25_besoins"("id")
+    UNIQUE ("no_id", "id_besoins_moindres" )
 );
