@@ -460,6 +460,7 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
         "id",
         "mail_professionnel",
         "mail_corrige",
+        "no_id",
         # "direction",
         # "types_d_interactions_mef",
         "autres_types_d_interactions",
@@ -581,10 +582,10 @@ def process_questionnaire_2_typologie_interaction(df: pd.DataFrame) -> pd.DataFr
 
 def process_questionnaire_2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["mail_corrige", "formation_ia_suivie_post_expe_"]
+    cols_to_keep = ["no_id", "formation_ia_suivie_post_expe_"]
     df = df.loc[:, cols_to_keep]
 
-    df = df.dropna(subset=["mail_corrige"])
+    df = df.dropna(subset=["no_id"])
 
     # Renommage
     df = df.rename(
@@ -592,11 +593,6 @@ def process_questionnaire_2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
             "formation_ia_suivie_post_expe_": "id_formation_ia_suivie_post_expe_",
         }
     )
-
-    # Gestion des colonnes textuelles
-    txt_cols = ["mail_corrige"]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
     # Convertion
     df = convert_str_of_list_to_list(
         df=df, col_to_convert="id_formation_ia_suivie_post_expe_"
@@ -665,28 +661,24 @@ def process_questionnaire_2_freins(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_questionnaire_2_facteurs_progression(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "facteurs_de_progression"]
+    cols_to_keep = ["no_id", "facteurs_de_progression"]
     df = df.loc[:, cols_to_keep]
 
     # Renommage
     df = df.rename(
         columns={
-            "id": "id_questionnaire_2",
             "facteurs_de_progression": "id_facteurs_de_progression",
         }
     )
     # Gestion des refs
-    ref_cols = ["id_questionnaire_2", "id_facteurs_de_progression"]
+    ref_cols = ["id_facteurs_de_progression"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_facteurs_de_progression")
     df = df.explode(column="id_facteurs_de_progression")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_facteurs_de_progression"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_2", "id_facteurs_de_progression"]], index=False
-    ) % (2**63)
+
     return df
 
 
