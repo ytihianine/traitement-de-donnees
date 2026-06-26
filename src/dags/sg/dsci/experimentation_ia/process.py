@@ -316,6 +316,7 @@ def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
         "courriel_corrige",
     ]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
+    df = df.dropna(subset=["courriel"])
     df = df.drop_duplicates(subset="courriel", keep="last")
     return df
 
@@ -541,6 +542,7 @@ def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
         "id_ia_favorise_relations_humaines_",
     ]
     df = handle_grist_null_references(df=df, columns=ref_cols)
+    df = df.dropna(subset=["no_id"])
     df = df.drop_duplicates(subset="no_id", keep="last")
 
     return df
@@ -586,6 +588,7 @@ def process_questionnaire_2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
     )
     df = df.explode(column="id_formation_ia_suivie_post_expe_")
     df = df.dropna(subset=["id_formation_ia_suivie_post_expe_"])
+    df = df.drop_duplicates()
 
     return df
 
@@ -615,6 +618,7 @@ def process_questionnaire_2_participation(df: pd.DataFrame) -> pd.DataFrame:
     df = df.explode(column="id_participation_programme_rdv")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_participation_programme_rdv"])
+    df = df.drop_duplicates()
 
     return df
 
