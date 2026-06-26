@@ -12,14 +12,18 @@ import pandas as pd
 from pyiceberg.typedef import Identifier
 from src._enums.filesystem import IcebergTableStatus
 
-from src.constants import DEFAULT_POLARIS_CATALOG
+from src.constants import (
+    DEFAULT_POLARIS_CATALOG,
+    DEFAULT_POLARIS_CLIENT_ID,
+    DEFAULT_POLARIS_CLIENT_SECRET,
+)
 
 
 def generate_catalog_properties(
     uri: str,
     warehouse: str = DEFAULT_POLARIS_CATALOG,
-    client_id: str | None = None,
-    client_secret: str | None = None,
+    client_id: str | None = DEFAULT_POLARIS_CLIENT_ID,
+    client_secret: str | None = DEFAULT_POLARIS_CLIENT_SECRET,
     ca_bundle_path: str | None = None,
     options: dict[str, Any] | None = None,
 ) -> Mapping[str, Any]:

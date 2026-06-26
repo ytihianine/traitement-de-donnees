@@ -46,6 +46,8 @@ DEFAULT_S3_BUCKET = "dsci"
 # Catalog POLARIS
 DEFAULT_POLARIS_HOST = "https://polaris-catalog.lab.incubateur.finances.rie.gouv.fr"
 DEFAULT_POLARIS_CATALOG = "cat_data_store"
+DEFAULT_POLARIS_CLIENT_ID = ENV_VAR.get("AIRFLOW_POLARIS_CLIENT_ID", "root")
+DEFAULT_POLARIS_CLIENT_SECRET = ENV_VAR.get("AIRFLOW_POLARIS_CLIENT_SECRET", "root")
 
 # S3
 DEFAULT_S3_ENDPOINT_URL = "https://minio.lab.incubateur.finances.rie.gouv.fr"
