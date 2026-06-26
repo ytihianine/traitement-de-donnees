@@ -20,9 +20,7 @@ from src.common_tasks.validation import validate_dag_parameters
 from src.common_tasks.projet import get_selecteur_config
 from src.common_tasks.s3 import (
     copy_s3_files,
-    copy_staging_to_prod,
     del_s3_files,
-    del_iceberg_staging_table,
 )
 from src.dags.applications.configuration_projets.tasks import (
     process_data,
@@ -84,8 +82,6 @@ def configuration_projets() -> None:
             storage_options=storage_options,
         ),
         delete_tmp_tables(storage_options=storage_options),
-        copy_staging_to_prod.expand(selecteur_config=selecteur_configs),
-        del_iceberg_staging_table(),
         update_projet_snapshot_status(),
     )
 

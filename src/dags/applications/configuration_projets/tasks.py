@@ -9,7 +9,7 @@ from src.dags.applications.configuration_projets import process
 
 @task_group
 def process_data() -> None:
-    version = "v2"
+    version = "v1"
     ref_direction = create_grist_etl_task(
         selecteur="direction",
         normalisation_process_func=normalize_grist_dataframe,
