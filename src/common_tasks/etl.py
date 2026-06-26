@@ -68,13 +68,10 @@ def _add_metadata(
 def _write_to_iceberg_catalog(
     df: pd.DataFrame,
     filepath_s3: str,
-    catalog_name: str = DEFAULT_POLARIS_CATALOG,
+    catalog: IcebergCatalog,
     table_status: IcebergTableStatus = IcebergTableStatus.STAGING,
 ) -> None:
     """Write DataFrame to Iceberg catalog."""
-    properties = generate_catalog_properties(uri=DEFAULT_POLARIS_HOST)
-    catalog = IcebergCatalog(name=catalog_name, properties=properties)
-
     filepath = PurePosixPath(filepath_s3)
     tbl_name = filepath.stem
     if len(filepath.parts) < 1:
@@ -187,10 +184,15 @@ def create_grist_etl_task(
         )
 
         if version == "v2":
+            # Init IcebergCatalog
+            properties = generate_catalog_properties(uri=DEFAULT_POLARIS_HOST)
+            catalog = IcebergCatalog(
+                name=DEFAULT_POLARIS_CATALOG, properties=properties
+            )
             _write_to_iceberg_catalog(
                 df=df,
                 filepath_s3=str(task_config.get_full_s3_key()),
-                catalog_name=DEFAULT_POLARIS_CATALOG,
+                catalog=catalog,
                 table_status=IcebergTableStatus.STAGING,
             )
 
@@ -285,10 +287,15 @@ def create_file_etl_task(
         )
 
         if version == "v2":
+            # Init IcebergCatalog
+            properties = generate_catalog_properties(uri=DEFAULT_POLARIS_HOST)
+            catalog = IcebergCatalog(
+                name=DEFAULT_POLARIS_CATALOG, properties=properties
+            )
             _write_to_iceberg_catalog(
                 df=df,
                 filepath_s3=str(task_config.get_full_s3_key()),
-                catalog_name=DEFAULT_POLARIS_CATALOG,
+                catalog=catalog,
                 table_status=IcebergTableStatus.STAGING,
             )
 
@@ -431,10 +438,15 @@ def create_task(
         )
 
         if version == "v2":
+            # Init IcebergCatalog
+            properties = generate_catalog_properties(uri=DEFAULT_POLARIS_HOST)
+            catalog = IcebergCatalog(
+                name=DEFAULT_POLARIS_CATALOG, properties=properties
+            )
             _write_to_iceberg_catalog(
                 df=result,
                 filepath_s3=str(output_config.get_full_s3_key()),
-                catalog_name=DEFAULT_POLARIS_CATALOG,
+                catalog=catalog,
                 table_status=IcebergTableStatus.STAGING,
             )
 
