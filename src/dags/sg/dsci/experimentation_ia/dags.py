@@ -10,6 +10,7 @@ from src.common_tasks.sql import (
     delete_tmp_tables,
     create_projet_snapshot,
     get_projet_snapshot,
+    ensure_partition,
     update_projet_snapshot_status,
     import_file_to_db,
 )
@@ -86,6 +87,7 @@ def experimentation_ia_dag() -> None:
             reset_id_seq=False,
         ),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
+        ensure_partition.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(storage_options=storage_options),
         copy_s3_files(
             storage_options=storage_options,
