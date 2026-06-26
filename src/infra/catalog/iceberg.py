@@ -3,6 +3,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 import pyarrow as pa
+from tenacity import retry, wait_fixed, stop_after_attempt
 
 from pyiceberg.catalog import Catalog, load_catalog
 from pyiceberg.table import Table
@@ -139,6 +140,7 @@ class IcebergCatalog:
                 update.union_by_name(pa.schema(new_fields))
         return table
 
+    @retry(wait=wait_fixed(wait=2), stop=stop_after_attempt(max_attempt_number=5))
     def write_table(
         self, table_name: str, df: pd.DataFrame, overwrite: bool = False
     ) -> None:
