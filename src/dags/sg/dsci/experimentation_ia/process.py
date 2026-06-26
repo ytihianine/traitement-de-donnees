@@ -257,7 +257,6 @@ def process_quota_entite(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     cols_to_keep = [
-        "id",
         "experimentation_demarree",
         "entite",
         "nbre_d_acces_previsionnels",
@@ -297,7 +296,6 @@ def process_quota_entite(df: pd.DataFrame) -> pd.DataFrame:
 # =============================================================
 def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_keep = [
-        "id",
         "no_id",
         "entite",
         "parti",
@@ -335,7 +333,6 @@ def process_questionnaire_1(df: pd.DataFrame) -> pd.DataFrame:
     )
     # Gestion des colonnes
     cols_to_keep = [
-        "id",
         "no_id",
         "id_direction",
         "tranche_age",
@@ -845,7 +842,6 @@ def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     cols_to_keep: list[str] = [
-        "id",
         "no_id",
         "temps_fonction_exercee",
         "genre",
