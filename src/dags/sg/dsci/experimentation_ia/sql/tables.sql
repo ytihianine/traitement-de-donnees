@@ -179,7 +179,7 @@ CREATE TABLE assistant_ia."quota_par_entite" (
 CREATE TABLE assistant_ia."experimentateurs"(
     "id" integer PRIMARY KEY,
     "no_id" text,
-    --"entite" text,
+    "entite" text,
     "courriel" text,
     --"courriel_corrige" text,
     "connecte_" text,
@@ -201,6 +201,7 @@ DROP TABLE IF EXISTS assistant_ia."questionnaire_1" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_1"(
     "id" INTEGER PRIMARY KEY,
     "mail_professionnel" TEXT,
+    "mail_corrige" TEXT,
     "id_direction" INTEGER,
     "tranche_age" TEXT,
     "categorie_emploi" TEXT,
@@ -256,6 +257,7 @@ DROP TABLE IF EXISTS assistant_ia."questionnaire_2" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_2" (
     "id" INTEGER PRIMARY KEY,
     "mail_professionnel" TEXT,
+    "mail_corrige" TEXT,
     -- "direction" TEXT,
     --"types_d_interactions_mef" TEXT,
     "autres_types_d_interactions" TEXT,
@@ -327,7 +329,7 @@ ALTER TABLE "questionnaire_2" ADD FOREIGN KEY ("id_ia_favorise_relations_humaine
 DROP TABLE IF EXISTS assistant_ia."questionnaire_2_formation_suivie" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_2_formation_suivie" (
     "id" bigint PRIMARY KEY,
-    "id_questionnaire_2" INTEGER,
+    "no_id" BIGINT,
     "id_formation_ia_suivie_post_expe_" INTEGER,
     UNIQUE ("id_questionnaire_2", "id_formation_ia_suivie_post_expe_" ),
     FOREIGN KEY ("id_questionnaire_2") REFERENCES assistant_ia."questionnaire_2"("id"),
@@ -361,11 +363,11 @@ CREATE TABLE assistant_ia."questionnaire_2_freins" (
 );
 
 CREATE TABLE assistant_ia."questionnaire_2_facteurs_progression" (
-    "id" bigint PRIMARY KEY,
-    "id_questionnaire_2" INTEGER,
+    "id" bigserial PRIMARY KEY,
+    "no_id" INTEGER,
     "id_facteurs_de_progression" INTEGER,
-    UNIQUE ("id_questionnaire_2","id_facteurs_de_progression"),
-    FOREIGN KEY ("id_questionnaire_2") REFERENCES assistant_ia."questionnaire_2"("id"),
+    UNIQUE ("no_id","id_facteurs_de_progression"),
+    FOREIGN KEY ("no_id") REFERENCES assistant_ia."questionnaire_2"("id"),
     FOREIGN KEY ("id_facteurs_de_progression") REFERENCES assistant_ia."ref_q13_facteurs_progression"("id")
 );
 
@@ -412,7 +414,7 @@ CREATE TABLE assistant_ia."questionnaire_2_impact_identifie" (
 
 DROP TABLE IF EXISTS assistant_ia."questionnaire_2_bis" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_2_bis" (
-    "id" INTEGER PRIMARY KEY,
+    "id_questionnaire_2_bis" INTEGER PRIMARY KEY,
     "avez_vous_deja_utilise_l_assistant_ia_" TEXT,
     "autres_raisons" TEXT,
     "ajouter_quelque_chose" TEXT
@@ -435,7 +437,7 @@ CREATE TABLE assistant_ia."questionnaire_2_bis_raisons_non_utilisation" (
 DROP TABLE IF EXISTS assistant_ia."questionnaire_3" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_3" (
     "id" INTEGER PRIMARY KEY,
-    "no_id" INTEGER,
+    "no_id" BIGINT,
     "mail_professionnel" TEXT,
     "mail_corrige" TEXT,
     "temps_fonction_exercee" TEXT,
@@ -498,10 +500,10 @@ CREATE TABLE assistant_ia."questionnaire_3_formation_suivie" (
 CREATE TABLE assistant_ia."questionnaire_3_programme_rdv" (
     "id" bigint PRIMARY KEY,
     "id_questionnaire_3" INTEGER,
-    "id_Programme_de_rdv" INTEGER,
-    UNIQUE ("id_questionnaire_3", "id_Programme_de_rdv"),
+    "id_programme_de_rdv" INTEGER,
+    UNIQUE ("id_questionnaire_3", "id_programme_de_rdv"),
     FOREIGN KEY ("id_questionnaire_3") REFERENCES assistant_ia."questionnaire_3"("id"),
-    FOREIGN KEY ("id_Programme_de_rdv") REFERENCES assistant_ia."ref_q7_particip_programme"("id")
+    FOREIGN KEY ("id_programme_de_rdv") REFERENCES assistant_ia."ref_q7_particip_programme"("id")
 );
 CREATE TABLE assistant_ia."questionnaire_3_leviers_progression" (
     "id" bigint PRIMARY KEY,

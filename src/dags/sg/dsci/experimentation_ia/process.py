@@ -322,7 +322,7 @@ def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
         # "service",
         # "metier",
         # "cas_d_usages",
-        "courriel"
+        "courriel",
     ]
     df = normalize_whitespace_columns(df=df, columns=txt_cols)
     df = df.drop_duplicates(subset="courriel", keep="last")
@@ -581,30 +581,29 @@ def process_questionnaire_2_typologie_interaction(df: pd.DataFrame) -> pd.DataFr
 
 def process_questionnaire_2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
-    cols_to_keep = ["id", "formation_ia_suivie_post_expe_"]
+    cols_to_keep = ["mail_corrige", "formation_ia_suivie_post_expe_"]
     df = df.loc[:, cols_to_keep]
+
+    df = df.dropna(subset=["mail_corrige"])
 
     # Renommage
     df = df.rename(
         columns={
-            "id": "id_questionnaire_2",
             "formation_ia_suivie_post_expe_": "id_formation_ia_suivie_post_expe_",
         }
     )
-    # Gestion des refs
-    ref_cols = ["id_questionnaire_2", "id_formation_ia_suivie_post_expe_"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
+
+    # Gestion des colonnes textuelles
+    txt_cols = ["mail_corrige"]
+    df = normalize_whitespace_columns(df=df, columns=txt_cols)
+
     # Convertion
     df = convert_str_of_list_to_list(
         df=df, col_to_convert="id_formation_ia_suivie_post_expe_"
     )
     df = df.explode(column="id_formation_ia_suivie_post_expe_")
-    # Nettoyage des lignes vides
     df = df.dropna(subset=["id_formation_ia_suivie_post_expe_"])
-    # Nouvel ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_2", "id_formation_ia_suivie_post_expe_"]], index=False
-    ) % (2**63)
+
     return df
 
 
@@ -854,13 +853,14 @@ def process_questionnaire_2_bis_raisons_non_utilisation(
 
 def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
     # Renommage des colonnes référentielles simples
-    df = df.rename(columns={
-        "raisons_non_participation": "id_raisons_non_participation",
-        "impacts_taches_pro": "id_impacts_taches_pro",
-        "impacts_taches_rebarbatives": "id_impacts_taches_rebarbatives",
-        "autres_outils": "id_autres_outils",
-        "satisfaction_autre_outil": "id_satisfaction_autre_outil",
-        "comparaison_autres_ia": "id_comparaison_autres_ia"
+    df = df.rename(
+        columns={
+            "raisons_non_participation": "id_raisons_non_participation",
+            "impacts_taches_pro": "id_impacts_taches_pro",
+            "impacts_taches_rebarbatives": "id_impacts_taches_rebarbatives",
+            "autres_outils": "id_autres_outils",
+            "satisfaction_autre_outil": "id_satisfaction_autre_outil",
+            "comparaison_autres_ia": "id_comparaison_autres_ia",
         }
     )
     cols_to_keep: list[str] = [
@@ -903,7 +903,7 @@ def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
         "contenu",
         "connexions",
         "autre_retour_libre",
-        "retours_libres"
+        "retours_libres",
     ]
     txt_cols = [
         "mail_professionnel",
@@ -921,7 +921,7 @@ def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
         "contenu",
         "connexions",
         "autre_retour_libre",
-        "retours_libres"
+        "retours_libres",
     ]
     df = df.loc[:, cols_to_keep]
     # Gestions des refs simples
@@ -931,7 +931,7 @@ def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
         "id_impacts_taches_rebarbatives",
         "id_autres_outils",
         "id_satisfaction_autre_outil",
-        "id_comparaison_autres_ia"
+        "id_comparaison_autres_ia",
     ]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     df = df.drop_duplicates(subset="mail_professionnel", keep="last")
@@ -943,9 +943,9 @@ def process_questionnaire_3_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = ["id", "formation_suivie"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={
-        "id": "id_questionnaire_3",
-        "formation_suivie": "id_formation_suivie"})
+    df = df.rename(
+        columns={"id": "id_questionnaire_3", "formation_suivie": "id_formation_suivie"}
+    )
     # Gestion des refs
     ref_cols = ["id_questionnaire_3", "id_formation_suivie"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
@@ -965,21 +965,20 @@ def process_questionnaire_3_programme_rdv(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnes
     cols_to_keep = ["id", "programme_de_rdv"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={
-        "id": "id_questionnaire_3",
-        "programme_de_rdv": "id_Programme_de_rdv"}
-        )
+    df = df.rename(
+        columns={"id": "id_questionnaire_3", "programme_de_rdv": "id_programme_de_rdv"}
+    )
     # Gestion des refs
-    ref_cols = ["id_questionnaire_3", "id_Programme_de_rdv"]
+    ref_cols = ["id_questionnaire_3", "id_programme_de_rdv"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
-    df = convert_str_of_list_to_list(df=df, col_to_convert="id_Programme_de_rdv")
-    df = df.explode(column="id_Programme_de_rdv")
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_programme_de_rdv")
+    df = df.explode(column="id_programme_de_rdv")
     # Nettoyage des lignes vides
-    df = df.dropna(subset=["id_Programme_de_rdv"])
+    df = df.dropna(subset=["id_programme_de_rdv"])
     # Nouvel ID unique
     df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_questionnaire_3", "id_Programme_de_rdv"]], index=False
+        obj=df[["id_questionnaire_3", "id_programme_de_rdv"]], index=False
     ) % (2**63)
     return df
 
@@ -988,9 +987,11 @@ def process_questionnaire_3_leviers_progression(df: pd.DataFrame) -> pd.DataFram
     # Gestion des colonnnes
     cols_to_keep = ["id", "leviers_progression"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={
-        "id": "id_questionnaire_3",
-        "leviers_progression": "id_leviers_progression"}
+    df = df.rename(
+        columns={
+            "id": "id_questionnaire_3",
+            "leviers_progression": "id_leviers_progression",
+        }
     )
     ref_cols = ["id_questionnaire_3", "id_leviers_progression"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
@@ -1001,7 +1002,7 @@ def process_questionnaire_3_leviers_progression(df: pd.DataFrame) -> pd.DataFram
     df = df.dropna(subset=["id_leviers_progression"])
     # Gestion nouvel ID
     df["id"] = pd.util.hash_pandas_object(
-         obj=df[["id_questionnaire_3", "id_leviers_progression"]], index=False
+        obj=df[["id_questionnaire_3", "id_leviers_progression"]], index=False
     ) % (2**63)
     return df
 
@@ -1010,9 +1011,8 @@ def process_questionnaire_3_fonctionnalites(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnnes
     cols_to_keep = ["id", "fonctionnalites"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={
-        "id": "id_questionnaire_3",
-        "fonctionnalites": "id_fonctionnalites"}
+    df = df.rename(
+        columns={"id": "id_questionnaire_3", "fonctionnalites": "id_fonctionnalites"}
     )
     ref_cols = ["id_questionnaire_3", "id_fonctionnalites"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
@@ -1023,7 +1023,7 @@ def process_questionnaire_3_fonctionnalites(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["id_fonctionnalites"])
     # Gestion nouvel ID
     df["id"] = pd.util.hash_pandas_object(
-         obj=df[["id_questionnaire_3", "id_fonctionnalites"]], index=False
+        obj=df[["id_questionnaire_3", "id_fonctionnalites"]], index=False
     ) % (2**63)
     return df
 
@@ -1032,9 +1032,11 @@ def process_questionnaire_3_risques_identifies(df: pd.DataFrame) -> pd.DataFrame
     # Gestion des colonnnes
     cols_to_keep = ["id", "risques_identifies"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={
-        "id": "id_questionnaire_3",
-        "risques_identifies": "id_risques_identifies"}
+    df = df.rename(
+        columns={
+            "id": "id_questionnaire_3",
+            "risques_identifies": "id_risques_identifies",
+        }
     )
     ref_cols = ["id_questionnaire_3", "id_risques_identifies"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
@@ -1045,7 +1047,7 @@ def process_questionnaire_3_risques_identifies(df: pd.DataFrame) -> pd.DataFrame
     df = df.dropna(subset=["id_risques_identifies"])
     # Gestion nouvel ID
     df["id"] = pd.util.hash_pandas_object(
-         obj=df[["id_questionnaire_3", "id_risques_identifies"]], index=False
+        obj=df[["id_questionnaire_3", "id_risques_identifies"]], index=False
     ) % (2**63)
     return df
 
@@ -1054,9 +1056,11 @@ def process_questionnaire_3_besoins_prioritaires(df: pd.DataFrame) -> pd.DataFra
     # Gestion des colonnnes
     cols_to_keep = ["id", "besoins_prioritaires"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={
-        "id": "id_questionnaire_3",
-        "besoins_prioritaires": "id_besoins_prioritaires"}
+    df = df.rename(
+        columns={
+            "id": "id_questionnaire_3",
+            "besoins_prioritaires": "id_besoins_prioritaires",
+        }
     )
     ref_cols = ["id_questionnaire_3", "id_besoins_prioritaires"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
@@ -1067,7 +1071,7 @@ def process_questionnaire_3_besoins_prioritaires(df: pd.DataFrame) -> pd.DataFra
     df = df.dropna(subset=["id_besoins_prioritaires"])
     # Gestion nouvel ID
     df["id"] = pd.util.hash_pandas_object(
-         obj=df[["id_questionnaire_3", "id_besoins_prioritaires"]], index=False
+        obj=df[["id_questionnaire_3", "id_besoins_prioritaires"]], index=False
     ) % (2**63)
     return df
 
@@ -1076,9 +1080,8 @@ def process_questionnaire_3_besoins_moindres(df: pd.DataFrame) -> pd.DataFrame:
     # Gestion des colonnnes
     cols_to_keep = ["id", "besoins_moindres"]
     df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={
-        "id": "id_questionnaire_3",
-        "besoins_moindres": "id_besoins_moindres"}
+    df = df.rename(
+        columns={"id": "id_questionnaire_3", "besoins_moindres": "id_besoins_moindres"}
     )
     ref_cols = ["id_questionnaire_3", "id_besoins_moindres"]
     df = handle_grist_null_references(df=df, columns=ref_cols)
@@ -1089,6 +1092,6 @@ def process_questionnaire_3_besoins_moindres(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["id_besoins_moindres"])
     # Gestion nouvel ID
     df["id"] = pd.util.hash_pandas_object(
-         obj=df[["id_questionnaire_3", "id_besoins_moindres"]], index=False
+        obj=df[["id_questionnaire_3", "id_besoins_moindres"]], index=False
     ) % (2**63)
     return df
