@@ -310,7 +310,7 @@ def referentiels() -> None:
 
 @task_group()
 def repartition() -> None:
-    version = "v2"
+    version = "v1"
     quota_par_entite = create_grist_etl_task(
         selecteur="quota_par_entite",
         normalisation_process_func=normalize_grist_dataframe,
@@ -325,7 +325,7 @@ def repartition() -> None:
 
 @task_group
 def suivi_experimentateurs() -> None:
-    version = "v2"
+    version = "v1"
     experimentateurs = create_grist_etl_task(
         selecteur="experimentateurs",
         normalisation_process_func=normalize_grist_dataframe,
@@ -340,7 +340,7 @@ def suivi_experimentateurs() -> None:
 
 @task_group
 def suivi_questionnaire_1() -> None:
-    version = "v2"
+    version = "v1"
     questionnaire_1 = create_grist_etl_task(
         selecteur="questionnaire_1",
         normalisation_process_func=normalize_grist_dataframe,
@@ -378,7 +378,7 @@ def suivi_questionnaire_1() -> None:
 
 @task_group
 def suivi_questionnaire_2() -> None:
-    version = "v2"
+    version = "v1"
     questionnaire_2 = create_grist_etl_task(
         selecteur="questionnaire_2",
         normalisation_process_func=normalize_grist_dataframe,
@@ -479,7 +479,7 @@ def suivi_questionnaire_2() -> None:
 
 @task_group
 def suivi_questionnaire_2_bis() -> None:
-    version = "v2"
+    version = "v1"
     questionnaire_2_bis = create_grist_etl_task(
         selecteur="questionnaire_2_bis",
         normalisation_process_func=normalize_grist_dataframe,
@@ -507,7 +507,7 @@ def suivi_questionnaire_2_bis() -> None:
 
 @task_group
 def suivi_questionnaire_3() -> None:
-    version = "v2"
+    version = "v1"
     questionnaire_3 = create_grist_etl_task(
         selecteur="questionnaire_3",
         normalisation_process_func=normalize_grist_dataframe,
