@@ -158,7 +158,7 @@ class ETLTask(ABC):
         for writer in self.writers:
             writer.write(df=output_df, selecteur=target_selecteur)
 
-    def create_task(self) -> Callable[..., XComArg]:
+    def create_task(self) -> XComArg:
         @task(
             task_id=self.task_config.task_id,
             retries=self.task_config.retries,
@@ -174,4 +174,4 @@ class ETLTask(ABC):
         def _task(**context) -> None:
             self.run_pipeline(context=context)
 
-        return _task
+        return _task()
