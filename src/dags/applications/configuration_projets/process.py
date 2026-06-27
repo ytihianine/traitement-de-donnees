@@ -59,7 +59,7 @@ def process_service(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_projet(df: pd.DataFrame) -> pd.DataFrame:
+def process_projets(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
         "id",
@@ -217,7 +217,7 @@ def process_selecteur(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_source(df: pd.DataFrame) -> pd.DataFrame:
+def process_selecteur_source(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
         "projet",
@@ -306,7 +306,7 @@ def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_col_mapping(df: pd.DataFrame) -> pd.DataFrame:
+def process_selecteur_column_mapping(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only mandatory columns
     cols_to_keep = [
         "id",
