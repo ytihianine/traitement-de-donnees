@@ -93,6 +93,7 @@ def download_grist_doc_to_s3(
 
 
 def generic_grist_processing(
+    *,
     df: pd.DataFrame,
     cols_mapping: dict[str, str] | None = None,
     cols_to_keep: list[str] | None = None,
