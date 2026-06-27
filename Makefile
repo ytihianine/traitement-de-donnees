@@ -1,7 +1,7 @@
 
 # Variables
 PYTHON_VERSION := 3.12
-AIRFLOW_VERSION := 3.1.8
+AIRFLOW_VERSION := 3.2.2
 ENV_NAME := env
 
 # OS detection
@@ -51,8 +51,7 @@ install-packages: ## Installer les packages python complémentaires
 	@echo "Installation de uv"
 	$(VENV_BIN)/python -m pip install uv
 	$(UV_PIP) -e .
-	$(UV_PIP) -r requirements.txt --prerelease=allow
-	$(UV_PIP) -r requirements_dev.txt --prerelease=allow
+	$(UV_PIP) -r requirements.txt
 
 install-pre-commit: ## Installer les pre-commits
 	@echo "Installation des pre-commits"
