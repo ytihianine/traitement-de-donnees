@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 from collections.abc import Mapping
@@ -114,6 +114,7 @@ class SelecteurStorageOptions:
     s3_conn_id: str = DEFAULT_S3_CONN_ID
     write_to_s3: bool = True
     write_to_s3_with_iceberg: bool = True
+    read_options: dict[str, Any] = field(default_factory=dict)
     # Database
     db_conn_id: str = DEFAULT_PG_DATA_CONN_ID
     write_to_db: bool = True
