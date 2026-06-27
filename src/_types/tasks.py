@@ -94,7 +94,7 @@ class RuntimeContext:
 
 
 @dataclass(frozen=True)
-class GenericTask(ABC):
+class ETLTask(ABC):
     task_config: TaskConfig
     target: str
     reader: ReaderStrategy
