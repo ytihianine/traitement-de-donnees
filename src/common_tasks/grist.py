@@ -1,6 +1,9 @@
 from datetime import timedelta
+import logging
+from typing import Callable
 from airflow.sdk import task
 from airflow.sdk import Variable
+import pandas as pd
 
 from src.infra.file_system.factory import create_file_handler
 from src.infra.http_client.adapters import RequestsClient
@@ -18,6 +21,12 @@ from src.constants import (
     PROXY,
     AGENT,
 )
+from src.utils.process.dates import convert_grist_date_to_date
+from src.utils.process.structures import (
+    handle_grist_null_references,
+    normalize_grist_dataframe,
+)
+from src.utils.process.text import normalize_whitespace_columns
 
 
 @task(
@@ -80,3 +89,65 @@ def download_grist_doc_to_s3(
         content=grist_response,
     )
     print("✅ Export done!")
+
+
+def generic_grist_processing(
+    df: pd.DataFrame,
+    cols_mapping: dict[str, str] | None = None,
+    cols_to_keep: list[str] | None = None,
+    txt_columns: list[str] | None = None,
+    ref_columns: list[str] | None = None,
+    date_columns: list[str] | None = None,
+    custom_fn: Callable[[pd.DataFrame], pd.DataFrame] | None = None,
+) -> pd.DataFrame:
+    """
+    Generic processing for Grist dataframes.
+    """
+    # Normalize source
+    logging.info("Normalizing Grist dataframe")
+    df = normalize_grist_dataframe(df=df)
+
+    # Rename columns
+    if cols_mapping:
+        logging.info(f"Renaming columns: {cols_mapping}")
+        df = df.rename(columns=cols_mapping)
+    else:
+        logging.info("No column renaming mapping provided. Skipping ...")
+
+    # Keep only mandatory columns
+    if cols_to_keep:
+        logging.info(f"Keeping only mandatory columns: {cols_to_keep}")
+        df = df[cols_to_keep]
+    else:
+        logging.info(
+            "No mandatory columns provided. Using all available columns in the dataframe."
+        )
+
+    # Normalizing text columns
+    if txt_columns:
+        logging.info(f"Normalizing text columns to string: {txt_columns}")
+        df = normalize_whitespace_columns(df=df, columns=txt_columns)
+    else:
+        logging.info("No text columns provided. Skipping ...")
+
+    # Convert reference columns to string
+    if ref_columns:
+        logging.info(f"Converting reference columns to string: {ref_columns}")
+        df = handle_grist_null_references(df=df, columns=ref_columns)
+    else:
+        logging.info("No reference columns provided. Skipping ...")
+
+    # Convert date columns to datetime
+    if date_columns:
+        logging.info(f"Converting date columns to datetime: {date_columns}")
+        df = convert_grist_date_to_date(df=df, columns=date_columns)
+    else:
+        logging.info("No date columns provided. Skipping ...")
+
+    if custom_fn:
+        logging.info(f"Applying custom processing function: {custom_fn.__name__}")
+        df = custom_fn(df)
+    else:
+        logging.info("No custom processing function provided.")
+
+    return df
