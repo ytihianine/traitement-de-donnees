@@ -23,6 +23,7 @@ from src.constants import (
 )
 from src.utils.process.dates import convert_grist_date_to_date
 from src.utils.process.structures import (
+    handle_grist_boolean_columns,
     handle_grist_null_references,
     normalize_grist_dataframe,
 )
@@ -98,6 +99,7 @@ def generic_grist_processing(
     txt_columns: list[str] | None = None,
     ref_columns: list[str] | None = None,
     date_columns: list[str] | None = None,
+    bool_columns: list[str] | None = None,
     custom_fn: Callable[[pd.DataFrame], pd.DataFrame] | None = None,
 ) -> pd.DataFrame:
     """
@@ -143,6 +145,13 @@ def generic_grist_processing(
         df = convert_grist_date_to_date(df=df, columns=date_columns)
     else:
         logging.info("No date columns provided. Skipping ...")
+
+    # Convert boolean columns to boolean
+    if bool_columns:
+        logging.info(f"Converting boolean columns to boolean: {bool_columns}")
+        df = handle_grist_boolean_columns(df=df, columns=bool_columns)
+    else:
+        logging.info("No boolean columns provided. Skipping ...")
 
     if custom_fn:
         logging.info(f"Applying custom processing function: {custom_fn.__name__}")
