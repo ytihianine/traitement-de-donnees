@@ -32,6 +32,7 @@ class DataContext:
         return name in self.datasets
 
 
+@dataclass(frozen=True)
 class ReaderStrategy(ABC):
     context: DataContext = field(default_factory=DataContext)
 
@@ -104,7 +105,7 @@ class GristReaderStrategy(ReaderStrategy):
 
 @dataclass(frozen=True)
 class FileReaderStrategy(ReaderStrategy):
-    fs_type: FileHandlerType
+    fs_type: FileHandlerType = field(default=FileHandlerType.S3)
 
     def read(
         self,
@@ -127,7 +128,7 @@ class FileReaderStrategy(ReaderStrategy):
 
 @dataclass(frozen=True)
 class DbReaderStrategy(ReaderStrategy):
-    query: str
+    query: str = field(default="SELECT * FROM my_table")
 
     def read(
         self,
