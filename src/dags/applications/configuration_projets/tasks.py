@@ -21,11 +21,11 @@ def process_data() -> None:
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
-                    cols_mapping={"id": "id_direction"},
                     cols_to_keep=[
-                        "id_direction",
+                        "id",
                         "direction",
                     ],
+                    cols_mapping={"id": "id_direction"},
                     txt_columns=["direction"],
                     custom_fn=process.process_direction,
                 ),
@@ -44,12 +44,12 @@ def process_data() -> None:
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
-                    cols_mapping={"direction": "id_direction"},
                     cols_to_keep=[
                         "id",
-                        "id_direction",
+                        "direction",
                         "service",
                     ],
+                    cols_mapping={"direction": "id_direction"},
                     txt_columns=["service"],
                     ref_columns=["id_direction"],
                     custom_fn=process.process_service,
@@ -70,17 +70,17 @@ def process_data() -> None:
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
+                    cols_to_keep=[
+                        "id",
+                        "projet",
+                        "direction",
+                        "service",
+                    ],
                     cols_mapping={
                         "id": "id_projet",
                         "direction": "id_direction",
                         "service": "id_service",
                     },
-                    cols_to_keep=[
-                        "id_projet",
-                        "projet",
-                        "id_direction",
-                        "id_service",
-                    ],
                     txt_columns=["projet"],
                     ref_columns=["id_direction", "id_service"],
                     custom_fn=process.process_projets,
@@ -100,16 +100,16 @@ def process_data() -> None:
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
+                    cols_to_keep=[
+                        "id",
+                        "projet",
+                        "contact_mail",
+                        "is_mail_generic",
+                    ],
                     cols_mapping={
                         "id": "id_contact",
                         "projet": "id_projet",
                     },
-                    cols_to_keep=[
-                        "id_contact",
-                        "id_projet",
-                        "contact_mail",
-                        "is_mail_generic",
-                    ],
                     txt_columns=["contact_mail"],
                     ref_columns=["id_projet"],
                     bool_columns=["is_mail_generic"],
@@ -130,17 +130,16 @@ def process_data() -> None:
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
-                    cols_mapping={
-                        "projet": "id_projet",
-                    },
                     cols_to_keep=[
-                        "id_projet",
+                        "projet",
                         "type_documentation",
                         "lien",
                     ],
+                    cols_mapping={
+                        "projet": "id_projet",
+                    },
                     txt_columns=["type_documentation", "lien"],
                     ref_columns=["id_projet"],
-                    bool_columns=["is_mail_generic"],
                     custom_fn=process.process_projet_documentation,
                 ),
                 input_key="projet_documentation",
@@ -158,15 +157,15 @@ def process_data() -> None:
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
-                    cols_mapping={
-                        "projet": "id_projet",
-                    },
                     cols_to_keep=[
-                        "id_projet",
+                        "projet",
                         "bucket",
                         "key",
                         "key_tmp",
                     ],
+                    cols_mapping={
+                        "projet": "id_projet",
+                    },
                     txt_columns=["bucket", "key", "key_tmp"],
                     ref_columns=["id_projet"],
                     custom_fn=process.process_projet_s3,
@@ -186,19 +185,18 @@ def process_data() -> None:
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
+                    cols_to_keep=[
+                        "id",
+                        "projet",
+                        "type_de_selecteur",
+                        "selecteur",
+                    ],
                     cols_mapping={
                         "id": "id_selecteur",
                         "projet": "id_projet",
                         "type_de_selecteur": "type_selecteur",
-                        "selecteur": "selecteur",
                     },
-                    cols_to_keep=[
-                        "id_selecteur",
-                        "id_projet",
-                        "type_selecteur",
-                        "selecteur",
-                    ],
-                    txt_columns=["selecteur"],
+                    txt_columns=["selecteur", "type_selecteur"],
                     ref_columns=["id_projet"],
                     custom_fn=process.process_projet_selecteur,
                 ),
@@ -218,17 +216,16 @@ def process_data() -> None:
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
-                    cols_mapping={
-                        "projet": "id_projet",
-                        "type": "type_source",
-                        "selecteur": "id_selecteur",
-                    },
                     cols_to_keep=[
                         "projet",
                         "type_source",
-                        "id_selecteur",
+                        "selecteur",
                         "id_source",
                     ],
+                    cols_mapping={
+                        "projet": "id_projet",
+                        "selecteur": "id_selecteur",
+                    },
                     txt_columns=["type_source", "id_source"],
                     ref_columns=["id_projet", "id_selecteur"],
                     custom_fn=process.process_selecteur_source,
@@ -248,16 +245,16 @@ def process_data() -> None:
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
+                    cols_to_keep=[
+                        "projet",
+                        "selecteur",
+                        "filename",
+                        "key",
+                    ],
                     cols_mapping={
                         "projet": "id_projet",
                         "selecteur": "id_selecteur",
                     },
-                    cols_to_keep=[
-                        "id_projet",
-                        "id_selecteur",
-                        "filename",
-                        "key",
-                    ],
                     txt_columns=["filename", "key"],
                     ref_columns=["id_projet", "id_selecteur"],
                     custom_fn=process.process_selecteur_s3,
@@ -277,15 +274,15 @@ def process_data() -> None:
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
+                    cols_to_keep=[
+                        "projet",
+                        "selecteur",
+                        "tbl_name",
+                    ],
                     cols_mapping={
                         "projet": "id_projet",
                         "selecteur": "id_selecteur",
                     },
-                    cols_to_keep=[
-                        "id_projet",
-                        "id_selecteur",
-                        "tbl_name",
-                    ],
                     txt_columns=["tbl_name"],
                     ref_columns=["id_projet", "id_selecteur"],
                     custom_fn=process.process_selecteur_database,
@@ -305,11 +302,6 @@ def process_data() -> None:
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
-                    cols_mapping={
-                        "id": "id_col_mapping",
-                        "projet": "id_projet",
-                        "selecteur": "id_selecteur",
-                    },
                     cols_to_keep=[
                         "id",
                         "projet",
@@ -319,6 +311,11 @@ def process_data() -> None:
                         "to_keep",
                         "date_archivage",
                     ],
+                    cols_mapping={
+                        "id": "id_col_mapping",
+                        "projet": "id_projet",
+                        "selecteur": "id_selecteur",
+                    },
                     txt_columns=["colname_source", "colname_dest"],
                     ref_columns=["id_projet", "id_selecteur"],
                     bool_columns=["to_keep"],

@@ -38,7 +38,6 @@ def process_projets(df: pd.DataFrame) -> pd.DataFrame:
 def process_projet_contact(df: pd.DataFrame) -> pd.DataFrame:
     # Retirer les lignes avec contact_mail vide (après normalisation)
     df = df.loc[df["contact_mail"].astype(bool)]
-
     return df
 
 
