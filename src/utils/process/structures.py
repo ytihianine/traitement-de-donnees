@@ -18,7 +18,7 @@ def convert_str_of_list_to_list(df: pd.DataFrame, col_to_convert: str) -> pd.Dat
 
 
 def lower_dataframe_labels(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.set_axis(labels=map(str.lower, df.columns), axis="columns")
+    df = df.set_axis(labels=map(str.lower, df.columns), axis="columns")  # type: ignore
     return df
 
 
@@ -38,7 +38,7 @@ def handle_grist_null_references(
         )
         return df
     for col in columns:
-        df[col] = df[col].replace({0: pd.NA})
+        df[col] = df[col].replace({0: pd.NA})  # type: ignore
     return df
 
 
