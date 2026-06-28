@@ -101,6 +101,7 @@ def generic_grist_processing(
     ref_columns: list[str] | None = None,
     date_columns: list[str] | None = None,
     bool_columns: list[str] | None = None,
+    num_columns: list[str] | None = None,
     custom_fn: Callable[[pd.DataFrame], pd.DataFrame] | None = None,
 ) -> pd.DataFrame:
     """
@@ -153,6 +154,14 @@ def generic_grist_processing(
         df = handle_grist_boolean_columns(df=df, columns=bool_columns)
     else:
         logging.info("No boolean columns provided. Skipping ...")
+
+    # Convert numeric columns to float
+    if num_columns:
+        logging.info(f"Converting numeric columns to float: {num_columns}")
+        for col in num_columns:
+            df[col] = pd.to_numeric(arg=df[col], errors="coerce").astype("Float64")
+    else:
+        logging.info("No numeric columns provided. Skipping ...")
 
     if custom_fn:
         logging.info(f"Applying custom processing function: {custom_fn.__name__}")
