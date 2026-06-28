@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+import logging
 from typing import Any, Callable
 from datetime import datetime
 import pandas as pd
@@ -137,7 +138,8 @@ class ETLTask(ABC):
             selecteurs=runtime.selecteurs,
         )
 
-        for step in self.steps:
+        for index, step in enumerate(self.steps):
+            logging.info(f"Running step {index + 1}/{len(self.steps)}: {step}")
             data_context = step(data_context)
 
         if self.target not in data_context.datasets:
