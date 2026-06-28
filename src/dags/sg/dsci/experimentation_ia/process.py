@@ -1,18 +1,17 @@
+import logging
 import pandas as pd
 
 from src.utils.process.structures import (
     convert_str_of_list_to_list,
-    handle_grist_null_references,
 )
-from src.utils.process.text import normalize_whitespace_columns
+from src.constants import NO_PROCESS_MSG
 
 
 # =============================================================
 # Fonction de processing des référentiels du questionnaire 1
 # =============================================================
 def process_ref_q1_direction(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["direction"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
@@ -32,15 +31,12 @@ def process_ref_q1_direction(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_q5_domaine(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["domaine"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q6_niveau_utilisation(df: pd.DataFrame) -> pd.DataFrame:
-    col_to_keep = ["id", "niveau_d_appropriation"]
-    df = df.loc[:, col_to_keep]
-    df = normalize_whitespace_columns(df=df, columns=["niveau_d_appropriation"])
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
@@ -50,8 +46,7 @@ def process_ref_q6_niveau_utilisation(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_q9_cas_usage(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["cas_d_usage"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
@@ -69,88 +64,72 @@ def process_ref_q9_cas_usage(df: pd.DataFrame) -> pd.DataFrame:
 # Processing des referenciels questionnaire 2
 # =============================================================
 def process_ref_q28_raisons_perte(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["raisons"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q25_impact_observe(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["observation"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q24_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["impacts"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q23_taux_correction(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    col_to_keep = ["id", "taux_de_correction"]
-    df = df.loc[:, col_to_keep]
-    df = normalize_whitespace_columns(df=df, columns=["taux_de_correction"])
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
-def process_ref_q22_erreurs(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["erreurs"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+def process_ref_q22_typologie_erreurs(df: pd.DataFrame) -> pd.DataFrame:
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q20_autres_ia(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["comparaisons"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q16_taches(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["taches"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q14_evolution_craintes(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["evolutions"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q13_facteurs_progression(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["facteurs"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q10_principaux_freins(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["freins"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q6_participation_programme(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["participation"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q5_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["formation_suivie"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q3_niveau(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["niveau"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q7_accords(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["reponses"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
@@ -158,8 +137,7 @@ def process_ref_q7_accords(df: pd.DataFrame) -> pd.DataFrame:
 # Processing référentiel questionnaire2_bis : Jamais connecté à l'Assistant IA
 # =============================================================
 def process_ref_raisons_non_utilisation(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["raisons"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
@@ -169,124 +147,69 @@ def process_ref_raisons_non_utilisation(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_ref_q6_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["formation"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q7_particip_programme(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["participation"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q8_raisons_non_participation(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["raisons"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q11_leviers_progressions(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["leviers"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q12_impacts_taches_pro(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["impacts"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q14_taches_rebarbativ(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["taches_rebarbatives"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q17_autres_outils(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    col_to_keep = ["id", "autres_outils"]
-    df = df.loc[:, col_to_keep]
-    df = normalize_whitespace_columns(df=df, columns=["autres_outils"])
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q17_satisfaction_autre_outil(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    col_to_keep = ["id", "satisfaction_autres_outils"]
-    df = df.loc[:, col_to_keep]
-    df = normalize_whitespace_columns(df=df, columns=["satisfaction_autres_outils"])
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q18_comparaisons(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["comparaisons"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q19_fonctionnalites(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["fonctionnalites"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q21_risques_identifies(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["risques"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_ref_q25_besoins(df: pd.DataFrame) -> pd.DataFrame:
-    txt_col = ["besoins"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 # =============================================================
 # Processing Entité
 # =============================================================
-
-
-def process_quota_entite(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    df = df.rename(
-        columns={
-            "nbre_de_connexion_effective_au_05_03_2026": "nbre_connexion_effective"
-        }
-    )
-    cols_to_keep = [
-        "experimentation_demarree",
-        "entite",
-        "nbre_d_acces_previsionnels",
-        "nb_acces_demande",
-        "code",
-        "nbre_connexion_effective",
-        "nb_de_reponses_au_questionnaire",
-        "nb_reponse_q2",
-        "nb_reponse_q3",
-        "relance_dsci",
-        "appel_a_candidature_dsci",
-        "referent_ia",
-        "courriel",
-    ]
-    df = df.loc[:, cols_to_keep]
-
-    # Normaliser les colonnes textuelles
-    txt_cols = [
-        "code",
-        "relance_dsci",
-        "appel_a_candidature_dsci",
-        "referent_ia",
-        "courriel",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
-    # Normaliser les colonnes numériques
-    num_col = ["nbre_d_acces_previsionnels", "nbre_connexion_effective"]
-    for col in num_col:
-        df[col] = pd.to_numeric(arg=df[col], errors="coerce").astype("Int64")
+def process_quota_par_entite(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop_duplicates(subset="courriel", keep="last")
     return df
 
@@ -295,27 +218,6 @@ def process_quota_entite(df: pd.DataFrame) -> pd.DataFrame:
 # Processing experimentateurs
 # =============================================================
 def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
-    cols_to_keep = [
-        "no_id",
-        "entite",
-        "parti",
-        "courriel",
-        "courriel_corrige",
-        "connecte_",
-        "reponse_au_questionnaire_1",
-        "reponse_au_questionnaire_2",
-        "reponse_au_questionnaire_3",
-    ]
-    df = df.loc[:, cols_to_keep]
-
-    # Normaliser les colonnes textuelles
-    txt_cols = [
-        "no_id",
-        "parti",
-        "courriel",
-        "courriel_corrige",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     df = df.dropna(subset=["courriel"])
     df = df.drop_duplicates(subset="courriel", keep="last")
     return df
@@ -325,80 +227,11 @@ def process_experimentateurs(df: pd.DataFrame) -> pd.DataFrame:
 # Processing Questionnaire 1 : profil des expérimentateurs
 # =============================================================
 def process_questionnaire_1(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.rename(
-        columns={
-            "direction": "id_direction",
-            "domaine_professionnel": "id_domaine_professionnel",
-            "niveau_d_utilisation_ia": "id_niveau_d_utilisation_ia",
-        }
-    )
-    # Gestion des colonnes
-    cols_to_keep = [
-        "no_id",
-        "id_direction",
-        "tranche_age",
-        "categorie_emploi",
-        "statut",
-        "id_domaine_professionnel",
-        "metier",
-        "situation_d_encadrement",
-        "autres_experimentateurs",
-        "id_niveau_d_utilisation_ia",
-        "usage_ia_perso_avant_expe",
-        "usage_ia_pro_avant_expe",
-        "craintes_usage_ia_pro",
-        "raisons_des_craintes",
-        "attentes_experimentation",
-        "autres_cas_usage_transverse",
-        "cas_d_usage_metier",
-        "formation_suivie_usage_ia_",
-        "autre_formation_suivie",
-        "autre_besoin_accompagnement",
-        "besoin_acculturation_encadrement",
-    ]
-    df = df.loc[:, cols_to_keep]
-    txt_cols = [
-        "no_id",
-        "metier",
-        "raisons_des_craintes",
-        "attentes_experimentation",
-        "cas_d_usage_metier",
-        "autres_cas_usage_transverse",
-        "autre_formation_suivie",
-        "autre_besoin_accompagnement",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
-    # Gestion des references simples
-    ref_cols = [
-        "id_direction",
-        "id_domaine_professionnel",
-        "id_niveau_d_utilisation_ia",
-    ]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     df = df.drop_duplicates(subset="no_id", keep="last")
     return df
 
 
 def process_questionnaire_1_cas_usage(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    df = df.rename(
-        columns={
-            "cas_d_usage_envisages": "id_cas_d_usage_envisages",
-        }
-    )
-    cols_to_keep = ["no_id", "id_cas_d_usage_envisages"]
-    df = df.loc[:, cols_to_keep]
-
-    # Txt normalisation
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
-    # Gestion des refs
-    ref_cols = ["id_cas_d_usage_envisages"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion, Explode et dropna
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_cas_d_usage_envisages")
     df = df.explode(column="id_cas_d_usage_envisages")
@@ -408,15 +241,6 @@ def process_questionnaire_1_cas_usage(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_questionnaire_1_besoins_accompagnement(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "besoin_accompagnement"]
-    df = df.loc[:, cols_to_keep]
-    # Txt normalisation
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
     # Convertion et Explode
     df = convert_str_of_list_to_list(df=df, col_to_convert="besoin_accompagnement")
     df = df.explode(column="besoin_accompagnement")
@@ -430,132 +254,12 @@ def process_questionnaire_1_besoins_accompagnement(df: pd.DataFrame) -> pd.DataF
 # Processing Questionnaire 2 : Retour sur l'utiliation de l'assistant ia
 # =============================================================
 def process_questionnaire_2(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.rename(
-        columns={
-            "niveau_d_usage_ia_post_expe_": "id_niveau_d_usage_ia_post_expe_",
-            "recommandation_collegues_mef": "id_recommandation_collegues_mef",
-            "sensation_montee_en_competences": "id_sensation_montee_en_competences",
-            "evolution_des_craintes_initiales": "id_evolution_des_craintes_initiales",
-            "utilite_metier_mef": "id_utilite_metier_mef",
-            "diminution_d_usage_ia_non_souveraines": "id_diminution_d_usage_ia_non_souveraines",
-            "comparaison_autres_ia": "id_comparaison_autres_ia",
-            "taux_moyen_de_correction_rep_assistant": "id_taux_moyen_de_correction_rep_assistant",
-            "cu2_taux_moyen_de_correction_assistant": "id_cu2_taux_moyen_de_correction_rep_assistant",
-            "cu3_taux_moyen_de_correction_assistant": "id_cu3_taux_moyen_de_correction_rep_assistant",
-            "raisons_perte_de_temps": "id_raisons_perte_de_temps",
-            "ia_favorise_relations_humaines_": "id_ia_favorise_relations_humaines_",
-        }
-    )
-    col_to_keep = [
-        "no_id",
-        "autres_types_d_interactions",
-        "id_niveau_d_usage_ia_post_expe_",
-        "frequence_d_usage_assistant_ia",
-        "autres_formation_ia",
-        "raison_non_participation_rdv",
-        "autre_besoin_accompagnement",
-        "apprentissage_assistant_ia_ressenti_",
-        "difficultes_techniques_rencontrees2",
-        "autres_difficultes",
-        "autres_taches_realisees",
-        "autres_freins",
-        "id_recommandation_collegues_mef",
-        "id_sensation_montee_en_competences",
-        "autres_sources_de_progression",
-        "id_evolution_des_craintes_initiales",
-        "id_utilite_metier_mef",
-        "decouverte_d_usages_inattendus",
-        "les_usages_inattendus",
-        "mode_de_decouverte_usages",
-        "autre_mode_de_decouverte",
-        "id_diminution_d_usage_ia_non_souveraines",
-        "id_comparaison_autres_ia",
-        "frequence_des_erreurs",
-        "autres_types_d_erreurs",
-        "cas_usage_principal_teste",
-        "temps_economise_par_semaine",
-        "cu1_nombre_echanges_moyens_affinage_reponse",
-        "id_taux_moyen_de_correction_rep_assistant",
-        "pertinence_assistant_ia",
-        "commentaires",
-        "deuxieme_cas_d_usage_teste",
-        "cu2_temps_economise_par_semaine",
-        "cu2_nombre_echanges_moyens",
-        "id_cu2_taux_moyen_de_correction_rep_assistant",
-        "cu2_pertinence_assistant_ia",
-        "commentaires2",
-        "troisieme_cas_d_usage",
-        "cu3_temps_economise_par_semaine",
-        "cu3_nombre_echanges_moyens_affinage_reponse",
-        "id_cu3_taux_moyen_de_correction_rep_assistant",
-        "cu3_pertinence_assistant_ia",
-        "commentaires3",
-        "autres_impacts_identifies",
-        "autres_impacts_observes",
-        "impact_sur_le_temps_de_travail",
-        "estimation_globale_gain_de_temps",
-        "id_raisons_perte_de_temps",
-        "autres_raisons",
-        "id_ia_favorise_relations_humaines_",
-    ]
-    df = df.loc[:, col_to_keep]
-
-    txt_cols = [
-        "no_id",
-        "autres_types_d_interactions",
-        "autres_formation_ia",
-        "raison_non_participation_rdv",
-        "autre_besoin_accompagnement",
-        "autres_difficultes",
-        "autres_freins",
-        "autres_sources_de_progression",
-        "autres_taches_realisees",
-        "les_usages_inattendus",
-        "mode_de_decouverte_usages",
-        "autre_mode_de_decouverte",
-        "autres_types_d_erreurs",
-        "cas_usage_principal_teste",
-        "commentaires",
-        "deuxieme_cas_d_usage_teste",
-        "commentaires2",
-        "troisieme_cas_d_usage",
-        "commentaires3",
-        "autres_impacts_identifies",
-        "autres_impacts_observes",
-        "autres_raisons",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-
-    # Gestion des references simples
-    ref_cols = [
-        "id_niveau_d_usage_ia_post_expe_",
-        "id_recommandation_collegues_mef",
-        "id_sensation_montee_en_competences",
-        "id_evolution_des_craintes_initiales",
-        "id_utilite_metier_mef",
-        "id_diminution_d_usage_ia_non_souveraines",
-        "id_comparaison_autres_ia",
-        "id_taux_moyen_de_correction_rep_assistant",
-        "id_cu2_taux_moyen_de_correction_rep_assistant",
-        "id_cu3_taux_moyen_de_correction_rep_assistant",
-        "id_raisons_perte_de_temps",
-        "id_ia_favorise_relations_humaines_",
-    ]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     df = df.dropna(subset=["no_id"])
     df = df.drop_duplicates(subset="no_id", keep="last")
-
     return df
 
 
 def process_questionnaire_2_typologie_interaction(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "types_d_interactions_mef"]
-    df = df.loc[:, cols_to_keep]
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Convertion et Explode
     df = convert_str_of_list_to_list(df=df, col_to_convert="types_d_interactions_mef")
     df = df.explode(column="types_d_interactions_mef")
@@ -566,22 +270,6 @@ def process_questionnaire_2_typologie_interaction(df: pd.DataFrame) -> pd.DataFr
 
 
 def process_questionnaire_2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "formation_ia_suivie_post_expe_"]
-    df = df.loc[:, cols_to_keep]
-
-    df = df.dropna(subset=["no_id"])
-
-    # Renommage
-    df = df.rename(
-        columns={
-            "formation_ia_suivie_post_expe_": "id_formation_ia_suivie_post_expe_",
-        }
-    )
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
     # Convertion
     df = convert_str_of_list_to_list(
         df=df, col_to_convert="id_formation_ia_suivie_post_expe_"
@@ -594,23 +282,6 @@ def process_questionnaire_2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_questionnaire_2_participation(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "participation_programme_rdv"]
-    df = df.loc[:, cols_to_keep]
-
-    # Renommage
-    df = df.rename(
-        columns={
-            "participation_programme_rdv": "id_participation_programme_rdv",
-        }
-    )
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    # Gestion des refs
-    ref_cols = ["id_participation_programme_rdv"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(
         df=df, col_to_convert="id_participation_programme_rdv"
@@ -624,23 +295,6 @@ def process_questionnaire_2_participation(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_questionnaire_2_freins(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "freins_a_l_utilisation"]
-    df = df.loc[:, cols_to_keep]
-
-    # Renommage
-    df = df.rename(
-        columns={
-            "freins_a_l_utilisation": "id_freins_a_l_utilisation",
-        }
-    )
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    # Gestion des refs
-    ref_cols = ["id_freins_a_l_utilisation"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_freins_a_l_utilisation")
     df = df.explode(column="id_freins_a_l_utilisation")
@@ -651,23 +305,6 @@ def process_questionnaire_2_freins(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_questionnaire_2_facteurs_progression(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "facteurs_de_progression"]
-    df = df.loc[:, cols_to_keep]
-
-    # Renommage
-    df = df.rename(
-        columns={
-            "facteurs_de_progression": "id_facteurs_de_progression",
-        }
-    )
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    # Gestion des refs
-    ref_cols = ["id_facteurs_de_progression"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_facteurs_de_progression")
     df = df.explode(column="id_facteurs_de_progression")
@@ -678,21 +315,6 @@ def process_questionnaire_2_facteurs_progression(df: pd.DataFrame) -> pd.DataFra
 
 
 def process_questionnaire_2_taches(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "taches_realisees_avec_ia"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={
-            "taches_realisees_avec_ia": "id_taches_realisees_avec_ia",
-        }
-    )
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    # Gestion des refs
-    ref_cols = ["id_taches_realisees_avec_ia"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(
         df=df, col_to_convert="id_taches_realisees_avec_ia"
@@ -705,22 +327,6 @@ def process_questionnaire_2_taches(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_questionnaire_2_typologie_erreurs(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "types_d_erreurs_frequentes2"]
-    df = df.loc[:, cols_to_keep]
-    # Renommage
-    df = df.rename(
-        columns={
-            "types_d_erreurs_frequentes2": "id_types_d_erreurs_frequentes2",
-        }
-    )
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    # Gestion des refs
-    ref_cols = ["id_types_d_erreurs_frequentes2"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(
         df=df, col_to_convert="id_types_d_erreurs_frequentes2"
@@ -732,22 +338,7 @@ def process_questionnaire_2_typologie_erreurs(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_questionnaire_2_observation_impact(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "observations_des_impacts"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={
-            "observations_des_impacts": "id_observations_des_impacts",
-        }
-    )
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    # Gestion des refs
-    ref_cols = ["id_observations_des_impacts"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
+def process_questionnaire_2_impact_observe(df: pd.DataFrame) -> pd.DataFrame:
     # Convertion
     df = convert_str_of_list_to_list(
         df=df, col_to_convert="id_observations_des_impacts"
@@ -760,21 +351,6 @@ def process_questionnaire_2_observation_impact(df: pd.DataFrame) -> pd.DataFrame
 
 
 def process_questionnaire_2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "impacts_identifies_au_travail"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={
-            "impacts_identifies_au_travail": "id_impacts_identifies_au_travail",
-        }
-    )
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    # Gestion des refs
-    ref_cols = ["id_impacts_identifies_au_travail"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(
         df=df, col_to_convert="id_impacts_identifies_au_travail"
@@ -790,35 +366,13 @@ def process_questionnaire_2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
 # Processing du questionnaire2_bis : Les agents qui ne se sont jamais connectés
 # =============================================================
 def process_questionnaire_2_bis(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep: list[str] = [
-        "courriel",
-        "avez_vous_deja_utilise_l_assistant_ia_",
-        "autres_raisons",
-        "ajouter_quelque_chose",
-    ]
-    df = df.loc[:, cols_to_keep]
-    txt_col = ["courriel", "autres_raisons", "ajouter_quelque_chose"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
+    logging.info(msg=NO_PROCESS_MSG)
     return df
 
 
 def process_questionnaire_2_bis_raisons_non_utilisation(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["courriel", "raisons_non_utilisation_assistant_ia"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={
-            "raisons_non_utilisation_assistant_ia": "id_raisons_non_utilisation",
-        }
-    )
-    txt_col = ["courriel"]
-    df = normalize_whitespace_columns(df=df, columns=txt_col)
-    # Gestion des refs
-    ref_cols = ["id_raisons_non_utilisation"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_raisons_non_utilisation")
     df = df.explode(column="id_raisons_non_utilisation")
@@ -831,105 +385,12 @@ def process_questionnaire_2_bis_raisons_non_utilisation(
 # =============================================================
 # Processing du questionnaire 3 : Usages et ressentis face à l’Assistant IA, en fin de phase de test
 # =============================================================
-
-
 def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
-    # Renommage des colonnes référentielles simples
-    df = df.rename(
-        columns={
-            "raisons_non_participation": "id_raisons_non_participation",
-            "impacts_taches_pro": "id_impacts_taches_pro",
-            "impacts_taches_rebarbatives": "id_impacts_taches_rebarbatives",
-            "autres_outils": "id_autres_outils",
-            "satisfaction_autre_outil": "id_satisfaction_autre_outil",
-            "comparaison_autres_ia": "id_comparaison_autres_ia",
-        }
-    )
-    cols_to_keep: list[str] = [
-        "no_id",
-        "temps_fonction_exercee",
-        "genre",
-        "frequence_utilisation",
-        "evolution_usage",
-        "quelles_raisons_facons",
-        # "formation_suivie",
-        # "programme_de_rdv",
-        "id_raisons_non_participation",
-        "autres",
-        "evaluation_niveau_acculturation",
-        "evolution_sentiment",
-        "autres_leviers",
-        "id_impacts_taches_pro",
-        "temps_gagnes",
-        "id_impacts_taches_rebarbatives",
-        "impact_perception",
-        "sentiment_de_fierte",
-        "experimentation_interne",
-        "id_autres_outils",
-        "id_satisfaction_autre_outil",
-        "id_comparaison_autres_ia",
-        "autres_fonctionnalites",
-        "utilisation_moindre",
-        "autres_risques",
-        "recommandations",
-        "etre_ambassadeur",
-        "bonnes_pratiques",
-        "autres_besoins_importants",
-        "autres_besoins_moindres",
-        "ameliorations",
-        "aspects_a_ameliorer",
-        "interface",
-        "contenu",
-        "connexions",
-        "autre_retour_libre",
-        "retours_libres",
-    ]
-    df = df.loc[:, cols_to_keep]
-    txt_cols = [
-        "no_id",
-        "quelles_raisons_facons",
-        "autres",
-        "autres_leviers",
-        "autres_fonctionnalites",
-        "autres_risques",
-        "bonnes_pratiques",
-        "autres_besoins_importants",
-        "autres_besoins_moindres",
-        "ameliorations",
-        "aspects_a_ameliorer",
-        "interface",
-        "contenu",
-        "connexions",
-        "autre_retour_libre",
-        "retours_libres",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    # Gestions des refs simples
-    ref_cols = [
-        "id_raisons_non_participation",
-        "id_impacts_taches_pro",
-        "id_impacts_taches_rebarbatives",
-        "id_autres_outils",
-        "id_satisfaction_autre_outil",
-        "id_comparaison_autres_ia",
-    ]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     df = df.drop_duplicates(subset="no_id", keep="last")
     return df
 
 
 def process_questionnaire_3_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "formation_suivie"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={"formation_suivie": "id_formation_suivie"})
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    # Gestion des refs
-    ref_cols = ["id_formation_suivie"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_formation_suivie")
     df = df.explode(column="id_formation_suivie")
@@ -940,17 +401,6 @@ def process_questionnaire_3_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_questionnaire_3_programme_rdv(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnes
-    cols_to_keep = ["no_id", "programme_de_rdv"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={"programme_de_rdv": "id_programme_de_rdv"})
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    # Gestion des refs
-    ref_cols = ["id_programme_de_rdv"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Convertion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_programme_de_rdv")
     df = df.explode(column="id_programme_de_rdv")
@@ -961,21 +411,6 @@ def process_questionnaire_3_programme_rdv(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_questionnaire_3_leviers_progression(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnnes
-    cols_to_keep = ["no_id", "leviers_progression"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={
-            "leviers_progression": "id_leviers_progression",
-        }
-    )
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    ref_cols = ["id_leviers_progression"]
-    # Gestion des refs
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Conversion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_leviers_progression")
     df = df.explode(column="id_leviers_progression")
@@ -986,16 +421,6 @@ def process_questionnaire_3_leviers_progression(df: pd.DataFrame) -> pd.DataFram
 
 
 def process_questionnaire_3_fonctionnalites(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnnes
-    cols_to_keep = ["no_id", "fonctionnalites"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={"fonctionnalites": "id_fonctionnalites"})
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    ref_cols = ["id_fonctionnalites"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Conversion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_fonctionnalites")
     df = df.explode(column="id_fonctionnalites")
@@ -1006,20 +431,6 @@ def process_questionnaire_3_fonctionnalites(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_questionnaire_3_risques_identifies(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnnes
-    cols_to_keep = ["no_id", "risques_identifies"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={
-            "risques_identifies": "id_risques_identifies",
-        }
-    )
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    ref_cols = ["id_risques_identifies"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Conversion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_risques_identifies")
     df = df.explode(column="id_risques_identifies")
@@ -1030,20 +441,6 @@ def process_questionnaire_3_risques_identifies(df: pd.DataFrame) -> pd.DataFrame
 
 
 def process_questionnaire_3_besoins_prioritaires(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnnes
-    cols_to_keep = ["no_id", "besoins_prioritaires"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(
-        columns={
-            "besoins_prioritaires": "id_besoins_prioritaires",
-        }
-    )
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    ref_cols = ["id_besoins_prioritaires"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Conversion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_besoins_prioritaires")
     df = df.explode(column="id_besoins_prioritaires")
@@ -1054,16 +451,6 @@ def process_questionnaire_3_besoins_prioritaires(df: pd.DataFrame) -> pd.DataFra
 
 
 def process_questionnaire_3_besoins_moindres(df: pd.DataFrame) -> pd.DataFrame:
-    # Gestion des colonnnes
-    cols_to_keep = ["no_id", "besoins_moindres"]
-    df = df.loc[:, cols_to_keep]
-    df = df.rename(columns={"besoins_moindres": "id_besoins_moindres"})
-    txt_cols = [
-        "no_id",
-    ]
-    df = normalize_whitespace_columns(df=df, columns=txt_cols)
-    ref_cols = ["id_besoins_moindres"]
-    df = handle_grist_null_references(df=df, columns=ref_cols)
     # Conversion
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_besoins_moindres")
     df = df.explode(column="id_besoins_moindres")
