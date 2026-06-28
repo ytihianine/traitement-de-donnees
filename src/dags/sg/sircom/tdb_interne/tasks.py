@@ -28,7 +28,7 @@ def abonnes_visites() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     visites_portail = ETLTask(
         task_config=TaskConfig(task_id="visites_portail"),
@@ -45,7 +45,7 @@ def abonnes_visites() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     visites_bercyinfo = ETLTask(
         task_config=TaskConfig(task_id="visites_bercyinfo"),
@@ -62,7 +62,7 @@ def abonnes_visites() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     visites_alize = ETLTask(
         task_config=TaskConfig(task_id="visites_alize"),
@@ -79,7 +79,7 @@ def abonnes_visites() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     visites_intranet_sg = ETLTask(
         task_config=TaskConfig(task_id="visites_intranet_sg"),
@@ -96,7 +96,7 @@ def abonnes_visites() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     performances_lettres = ETLTask(
         task_config=TaskConfig(task_id="performances_lettres"),
@@ -113,7 +113,7 @@ def abonnes_visites() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     abonnes_lettres = ETLTask(
         task_config=TaskConfig(task_id="abonnes_lettres"),
@@ -130,7 +130,7 @@ def abonnes_visites() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     ouverture_lettre_alize = ETLTask(
         task_config=TaskConfig(task_id="ouverture_lettre_alize"),
@@ -147,7 +147,7 @@ def abonnes_visites() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     impressions_reseaux_sociaux = ETLTask(
         task_config=TaskConfig(task_id="impressions_reseaux_sociaux"),
@@ -164,7 +164,7 @@ def abonnes_visites() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     impact_actions_com = ETLTask(
         task_config=TaskConfig(task_id="impact_actions_com"),
@@ -181,7 +181,7 @@ def abonnes_visites() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
 
     chain(
@@ -217,7 +217,7 @@ def budget() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     chain(synthese_depenses.create_task())
 
@@ -239,7 +239,7 @@ def enquetes() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     qualite_vie_travail = ETLTask(
         task_config=TaskConfig(task_id="qualite_vie_travail"),
@@ -256,7 +256,7 @@ def enquetes() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     collab_inter_structure = ETLTask(
         task_config=TaskConfig(task_id="collab_inter_structure"),
@@ -273,7 +273,7 @@ def enquetes() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     obs_interne = ETLTask(
         task_config=TaskConfig(task_id="obs_interne"),
@@ -290,7 +290,7 @@ def enquetes() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     enquete_360 = ETLTask(
         task_config=TaskConfig(task_id="enquete_360"),
@@ -307,7 +307,7 @@ def enquetes() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     obs_interne_participation = ETLTask(
         task_config=TaskConfig(task_id="obs_interne_participation"),
@@ -324,7 +324,7 @@ def enquetes() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     engagement_environnement = ETLTask(
         task_config=TaskConfig(task_id="engagement_environnement"),
@@ -341,7 +341,7 @@ def enquetes() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
 
     chain(
@@ -374,7 +374,7 @@ def metiers() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     enquete_satisfaction = ETLTask(
         task_config=TaskConfig(task_id="enquete_satisfaction"),
@@ -391,7 +391,7 @@ def metiers() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     etudes = ETLTask(
         task_config=TaskConfig(task_id="etudes"),
@@ -408,7 +408,7 @@ def metiers() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     communique_presse = ETLTask(
         task_config=TaskConfig(task_id="communique_presse"),
@@ -425,7 +425,7 @@ def metiers() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     studio_graphique = ETLTask(
         task_config=TaskConfig(task_id="studio_graphique"),
@@ -442,7 +442,7 @@ def metiers() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     notes_veilles = ETLTask(
         task_config=TaskConfig(task_id="notes_veilles"),
@@ -459,7 +459,7 @@ def metiers() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     recommandation_strat = ETLTask(
         task_config=TaskConfig(task_id="recommandation_strat"),
@@ -476,7 +476,7 @@ def metiers() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     projets_graphiques = ETLTask(
         task_config=TaskConfig(task_id="projets_graphiques"),
@@ -493,7 +493,7 @@ def metiers() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
 
     chain(
@@ -527,7 +527,7 @@ def ressources_humaines() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     rh_turnover = ETLTask(
         task_config=TaskConfig(task_id="rh_turnover"),
@@ -544,7 +544,7 @@ def ressources_humaines() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     rh_contractuel = ETLTask(
         task_config=TaskConfig(task_id="rh_contractuel"),
@@ -561,7 +561,7 @@ def ressources_humaines() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     chain(
         [
