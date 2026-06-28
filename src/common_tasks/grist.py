@@ -111,13 +111,6 @@ def generic_grist_processing(
     logging.info("Normalizing Grist dataframe")
     df = normalize_grist_dataframe(df=df)
 
-    # Rename columns
-    if cols_mapping:
-        logging.info(f"Renaming columns: {cols_mapping}")
-        df = df.rename(columns=cols_mapping)
-    else:
-        logging.info("No column renaming mapping provided. Skipping ...")
-
     # Keep only mandatory columns
     if cols_to_keep:
         logging.info(f"Keeping only mandatory columns: {cols_to_keep}")
@@ -126,6 +119,13 @@ def generic_grist_processing(
         logging.info(
             "No mandatory columns provided. Using all available columns in the dataframe."
         )
+
+    # Rename columns
+    if cols_mapping:
+        logging.info(f"Renaming columns: {cols_mapping}")
+        df = df.rename(columns=cols_mapping)
+    else:
+        logging.info("No column renaming mapping provided. Skipping ...")
 
     # Normalizing text columns
     if txt_columns:
