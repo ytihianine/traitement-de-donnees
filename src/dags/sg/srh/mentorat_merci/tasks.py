@@ -1,15 +1,27 @@
-from src._types.dags import ETLStep, TaskConfig
-from src.common_tasks.etl import create_task, create_file_etl_task
+from src._types.tasks import DataFrameStep, ETLTask
+from src._types.readers import GristReaderStrategy
+from src._types.writers import FileWriterStrategy
+from src._types.dags import TaskConfig
+
+from src._types.dags import ETLStep
+from src.common_tasks.etl import create_task
 
 from src.dags.sg.srh.mentorat_merci import action
 from src.dags.sg.srh.mentorat_merci import process
 
-agent_inscrit = create_file_etl_task(
-    selecteur="agent_inscrit",
-    process_func=process.clean_data,
-    apply_cols_mapping=False,
-    add_import_date=False,
-    add_snapshot_id=False,
+agent_inscrit = ETLTask(
+    task_config=TaskConfig(task_id="agent_inscrit"),
+    target="agent_inscrit",
+    reader=GristReaderStrategy(),
+    steps=[
+        DataFrameStep(
+            fn=process.clean_data,
+            input_key="agent_inscrit",
+            output_key="agent_inscrit",
+        )
+    ],
+    writers=[FileWriterStrategy()],
+    add_metadata=True,
 )
 
 

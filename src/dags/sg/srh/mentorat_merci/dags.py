@@ -70,7 +70,7 @@ def mentorat_merci() -> None:
     chain(
         validate_dag_parameters(),
         looking_for_files,
-        agent_inscrit(),
+        agent_inscrit.create_task(),
         generer_binomes(),
         copy_s3_files(
             storage_options=storage_options,
