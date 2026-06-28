@@ -115,18 +115,18 @@ def abonnes_visites() -> None:
         writers=[FileWriterStrategy()],
         add_metadata=True,
     )
-    abonnes_aux_lettres = ETLTask(
-        task_config=TaskConfig(task_id="abonnes_aux_lettres"),
-        target="abonnes_aux_lettres",
+    abonnes_lettres = ETLTask(
+        task_config=TaskConfig(task_id="abonnes_lettres"),
+        target="abonnes_lettres",
         reader=GristReaderStrategy(),
         steps=[
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
-                    custom_fn=process.process_abonnes_aux_lettres,
+                    custom_fn=process.process_abonnes_lettres,
                 ),
-                input_key="abonnes_aux_lettres",
-                output_key="abonnes_aux_lettres",
+                input_key="abonnes_lettres",
+                output_key="abonnes_lettres",
             )
         ],
         writers=[FileWriterStrategy()],
@@ -192,7 +192,7 @@ def abonnes_visites() -> None:
             visites_alize.create_task(),
             visites_intranet_sg.create_task(),
             performances_lettres.create_task(),
-            abonnes_aux_lettres.create_task(),
+            abonnes_lettres.create_task(),
             ouverture_lettre_alize.create_task(),
             impressions_reseaux_sociaux.create_task(),
             impact_actions_com.create_task(),

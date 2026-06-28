@@ -98,7 +98,7 @@ def process_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_abonnes_aux_lettres(df: pd.DataFrame) -> pd.DataFrame:
+def process_abonnes_lettres(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     df["date"] = pd.to_datetime(df["mois"], unit="s").astype("datetime64[s]")
     df = df.drop(columns=["mois"])
