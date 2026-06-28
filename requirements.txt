@@ -31,7 +31,7 @@ apache-airflow-providers-smtp==2.4.5
 apache-airflow-providers-standard==1.12.3
 apache-airflow-task-sdk==1.2.1
 psycopg2-binary==2.9.12
-pandas==2.3.3
+pandas==3.0.4
 pytest==9.0.3
 pre-commit==4.6.0
 pyxlsb==1.0.10
