@@ -1,7 +1,9 @@
 from src._types.projet import SelecteurStorageOptions, LoadStrategy
 
 storage_options = {
-    "agent": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
+    "agent": SelecteurStorageOptions(
+        load_strategy=LoadStrategy.FULL_LOAD, read_options={"sep": ";"}
+    ),
     "certificat": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
     "mandataire": SelecteurStorageOptions(load_strategy=LoadStrategy.FULL_LOAD),
 }

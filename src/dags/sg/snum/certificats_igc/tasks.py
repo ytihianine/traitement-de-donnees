@@ -1,25 +1,59 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src.common_tasks.etl import create_file_etl_task
+from src._types.tasks import DataFrameStep, ETLTask
+from src._types.readers import GristReaderStrategy
+from src._types.writers import FileWriterStrategy
+from src._types.dags import TaskConfig
+
 
 from src.dags.sg.snum.certificats_igc import process
 
 
 @task_group
 def source_files() -> None:
-    agent = create_file_etl_task(
-        selecteur="agent",
-        process_func=process.process_agent,
-        read_options={"sep": ";"},
+    agent = ETLTask(
+        task_config=TaskConfig(task_id="agent"),
+        target="agent",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=process.process_agent,
+                input_key="agent",
+                output_key="agent",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    certificat = create_file_etl_task(
-        selecteur="certificat",
-        process_func=process.process_certificat,
+    certificat = ETLTask(
+        task_config=TaskConfig(task_id="certificat"),
+        target="certificat",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=process.process_certificat,
+                input_key="certificat",
+                output_key="certificat",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    mandataire = create_file_etl_task(
-        selecteur="mandataire", process_func=process.process_mandataire
+    mandataire = ETLTask(
+        task_config=TaskConfig(task_id="mandataire"),
+        target="mandataire",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=process.process_mandataire,
+                input_key="mandataire",
+                output_key="mandataire",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
 
     # ordre des tâches
-    chain([agent(), certificat(), mandataire()])
+    chain([agent.create_task(), certificat.create_task(), mandataire.create_task()])
