@@ -27,7 +27,7 @@ class DataFrameStep(PipelineStep):
 
     def __call__(self, data_context: DataContext) -> DataContext:
         df = data_context.get(self.input_key)
-        result = self.fn(df)
+        result = self.fn(df=df)
         data_context.add(self.output_key, result)
         return data_context
 
