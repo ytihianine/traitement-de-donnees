@@ -3,7 +3,7 @@ from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
 from src.common_tasks.grist import generic_grist_processing
-from src._types.tasks import DataFrameStep, ETLTask
+from src._types.tasks import SingleInputStep, ETLTask
 from src._types.readers import GristReaderStrategy
 from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
@@ -18,7 +18,7 @@ def abonnes_visites() -> None:
         target="reseaux_sociaux",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_reseaux_sociaux,
@@ -35,7 +35,7 @@ def abonnes_visites() -> None:
         target="visites_portail",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_visites_portail,
@@ -52,7 +52,7 @@ def abonnes_visites() -> None:
         target="visites_bercyinfo",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_visites_bercyinfo,
@@ -69,7 +69,7 @@ def abonnes_visites() -> None:
         target="visites_alize",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_visites_alize,
@@ -86,7 +86,7 @@ def abonnes_visites() -> None:
         target="visites_intranet_sg",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_visites_intranet_sg,
@@ -103,7 +103,7 @@ def abonnes_visites() -> None:
         target="performances_lettres",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_performances_lettres,
@@ -120,7 +120,7 @@ def abonnes_visites() -> None:
         target="abonnes_aux_lettres",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_abonnes_aux_lettres,
@@ -137,7 +137,7 @@ def abonnes_visites() -> None:
         target="ouverture_lettre_alize",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_ouverture_lettre_alize,
@@ -154,7 +154,7 @@ def abonnes_visites() -> None:
         target="impressions_reseaux_sociaux",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_impressions_reseaux_sociaux,
@@ -171,7 +171,7 @@ def abonnes_visites() -> None:
         target="impact_actions_com",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_impact_actions_com,
@@ -207,7 +207,7 @@ def budget() -> None:
         target="budget_depense",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_budget_depense,
@@ -229,7 +229,7 @@ def enquetes() -> None:
         target="engagement_agents_mef",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_engagement_agents_mef,
@@ -246,7 +246,7 @@ def enquetes() -> None:
         target="qualite_vie_travail",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_qualite_vie_travail,
@@ -263,7 +263,7 @@ def enquetes() -> None:
         target="collab_inter_structure",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_collab_inter_structure,
@@ -280,7 +280,7 @@ def enquetes() -> None:
         target="obs_interne",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_obs_interne,
@@ -297,7 +297,7 @@ def enquetes() -> None:
         target="enquete_360",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_enquete_360,
@@ -314,7 +314,7 @@ def enquetes() -> None:
         target="obs_interne_participation",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_obs_interne_participation,
@@ -331,7 +331,7 @@ def enquetes() -> None:
         target="engagement_environnement",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_engagement_environnement,
@@ -364,7 +364,7 @@ def metiers() -> None:
         target="indicateurs_metiers",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_indicateurs_metiers,
@@ -381,7 +381,7 @@ def metiers() -> None:
         target="enquete_satisfaction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_enquete_satisfaction,
@@ -398,7 +398,7 @@ def metiers() -> None:
         target="etudes",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_etudes,
@@ -415,7 +415,7 @@ def metiers() -> None:
         target="communique_presse",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_communique_presse,
@@ -432,7 +432,7 @@ def metiers() -> None:
         target="studio_graphique",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_studio_graphique,
@@ -449,7 +449,7 @@ def metiers() -> None:
         target="notes_veilles",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_notes_veilles,
@@ -466,7 +466,7 @@ def metiers() -> None:
         target="recommandation_strat",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_recommandation_strat,
@@ -483,7 +483,7 @@ def metiers() -> None:
         target="projets_graphiques",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_projets_graphiques,
@@ -517,7 +517,7 @@ def ressources_humaines() -> None:
         target="rh_formation",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_rh_formation,
@@ -534,7 +534,7 @@ def ressources_humaines() -> None:
         target="rh_turnover",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_rh_turnover,
@@ -551,7 +551,7 @@ def ressources_humaines() -> None:
         target="rh_contractuel",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_rh_contractuel,

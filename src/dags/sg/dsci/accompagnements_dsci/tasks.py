@@ -3,7 +3,7 @@ from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
 from src.common_tasks.grist import generic_grist_processing
-from src._types.tasks import DataFrameStep, ETLTask
+from src._types.tasks import SingleInputStep, ETLTask
 from src._types.readers import GristReaderStrategy
 from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
@@ -19,7 +19,7 @@ def referentiels() -> None:
         target="ref_bureau",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_ref_bureau,
@@ -36,7 +36,7 @@ def referentiels() -> None:
         target="ref_certification",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_ref_certification,
@@ -53,7 +53,7 @@ def referentiels() -> None:
         target="ref_competence_particuliere",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_ref_competence_particuliere,
@@ -70,7 +70,7 @@ def referentiels() -> None:
         target="ref_direction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_ref_direction,
@@ -87,7 +87,7 @@ def referentiels() -> None:
         target="ref_profil_correspondant",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=[
@@ -117,7 +117,7 @@ def referentiels() -> None:
         target="ref_qualite_service",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_ref_qualite_service,
@@ -134,7 +134,7 @@ def referentiels() -> None:
         target="ref_region",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_ref_region,
@@ -151,7 +151,7 @@ def referentiels() -> None:
         target="ref_semainier",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     date_columns=["date_semaine"],
@@ -169,7 +169,7 @@ def referentiels() -> None:
         target="ref_typologie_accompagnement",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["typologie_accompagnement"],
@@ -187,7 +187,7 @@ def referentiels() -> None:
         target="ref_pole",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"bureau": "id_bureau"},
@@ -205,7 +205,7 @@ def referentiels() -> None:
         target="ref_type_accompagnement",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"pole": "id_pole"},
@@ -245,7 +245,7 @@ def bilaterales() -> None:
         target="bilaterale",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"direction": "id_direction"},
@@ -265,7 +265,7 @@ def bilaterales() -> None:
         target="bilaterale_remontee",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -294,7 +294,7 @@ def correspondant() -> None:
         target="correspondant",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=[
@@ -342,7 +342,7 @@ def correspondant() -> None:
         target="correspondant_profil",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -365,7 +365,7 @@ def correspondant() -> None:
         target="correspondant_competence_particuliere",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -388,7 +388,7 @@ def correspondant() -> None:
         target="correspondant_connaissance_communaute",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"id": "id_correspondant"},
@@ -422,7 +422,7 @@ def dsci() -> None:
         target="accompagnement_dsci",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -475,7 +475,7 @@ def dsci() -> None:
         target="effectif_dsci",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"bureau": "id_bureau", "pole": "id_pole"},
@@ -495,7 +495,7 @@ def dsci() -> None:
         target="accompagnement_dsci_equipe",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -518,7 +518,7 @@ def dsci() -> None:
         target="accompagnement_dsci_porteur",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -541,7 +541,7 @@ def dsci() -> None:
         target="accompagnement_dsci_typologie",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -578,7 +578,7 @@ def mission_innovation() -> None:
         target="accompagnement_mi",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -618,7 +618,7 @@ def mission_innovation() -> None:
         target="accompagnement_mi_satisfaction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -656,7 +656,7 @@ def mission_innovation() -> None:
         target="animateur_interne",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -678,7 +678,7 @@ def mission_innovation() -> None:
         target="animateur_externe",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"accompagnement": "id_accompagnement"},
@@ -697,7 +697,7 @@ def mission_innovation() -> None:
         target="animateur_fac",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -724,7 +724,7 @@ def mission_innovation() -> None:
         target="animateur_fac_certification",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -747,7 +747,7 @@ def mission_innovation() -> None:
         target="animateur_fac_certification_valide",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -770,7 +770,7 @@ def mission_innovation() -> None:
         target="laboratoires_territoriaux",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"direction": "id_direction", "region": "id_region"},
@@ -789,7 +789,7 @@ def mission_innovation() -> None:
         target="pleniere_quest_inscription",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -812,7 +812,7 @@ def mission_innovation() -> None:
         target="pleniere_quest_satisfaction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -841,7 +841,7 @@ def mission_innovation() -> None:
         target="passinnov_quest_inscription",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_passinnov_quest_inscription,
@@ -858,7 +858,7 @@ def mission_innovation() -> None:
         target="passinnov_quest_satisfaction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -880,7 +880,7 @@ def mission_innovation() -> None:
         target="formation_codev_quest_inscription",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -914,7 +914,7 @@ def mission_innovation() -> None:
         target="formation_fac_quest_satisfaction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -964,7 +964,7 @@ def mission_innovation() -> None:
         target="formation_fac_envie_suite_quest_satisfaction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_formation_fac_envie_suite_quest_satisfaction,
@@ -981,7 +981,7 @@ def mission_innovation() -> None:
         target="fac_hors_bercylab_quest_accompagnement",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -1030,7 +1030,7 @@ def mission_innovation() -> None:
         target="fac_hors_bercylab_quest_type_accompagnement",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"id": "id_formation_fac_hors_bercylab"},
@@ -1052,7 +1052,7 @@ def mission_innovation() -> None:
         target="fac_hors_bercylab_quest_accompagnement_partiicipants",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"id": "id_formation_fac_hors_bercylab"},
@@ -1074,7 +1074,7 @@ def mission_innovation() -> None:
         target="fac_hors_bercylab_quest_accompagnement_facilitateurs",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -1126,7 +1126,7 @@ def conseil_interne() -> None:
         target="accompagnement_cci_opportunite",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"accompagnement": "id_accompagnement"},
@@ -1150,7 +1150,7 @@ def conseil_interne() -> None:
         target="charge_agent_cci",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -1173,7 +1173,7 @@ def conseil_interne() -> None:
         target="accompagnement_cci_quest_satisfaction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={

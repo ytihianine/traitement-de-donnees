@@ -1,7 +1,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src._types.tasks import DataFrameStep, MultiInputStep, ETLTask
+from src._types.tasks import SingleInputStep, MultiInputStep, ETLTask
 from src._types.readers import GristReaderStrategy
 from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
@@ -17,7 +17,7 @@ def source_files() -> None:
         target="demande_achat",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=process.process_demande_achat,
                 input_key="demande_achat",
                 output_key="demande_achat",
@@ -31,7 +31,7 @@ def source_files() -> None:
         target="engagement_juridique",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=process.process_engagement_juridique,
                 input_key="engagement_juridique",
                 output_key="engagement_juridique",
@@ -45,7 +45,7 @@ def source_files() -> None:
         target="demande_paiement",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=process.process_demande_paiement,
                 input_key="demande_paiement",
                 output_key="demande_paiement",
@@ -59,7 +59,7 @@ def source_files() -> None:
         target="demande_paiement_flux",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=process.process_demande_paiement_flux,
                 input_key="demande_paiement_flux",
                 output_key="demande_paiement_flux",
@@ -73,7 +73,7 @@ def source_files() -> None:
         target="demande_paiement_sfp",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=process.process_demande_paiement_sfp,
                 input_key="demande_paiement_sfp",
                 output_key="demande_paiement_sfp",
@@ -87,7 +87,7 @@ def source_files() -> None:
         target="demande_paiement_carte_achat",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=process.process_demande_paiement_carte_achat,
                 input_key="demande_paiement_carte_achat",
                 output_key="demande_paiement_carte_achat",
@@ -101,7 +101,7 @@ def source_files() -> None:
         target="demande_paiement_journal_pieces",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=process.process_demande_paiement_journal_pieces,
                 input_key="demande_paiement_journal_pieces",
                 output_key="demande_paiement_journal_pieces",
@@ -115,7 +115,7 @@ def source_files() -> None:
         target="delai_global_paiement",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=process.process_delai_global_paiement,
                 input_key="delai_global_paiement",
                 output_key="delai_global_paiement",

@@ -4,7 +4,7 @@ from airflow.sdk.bases.operator import chain
 
 from src.common_tasks.etl import create_task
 from src.common_tasks.grist import generic_grist_processing
-from src._types.tasks import DataFrameStep, ETLTask
+from src._types.tasks import SingleInputStep, ETLTask
 from src._types.readers import GristReaderStrategy
 from src._types.writers import FileWriterStrategy
 from src._types.dags import ETLStep, TaskConfig
@@ -21,7 +21,7 @@ def grist_source() -> None:
         target="ref_prog",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["prog"],
@@ -39,7 +39,7 @@ def grist_source() -> None:
         target="ref_bop",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["bop"],
@@ -58,7 +58,7 @@ def grist_source() -> None:
         target="ref_uo",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["uo"],
@@ -77,7 +77,7 @@ def grist_source() -> None:
         target="ref_cc",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["cc"],
@@ -96,7 +96,7 @@ def grist_source() -> None:
         target="ref_sp_pilotage",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["service_prescripteur"],
@@ -114,7 +114,7 @@ def grist_source() -> None:
         target="ref_sp_choisi",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["service_prescripteur", "mail"],
@@ -132,7 +132,7 @@ def grist_source() -> None:
         target="ref_sdep",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["service_depense"],
@@ -150,7 +150,7 @@ def grist_source() -> None:
         target="sp",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"centre_de_cout": "centre_cout"},
@@ -185,7 +185,7 @@ def grist_source() -> None:
         target="delai_global_paiement_sp_manuel",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"service_prescripteur": "id_service_prescripteur"},
@@ -204,7 +204,7 @@ def grist_source() -> None:
         target="demande_achat_sp_manuel",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"service_prescripteur": "id_service_prescripteur"},
@@ -223,7 +223,7 @@ def grist_source() -> None:
         target="demande_paiement_sp_manuel",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"service_prescripteur": "id_service_prescripteur"},
@@ -242,7 +242,7 @@ def grist_source() -> None:
         target="engagement_juridique_sp_manuel",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"service_prescripteur": "id_service_prescripteur"},

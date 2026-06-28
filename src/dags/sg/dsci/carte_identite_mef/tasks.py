@@ -3,7 +3,7 @@ from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
 from src.common_tasks.grist import generic_grist_processing
-from src._types.tasks import DataFrameStep, ETLTask
+from src._types.tasks import SingleInputStep, ETLTask
 from src._types.readers import GristReaderStrategy
 from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
@@ -18,7 +18,7 @@ def effectif():
         target="teletravail",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_teletravail,
@@ -35,7 +35,7 @@ def effectif():
         target="teletravail_frequence",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_teletravail_frequence,
@@ -52,7 +52,7 @@ def effectif():
         target="teletravail_opinion",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_teletravail_opinion,
@@ -69,7 +69,7 @@ def effectif():
         target="effectif_direction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"nombre_d_agent": "nombre_agents"},
@@ -87,7 +87,7 @@ def effectif():
         target="effectif_perimetre",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_effectif_perimetre,
@@ -104,7 +104,7 @@ def effectif():
         target="effectif_departements",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"nombre_d_agent": "nombre_agents"},
@@ -122,7 +122,7 @@ def effectif():
         target="masse_salariale",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -159,7 +159,7 @@ def budget():
         target="budget_total",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -185,7 +185,7 @@ def budget():
         target="budget_pilotable",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_budget_pilotable,
@@ -202,7 +202,7 @@ def budget():
         target="budget_general",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -228,7 +228,7 @@ def budget():
         target="evolution_budget_mef",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_evolution_budget_mef,
@@ -245,7 +245,7 @@ def budget():
         target="montant_intervention_invest",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -265,7 +265,7 @@ def budget():
         target="budget_ministere",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -304,7 +304,7 @@ def taux_agent():
         target="engagement_agent",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_engagement_agent,
@@ -321,7 +321,7 @@ def taux_agent():
         target="election_resultat",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_election_resultat,
@@ -338,7 +338,7 @@ def taux_agent():
         target="taux_participation",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     custom_fn=process.process_taux_participation,
@@ -368,7 +368,7 @@ def plafond():
         target="plafond_etpt",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -390,7 +390,7 @@ def plafond():
         target="db_plafond_etpt",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={

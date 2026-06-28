@@ -3,7 +3,7 @@ from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
 from src.common_tasks.grist import generic_grist_processing
-from src._types.tasks import DataFrameStep, ETLTask
+from src._types.tasks import SingleInputStep, ETLTask
 from src._types.readers import GristReaderStrategy
 from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
@@ -21,7 +21,7 @@ def referentiels() -> None:
         target="ref_q1_direction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["direction"],
@@ -39,7 +39,7 @@ def referentiels() -> None:
         target="ref_q5_domaine",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["domaine"],
@@ -57,7 +57,7 @@ def referentiels() -> None:
         target="ref_q6_niveau_utilisation",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["id", "niveau_d_appropriation"],
@@ -76,7 +76,7 @@ def referentiels() -> None:
         target="ref_q9_cas_usage",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["cas_d_usage"],
@@ -97,7 +97,7 @@ def referentiels() -> None:
         target="ref_q28_raisons_perte",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["raisons"],
@@ -115,7 +115,7 @@ def referentiels() -> None:
         target="ref_q25_impact_observe",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["observation"],
@@ -133,7 +133,7 @@ def referentiels() -> None:
         target="ref_q24_impact_identifie",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["impacts"],
@@ -151,7 +151,7 @@ def referentiels() -> None:
         target="ref_q23_taux_correction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["id", "taux_de_correction"],
@@ -170,7 +170,7 @@ def referentiels() -> None:
         target="ref_q22_typologie_erreurs",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["erreurs"],
@@ -188,7 +188,7 @@ def referentiels() -> None:
         target="ref_q20_autres_ia",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["comparaisons"],
@@ -206,7 +206,7 @@ def referentiels() -> None:
         target="ref_q16_taches",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["taches"],
@@ -224,7 +224,7 @@ def referentiels() -> None:
         target="ref_q14_evolution_craintes",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["evolutions"],
@@ -242,7 +242,7 @@ def referentiels() -> None:
         target="ref_q13_facteurs_progression",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["facteurs"],
@@ -260,7 +260,7 @@ def referentiels() -> None:
         target="ref_q10_principaux_freins",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["freins"],
@@ -278,7 +278,7 @@ def referentiels() -> None:
         target="ref_q6_participation_programme",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["participation"],
@@ -296,7 +296,7 @@ def referentiels() -> None:
         target="ref_q5_formation_suivie",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["formation_suivie"],
@@ -314,7 +314,7 @@ def referentiels() -> None:
         target="ref_q3_niveau_2",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["niveau"],
@@ -332,7 +332,7 @@ def referentiels() -> None:
         target="ref_q7_accords",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["reponses"],
@@ -353,7 +353,7 @@ def referentiels() -> None:
         target="ref_raisons_non_utilisation",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["raisons"],
@@ -374,7 +374,7 @@ def referentiels() -> None:
         target="ref_q6_formation_suivie",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["formation"],
@@ -392,7 +392,7 @@ def referentiels() -> None:
         target="ref_q7_particip_programme",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["participation"],
@@ -410,7 +410,7 @@ def referentiels() -> None:
         target="ref_q8_raisons_non_participation",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["raisons"],
@@ -428,7 +428,7 @@ def referentiels() -> None:
         target="ref_q11_leviers_progressions",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["leviers"],
@@ -446,7 +446,7 @@ def referentiels() -> None:
         target="ref_q12_impacts_taches_pro",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["impacts"],
@@ -464,7 +464,7 @@ def referentiels() -> None:
         target="ref_q14_taches_rebarbativ",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["taches_rebarbatives"],
@@ -482,7 +482,7 @@ def referentiels() -> None:
         target="ref_q17_autres_outils",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["id", "autres_outils"],
@@ -501,7 +501,7 @@ def referentiels() -> None:
         target="ref_q17_satisfaction_autre_outil",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["id", "satisfaction_autres_outils"],
@@ -520,7 +520,7 @@ def referentiels() -> None:
         target="ref_q18_comparaisons",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["comparaisons"],
@@ -538,7 +538,7 @@ def referentiels() -> None:
         target="ref_q19_fonctionnalites",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["fonctionnalites"],
@@ -556,7 +556,7 @@ def referentiels() -> None:
         target="ref_q21_risques_identifies",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["risques"],
@@ -574,7 +574,7 @@ def referentiels() -> None:
         target="ref_q25_besoins",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["besoins"],
@@ -633,7 +633,7 @@ def repartition() -> None:
         target="quota_par_entite",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -685,7 +685,7 @@ def suivi_experimentateurs() -> None:
         target="experimentateurs",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=[
@@ -725,7 +725,7 @@ def suivi_questionnaire_1() -> None:
         target="questionnaire_1",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -785,7 +785,7 @@ def suivi_questionnaire_1() -> None:
         target="questionnaire_1_cas_usage",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -810,7 +810,7 @@ def suivi_questionnaire_1() -> None:
         target="questionnaire_1_besoins_accompagnement",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "besoin_accompagnement"],
@@ -844,7 +844,7 @@ def suivi_questionnaire_2() -> None:
         target="questionnaire_2",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -965,7 +965,7 @@ def suivi_questionnaire_2() -> None:
         target="questionnaire_2_typologie_interaction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "types_d_interactions_mef"],
@@ -986,7 +986,7 @@ def suivi_questionnaire_2() -> None:
         target="questionnaire_2_formation_suivie",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -1010,7 +1010,7 @@ def suivi_questionnaire_2() -> None:
         target="questionnaire_2_participation",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "participation_programme_rdv"],
@@ -1035,7 +1035,7 @@ def suivi_questionnaire_2() -> None:
         target="questionnaire_2_freins",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "freins_a_l_utilisation"],
@@ -1057,7 +1057,7 @@ def suivi_questionnaire_2() -> None:
         target="questionnaire_2_facteurs_progression",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "facteurs_de_progression"],
@@ -1082,7 +1082,7 @@ def suivi_questionnaire_2() -> None:
         target="questionnaire_2_taches",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "taches_realisees_avec_ia"],
@@ -1107,7 +1107,7 @@ def suivi_questionnaire_2() -> None:
         target="questionnaire_2_typologie_erreurs",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "types_d_erreurs_frequentes2"],
@@ -1132,7 +1132,7 @@ def suivi_questionnaire_2() -> None:
         target="questionnaire_2_impact_observe",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "observations_des_impacts"],
@@ -1157,7 +1157,7 @@ def suivi_questionnaire_2() -> None:
         target="questionnaire_2_impact_identifie",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "impacts_identifies_au_travail"],
@@ -1202,7 +1202,7 @@ def suivi_questionnaire_2_bis() -> None:
         target="questionnaire_2_bis",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=[
@@ -1226,7 +1226,7 @@ def suivi_questionnaire_2_bis() -> None:
         target="questionnaire_2_bis_raisons_non_utilisation",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["courriel", "raisons_non_utilisation_assistant_ia"],
@@ -1260,7 +1260,7 @@ def suivi_questionnaire_3() -> None:
         target="questionnaire_3",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=[
@@ -1348,7 +1348,7 @@ def suivi_questionnaire_3() -> None:
         target="questionnaire_3_formation_suivie",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "formation_suivie"],
@@ -1371,7 +1371,7 @@ def suivi_questionnaire_3() -> None:
         target="questionnaire_3_programme_rdv",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "programme_de_rdv"],
@@ -1394,7 +1394,7 @@ def suivi_questionnaire_3() -> None:
         target="questionnaire_3_leviers_progression",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "leviers_progression"],
@@ -1419,7 +1419,7 @@ def suivi_questionnaire_3() -> None:
         target="questionnaire_3_fonctionnalites",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "fonctionnalites"],
@@ -1442,7 +1442,7 @@ def suivi_questionnaire_3() -> None:
         target="questionnaire_3_risques_identifies",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "risques_identifies"],
@@ -1467,7 +1467,7 @@ def suivi_questionnaire_3() -> None:
         target="questionnaire_3_besoins_prioritaires",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "besoins_prioritaires"],
@@ -1492,7 +1492,7 @@ def suivi_questionnaire_3() -> None:
         target="questionnaire_3_besoins_moindres",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=["no_id", "besoins_moindres"],

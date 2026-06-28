@@ -1,4 +1,4 @@
-from src._types.tasks import DataFrameStep, ETLTask
+from src._types.tasks import SingleInputStep, ETLTask
 from src._types.readers import GristReaderStrategy
 from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
@@ -14,7 +14,7 @@ agent_inscrit = ETLTask(
     target="agent_inscrit",
     reader=GristReaderStrategy(),
     steps=[
-        DataFrameStep(
+        SingleInputStep(
             fn=process.clean_data,
             input_key="agent_inscrit",
             output_key="agent_inscrit",

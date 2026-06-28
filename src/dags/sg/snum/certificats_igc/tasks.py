@@ -1,7 +1,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src._types.tasks import DataFrameStep, ETLTask
+from src._types.tasks import SingleInputStep, ETLTask
 from src._types.readers import GristReaderStrategy
 from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
@@ -17,7 +17,7 @@ def source_files() -> None:
         target="agent",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=process.process_agent,
                 input_key="agent",
                 output_key="agent",
@@ -31,7 +31,7 @@ def source_files() -> None:
         target="certificat",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=process.process_certificat,
                 input_key="certificat",
                 output_key="certificat",
@@ -45,7 +45,7 @@ def source_files() -> None:
         target="mandataire",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=process.process_mandataire,
                 input_key="mandataire",
                 output_key="mandataire",

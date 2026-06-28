@@ -1,4 +1,4 @@
-from src._types.tasks import DataFrameStep, ETLTask
+from src._types.tasks import SingleInputStep, ETLTask
 from src._types.readers import GristReaderStrategy
 from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
@@ -10,7 +10,7 @@ ref_typologie = ETLTask(
     target="ref_typologie",
     reader=GristReaderStrategy(),
     steps=[
-        DataFrameStep(
+        SingleInputStep(
             fn=process.process_ref_typologie,
             input_key="ref_typologie",
             output_key="ref_typologie",

@@ -20,7 +20,7 @@ class PipelineStep(ABC):
 
 
 @dataclass(frozen=True)
-class DataFrameStep(PipelineStep):
+class SingleInputStep(PipelineStep):
     fn: Callable[..., pd.DataFrame]
     input_key: str
     output_key: str

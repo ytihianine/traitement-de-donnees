@@ -3,7 +3,7 @@ from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
 from src.common_tasks.grist import generic_grist_processing
-from src._types.tasks import DataFrameStep, ETLTask
+from src._types.tasks import SingleInputStep, ETLTask
 from src._types.readers import GristReaderStrategy
 from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
@@ -18,7 +18,7 @@ def process_data() -> None:
         target="direction",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"id": "id_direction"},
@@ -41,7 +41,7 @@ def process_data() -> None:
         target="service",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={"direction": "id_direction"},
@@ -67,7 +67,7 @@ def process_data() -> None:
         target="projets",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -97,7 +97,7 @@ def process_data() -> None:
         target="projet_contact",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -127,7 +127,7 @@ def process_data() -> None:
         target="projet_documentation",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -155,7 +155,7 @@ def process_data() -> None:
         target="projet_s3",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -183,7 +183,7 @@ def process_data() -> None:
         target="projet_selecteur",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -215,7 +215,7 @@ def process_data() -> None:
         target="selecteur_source",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -245,7 +245,7 @@ def process_data() -> None:
         target="selecteur_s3",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -274,7 +274,7 @@ def process_data() -> None:
         target="selecteur_database",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
@@ -302,7 +302,7 @@ def process_data() -> None:
         target="selecteur_column_mapping",
         reader=GristReaderStrategy(),
         steps=[
-            DataFrameStep(
+            SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
                     cols_mapping={
