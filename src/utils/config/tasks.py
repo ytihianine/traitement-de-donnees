@@ -78,7 +78,7 @@ def column_mapping_dataframe(
 
 def column_mapping_dict(
     df_cols_map: pd.DataFrame, selecteur: str | None = None
-) -> dict[str, str]:
+) -> dict:
     logger.debug("Colonnes du dataframe de mapping: %s", df_cols_map.columns.tolist())
     logger.debug(
         "Selecteurs du dataframe de mapping: %s",
@@ -175,7 +175,7 @@ def get_projet_s3_info(
         )
 
     record = df.iloc[0].to_dict(into=dict)
-    return ProjetS3(**record)
+    return ProjetS3(**record)  # type: ignore
 
 
 def merge_selecteur_config(

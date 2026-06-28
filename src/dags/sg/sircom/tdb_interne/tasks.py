@@ -1,244 +1,572 @@
+from functools import partial
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src.common_tasks.etl import create_grist_etl_task
-from src.utils.process.structures import normalize_grist_dataframe
-
+from src.common_tasks.grist import generic_grist_processing
+from src._types.tasks import DataFrameStep, ETLTask
+from src._types.readers import GristReaderStrategy
+from src._types.writers import FileWriterStrategy
+from src._types.dags import TaskConfig
 
 from src.dags.sg.sircom.tdb_interne import process
-
-version = "v1"
 
 
 @task_group(group_id="abonnes_visites")
 def abonnes_visites() -> None:
-    reseaux_sociaux = create_grist_etl_task(
-        selecteur="reseaux_sociaux",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_reseaux_sociaux,
-        version=version,
+    reseaux_sociaux = ETLTask(
+        task_config=TaskConfig(task_id="reseaux_sociaux"),
+        target="reseaux_sociaux",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_reseaux_sociaux,
+                ),
+                input_key="reseaux_sociaux",
+                output_key="reseaux_sociaux",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    visites_portail = create_grist_etl_task(
-        selecteur="visites_portail",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_visites_portail,
-        version=version,
+    visites_portail = ETLTask(
+        task_config=TaskConfig(task_id="visites_portail"),
+        target="visites_portail",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_visites_portail,
+                ),
+                input_key="visites_portail",
+                output_key="visites_portail",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    visites_bercyinfo = create_grist_etl_task(
-        selecteur="visites_bercyinfo",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_visites_bercyinfo,
-        version=version,
+    visites_bercyinfo = ETLTask(
+        task_config=TaskConfig(task_id="visites_bercyinfo"),
+        target="visites_bercyinfo",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_visites_bercyinfo,
+                ),
+                input_key="visites_bercyinfo",
+                output_key="visites_bercyinfo",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    visites_alize = create_grist_etl_task(
-        selecteur="visites_alize",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_visites_alize,
-        version=version,
+    visites_alize = ETLTask(
+        task_config=TaskConfig(task_id="visites_alize"),
+        target="visites_alize",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_visites_alize,
+                ),
+                input_key="visites_alize",
+                output_key="visites_alize",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    visites_intranet_sg = create_grist_etl_task(
-        selecteur="visites_intranet_sg",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_visites_intranet_sg,
-        version=version,
+    visites_intranet_sg = ETLTask(
+        task_config=TaskConfig(task_id="visites_intranet_sg"),
+        target="visites_intranet_sg",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_visites_intranet_sg,
+                ),
+                input_key="visites_intranet_sg",
+                output_key="visites_intranet_sg",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    performances_lettres = create_grist_etl_task(
-        selecteur="performances_lettres",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_performances_lettres,
-        version=version,
+    performances_lettres = ETLTask(
+        task_config=TaskConfig(task_id="performances_lettres"),
+        target="performances_lettres",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_performances_lettres,
+                ),
+                input_key="performances_lettres",
+                output_key="performances_lettres",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    abonnes_aux_lettres = create_grist_etl_task(
-        selecteur="abonnes_lettres",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_abonnes_aux_lettres,
-        version=version,
+    abonnes_aux_lettres = ETLTask(
+        task_config=TaskConfig(task_id="abonnes_aux_lettres"),
+        target="abonnes_aux_lettres",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_abonnes_aux_lettres,
+                ),
+                input_key="abonnes_aux_lettres",
+                output_key="abonnes_aux_lettres",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    ouverture_lettre_alize = create_grist_etl_task(
-        selecteur="ouverture_lettre_alize",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_ouverture_lettre_alize,
-        version=version,
+    ouverture_lettre_alize = ETLTask(
+        task_config=TaskConfig(task_id="ouverture_lettre_alize"),
+        target="ouverture_lettre_alize",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_ouverture_lettre_alize,
+                ),
+                input_key="ouverture_lettre_alize",
+                output_key="ouverture_lettre_alize",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    impressions_reseaux_sociaux = create_grist_etl_task(
-        selecteur="impressions_reseaux_sociaux",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_impressions_reseaux_sociaux,
-        version=version,
+    impressions_reseaux_sociaux = ETLTask(
+        task_config=TaskConfig(task_id="impressions_reseaux_sociaux"),
+        target="impressions_reseaux_sociaux",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_impressions_reseaux_sociaux,
+                ),
+                input_key="impressions_reseaux_sociaux",
+                output_key="impressions_reseaux_sociaux",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    impact_actions_com = create_grist_etl_task(
-        selecteur="impact_actions_com",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_impact_actions_com,
-        version=version,
+    impact_actions_com = ETLTask(
+        task_config=TaskConfig(task_id="impact_actions_com"),
+        target="impact_actions_com",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_impact_actions_com,
+                ),
+                input_key="impact_actions_com",
+                output_key="impact_actions_com",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
 
     chain(
         [
-            reseaux_sociaux(),
-            visites_portail(),
-            visites_bercyinfo(),
-            visites_alize(),
-            visites_intranet_sg(),
-            performances_lettres(),
-            abonnes_aux_lettres(),
-            ouverture_lettre_alize(),
-            impressions_reseaux_sociaux(),
-            impact_actions_com(),
+            reseaux_sociaux.create_task(),
+            visites_portail.create_task(),
+            visites_bercyinfo.create_task(),
+            visites_alize.create_task(),
+            visites_intranet_sg.create_task(),
+            performances_lettres.create_task(),
+            abonnes_aux_lettres.create_task(),
+            ouverture_lettre_alize.create_task(),
+            impressions_reseaux_sociaux.create_task(),
+            impact_actions_com.create_task(),
         ]
     )
 
 
 @task_group(group_id="budget")
 def budget() -> None:
-    budget_depense = create_grist_etl_task(
-        selecteur="synthese_depenses",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_budget_depense,
-        version=version,
+    budget_depense = ETLTask(
+        task_config=TaskConfig(task_id="budget_depense"),
+        target="budget_depense",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_budget_depense,
+                ),
+                input_key="budget_depense",
+                output_key="budget_depense",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    chain(budget_depense())
+    chain(budget_depense.create_task())
 
 
 @task_group(group_id="enquetes")
 def enquetes() -> None:
-    engagement_agents_mef = create_grist_etl_task(
-        selecteur="engagement_agents_mef",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_engagement_agents_mef,
-        version=version,
+    engagement_agents_mef = ETLTask(
+        task_config=TaskConfig(task_id="engagement_agents_mef"),
+        target="engagement_agents_mef",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_engagement_agents_mef,
+                ),
+                input_key="engagement_agents_mef",
+                output_key="engagement_agents_mef",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    qualite_vie_travail = create_grist_etl_task(
-        selecteur="qualite_vie_travail",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_qualite_vie_travail,
-        version=version,
+    qualite_vie_travail = ETLTask(
+        task_config=TaskConfig(task_id="qualite_vie_travail"),
+        target="qualite_vie_travail",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_qualite_vie_travail,
+                ),
+                input_key="qualite_vie_travail",
+                output_key="qualite_vie_travail",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    collab_inter_structure = create_grist_etl_task(
-        selecteur="collab_inter_structure",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_collab_inter_structure,
-        version=version,
+    collab_inter_structure = ETLTask(
+        task_config=TaskConfig(task_id="collab_inter_structure"),
+        target="collab_inter_structure",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_collab_inter_structure,
+                ),
+                input_key="collab_inter_structure",
+                output_key="collab_inter_structure",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    obs_interne = create_grist_etl_task(
-        selecteur="obs_interne",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_obs_interne,
-        version=version,
+    obs_interne = ETLTask(
+        task_config=TaskConfig(task_id="obs_interne"),
+        target="obs_interne",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_obs_interne,
+                ),
+                input_key="obs_interne",
+                output_key="obs_interne",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    enquete_360 = create_grist_etl_task(
-        selecteur="enquete_360",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_enquete_360,
-        version=version,
+    enquete_360 = ETLTask(
+        task_config=TaskConfig(task_id="enquete_360"),
+        target="enquete_360",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_enquete_360,
+                ),
+                input_key="enquete_360",
+                output_key="enquete_360",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    obs_interne_participation = create_grist_etl_task(
-        selecteur="obs_interne_participation",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_obs_interne_participation,
-        version=version,
+    obs_interne_participation = ETLTask(
+        task_config=TaskConfig(task_id="obs_interne_participation"),
+        target="obs_interne_participation",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_obs_interne_participation,
+                ),
+                input_key="obs_interne_participation",
+                output_key="obs_interne_participation",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    engagement_environnement = create_grist_etl_task(
-        selecteur="engagement_environnement",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_engagement_environnement,
-        version=version,
+    engagement_environnement = ETLTask(
+        task_config=TaskConfig(task_id="engagement_environnement"),
+        target="engagement_environnement",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_engagement_environnement,
+                ),
+                input_key="engagement_environnement",
+                output_key="engagement_environnement",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
+
     chain(
         [
-            engagement_agents_mef(),
-            qualite_vie_travail(),
-            collab_inter_structure(),
-            obs_interne(),
-            enquete_360(),
-            obs_interne_participation(),
-            engagement_environnement(),
+            engagement_agents_mef.create_task(),
+            qualite_vie_travail.create_task(),
+            collab_inter_structure.create_task(),
+            obs_interne.create_task(),
+            enquete_360.create_task(),
+            obs_interne_participation.create_task(),
+            engagement_environnement.create_task(),
         ]
     )
 
 
 @task_group(group_id="metiers")
 def metiers() -> None:
-    indicateurs_metiers = create_grist_etl_task(
-        selecteur="indicateurs_metiers",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_indicateurs_metiers,
-        version=version,
+    indicateurs_metiers = ETLTask(
+        task_config=TaskConfig(task_id="indicateurs_metiers"),
+        target="indicateurs_metiers",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_indicateurs_metiers,
+                ),
+                input_key="indicateurs_metiers",
+                output_key="indicateurs_metiers",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    enquete_satisfaction = create_grist_etl_task(
-        selecteur="enquete_satisfaction",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_enquete_satisfaction,
-        version=version,
+    enquete_satisfaction = ETLTask(
+        task_config=TaskConfig(task_id="enquete_satisfaction"),
+        target="enquete_satisfaction",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_enquete_satisfaction,
+                ),
+                input_key="enquete_satisfaction",
+                output_key="enquete_satisfaction",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    etudes = create_grist_etl_task(
-        selecteur="etudes",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_etudes,
-        version=version,
+    etudes = ETLTask(
+        task_config=TaskConfig(task_id="etudes"),
+        target="etudes",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_etudes,
+                ),
+                input_key="etudes",
+                output_key="etudes",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    communique_presse = create_grist_etl_task(
-        selecteur="communique_presse",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_communique_presse,
-        version=version,
+    communique_presse = ETLTask(
+        task_config=TaskConfig(task_id="communique_presse"),
+        target="communique_presse",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_communique_presse,
+                ),
+                input_key="communique_presse",
+                output_key="communique_presse",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    studio_graphique = create_grist_etl_task(
-        selecteur="studio_graphique",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_studio_graphique,
-        version=version,
+    studio_graphique = ETLTask(
+        task_config=TaskConfig(task_id="studio_graphique"),
+        target="studio_graphique",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_studio_graphique,
+                ),
+                input_key="studio_graphique",
+                output_key="studio_graphique",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    notes_veilles = create_grist_etl_task(
-        selecteur="notes_veilles",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_notes_veilles,
-        version=version,
+    notes_veilles = ETLTask(
+        task_config=TaskConfig(task_id="notes_veilles"),
+        target="notes_veilles",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_notes_veilles,
+                ),
+                input_key="notes_veilles",
+                output_key="notes_veilles",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    recommandation_strat = create_grist_etl_task(
-        selecteur="recommandation_strat",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_recommandation_strat,
-        version=version,
+    recommandation_strat = ETLTask(
+        task_config=TaskConfig(task_id="recommandation_strat"),
+        target="recommandation_strat",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_recommandation_strat,
+                ),
+                input_key="recommandation_strat",
+                output_key="recommandation_strat",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    projets_graphiques = create_grist_etl_task(
-        selecteur="projets_graphiques",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_projets_graphiques,
-        version=version,
+    projets_graphiques = ETLTask(
+        task_config=TaskConfig(task_id="projets_graphiques"),
+        target="projets_graphiques",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_projets_graphiques,
+                ),
+                input_key="projets_graphiques",
+                output_key="projets_graphiques",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
+
     chain(
         [
-            indicateurs_metiers(),
-            enquete_satisfaction(),
-            etudes(),
-            communique_presse(),
-            studio_graphique(),  # [OLD] ref projets_graphique
-            notes_veilles(),
-            recommandation_strat(),
-            projets_graphiques(),
+            indicateurs_metiers.create_task(),
+            enquete_satisfaction.create_task(),
+            etudes.create_task(),
+            communique_presse.create_task(),
+            studio_graphique.create_task(),
+            notes_veilles.create_task(),
+            recommandation_strat.create_task(),
+            projets_graphiques.create_task(),
         ]
     )
 
 
 @task_group(group_id="ressources_humaines")
 def ressources_humaines() -> None:
-    rh_formation = create_grist_etl_task(
-        selecteur="rh_formation",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_rh_formation,
-        version=version,
+    rh_formation = ETLTask(
+        task_config=TaskConfig(task_id="rh_formation"),
+        target="rh_formation",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_rh_formation,
+                ),
+                input_key="rh_formation",
+                output_key="rh_formation",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    rh_turnover = create_grist_etl_task(
-        selecteur="rh_turnover",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_rh_turnover,
-        version=version,
+    rh_turnover = ETLTask(
+        task_config=TaskConfig(task_id="rh_turnover"),
+        target="rh_turnover",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_rh_turnover,
+                ),
+                input_key="rh_turnover",
+                output_key="rh_turnover",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    rh_contractuel = create_grist_etl_task(
-        selecteur="rh_contractuel",
-        normalisation_process_func=normalize_grist_dataframe,
-        process_func=process.process_rh_contractuel,
-        version=version,
+    rh_contractuel = ETLTask(
+        task_config=TaskConfig(task_id="rh_contractuel"),
+        target="rh_contractuel",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    custom_fn=process.process_rh_contractuel,
+                ),
+                input_key="rh_contractuel",
+                output_key="rh_contractuel",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    chain([rh_formation(), rh_turnover(), rh_contractuel()])
+    chain(
+        [
+            rh_formation.create_task(),
+            rh_turnover.create_task(),
+            rh_contractuel.create_task(),
+        ]
+    )

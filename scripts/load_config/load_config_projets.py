@@ -20,18 +20,18 @@ register_adapter(typ=np.int64, callable=AsIs)
 TBL_ORDERED = [
     {"tbl_name": "ref_direction", "process_func": process.process_direction},
     {"tbl_name": "ref_service", "process_func": process.process_service},
-    {"tbl_name": "projet", "process_func": process.process_projet},
+    {"tbl_name": "projet", "process_func": process.process_projets},
     {"tbl_name": "projet_contact", "process_func": process.process_projet_contact},
     {
         "tbl_name": "projet_documentation",
         "process_func": process.process_projet_documentation,
     },
     {"tbl_name": "projet_s3", "process_func": process.process_projet_s3},
-    {"tbl_name": "projet_selecteur", "process_func": process.process_selecteur},
-    {"tbl_name": "selecteur_source", "process_func": process.process_source},
+    {"tbl_name": "projet_selecteur", "process_func": process.process_projet_selecteur},
+    {"tbl_name": "selecteur_source", "process_func": process.process_selecteur_source},
     {
         "tbl_name": "selecteur_column_mapping",
-        "process_func": process.process_col_mapping,
+        "process_func": process.process_selecteur_column_mapping,
     },
     {"tbl_name": "selecteur_s3", "process_func": process.process_selecteur_s3},
     {

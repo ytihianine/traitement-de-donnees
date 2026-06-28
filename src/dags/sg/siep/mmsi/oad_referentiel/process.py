@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def process_typologie_bien(df: pd.DataFrame) -> pd.DataFrame:
+def process_ref_typologie(df: pd.DataFrame) -> pd.DataFrame:
     df = (
         df.dropna(subset=["usage_detaille_du_bien"])
         .drop_duplicates(subset=["usage_detaille_du_bien"], ignore_index=True)

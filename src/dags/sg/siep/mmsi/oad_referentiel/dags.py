@@ -25,7 +25,7 @@ from src.common_tasks.s3 import (
 from src.utils.config.tasks import get_list_source_fichier
 from src.common_tasks.projet import get_selecteur_config
 
-from src.dags.sg.siep.mmsi.oad_referentiel.tasks import bien_typologie
+from src.dags.sg.siep.mmsi.oad_referentiel.tasks import ref_typologie
 
 # Mails
 nom_projet = "Outil aide diagnostic - référentiel"
@@ -75,9 +75,10 @@ def oad_referentiel() -> None:
     """ Task order """
     chain(
         validate_dag_parameters(),
+        selecteur_configs,
         looking_for_files,
         get_projet_snapshot(nom_projet="Outil aide diagnostic"),
-        bien_typologie(),
+        ref_typologie,
         create_tmp_tables(),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
         copy_tmp_table_to_real_table(),

@@ -8,10 +8,12 @@ storage_options = {
     "delai_global_paiement": SelecteurStorageOptions(
         is_partitioned=False,
         load_strategy=LoadStrategy.APPEND,
+        read_options={"skiprows": 3},
     ),
     "demande_achat": SelecteurStorageOptions(
         is_partitioned=False,
         load_strategy=LoadStrategy.APPEND,
+        read_options={"skiprows": 3},
     ),
     "demande_paiement": SelecteurStorageOptions(
         is_partitioned=False,
@@ -28,6 +30,7 @@ storage_options = {
     "demande_paiement_flux": SelecteurStorageOptions(
         is_partitioned=False,
         load_strategy=LoadStrategy.APPEND,
+        read_options={"skiprows": 3},
     ),
     "demande_paiement_journal_pieces": SelecteurStorageOptions(
         is_partitioned=False,

@@ -1,7 +1,6 @@
 """Module for ETL task creation and execution."""
 
 import logging
-from pathlib import Path, PurePosixPath
 from typing import Callable, Optional, Any
 
 import pandas as pd
@@ -11,22 +10,13 @@ from airflow.sdk import task, XComArg
 from src.infra.file_system.dataframe import read_dataframe, write_dataframe
 from src.infra.file_system.factory import (
     create_default_s3_handler,
-    create_local_handler,
 )
-from src.infra.database.factory import create_db_handler
-from src.infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
-from src._enums.filesystem import IcebergTableStatus
-from src.utils.process.structures import remove_grist_internal_cols
 from src.utils.logs import df_info
 from src.utils.config.tasks import (
     get_selecteur_storage_info,
-    column_mapping_dataframe,
-    column_mapping_dict,
 )
 from src.utils.config.dag_params import get_execution_date, get_project_name
 from src._types.dags import ETLStep, TaskConfig
-from src._enums.database import DatabaseType
-from src.constants import DEFAULT_POLARIS_HOST, DEFAULT_POLARIS_CATALOG
 
 
 def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
@@ -49,257 +39,6 @@ def _add_snapshot_id_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
 
     df["snapshot_id"] = snapshot_id
     return df
-
-
-def _add_metadata(
-    df: pd.DataFrame,
-    context: dict,
-    add_import_date: bool = True,
-    add_snapshot_id: bool = True,
-) -> pd.DataFrame:
-    """Add import timestamp, date and snapshot_id columns."""
-    if add_import_date:
-        df = _add_import_metadata(df=df, context=context)
-    if add_snapshot_id:
-        df = _add_snapshot_id_metadata(df=df, context=context)
-    return df
-
-
-def _write_to_iceberg_catalog(
-    df: pd.DataFrame,
-    filepath_s3: str,
-    catalog: IcebergCatalog,
-    table_status: IcebergTableStatus = IcebergTableStatus.STAGING,
-) -> None:
-    """Write DataFrame to Iceberg catalog."""
-    filepath = PurePosixPath(filepath_s3)
-    tbl_name = filepath.stem
-    if len(filepath.parts) < 1:
-        raise ValueError(f"Invalid filepath_s3 format: {filepath_s3}")
-    namespace = ".".join(filepath.parts[:-1])
-
-    catalog.write_table_and_namespace(
-        df=df,
-        table_status=table_status,
-        namespace=namespace,
-        table_name=tbl_name,
-    )
-
-
-def create_grist_etl_task(
-    selecteur: str,
-    doc_selecteur: Optional[str] = None,
-    normalisation_process_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
-    process_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
-    add_import_date: bool = False,
-    add_snapshot_id: bool = False,
-    version: str = "v1",
-) -> Callable[..., XComArg]:
-    """
-    Create an ETL task for extracting, transforming and loading data from a Grist table that:
-    1. Gets configuration using selecteur
-    2. Reads file from S3
-    3. Processes the data (optional)
-    4. Writes result to S3 as parquet
-
-    Args:
-        selecteur: Configuration selector key
-        doc_selecteur: Configuration selector for the Grist document
-        normalisation_process_func: Optional normalization process to run
-            before the process function
-        process_func: Optional function to process the DataFrame
-
-    Returns:
-        Callable: Airflow task function
-        ```
-    """
-    if doc_selecteur is None:
-        doc_selecteur = "grist_doc"
-
-    @task(task_id=selecteur)
-    def _task(**context) -> None:
-        """The actual ETL task function."""
-        # Get project name from context
-        nom_projet = get_project_name(context=context)
-
-        # Get config values related to the task
-        task_config = get_selecteur_storage_info(
-            nom_projet=nom_projet, selecteur=selecteur
-        )
-        doc_config = get_selecteur_storage_info(
-            nom_projet=nom_projet, selecteur=doc_selecteur
-        )
-        doc_local_path = Path("/tmp") / doc_config.filename
-
-        if task_config.id_source is None:
-            raise ValueError(f"nom_source must be defined for selecteur {selecteur}")
-
-        # Initialize hooks
-        s3_handler = create_default_s3_handler()
-        local_handler = create_local_handler()
-        sqlite_handler = create_db_handler(
-            connection_id=str(doc_local_path), db_type=DatabaseType.SQLITE
-        )
-
-        # Download Grist doc from S3 to local temp file
-        grist_doc = s3_handler.read(
-            file_path=doc_config.get_full_s3_key(with_tmp_segment=True)
-        )
-        local_handler.write(file_path=str(doc_local_path), content=grist_doc)
-
-        # Get data of table
-        df = sqlite_handler.fetch_df(query=f"SELECT * FROM {task_config.id_source}")
-
-        if normalisation_process_func is not None:
-            df = normalisation_process_func(df)
-        else:
-            logging.info(
-                msg="No normalisation process function provided. Skipping the normalisation step ..."
-            )
-
-        # Removing Grist internal colums
-        df = remove_grist_internal_cols(df=df)
-
-        df_info(df=df, df_name=f"{selecteur} - Source normalisée")
-        if process_func is not None:
-            df = process_func(df)
-        else:
-            logging.info(
-                msg="No process function provided. Skipping the processing step ..."
-            )
-
-        _add_metadata(
-            df=df,
-            context=context,
-            add_import_date=add_import_date,
-            add_snapshot_id=add_snapshot_id,
-        )
-
-        df_info(df=df, df_name=f"{selecteur} - After processing")
-
-        # Export
-        s3_handler.write(
-            file_path=str(task_config.get_full_s3_key(with_tmp_segment=True)),
-            content=df.to_parquet(path=None, index=False),
-        )
-
-        if version == "v2":
-            # Init IcebergCatalog
-            properties = generate_catalog_properties(uri=DEFAULT_POLARIS_HOST)
-            catalog = IcebergCatalog(
-                name=DEFAULT_POLARIS_CATALOG, properties=properties
-            )
-            _write_to_iceberg_catalog(
-                df=df,
-                filepath_s3=str(task_config.get_full_s3_key()),
-                catalog=catalog,
-                table_status=IcebergTableStatus.STAGING,
-            )
-
-    return _task
-
-
-def create_file_etl_task(
-    selecteur: str,
-    process_func: Optional[Callable[..., pd.DataFrame]] = None,
-    read_options: Optional[dict[str, Any]] = None,
-    apply_cols_mapping: bool = True,
-    add_import_date: bool = True,
-    add_snapshot_id: bool = True,
-    version: str = "v1",
-) -> Callable[..., XComArg]:
-    """Create an ETL task for extracting, transforming and loading data from a file.
-
-    Args:
-        selecteur: The identifier for this ETL task
-        process_func: Optional function to process the DataFrame
-        read_options: Optional options for reading the source file
-
-    Returns:
-        An Airflow task that performs the ETL operation
-    """
-
-    @task(task_id=selecteur)
-    def _task(**context) -> None:
-        """The actual ETL task function."""
-        # Get project name from context
-        nom_projet = get_project_name(context=context)
-
-        # Initialize hooks
-        s3_handler = create_default_s3_handler()
-
-        # Get config values related to the task
-        task_config = get_selecteur_storage_info(
-            nom_projet=nom_projet, selecteur=selecteur
-        )
-
-        # Get data of table
-        df = read_dataframe(
-            file_handler=s3_handler,
-            file_path=task_config.get_full_s3_key(use_id_source=True),
-            read_options=read_options,
-        )
-
-        df_info(df=df, df_name=f"{selecteur} - Source normalisée")
-        if apply_cols_mapping:
-            # Apply column mapping if available
-            cols_mapping = column_mapping_dataframe(
-                nom_projet=nom_projet, selecteur=selecteur
-            )
-            if cols_mapping.empty:
-
-                logging.info(f"No column mapping found for selecteur {selecteur}")
-            else:
-                logging.info(
-                    "apply_cols_mapping set to True. Renaming the dataframe labels ..."
-                )
-                cols_mapping = column_mapping_dict(df_cols_map=cols_mapping)
-                logging.info(f"Columns mapping: \n{cols_mapping}")
-                df = df.set_axis(
-                    labels=[" ".join(colname.split()) for colname in df.columns],
-                    axis="columns",
-                )
-                df = df.rename(columns=cols_mapping)
-                df = df.loc[:, list(cols_mapping.values())]
-
-        if process_func is None:
-            logging.info(
-                msg="No process function provided. Skipping the processing step ..."
-            )
-        else:
-            df_info(df=df, df_name=f"{selecteur} - After column mapping")
-            df = process_func(df)
-
-        if add_import_date:
-            df = _add_import_metadata(df=df, context=context)
-
-        if add_snapshot_id:
-            df = _add_snapshot_id_metadata(df=df, context=context)
-
-        df_info(df=df, df_name=f"{selecteur} - After processing")
-
-        # Export result to s3
-        write_dataframe(
-            df=df,
-            file_handler=s3_handler,
-            file_path=task_config.get_full_s3_key(with_tmp_segment=True),
-            write_options=None,
-        )
-
-        if version == "v2":
-            # Init IcebergCatalog
-            properties = generate_catalog_properties(uri=DEFAULT_POLARIS_HOST)
-            catalog = IcebergCatalog(
-                name=DEFAULT_POLARIS_CATALOG, properties=properties
-            )
-            _write_to_iceberg_catalog(
-                df=df,
-                filepath_s3=str(task_config.get_full_s3_key()),
-                catalog=catalog,
-                table_status=IcebergTableStatus.STAGING,
-            )
-
-    return _task
 
 
 def _execute_step(
@@ -350,7 +89,6 @@ def create_task(
     add_import_date: bool = True,
     add_snapshot_id: bool = True,
     export_output: bool = True,
-    version: str = "v1",
 ) -> Callable[..., XComArg]:
     """
     Create a generic Airflow task based on the provided TaskConfig.
@@ -436,18 +174,5 @@ def create_task(
             file_path=output_config.get_full_s3_key(with_tmp_segment=True),
             write_options=None,
         )
-
-        if version == "v2":
-            # Init IcebergCatalog
-            properties = generate_catalog_properties(uri=DEFAULT_POLARIS_HOST)
-            catalog = IcebergCatalog(
-                name=DEFAULT_POLARIS_CATALOG, properties=properties
-            )
-            _write_to_iceberg_catalog(
-                df=result,
-                filepath_s3=str(output_config.get_full_s3_key()),
-                catalog=catalog,
-                table_status=IcebergTableStatus.STAGING,
-            )
 
     return _task
