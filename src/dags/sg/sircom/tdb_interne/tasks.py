@@ -10,8 +10,6 @@ from src._types.dags import TaskConfig
 
 from src.dags.sg.sircom.tdb_interne import process
 
-version = "v1"
-
 
 @task_group(group_id="abonnes_visites")
 def abonnes_visites() -> None:
