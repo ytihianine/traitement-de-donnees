@@ -1,106 +1,276 @@
+from functools import partial
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src.common_tasks.etl import create_grist_etl_task, create_task
-from src._types.dags import TaskConfig, ETLStep
+from src.common_tasks.etl import create_task
+from src.common_tasks.grist import generic_grist_processing
+from src._types.tasks import DataFrameStep, ETLTask
+from src._types.readers import GristReaderStrategy
+from src._types.writers import FileWriterStrategy
+from src._types.dags import ETLStep, TaskConfig
+
 
 from src.dags.cbcm.ref_service_prescripteur import process
 from src.dags.cbcm.ref_service_prescripteur import actions
-from src.utils.process.structures import normalize_grist_dataframe
-
-version = "v1"
 
 
 @task_group(group_id="grist_source")
 def grist_source() -> None:
-    ref_prog = create_grist_etl_task(
-        selecteur="ref_prog",
-        process_func=process.process_ref_prog,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    ref_prog = ETLTask(
+        task_config=TaskConfig(task_id="ref_prog"),
+        target="ref_prog",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    txt_columns=["prog"],
+                    custom_fn=process.process_ref_prog,
+                ),
+                input_key="ref_prog",
+                output_key="ref_prog",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    ref_bop = create_grist_etl_task(
-        selecteur="ref_bop",
-        process_func=process.process_ref_bop,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    ref_bop = ETLTask(
+        task_config=TaskConfig(task_id="ref_bop"),
+        target="ref_bop",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    txt_columns=["bop"],
+                    ref_columns=["prog"],
+                    custom_fn=process.process_ref_bop,
+                ),
+                input_key="ref_bop",
+                output_key="ref_bop",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    ref_uo = create_grist_etl_task(
-        selecteur="ref_uo",
-        process_func=process.process_ref_uo,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    ref_uo = ETLTask(
+        task_config=TaskConfig(task_id="ref_uo"),
+        target="ref_uo",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    txt_columns=["uo"],
+                    ref_columns=["prog", "bop"],
+                    custom_fn=process.process_ref_uo,
+                ),
+                input_key="ref_uo",
+                output_key="ref_uo",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    ref_cc = create_grist_etl_task(
-        selecteur="ref_cc",
-        process_func=process.process_ref_cc,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    ref_cc = ETLTask(
+        task_config=TaskConfig(task_id="ref_cc"),
+        target="ref_cc",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    txt_columns=["cc"],
+                    ref_columns=["prog", "bop", "uo"],
+                    custom_fn=process.process_ref_cc,
+                ),
+                input_key="ref_cc",
+                output_key="ref_cc",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    ref_sdep = create_grist_etl_task(
-        selecteur="ref_sdep",
-        process_func=process.process_ref_sdep,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    ref_sp_pilotage = ETLTask(
+        task_config=TaskConfig(task_id="ref_sp_pilotage"),
+        target="ref_sp_pilotage",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    txt_columns=["service_prescripteur"],
+                    custom_fn=process.process_ref_sp_pilotage,
+                ),
+                input_key="ref_sp_pilotage",
+                output_key="ref_sp_pilotage",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    ref_sp_choisi = create_grist_etl_task(
-        selecteur="ref_sp_choisi",
-        process_func=process.process_ref_sp_choisi,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    ref_sp_choisi = ETLTask(
+        task_config=TaskConfig(task_id="ref_sp_choisi"),
+        target="ref_sp_choisi",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    txt_columns=["service_prescripteur", "mail"],
+                    custom_fn=process.process_ref_sp_choisi,
+                ),
+                input_key="ref_sp_choisi",
+                output_key="ref_sp_choisi",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    ref_sp_pilotage = create_grist_etl_task(
-        selecteur="ref_sp_pilotage",
-        process_func=process.process_ref_sp_pilotage,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    ref_sdep = ETLTask(
+        task_config=TaskConfig(task_id="ref_sdep"),
+        target="ref_sdep",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    txt_columns=["service_depense"],
+                    custom_fn=process.process_ref_sdep,
+                ),
+                input_key="ref_sdep",
+                output_key="ref_sdep",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    sp = create_grist_etl_task(
-        selecteur="sp",
-        process_func=process.process_service_prescripteur,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    sp = ETLTask(
+        task_config=TaskConfig(task_id="sp"),
+        target="sp",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    cols_mapping={"centre_de_cout": "centre_cout"},
+                    txt_columns=[
+                        "centre_financier",
+                        "centre_cout",
+                        "couple_cf_cc",
+                        "observation",
+                    ],
+                    date_columns=["date_derniere_maj"],
+                    ref_columns=[
+                        "service_prescripteur_pilotage_",
+                        "service_depense",
+                        "service_prescripteur_choisi_selon_cf_cc",
+                        "designation_prog",
+                        "designation_bop",
+                        "designation_uo",
+                        "designation_cc",
+                    ],
+                    custom_fn=process.process_sp,
+                ),
+                input_key="sp",
+                output_key="sp",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
     # Services prescripteurs renseignés manuellement
-    delai_global_paiement_sp_manuel = create_grist_etl_task(
-        selecteur="delai_global_paiement_sp_manuel",
-        process_func=process.process_delai_global_paiement_sp_manuel,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    delai_global_paiement_sp_manuel = ETLTask(
+        task_config=TaskConfig(task_id="delai_global_paiement_sp_manuel"),
+        target="delai_global_paiement_sp_manuel",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    cols_mapping={"service_prescripteur": "id_service_prescripteur"},
+                    ref_columns=["id_service_prescripteur"],
+                    custom_fn=process.process_delai_global_paiement_sp_manuel,
+                ),
+                input_key="delai_global_paiement_sp_manuel",
+                output_key="delai_global_paiement_sp_manuel",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    demande_achat_sp_manuel = create_grist_etl_task(
-        selecteur="demande_achat_sp_manuel",
-        process_func=process.process_demande_achat_sp_manuel,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    demande_achat_sp_manuel = ETLTask(
+        task_config=TaskConfig(task_id="demande_achat_sp_manuel"),
+        target="demande_achat_sp_manuel",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    cols_mapping={"service_prescripteur": "id_service_prescripteur"},
+                    ref_columns=["id_service_prescripteur"],
+                    custom_fn=process.process_demande_achat_sp_manuel,
+                ),
+                input_key="demande_achat_sp_manuel",
+                output_key="demande_achat_sp_manuel",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    demande_paiement_sp_manuel = create_grist_etl_task(
-        selecteur="demande_paiement_sp_manuel",
-        process_func=process.process_demande_paiement_sp_manuel,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    demande_paiement_sp_manuel = ETLTask(
+        task_config=TaskConfig(task_id="demande_paiement_sp_manuel"),
+        target="demande_paiement_sp_manuel",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    cols_mapping={"service_prescripteur": "id_service_prescripteur"},
+                    ref_columns=["id_service_prescripteur"],
+                    custom_fn=process.process_demande_paiement_sp_manuel,
+                ),
+                input_key="demande_paiement_sp_manuel",
+                output_key="demande_paiement_sp_manuel",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    engagement_juridique_sp_manuel = create_grist_etl_task(
-        selecteur="engagement_juridique_sp_manuel",
-        process_func=process.process_engagement_juridique_sp_manuel,
-        normalisation_process_func=normalize_grist_dataframe,
-        version=version,
+    engagement_juridique_sp_manuel = ETLTask(
+        task_config=TaskConfig(task_id="engagement_juridique_sp_manuel"),
+        target="engagement_juridique_sp_manuel",
+        reader=GristReaderStrategy(),
+        steps=[
+            DataFrameStep(
+                fn=partial(
+                    generic_grist_processing,
+                    cols_mapping={"service_prescripteur": "id_service_prescripteur"},
+                    ref_columns=["id_service_prescripteur"],
+                    custom_fn=process.process_engagement_juridique_sp_manuel,
+                ),
+                input_key="engagement_juridique_sp_manuel",
+                output_key="engagement_juridique_sp_manuel",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
 
     chain(
         [
-            ref_prog(),
-            ref_bop(),
-            ref_uo(),
-            ref_cc(),
-            ref_sdep(),
-            ref_sp_choisi(),
-            ref_sp_pilotage(),
-            sp(),
-            delai_global_paiement_sp_manuel(),
-            demande_achat_sp_manuel(),
-            demande_paiement_sp_manuel(),
-            engagement_juridique_sp_manuel(),
+            ref_prog.create_task(),
+            ref_bop.create_task(),
+            ref_uo.create_task(),
+            ref_cc.create_task(),
+            ref_sdep.create_task(),
+            ref_sp_choisi.create_task(),
+            ref_sp_pilotage.create_task(),
+            sp.create_task(),
+            delai_global_paiement_sp_manuel.create_task(),
+            demande_achat_sp_manuel.create_task(),
+            demande_paiement_sp_manuel.create_task(),
+            engagement_juridique_sp_manuel.create_task(),
         ]
     )
 
