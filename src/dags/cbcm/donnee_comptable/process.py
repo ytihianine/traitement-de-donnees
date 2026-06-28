@@ -542,7 +542,7 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
 
     # Ajouter un ID unique à chaque ligne
     df["id_dgp"] = [
-        create_row_id(name_seed="delai_global_paiement.INFDEP56", row=row)
+        create_row_id(name_seed="delai_global_paiement.INFDEP56", row=row)  # type: ignore
         for row in df.to_dict("records")
     ]
 
