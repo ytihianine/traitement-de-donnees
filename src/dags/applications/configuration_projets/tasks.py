@@ -49,7 +49,7 @@ def process_data() -> None:
                         "direction",
                         "service",
                     ],
-                    cols_mapping={"direction": "id_direction"},
+                    cols_mapping={"direction": "id_direction", "id": "id_service"},
                     txt_columns=["service"],
                     ref_columns=["id_direction"],
                     custom_fn=process.process_service,
