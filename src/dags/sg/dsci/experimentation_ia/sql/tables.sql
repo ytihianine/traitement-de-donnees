@@ -6,83 +6,170 @@ CREATE SCHEMA IF NOT EXISTS assistant_ia;
 */
 
 CREATE TABLE assistant_ia."ref_q1_direction" (
-  "id" INTEGER PRIMARY KEY,
-  "direction" TEXT
-);
+  "id" INTEGER,
+  "direction" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."ref_q5_domaine" (
-  "id" INTEGER PRIMARY KEY,
-  "domaine" TEXT
-);
+  "id" INTEGER,
+  "domaine" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q6_niveau_utilisation" (
-  "id" INTEGER PRIMARY KEY,
-  "niveau_d_appropriation" TEXT
-);
+  "id" INTEGER,
+  "niveau_d_appropriation" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q9_cas_usage" (
-  "id" INTEGER PRIMARY KEY,
-  "cas_d_usage" TEXT
-);
+  "id" INTEGER,
+  "cas_d_usage" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 /*
    Référentiels questionnaire 2
 */
 
 CREATE TABLE assistant_ia."ref_q28_raisons_perte" (
-  "id" INTEGER PRIMARY KEY,
-  "raisons" TEXT
-);
+  "id" INTEGER,
+  "raisons" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q25_impact_observe" (
-  "id" INTEGER PRIMARY KEY,
-  "observation" TEXT
-);
+  "id" INTEGER,
+  "observation" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q24_impact_identifie" (
-  "id" INTEGER PRIMARY KEY,
-  "impacts" TEXT
-);
+  "id" INTEGER,
+  "impacts" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q23_taux_correction" (
-  "id" INTEGER PRIMARY KEY,
-  "taux_de_correction" TEXT
-);
+  "id" INTEGER,
+  "taux_de_correction" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q22_typologie_erreurs" (
-  "id" INTEGER PRIMARY KEY,
-  "erreurs" TEXT
-);
+  "id" INTEGER,
+  "erreurs" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q20_autres_ia" (
-  "id" INTEGER PRIMARY KEY,
-  "comparaisons" TEXT
-);
+  "id" INTEGER,
+  "comparaisons" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q16_taches" (
-  "id" INTEGER PRIMARY KEY,
-  "taches" TEXT
-);
+  "id" INTEGER,
+  "taches" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q14_evolution_craintes" (
-  "id" INTEGER PRIMARY KEY,
-  "evolutions" TEXT
-);
+  "id" INTEGER,
+  "evolutions" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q13_facteurs_progression"(
-  "id" INTEGER PRIMARY KEY,
-  "facteurs" TEXT
-);
+  "id" INTEGER,
+  "facteurs" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q10_principaux_freins" (
-  "id" INTEGER PRIMARY KEY,
-  "freins" TEXT
-);
+  "id" INTEGER,
+  "freins" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q6_participation_programme" (
-  "id" INTEGER PRIMARY KEY,
-  "participation" TEXT
-);
+  "id" INTEGER,
+  "participation" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q5_formation_suivie" (
-  "id" INTEGER PRIMARY KEY,
-  "formation_suivie" TEXT
-);
+  "id" INTEGER,
+  "formation_suivie" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q3_niveau_2" (
-  "id" INTEGER PRIMARY KEY,
-  "niveau" TEXT
-);
+  "id" INTEGER,
+  "niveau" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q7_accords" (
-  "id" INTEGER PRIMARY KEY,
-  "reponses" TEXT
-);
+  "id" INTEGER,
+  "reponses" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 
 /*
@@ -90,9 +177,13 @@ CREATE TABLE assistant_ia."ref_q7_accords" (
 */
 
 CREATE TABLE assistant_ia."ref_raisons_non_utilisation" (
-  "id" INTEGER PRIMARY KEY,
-  "raisons" TEXT
-);
+  "id" INTEGER,
+  "raisons" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 
 /*
@@ -100,63 +191,119 @@ CREATE TABLE assistant_ia."ref_raisons_non_utilisation" (
 */
 
 CREATE TABLE assistant_ia."ref_q6_formation_suivie"(
-  "id" INTEGER PRIMARY KEY,
-  "formation" TEXT
-);
+  "id" INTEGER,
+  "formation" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."ref_q7_particip_programme"(
-  "id" INTEGER PRIMARY KEY,
-  "participation" TEXT
-);
+  "id" INTEGER,
+  "participation" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."ref_q8_raisons_non_participation"(
-  "id" INTEGER PRIMARY KEY,
-  "raisons" TEXT
-);
+  "id" INTEGER,
+  "raisons" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."ref_q11_leviers_progressions"(
-  "id" INTEGER PRIMARY KEY,
-  "leviers" TEXT
-);
+  "id" INTEGER,
+  "leviers" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q12_impacts_taches_pro"(
-  "id" INTEGER PRIMARY KEY,
-  "impacts" TEXT
-);
+  "id" INTEGER,
+  "impacts" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q14_taches_rebarbativ"(
-  "id" INTEGER PRIMARY KEY,
-  "taches_rebarbatives" TEXT
-);
+  "id" INTEGER,
+  "taches_rebarbatives" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q17_autres_outils"(
-  "id" INTEGER PRIMARY KEY,
-  "autres_outils" TEXT
-);
+  "id" INTEGER,
+  "autres_outils" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q17_satisfaction_autre_outil"(
-  "id" INTEGER PRIMARY KEY,
-  "satisfaction_autres_outils" TEXT
-);
+  "id" INTEGER,
+  "satisfaction_autres_outils" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q18_comparaisons"(
-  "id" INTEGER PRIMARY KEY,
-  "comparaisons" TEXT
-);
+  "id" INTEGER,
+  "comparaisons" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q19_fonctionnalites"(
-  "id" INTEGER PRIMARY KEY,
-  "fonctionnalites" TEXT
-);
+  "id" INTEGER,
+  "fonctionnalites" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q21_risques_identifies"(
-  "id" INTEGER PRIMARY KEY,
-  "risques" TEXT
-);
+  "id" INTEGER,
+  "risques" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 CREATE TABLE assistant_ia."ref_q25_besoins"(
-  "id" INTEGER PRIMARY KEY,
-  "besoins" TEXT
-);
+  "id" INTEGER,
+  "besoins" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 /*
     Repartition par entité
 */
 
 CREATE TABLE assistant_ia."quota_par_entite" (
-  "id" integer PRIMARY KEY,
+  "id" bigserial,
   "experimentation_demarree" boolean,
   "entite" text,
   "nbre_d_acces_previsionnels" int,
@@ -169,15 +316,19 @@ CREATE TABLE assistant_ia."quota_par_entite" (
   "relance_dsci" text,
   "appel_a_candidature_dsci" text,
   "referent_ia" text,
-  "courriel" text
-);
+  "courriel" text,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 
 /*
     Experimentateurs
 */
 CREATE TABLE assistant_ia."experimentateurs"(
-    "id" integer PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "entite" text,
     "courriel" text,
@@ -186,8 +337,12 @@ CREATE TABLE assistant_ia."experimentateurs"(
     "reponse_au_questionnaire_1" text,
     "reponse_au_questionnaire_2" text,
     "reponse_au_questionnaire_3" text,
-    "parti" text
-);
+    "parti" text,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 
 /*
@@ -195,7 +350,7 @@ CREATE TABLE assistant_ia."experimentateurs"(
 */
 DROP TABLE IF EXISTS assistant_ia."questionnaire_1" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_1"(
-    "id" INTEGER PRIMARY KEY,
+    "id" bigserial,
     "no_id" TEXT,
     "id_direction" INTEGER,
     "tranche_age" TEXT,
@@ -218,24 +373,36 @@ CREATE TABLE assistant_ia."questionnaire_1"(
     "autre_formation_suivie" TEXT,
     --"besoin_accompagnement" TEXT,
     "autre_besoin_accompagnement" TEXT,
-    "besoin_acculturation_encadrement" TEXT
-);
+    "besoin_acculturation_encadrement" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 ----  Table de liaison  cas d'usage envisagés--------------
 DROP TABLE IF EXISTS assistant_ia."questionnaire_1_cas_usage" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_1_cas_usage"(
-  "id" bigint PRIMARY KEY,
+  "id" bigserial,
   "no_id" text,
   "id_cas_d_usage_envisages" INTEGER,
-  UNIQUE ("no_id", "id_cas_d_usage_envisages")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+  UNIQUE ("import_timestamp", "no_id", "id_cas_d_usage_envisages")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_1_besoins_accompagnement" (
-	"id" bigint PRIMARY KEY,
+	"id" bigserial,
   "no_id" text,
 	"besoin_accompagnement" text,
-	UNIQUE ("no_id", "besoin_accompagnement")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+	UNIQUE ("import_timestamp", "no_id", "besoin_accompagnement")
+) PARTITION BY RANGE (import_timestamp);
 
 
 /*
@@ -244,7 +411,7 @@ CREATE TABLE assistant_ia."questionnaire_1_besoins_accompagnement" (
 
 DROP TABLE IF EXISTS assistant_ia."questionnaire_2" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_2" (
-    "id" INTEGER PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "autres_types_d_interactions" TEXT,
     "id_niveau_d_usage_ia_post_expe_" INTEGER,
@@ -295,75 +462,115 @@ CREATE TABLE assistant_ia."questionnaire_2" (
     "id_raisons_perte_de_temps" INTEGER,
     "autres_raisons" TEXT,
     "id_ia_favorise_relations_humaines_" INTEGER,
-    UNIQUE ("no_id")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id")
+) PARTITION BY RANGE (import_timestamp);
 
 
 ----- Tables de liaisons du questionnaire 2--------------------
 
 DROP TABLE IF EXISTS assistant_ia."questionnaire_2_formation_suivie" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_2_formation_suivie" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_formation_ia_suivie_post_expe_" INTEGER,
-    UNIQUE ("no_id", "id_formation_ia_suivie_post_expe_" )
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id", "id_formation_ia_suivie_post_expe_" )
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_2_typologie_interaction" (
-	"id" bigint PRIMARY KEY,
+	"id" bigserial,
 	"no_id" text,
 	"types_d_interactions_mef" text,
-	UNIQUE ("no_id", "types_d_interactions_mef")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+	UNIQUE ("import_timestamp", "no_id", "types_d_interactions_mef")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_2_participation" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_participation_programme_rdv" INTEGER,
-    UNIQUE ("no_id","id_participation_programme_rdv")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id","id_participation_programme_rdv")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_2_freins" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_freins_a_l_utilisation" INTEGER,
-    UNIQUE ("no_id","id_freins_a_l_utilisation")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id","id_freins_a_l_utilisation")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_2_facteurs_progression" (
-    "id" bigserial PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_facteurs_de_progression" INTEGER,
-    UNIQUE ("no_id","id_facteurs_de_progression")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id","id_facteurs_de_progression")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_2_taches" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_taches_realisees_avec_ia" INTEGER,
-    UNIQUE ("no_id","id_taches_realisees_avec_ia")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id","id_taches_realisees_avec_ia")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_2_typologie_erreurs" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_types_d_erreurs_frequentes2" INTEGER,
-    UNIQUE ("no_id","id_types_d_erreurs_frequentes2")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id","id_types_d_erreurs_frequentes2")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_2_impact_observe" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_observations_des_impacts" INTEGER,
-    UNIQUE ("no_id","id_observations_des_impacts")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id","id_observations_des_impacts")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_2_impact_identifie" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_impacts_identifies_au_travail" INTEGER,
-    UNIQUE ("id_impacts_identifies_au_travail" )
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id", "id_impacts_identifies_au_travail" )
+) PARTITION BY RANGE (import_timestamp);
 
 
 /*
@@ -372,19 +579,27 @@ CREATE TABLE assistant_ia."questionnaire_2_impact_identifie" (
 
 DROP TABLE IF EXISTS assistant_ia."questionnaire_2_bis" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_2_bis" (
-    "courriel" TEXT PRIMARY KEY,
+    "courriel" TEXT,
     "avez_vous_deja_utilise_l_assistant_ia_" TEXT,
     "autres_raisons" TEXT,
-    "ajouter_quelque_chose" TEXT
-);
+    "ajouter_quelque_chose" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("courriel", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 -- table de liasion
 
 CREATE TABLE assistant_ia."questionnaire_2_bis_raisons_non_utilisation" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "courriel" TEXT,
     "id_raisons_non_utilisation" INTEGER,
-    UNIQUE ("courriel", "id_raisons_non_utilisation" )
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "courriel", "id_raisons_non_utilisation" )
+) PARTITION BY RANGE (import_timestamp);
 
 /*
    Questionnaire 3 : usages et ressentis
@@ -392,7 +607,7 @@ CREATE TABLE assistant_ia."questionnaire_2_bis_raisons_non_utilisation" (
 
 DROP TABLE IF EXISTS assistant_ia."questionnaire_3" CASCADE;
 CREATE TABLE assistant_ia."questionnaire_3" (
-    "id" INTEGER PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "temps_fonction_exercee" TEXT,
     "genre" TEXT,
@@ -429,56 +644,88 @@ CREATE TABLE assistant_ia."questionnaire_3" (
     "contenu" TEXT,
     "connexions" TEXT,
     "autre_retour_libre" TEXT,
-    "retours_libres" TEXT
-);
+    "retours_libres" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 ----- Tables de liaisons questionnaire_3
 
 CREATE TABLE assistant_ia."questionnaire_3_formation_suivie" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_formation_suivie" INTEGER,
-    UNIQUE ("no_id", "id_formation_suivie" )
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id", "id_formation_suivie" )
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_3_programme_rdv" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_programme_de_rdv" INTEGER,
-    UNIQUE ("no_id", "id_programme_de_rdv")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id", "id_programme_de_rdv")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_3_leviers_progression" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_leviers_progression" INTEGER,
-    UNIQUE ("no_id", "id_leviers_progression")
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id", "id_leviers_progression")
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_3_fonctionnalites" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_fonctionnalites" INTEGER,
-    UNIQUE ("no_id", "id_fonctionnalites" )
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id", "id_fonctionnalites" )
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_3_risques_identifies" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_risques_identifies" INTEGER,
-    UNIQUE ("no_id", "id_risques_identifies" )
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id", "id_risques_identifies" )
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_3_besoins_prioritaires" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_besoins_prioritaires" INTEGER,
-    UNIQUE ("no_id", "id_besoins_prioritaires" )
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id", "id_besoins_prioritaires" )
+) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."questionnaire_3_besoins_moindres" (
-    "id" bigint PRIMARY KEY,
+    "id" bigserial,
     "no_id" text,
     "id_besoins_moindres" INTEGER,
-    UNIQUE ("no_id", "id_besoins_moindres" )
-);
+  import_timestamp TIMESTAMP NOT NULL,
+  import_date DATE NOT NULL,
+  snapshot_id TEXT,
+  PRIMARY KEY ("id", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id", "id_besoins_moindres" )
+) PARTITION BY RANGE (import_timestamp);
