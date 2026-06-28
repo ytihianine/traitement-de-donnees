@@ -242,7 +242,7 @@ def process_visites_intranet_sg(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_budget_depense(df: pd.DataFrame) -> pd.DataFrame:
+def process_synthese_depenses(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     df = df.drop(columns=["faits_marquants"])
 

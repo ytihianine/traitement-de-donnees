@@ -202,24 +202,24 @@ def abonnes_visites() -> None:
 
 @task_group(group_id="budget")
 def budget() -> None:
-    budget_depense = ETLTask(
-        task_config=TaskConfig(task_id="budget_depense"),
-        target="budget_depense",
+    synthese_depenses = ETLTask(
+        task_config=TaskConfig(task_id="synthese_depenses"),
+        target="synthese_depenses",
         reader=GristReaderStrategy(),
         steps=[
             SingleInputStep(
                 fn=partial(
                     generic_grist_processing,
-                    custom_fn=process.process_budget_depense,
+                    custom_fn=process.process_synthese_depenses,
                 ),
-                input_key="budget_depense",
-                output_key="budget_depense",
+                input_key="synthese_depenses",
+                output_key="synthese_depenses",
             )
         ],
         writers=[FileWriterStrategy()],
         add_metadata=True,
     )
-    chain(budget_depense.create_task())
+    chain(synthese_depenses.create_task())
 
 
 @task_group(group_id="enquetes")
