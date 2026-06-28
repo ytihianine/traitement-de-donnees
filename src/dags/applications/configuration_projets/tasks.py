@@ -218,13 +218,14 @@ def process_data() -> None:
                     generic_grist_processing,
                     cols_to_keep=[
                         "projet",
-                        "type_source",
+                        "type",
                         "selecteur",
                         "id_source",
                     ],
                     cols_mapping={
                         "projet": "id_projet",
                         "selecteur": "id_selecteur",
+                        "type": "type_source",
                     },
                     txt_columns=["type_source", "id_source"],
                     ref_columns=["id_projet", "id_selecteur"],
