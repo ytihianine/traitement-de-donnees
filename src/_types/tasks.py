@@ -12,6 +12,7 @@ from src._types.projet import SelecteurConfig
 from src._types.readers import DataContext, ReaderStrategy
 from src._types.writers import WriterStrategy
 from src.utils.config.dag_params import get_execution_date, get_project_name
+from src.utils.logs import df_info
 
 
 class PipelineStep(ABC):
@@ -27,7 +28,9 @@ class SingleInputStep(PipelineStep):
 
     def __call__(self, data_context: DataContext) -> DataContext:
         df = data_context.get(self.input_key)
+        df_info(df=df, df_name=f"{self.input_key} -- Source")
         result = self.fn(df=df)
+        df_info(df=df, df_name=f"{self.input_key} -- After processing")
         data_context.add(self.output_key, result)
         return data_context
 
