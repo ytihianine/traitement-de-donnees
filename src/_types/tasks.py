@@ -27,11 +27,11 @@ class SingleInputStep(PipelineStep):
     output_key: str
 
     def __call__(self, data_context: DataContext) -> DataContext:
-        df = data_context.get(self.input_key)
+        df = data_context.get(name=self.input_key)
         df_info(df=df, df_name=f"{self.input_key} -- Source")
         result = self.fn(df=df)
-        df_info(df=df, df_name=f"{self.input_key} -- After processing")
-        data_context.add(self.output_key, result)
+        df_info(df=result, df_name=f"{self.input_key} -- After processing")
+        data_context.add(name=self.output_key, df=result)
         return data_context
 
 
