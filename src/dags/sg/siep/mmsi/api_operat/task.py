@@ -53,7 +53,7 @@ def output() -> None:
         output_selecteur="declaration_ademe",
         steps=[
             ETLStep(
-                fn=actions.liste_declaration,
+                fn=process.process_declarations,
                 use_context=False,
                 read_data=True,
             ),
@@ -66,7 +66,7 @@ def output() -> None:
         output_selecteur="adresses_efa",
         steps=[
             ETLStep(
-                fn=actions.liste_declaration,
+                fn=process.process_adresse_efa,
                 use_context=False,
                 read_data=True,
             ),
