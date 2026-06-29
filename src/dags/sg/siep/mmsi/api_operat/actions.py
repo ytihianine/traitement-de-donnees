@@ -78,6 +78,7 @@ def liste_declaration() -> list[dict]:
         )
         api_result.extend(lst_declarations.get("resultat", []))
 
+    logging.info(msg=api_result)
     return api_result
 
 
