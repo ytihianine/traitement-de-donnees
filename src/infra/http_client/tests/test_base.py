@@ -7,6 +7,7 @@ import pytest
 
 from src.infra.http_client.base import HttpInterface
 from src.infra.http_client.config import ClientConfig
+from src.infra.http_client.exceptions import RateLimitError, RequestError
 from src.infra.http_client.types import HTTPResponse
 
 
@@ -97,6 +98,48 @@ class TestGet:
     def test_returns_http_response(self, client: ConcreteHttpClient) -> None:
         result = client.get("/users")
         assert isinstance(result, HTTPResponse)
+
+    def test_retries_on_rate_limit_429(self, client: ConcreteHttpClient) -> None:
+        attempts = 0
+
+        def side_effect(*_args, **_kwargs):
+            nonlocal attempts
+            attempts += 1
+            if attempts < 3:
+                response = MagicMock()
+                response.headers = {"Retry-After": "0"}
+                raise RateLimitError(
+                    message="Rate limit exceeded",
+                    status_code=429,
+                    response=response,
+                )
+
+            raw = MagicMock()
+            raw.status_code = 200
+            raw.json.return_value = {}
+            return HTTPResponse(raw=raw)
+
+        client.request = MagicMock(side_effect=side_effect)
+
+        response = client.get("/users")
+
+        assert response.status_code == 200
+        assert attempts == 3
+
+    def test_does_not_retry_on_non_429_error(self, client: ConcreteHttpClient) -> None:
+        attempts = 0
+
+        def side_effect(*_args, **_kwargs):
+            nonlocal attempts
+            attempts += 1
+            raise RequestError(message="Bad request", status_code=400)
+
+        client.request = MagicMock(side_effect=side_effect)
+
+        with pytest.raises(RequestError):
+            client.get("/users")
+
+        assert attempts == 1
 
 
 class TestPost:
