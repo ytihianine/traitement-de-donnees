@@ -135,13 +135,16 @@ class HttpxClient(HttpInterface):
                 return HTTPResponse(raw=response)
 
         except httpx.TimeoutException as e:
-            raise TimeoutError(message=f"Request timed out: {e}")
+            raise TimeoutError(message=f"Request timed out: {e}") from e
         except httpx.NetworkError as e:
-            raise ConnectionError(message=f"Network error occurred: {e}")
+            raise ConnectionError(message=f"Network error occurred: {e}") from e
         except httpx.HTTPError as e:
-            raise HTTPClientError(message=f"HTTP error occurred: {e}")
+            raise HTTPClientError(message=f"HTTP error occurred: {e}") from e
+        except HTTPClientError:
+            # Preserve domain-specific errors (e.g. RateLimitError 429) for retry logic.
+            raise
         except Exception as e:
-            raise HTTPClientError(message=f"An unexpected error occurred: {e}")
+            raise HTTPClientError(message=f"An unexpected error occurred: {e}") from e
 
     def close(self) -> None:
         if self._session:
@@ -244,6 +247,9 @@ class RequestsClient(HttpInterface):
             raise ConnectionError(message=f"Connection error occurred: {e}") from e
         except requests.RequestException as e:
             raise HTTPClientError(message=f"HTTP error occurred: {e}") from e
+        except HTTPClientError:
+            # Preserve domain-specific errors (e.g. RateLimitError 429) for retry logic.
+            raise
         except Exception as e:
             raise HTTPClientError(message=f"An unexpected error occurred: {e}") from e
 
