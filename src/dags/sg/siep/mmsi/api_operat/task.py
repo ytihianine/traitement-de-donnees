@@ -26,7 +26,7 @@ def source() -> None:
     consommations = create_task(
         task_config=TaskConfig(task_id="consommation_by_id"),
         output_selecteur="consommations",
-        input_selecteurs=["declaration_ademe"],
+        input_selecteurs=["declarations"],
         steps=[
             ETLStep(
                 fn=actions.consommation_by_id,
