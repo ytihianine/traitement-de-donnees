@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 from urllib.parse import urljoin
+from tenacity import retry, wait_fixed, stop_after_attempt
 
 from src.infra.http_client.config import ClientConfig
 from src.infra.http_client.types import HTTPResponse
@@ -35,11 +36,13 @@ class HttpInterface(ABC):
         """Make an HTTP request."""
         raise NotImplementedError
 
+    @retry(wait=wait_fixed(wait=2), stop=stop_after_attempt(max_attempt_number=5))
     def get(
         self, endpoint: str, params: dict[str, Any] | None = None, **kwargs
     ) -> HTTPResponse:
         return self.request("GET", endpoint, params=params, **kwargs)
 
+    @retry(wait=wait_fixed(wait=2), stop=stop_after_attempt(max_attempt_number=5))
     def post(
         self,
         endpoint: str,
@@ -49,6 +52,7 @@ class HttpInterface(ABC):
     ) -> HTTPResponse:
         return self.request("POST", endpoint, data=data, json=json, **kwargs)
 
+    @retry(wait=wait_fixed(wait=2), stop=stop_after_attempt(max_attempt_number=5))
     def put(
         self,
         endpoint: str,
@@ -58,6 +62,7 @@ class HttpInterface(ABC):
     ) -> HTTPResponse:
         return self.request("PUT", endpoint, data=data, json=json, **kwargs)
 
+    @retry(wait=wait_fixed(wait=2), stop=stop_after_attempt(max_attempt_number=5))
     def patch(
         self,
         endpoint: str,
@@ -67,6 +72,7 @@ class HttpInterface(ABC):
     ) -> HTTPResponse:
         return self.request("PATCH", endpoint, data=data, json=json, **kwargs)
 
+    @retry(wait=wait_fixed(wait=2), stop=stop_after_attempt(max_attempt_number=5))
     def delete(self, endpoint: str, **kwargs) -> HTTPResponse:
         return self.request("DELETE", endpoint, **kwargs)
 
