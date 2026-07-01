@@ -62,7 +62,7 @@ def grist_source() -> None:
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["uo"],
-                    num_columns=["prog", "bop"],
+                    ref_columns=["prog", "bop"],
                     custom_fn=process.process_ref_uo,
                 ),
                 input_key="ref_uo",
@@ -81,7 +81,7 @@ def grist_source() -> None:
                 fn=partial(
                     generic_grist_processing,
                     txt_columns=["cc"],
-                    num_columns=["prog", "bop", "uo"],
+                    ref_columns=["prog", "bop", "uo"],
                     custom_fn=process.process_ref_cc,
                 ),
                 input_key="ref_cc",
@@ -161,7 +161,7 @@ def grist_source() -> None:
                         "observation",
                     ],
                     date_columns=["date_derniere_maj"],
-                    num_columns=[
+                    ref_columns=[
                         "service_prescripteur_pilotage_",
                         "service_depense",
                         "service_prescripteur_choisi_selon_cf_cc",
