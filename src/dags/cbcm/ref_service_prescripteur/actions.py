@@ -211,19 +211,19 @@ def load_new_cf_cc(df_get_all_cf_cc: pd.DataFrame, df_sp: pd.DataFrame) -> None:
 
 
 def load_demande_achat(
-    get_demande_achat: pd.DataFrame, demande_achat_sp_manuel: pd.DataFrame
+    df_get_demande_achat: pd.DataFrame, df_demande_achat_sp_manuel: pd.DataFrame
 ) -> None:
     # Filtrer les lignes
-    get_demande_achat = get_demande_achat.loc[
-        (get_demande_achat["unique_multi"] == "Multiple")
-        | (get_demande_achat["centre_financier"] == "Ind")
-        | (get_demande_achat["centre_cout"].isin(["Ind", "TECHNIQUE"]))
+    df_get_demande_achat = df_get_demande_achat.loc[
+        (df_get_demande_achat["unique_multi"] == "Multiple")
+        | (df_get_demande_achat["centre_financier"] == "Ind")
+        | (df_get_demande_achat["centre_cout"].isin(["Ind", "TECHNIQUE"]))
     ]
 
     # Merge pour comparer
     df = pd.merge(
-        left=get_demande_achat,
-        right=demande_achat_sp_manuel["id_da"],
+        left=df_get_demande_achat,
+        right=df_demande_achat_sp_manuel["id_da"],
         how="left",
         on=["id_da"],
         indicator=True,
@@ -263,20 +263,20 @@ def load_demande_achat(
 
 
 def load_demande_paiement_complet(
-    get_demande_paiement_complet: pd.DataFrame,
-    demande_paiement_sp_manuel: pd.DataFrame,
+    df_get_demande_paiement_complet: pd.DataFrame,
+    df_demande_paiement_sp_manuel: pd.DataFrame,
 ) -> None:
     # Filtrer les lignes
-    get_demande_paiement_complet = get_demande_paiement_complet.loc[
-        (get_demande_paiement_complet["centre_financier"] == "Ind")
-        | (get_demande_paiement_complet["centre_cout"].isin(["Ind", "TECHNIQUE"]))
-        | (get_demande_paiement_complet["unique_multi"] == "Multiple")
+    df_get_demande_paiement_complet = df_get_demande_paiement_complet.loc[
+        (df_get_demande_paiement_complet["centre_financier"] == "Ind")
+        | (df_get_demande_paiement_complet["centre_cout"].isin(["Ind", "TECHNIQUE"]))
+        | (df_get_demande_paiement_complet["unique_multi"] == "Multiple")
     ]
 
     # Merge pour comparer
     df = pd.merge(
-        left=get_demande_paiement_complet,
-        right=demande_paiement_sp_manuel["id_dp"],
+        left=df_get_demande_paiement_complet,
+        right=df_demande_paiement_sp_manuel["id_dp"],
         how="left",
         on=["id_dp"],
         indicator=True,
@@ -316,19 +316,19 @@ def load_demande_paiement_complet(
 
 
 def load_delai_global_paiement(
-    get_delai_global_paiement: pd.DataFrame,
-    delai_global_paiement_sp_manuel: pd.DataFrame,
+    df_get_delai_global_paiement: pd.DataFrame,
+    df_delai_global_paiement_sp_manuel: pd.DataFrame,
 ) -> None:
     # Filtrer les lignes
-    get_delai_global_paiement = get_delai_global_paiement.loc[
-        (get_delai_global_paiement["centre_financier"] == "Ind")
-        | (get_delai_global_paiement["centre_cout"].isin(["Ind", "TECHNIQUE"]))
+    df_get_delai_global_paiement = df_get_delai_global_paiement.loc[
+        (df_get_delai_global_paiement["centre_financier"] == "Ind")
+        | (df_get_delai_global_paiement["centre_cout"].isin(["Ind", "TECHNIQUE"]))
     ]
 
     # Merge pour comparer
     df = pd.merge(
-        left=get_delai_global_paiement,
-        right=delai_global_paiement_sp_manuel["id_dgp"],
+        left=df_get_delai_global_paiement,
+        right=df_delai_global_paiement_sp_manuel["id_dgp"],
         how="left",
         on=["id_dgp"],
         indicator=True,
@@ -365,19 +365,19 @@ def load_delai_global_paiement(
 
 
 def load_engagement_juridique(
-    get_engagement_juridique: pd.DataFrame,
-    engagement_juridique_sp_manuel: pd.DataFrame,
+    df_get_engagement_juridique: pd.DataFrame,
+    df_engagement_juridique_sp_manuel: pd.DataFrame,
 ) -> None:
     # Filtrer les lignes
-    get_engagement_juridique = get_engagement_juridique.loc[
-        (get_engagement_juridique["centre_financier"] == "Ind")
-        | (get_engagement_juridique["centre_cout"].isin(["Ind", "TECHNIQUE"]))
+    df_get_engagement_juridique = df_get_engagement_juridique.loc[
+        (df_get_engagement_juridique["centre_financier"] == "Ind")
+        | (df_get_engagement_juridique["centre_cout"].isin(["Ind", "TECHNIQUE"]))
     ]
 
     # Merge pour comparer
     df = pd.merge(
-        left=get_engagement_juridique,
-        right=engagement_juridique_sp_manuel["id_ej"],
+        left=df_get_engagement_juridique,
+        right=df_engagement_juridique_sp_manuel["id_ej"],
         how="left",
         on=["id_ej"],
         indicator=True,
