@@ -32,7 +32,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     ref_bop = ETLTask(
         task_config=TaskConfig(task_id="ref_bop"),
@@ -51,7 +51,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     ref_uo = ETLTask(
         task_config=TaskConfig(task_id="ref_uo"),
@@ -70,7 +70,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     ref_cc = ETLTask(
         task_config=TaskConfig(task_id="ref_cc"),
@@ -89,7 +89,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     ref_sp_pilotage = ETLTask(
         task_config=TaskConfig(task_id="ref_sp_pilotage"),
@@ -107,7 +107,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     ref_sp_choisi = ETLTask(
         task_config=TaskConfig(task_id="ref_sp_choisi"),
@@ -125,7 +125,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     ref_sdep = ETLTask(
         task_config=TaskConfig(task_id="ref_sdep"),
@@ -143,7 +143,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     sp = ETLTask(
         task_config=TaskConfig(task_id="sp"),
@@ -177,7 +177,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     # Services prescripteurs renseignés manuellement
     delai_global_paiement_sp_manuel = ETLTask(
@@ -197,7 +197,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     demande_achat_sp_manuel = ETLTask(
         task_config=TaskConfig(task_id="demande_achat_sp_manuel"),
@@ -216,7 +216,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     demande_paiement_sp_manuel = ETLTask(
         task_config=TaskConfig(task_id="demande_paiement_sp_manuel"),
@@ -235,7 +235,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
     engagement_juridique_sp_manuel = ETLTask(
         task_config=TaskConfig(task_id="engagement_juridique_sp_manuel"),
@@ -254,7 +254,7 @@ def grist_source() -> None:
             )
         ],
         writers=[FileWriterStrategy()],
-        add_metadata=True,
+        add_metadata=False,
     )
 
     chain(
@@ -285,7 +285,7 @@ def fetch_from_db() -> None:
                 fn=actions.get_all_cf_cc,
             )
         ],
-        add_import_date=True,
+        add_import_date=False,
         add_snapshot_id=False,
     )
     get_demande_achat = create_task(
@@ -351,7 +351,7 @@ def load_to_grist() -> None:
         task_config=TaskConfig(task_id="load_new_cf_cc"),
         output_selecteur="load_new_cf_cc",
         input_selecteurs=["get_all_cf_cc", "sp"],
-        steps=[ETLStep(fn=actions.load_new_cf_cc, read_data=True)],
+        steps=[ETLStep(fn=actions.load_new_cf_cc, read_data=False)],
         add_import_date=False,
         add_snapshot_id=False,
         export_output=False,
@@ -364,7 +364,7 @@ def load_to_grist() -> None:
         steps=[
             ETLStep(
                 fn=actions.load_demande_achat,
-                read_data=True,
+                read_data=False,
             )
         ],
         add_import_date=False,
@@ -382,7 +382,7 @@ def load_to_grist() -> None:
         steps=[
             ETLStep(
                 fn=actions.load_demande_paiement_complet,
-                read_data=True,
+                read_data=False,
             )
         ],
         add_import_date=False,
@@ -400,7 +400,7 @@ def load_to_grist() -> None:
         steps=[
             ETLStep(
                 fn=actions.load_delai_global_paiement,
-                read_data=True,
+                read_data=False,
             )
         ],
         add_import_date=False,
@@ -415,7 +415,7 @@ def load_to_grist() -> None:
         steps=[
             ETLStep(
                 fn=actions.load_engagement_juridique,
-                read_data=True,
+                read_data=False,
             )
         ],
         add_import_date=False,
