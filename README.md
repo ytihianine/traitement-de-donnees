@@ -12,8 +12,8 @@ Ce repo contient des scripts et dags permettant de traiter des données.
 │    ├── dags: Contient l'ensemble des dags
 │    ├── enums: enums transverses
 │    ├── infra: Code pour interagir avec l'infrastructure / systèmes externes
-│    ├── utils: Code réutilisable (variables globales, tâches, fonctions ...)
-│    └── src.constants.py: variables globales
+│    ├── utils: Code réutilisable (fonctions de traitements, récupération des configs ...)
+│    └── constants.py: variables globales
 ├── docs: Contient toute la documentation du repo
 ├── test: Contient tous les tests unitaires
 └── scripts: Contient différents scripts utilitaires
