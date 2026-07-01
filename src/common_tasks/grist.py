@@ -108,24 +108,24 @@ def generic_grist_processing(
     Generic processing for Grist dataframes.
     """
     # Normalize source
-    logging.info("Normalizing Grist dataframe")
+    logging.info(msg="Normalizing Grist dataframe")
     df = normalize_grist_dataframe(df=df)
 
     # Keep only mandatory columns
     if cols_to_keep:
-        logging.info(f"Keeping only mandatory columns: {cols_to_keep}")
-        df = df[cols_to_keep]
+        logging.info(msg=f"Keeping only mandatory columns: {cols_to_keep}")
+        df = df.loc[:, cols_to_keep]
     else:
         logging.info(
-            "No mandatory columns provided. Using all available columns in the dataframe."
+            msg="No mandatory columns provided. Using all available columns in the dataframe."
         )
 
     # Rename columns
     if cols_mapping:
-        logging.info(f"Renaming columns: {cols_mapping}")
+        logging.info(msg=f"Renaming columns: {cols_mapping}")
         df = df.rename(columns=cols_mapping)
     else:
-        logging.info("No column renaming mapping provided. Skipping ...")
+        logging.info(msg="No column renaming mapping provided. Skipping ...")
 
     # Normalizing text columns
     if txt_columns:
@@ -136,37 +136,37 @@ def generic_grist_processing(
 
     # Convert reference columns to string
     if ref_columns:
-        logging.info(f"Converting reference columns to string: {ref_columns}")
+        logging.info(msg=f"Converting reference columns to string: {ref_columns}")
         df = handle_grist_null_references(df=df, columns=ref_columns)
     else:
-        logging.info("No reference columns provided. Skipping ...")
+        logging.info(msg="No reference columns provided. Skipping ...")
 
     # Convert date columns to datetime
     if date_columns:
-        logging.info(f"Converting date columns to datetime: {date_columns}")
+        logging.info(msg=f"Converting date columns to datetime: {date_columns}")
         df = convert_grist_date_to_date(df=df, columns=date_columns)
     else:
-        logging.info("No date columns provided. Skipping ...")
+        logging.info(msg="No date columns provided. Skipping ...")
 
     # Convert boolean columns to boolean
     if bool_columns:
-        logging.info(f"Converting boolean columns to boolean: {bool_columns}")
+        logging.info(msg=f"Converting boolean columns to boolean: {bool_columns}")
         df = handle_grist_boolean_columns(df=df, columns=bool_columns)
     else:
-        logging.info("No boolean columns provided. Skipping ...")
+        logging.info(msg="No boolean columns provided. Skipping ...")
 
     # Convert numeric columns to float
     if num_columns:
-        logging.info(f"Converting numeric columns to float: {num_columns}")
+        logging.info(msg=f"Converting numeric columns to float: {num_columns}")
         for col in num_columns:
-            df[col] = pd.to_numeric(arg=df[col], errors="coerce").astype("Float64")
+            df[col] = pd.to_numeric(arg=df[col], errors="coerce")
     else:
-        logging.info("No numeric columns provided. Skipping ...")
+        logging.info(msg="No numeric columns provided. Skipping ...")
 
     if custom_fn:
-        logging.info(f"Applying custom processing function: {custom_fn.__name__}")
+        logging.info(msg=f"Applying custom processing function: {custom_fn.__name__}")
         df = custom_fn(df)
     else:
-        logging.info("No custom processing function provided.")
+        logging.info(msg="No custom processing function provided.")
 
     return df
