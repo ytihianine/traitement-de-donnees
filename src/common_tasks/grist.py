@@ -134,12 +134,13 @@ def generic_grist_processing(
     else:
         logging.info("No text columns provided. Skipping ...")
 
-    # Convert reference columns to string
-    if ref_columns:
-        logging.info(msg=f"Converting reference columns to string: {ref_columns}")
-        df = handle_grist_null_references(df=df, columns=ref_columns)
+    # Convert numeric columns to float
+    if num_columns:
+        logging.info(msg=f"Converting numeric columns to float: {num_columns}")
+        for col in num_columns:
+            df[col] = pd.to_numeric(arg=df[col], errors="coerce")
     else:
-        logging.info(msg="No reference columns provided. Skipping ...")
+        logging.info(msg="No numeric columns provided. Skipping ...")
 
     # Convert date columns to datetime
     if date_columns:
@@ -155,13 +156,12 @@ def generic_grist_processing(
     else:
         logging.info(msg="No boolean columns provided. Skipping ...")
 
-    # Convert numeric columns to float
-    if num_columns:
-        logging.info(msg=f"Converting numeric columns to float: {num_columns}")
-        for col in num_columns:
-            df[col] = pd.to_numeric(arg=df[col], errors="coerce")
+    # Convert reference columns to string
+    if ref_columns:
+        logging.info(msg=f"Converting reference columns to string: {ref_columns}")
+        df = handle_grist_null_references(df=df, columns=ref_columns)
     else:
-        logging.info(msg="No numeric columns provided. Skipping ...")
+        logging.info(msg="No reference columns provided. Skipping ...")
 
     if custom_fn:
         logging.info(msg=f"Applying custom processing function: {custom_fn.__name__}")
