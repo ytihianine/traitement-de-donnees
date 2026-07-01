@@ -364,7 +364,7 @@ def load_to_grist() -> None:
         steps=[
             ETLStep(
                 fn=actions.load_demande_achat,
-                read_data=False,
+                read_data=True,
             )
         ],
         add_import_date=False,
@@ -382,7 +382,7 @@ def load_to_grist() -> None:
         steps=[
             ETLStep(
                 fn=actions.load_demande_paiement_complet,
-                read_data=False,
+                read_data=True,
             )
         ],
         add_import_date=False,
@@ -400,7 +400,7 @@ def load_to_grist() -> None:
         steps=[
             ETLStep(
                 fn=actions.load_delai_global_paiement,
-                read_data=False,
+                read_data=True,
             )
         ],
         add_import_date=False,
@@ -415,7 +415,7 @@ def load_to_grist() -> None:
         steps=[
             ETLStep(
                 fn=actions.load_engagement_juridique,
-                read_data=False,
+                read_data=True,
             )
         ],
         add_import_date=False,
