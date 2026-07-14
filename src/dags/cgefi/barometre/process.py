@@ -2,21 +2,6 @@ import numpy as np
 import pandas as pd
 
 
-def normalize_str(value: str) -> str:
-    try:
-        value = value.strip()
-        value = value.upper()
-        value = value.replace("'", "'")
-        return value
-    except Exception as e:
-        print(f"Valeur problématique: {value}")
-        raise ValueError(e) from e
-
-
-def concat_df(list_df: list[pd.DataFrame]) -> pd.DataFrame:
-    return pd.concat(list_df)
-
-
 def split_df_organisme(df_orga: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     col_id = ["denomination", "sigle", "siren"]
     cols_df_orga_merge = [
