@@ -2,32 +2,13 @@
 
 import logging
 import textwrap
-from typing import Any, Mapping, Optional
+from collections.abc import Mapping
 from datetime import datetime, timedelta
+from typing import Any
 
-from airflow.sdk import task
-from airflow.sdk import get_current_context
+from airflow.sdk import get_current_context, task
 
-from src.infra.database.base import DBInterface
-from src.infra.database.factory import create_db_handler
-
-from src.infra.file_system.dataframe import read_dataframe
-from src.infra.file_system.factory import (
-    create_default_s3_handler,
-    create_local_handler,
-)
-
-from src.utils.config.dag_params import (
-    get_db_info,
-    get_execution_date,
-    get_project_name,
-    should_skip_task,
-)
 from src._enums.dags import FeatureFlags
-from src.utils.config.tasks import (
-    get_list_selecteur_storage_info,
-    merge_selecteur_config,
-)
 from src._enums.database import (
     LoadStrategy,
     PartitionTimePeriod,
@@ -36,12 +17,29 @@ from src._types.projet import (
     SelecteurConfig,
     SelecteurStorageOptions,
 )
-from src.utils.process.structures import are_lists_egal
 from src.constants import (
-    DEFAULT_TMP_SCHEMA,
     DEFAULT_PG_DATA_CONN_ID,
     DEFAULT_S3_CONN_ID,
+    DEFAULT_TMP_SCHEMA,
 )
+from src.infra.database.base import DBInterface
+from src.infra.database.factory import create_db_handler
+from src.infra.file_system.dataframe import read_dataframe
+from src.infra.file_system.factory import (
+    create_default_s3_handler,
+    create_local_handler,
+)
+from src.utils.config.dag_params import (
+    get_db_info,
+    get_execution_date,
+    get_project_name,
+    should_skip_task,
+)
+from src.utils.config.tasks import (
+    get_list_selecteur_storage_info,
+    merge_selecteur_config,
+)
+from src.utils.process.structures import are_lists_egal
 
 # ------------------------------------------------------------------------------
 # Internal functions
@@ -141,35 +139,23 @@ def _get_snapshot_id(nom_projet: str, db_handler: DBInterface) -> str:
     return snapshot_id
 
 
-def determine_partition_period(
-    time_period: PartitionTimePeriod, execution_date: datetime
-) -> tuple[datetime, datetime]:
+def determine_partition_period(time_period: PartitionTimePeriod, execution_date: datetime) -> tuple[datetime, datetime]:
     """Determine the start and end dates for a partition based on the time period."""
     if time_period == PartitionTimePeriod.YEAR:
-        from_date_period = execution_date.replace(
-            month=1, day=1, hour=0, minute=0, second=0, microsecond=0
-        )
+        from_date_period = execution_date.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
         to_date_period = from_date_period.replace(year=from_date_period.year + 1)
     elif time_period == PartitionTimePeriod.MONTH:
-        from_date_period = execution_date.replace(
-            day=1, hour=0, minute=0, second=0, microsecond=0
-        )
+        from_date_period = execution_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         if from_date_period.month == 12:
-            to_date_period = from_date_period.replace(
-                year=from_date_period.year + 1, month=1
-            )
+            to_date_period = from_date_period.replace(year=from_date_period.year + 1, month=1)
         else:
             to_date_period = from_date_period.replace(month=from_date_period.month + 1)
     elif time_period == PartitionTimePeriod.WEEK:
         from_date_period = execution_date - timedelta(days=execution_date.weekday())
-        from_date_period = from_date_period.replace(
-            hour=0, minute=0, second=0, microsecond=0
-        )
+        from_date_period = from_date_period.replace(hour=0, minute=0, second=0, microsecond=0)
         to_date_period = from_date_period + timedelta(weeks=1)
     elif time_period == PartitionTimePeriod.DAY:
-        from_date_period = execution_date.replace(
-            hour=0, minute=0, second=0, microsecond=0
-        )
+        from_date_period = execution_date.replace(hour=0, minute=0, second=0, microsecond=0)
         to_date_period = from_date_period + timedelta(days=1)
     else:
         raise ValueError(f"Unsupported time period: {time_period}")
@@ -180,9 +166,7 @@ def determine_partition_period(
 # SQL tasks
 # ------------------------------------------------------------------------------
 @task
-def create_projet_snapshot(
-    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context
-) -> None:
+def create_projet_snapshot(pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context) -> None:
     """ """
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
@@ -198,7 +182,7 @@ def create_projet_snapshot(
 
 @task
 def get_projet_snapshot(
-    nom_projet: Optional[str] = None,
+    nom_projet: str | None = None,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     **context,
 ) -> str:
@@ -319,9 +303,7 @@ def ensure_partition(
     partition_period = config.storage_options.partition_period
 
     if config.storage_options.write_to_db is False:
-        logging.info(
-            msg=f"write_to_db is set to False for selecteur {config.storage_info.selecteur} ... skipping"
-        )
+        logging.info(msg=f"write_to_db is set to False for selecteur {config.storage_info.selecteur} ... skipping")
         return
 
     if tbl_name is None or tbl_name == "":
@@ -348,7 +330,7 @@ def ensure_partition(
     )
 
     # Nom de la partition : parenttable_YYYY_MM
-    partition_name = f"{tbl_name}_{from_date.strftime(format='%Y%m%d')}_{to_date.strftime(format='%Y%m%d')}"  # noqa
+    partition_name = f"{tbl_name}_{from_date.strftime(format='%Y%m%d')}_{to_date.strftime(format='%Y%m%d')}"
 
     try:
         logging.info(msg=f"Creating partition {partition_name} for {tbl_name}.")
@@ -362,7 +344,7 @@ def ensure_partition(
         db.execute(query=create_sql)
         logging.info(msg=f"Partition {partition_name} created successfully.")
     except Exception as e:
-        logging.error(msg=f"Error creating partition {partition_name}: {str(e)}")
+        logging.error(msg=f"Error creating partition {partition_name}: {e!s}")
         raise
 
 
@@ -391,9 +373,7 @@ def create_tmp_tables(
 
     # Get selecteur config
     storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    selecteur_config = merge_selecteur_config(
-        storage_info=storage_info, storage_options=storage_options
-    )
+    selecteur_config = merge_selecteur_config(storage_info=storage_info, storage_options=storage_options)
 
     drop_queries = []
     create_queries = []
@@ -401,9 +381,7 @@ def create_tmp_tables(
 
     for config in selecteur_config:
         if not config.should_write_to_db():
-            logging.info(
-                msg=f"Skipping DB tmp table creation for selecteur <{config.storage_info.selecteur}>"
-            )
+            logging.info(msg=f"Skipping DB tmp table creation for selecteur <{config.storage_info.selecteur}>")
             continue
 
         tbl_name = config.storage_info.tbl_name
@@ -413,9 +391,7 @@ def create_tmp_tables(
                 IF NOT EXISTS {tmp_schema}.tmp_{tbl_name}
                 ( LIKE {prod_schema}.{tbl_name} INCLUDING ALL);
             """)
-        alter_queries.append(
-            f"ALTER SEQUENCE {prod_schema}.{tbl_name}_id_seq RESTART WITH 1;"
-        )
+        alter_queries.append(f"ALTER SEQUENCE {prod_schema}.{tbl_name}_id_seq RESTART WITH 1;")
 
     for drop_query in drop_queries:
         db.execute(query=drop_query)
@@ -443,18 +419,14 @@ def delete_tmp_tables(
 
     # Get selecteur config
     storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    selecteur_config = merge_selecteur_config(
-        storage_info=storage_info, storage_options=storage_options
-    )
+    selecteur_config = merge_selecteur_config(storage_info=storage_info, storage_options=storage_options)
 
     # Hook
     db = create_db_handler(connection_id=pg_conn_id)
 
     for config in selecteur_config:
         if not config.should_write_to_db():
-            logging.info(
-                msg=f"Skipping DB tmp table deletion for selecteur <{config.storage_info.selecteur}>"
-            )
+            logging.info(msg=f"Skipping DB tmp table deletion for selecteur <{config.storage_info.selecteur}>")
             continue
 
         tbl_name = config.storage_info.tbl_name
@@ -491,13 +463,9 @@ def copy_tmp_table_to_real_table(
 
     # Get selecteur config
     storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    selecteur_config = merge_selecteur_config(
-        storage_info=storage_info, storage_options=storage_options
-    )
+    selecteur_config = merge_selecteur_config(storage_info=storage_info, storage_options=storage_options)
     # Sort by tbl_order to handle foreign key dependencies
-    selecteur_config = sorted(
-        selecteur_config, key=lambda x: x.storage_options.tbl_order
-    )
+    selecteur_config = sorted(selecteur_config, key=lambda x: x.storage_options.tbl_order)
     logging.info(msg=f"Nombre de tables à copier: {len(selecteur_config)}")
 
     try:
@@ -506,9 +474,7 @@ def copy_tmp_table_to_real_table(
         queries = []
         for config in selecteur_config:
             if not config.should_write_to_db():
-                logging.info(
-                    msg=f"Skipping DB copy to real table for selecteur <{config.storage_info.selecteur}>"
-                )
+                logging.info(msg=f"Skipping DB copy to real table for selecteur <{config.storage_info.selecteur}>")
                 continue
 
             load_strategy = config.storage_options.load_strategy
@@ -517,26 +483,26 @@ def copy_tmp_table_to_real_table(
             prod_table = f"{prod_schema}.{tbl_name}"
             tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
 
+            col_list = sort_db_colnames(
+                db_handler=db_handler,
+                selecteur_config=config,
+                schema=prod_schema,
+            )
+            cols = ", ".join(col_list)
+
             if load_strategy == LoadStrategy.APPEND:
-                query = f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
-                queries.append(query)
+                insert_query = f"INSERT INTO {prod_table} ({cols}) SELECT {cols} FROM {tmp_table};"
+                queries.append(insert_query)
 
             if load_strategy == LoadStrategy.FULL_LOAD:
                 del_query = f"DELETE FROM {prod_table};"
-                insert_query = f"INSERT INTO {prod_table} SELECT * FROM {tmp_table};"
+                insert_query = f"INSERT INTO {prod_table} ({cols}) SELECT {cols} FROM {tmp_table};"
                 queries.append(del_query)
                 queries.append(insert_query)
 
             if load_strategy == LoadStrategy.INCREMENTAL:
-                pk_cols = _get_primary_keys(
-                    schema=prod_schema, table=tbl_name, db_handler=db_handler
-                )
+                pk_cols = _get_primary_keys(schema=prod_schema, table=tbl_name, db_handler=db_handler)
                 logging.info(msg=f"Table <{tbl_name}> primary key: {pk_cols}")
-                col_list = sort_db_colnames(
-                    db_handler=db_handler,
-                    selecteur_config=config,
-                    schema=prod_schema,
-                )
 
                 merge_query = f"""
                     MERGE INTO {prod_table} tbl_target
@@ -588,14 +554,12 @@ def sort_db_colnames(
     pg_conn_id = selecteur_config.storage_options.db_conn_id
 
     if tbl_name is None or tbl_name == "":
-        return []  # noqa
+        return []
 
     tbl_cols = _get_table_columns(schema=schema, table=tbl_name, db_handler=db_handler)
 
     sorted_cols = sorted(tbl_cols)
-    logging.info(
-        msg=f"Sorted columns for > {pg_conn_id} - {schema}.{tbl_name}: {sorted_cols}"
-    )
+    logging.info(msg=f"Sorted columns for > {pg_conn_id} - {schema}.{tbl_name}: {sorted_cols}")
     return sorted_cols
 
 
@@ -630,9 +594,7 @@ def bulk_load_local_tsv_file_to_db(
         sql=copy_sql,
         filepath=local_filepath,
     )
-    logging.info(
-        msg=f"Successfully loaded {local_filepath} into {schema}.tmp_{tbl_name}"
-    )
+    logging.info(msg=f"Successfully loaded {local_filepath} into {schema}.tmp_{tbl_name}")
 
 
 @task(map_index_template="{{ import_task_name }}")
@@ -654,15 +616,10 @@ def import_file_to_db(
         return
 
     if config.storage_options.write_to_db is False:
-        logging.info(
-            msg=f"write_to_db option is set to False for selecteur <{selecteur}>. Skipping import to db ..."  # noqa
-        )
+        logging.info(msg=f"write_to_db option is set to False for selecteur <{selecteur}>. Skipping import to db ...")
         return
 
-    if config.storage_options.use_prod_schema:
-        schema = db_info.prod_schema
-    else:
-        schema = db_info.tmp_schema
+    schema = db_info.prod_schema if config.storage_options.use_prod_schema else db_info.tmp_schema
 
     # Define hooks
     db_handler = create_db_handler(connection_id=pg_conn_id)
@@ -673,9 +630,7 @@ def import_file_to_db(
     tbl_name = config.storage_info.tbl_name
 
     if tbl_name is None or tbl_name == "":
-        logging.info(
-            msg=f"tbl_name is None for selecteur <{selecteur}>. Nothing to import to db"
-        )
+        logging.info(msg=f"tbl_name is None for selecteur <{selecteur}>. Nothing to import to db")
     else:
         # Variables
         local_filepath = config.storage_info.get_local_path()
@@ -738,18 +693,11 @@ def refresh_views(pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context) -> None:
         WHERE schemaname = %s;
     """
 
-    views = db.fetch_df(query=get_mview_query, parameters=(prod_schema,))[
-        "matviewname"
-    ].tolist()
+    views = db.fetch_df(query=get_mview_query, parameters=(prod_schema,))["matviewname"].tolist()
 
     if len(views) == 0:
-        logging.info(
-            msg=f"No materialized views found for schema {prod_schema}. Skipping ..."
-        )
+        logging.info(msg=f"No materialized views found for schema {prod_schema}. Skipping ...")
     else:
-        sql_queries = [
-            f"REFRESH MATERIALIZED VIEW {prod_schema}.{view_name};"
-            for view_name in views
-        ]
+        sql_queries = [f"REFRESH MATERIALIZED VIEW {prod_schema}.{view_name};" for view_name in views]
         for query in sql_queries:
             db.execute(query=query)
