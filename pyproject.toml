@@ -18,7 +18,7 @@ description = "Airflow ETL pipeline platform for DSCI / suite-donnee"
 requires-python = ">=3.12"
 dependencies = [
     "pandas==2.3.3",
-    "pydantic-settings==2.13.1",
+    "pydantic-settings==2.14.2",
     "pyxlsb==1.0.10",
     "openpyxl==3.1.5",
     "xlrd==2.0.2",
