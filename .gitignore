@@ -5,7 +5,7 @@ values.yaml
 *.xlsx
 *.pyz
 *.xlsb
-mypy.py
+my.py
 *.grist
 *.db
 *.sqlite
