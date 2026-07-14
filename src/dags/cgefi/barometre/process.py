@@ -2,19 +2,6 @@ import numpy as np
 import pandas as pd
 
 
-def split_df_organisme(df_orga: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    col_id = ["denomination", "sigle", "siren"]
-    cols_df_orga_merge = [
-        "cartographie_attendue",
-        "efc_attendu",
-        "type_rapport",
-        "rapport_annuel_attendu",
-    ]
-    cols_df_orga = list(set(df_orga.columns) - set(cols_df_orga_merge))
-
-    return df_orga[cols_df_orga], df_orga[col_id + cols_df_orga_merge]  # type: ignore
-
-
 def process_organisme_hors_corpus(df: pd.DataFrame, cols_to_rename: dict[str, str]) -> pd.DataFrame:
     df = df.rename(columns=cols_to_rename, errors="raise")
     type_rapport = ["Principal", "Rattaché"]
