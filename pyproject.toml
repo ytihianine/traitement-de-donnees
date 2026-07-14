@@ -61,7 +61,7 @@ iceberg = [
 
 # ---- Development & tooling ------------------------------------------------
 dev = [
-    "pytest==9.0.3",
+    "pytest==9.1.1",
     "pre-commit==4.6.0",
 ]
 
