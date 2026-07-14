@@ -1,26 +1,30 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src.common_tasks.etl import (
-    create_file_etl_task,
-)
-
+from src._types.dags import ETLStep, TaskConfig
+from src.common_tasks.etl import create_task
 from src.dags.dge.carto_rem.fichiers import process
 
 
 @task_group
 def source_files() -> None:
-    agent_info_carriere = create_file_etl_task(
-        selecteur="agent_info_carriere",
-        process_func=process.process_agent_info_carriere,
+    agent_info_carriere = create_task(
+        task_config=TaskConfig(task_id="agent_info_carriere"),
+        output_selecteur="agent_info_carriere",
+        input_selecteurs=["agent_info_carriere"],
+        steps=[ETLStep(fn=process.process_agent_info_carriere, read_data=True)],
     )
-    agent_contrat = create_file_etl_task(
-        selecteur="agent_contrat",
-        process_func=process.process_agent_contrat,
+    agent_contrat = create_task(
+        task_config=TaskConfig(task_id="agent_contrat"),
+        output_selecteur="agent_contrat",
+        input_selecteurs=["agent_contrat"],
+        steps=[ETLStep(fn=process.process_agent_contrat, read_data=True)],
     )
-    agent_r4 = create_file_etl_task(
-        selecteur="agent_r4",
-        process_func=process.process_agent_r4,
+    agent_r4 = create_task(
+        task_config=TaskConfig(task_id="agent_r4"),
+        output_selecteur="agent_r4",
+        input_selecteurs=["agent_r4"],
+        steps=[ETLStep(fn=process.process_agent_r4, read_data=True)],
     )
 
     # ordre des tâches
