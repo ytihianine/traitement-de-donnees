@@ -50,7 +50,7 @@ airflow-providers = [
     "apache-airflow-providers-postgres==6.6.3",
     "apache-airflow-providers-smtp==2.4.5",
     "apache-airflow-providers-standard==1.12.3",
-    "apache-airflow-providers-openlineage==2.9.0",
+    "apache-airflow-providers-openlineage==2.19.0",
 ]
 
 # ---- Data / Iceberg / S3 --------------------------------------------------
