@@ -1,13 +1,9 @@
-from src._types.tasks import SingleInputStep, ETLTask
+from src._types.dags import ETLStep, TaskConfig
 from src._types.readers import GristReaderStrategy
+from src._types.tasks import ETLTask, SingleInputStep
 from src._types.writers import FileWriterStrategy
-from src._types.dags import TaskConfig
-
-from src._types.dags import ETLStep
 from src.common_tasks.etl import create_task
-
-from src.dags.sg.srh.mentorat_merci import action
-from src.dags.sg.srh.mentorat_merci import process
+from src.dags.sg.srh.mentorat_merci import actions, process
 
 agent_inscrit = ETLTask(
     task_config=TaskConfig(task_id="agent_inscrit"),
@@ -30,8 +26,8 @@ generer_binomes = create_task(
     output_selecteur="generer_binome",
     input_selecteurs=["agent_inscrit"],
     steps=[
-        ETLStep(fn=action.trouver_meilleurs_binomes, read_data=True),
-        ETLStep(fn=action.send_result, use_context=True, use_previous_output=True),
+        ETLStep(fn=actions.trouver_meilleurs_binomes, read_data=True),
+        ETLStep(fn=actions.send_result, use_context=True, use_previous_output=True),
     ],
     add_import_date=False,
     add_snapshot_id=False,

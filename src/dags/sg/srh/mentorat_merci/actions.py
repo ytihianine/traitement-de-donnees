@@ -1,15 +1,15 @@
 import os
-from pathlib import Path
 import pathlib
-from typing import Any, Mapping
+from collections.abc import Mapping
+from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
-from src.utils.config.dag_params import get_execution_date, get_project_name
-from src.infra.mails.default_smtp import MailMessage, render_template, send_mail
-from src.utils.config.tasks import get_list_contact
-
 from src.dags.sg.srh.mentorat_merci import process
+from src.infra.mails.default_smtp import MailMessage, render_template, send_mail
+from src.utils.config.dag_params import get_execution_date, get_project_name
+from src.utils.config.tasks import get_list_contact
 
 
 def trouver_meilleurs_binomes(df: pd.DataFrame) -> Mapping[str, pd.DataFrame]:
@@ -53,9 +53,7 @@ def trouver_meilleurs_binomes(df: pd.DataFrame) -> Mapping[str, pd.DataFrame]:
                 }
             )
 
-    print(
-        f"\nBinômes éliminés pour incompatibilité de catégorie : {binomes_incompatibles}"
-    )
+    print(f"\nBinômes éliminés pour incompatibilité de catégorie : {binomes_incompatibles}")
     print(f"Binômes éligibles évalués : {len(tous_scores)}")
 
     # Trier par score décroissant
@@ -84,12 +82,8 @@ def trouver_meilleurs_binomes(df: pd.DataFrame) -> Mapping[str, pd.DataFrame]:
         "27. Q9_Direction_Mentor",
         "28. Q3_Objectif_Mentor",
     ]
-    df_mentores_non_apparies = pd.DataFrame(
-        data=df_mentores.loc[list(mentores_disponibles)][cols_to_keep]
-    )
-    df_mentors_non_apparies = pd.DataFrame(
-        data=df_mentors.loc[list(mentors_disponibles)][cols_to_keep]
-    )
+    df_mentores_non_apparies = pd.DataFrame(data=df_mentores.loc[list(mentores_disponibles)][cols_to_keep])
+    df_mentors_non_apparies = pd.DataFrame(data=df_mentors.loc[list(mentors_disponibles)][cols_to_keep])
 
     return {
         "df_binomes": df_resultats,
@@ -121,12 +115,8 @@ def generer_rapport(dfs: Mapping[str, pd.DataFrame]) -> str:
         rapport.append(f"Score minimum: {df_binomes['score_total'].min()}")
         rapport.append(f"Score maximum: {df_binomes['score_total'].max()}")
 
-        rapport.append(
-            f"\nBinômes avec score parfait (2475p total): {len(df_binomes[df_binomes['score_total'] == 2475])}"  # noqa
-        )
-        rapport.append(
-            f"Binômes avec catégorie OK: {len(df_binomes[df_binomes['score_categorie'] == 1000])}"
-        )
+        rapport.append(f"\nBinômes avec score parfait (2475p total): {len(df_binomes[df_binomes['score_total'] == 2475])}")
+        rapport.append(f"Binômes avec catégorie OK: {len(df_binomes[df_binomes['score_categorie'] == 1000])}")
 
     rapport.append("=" * 80)
 
@@ -137,30 +127,16 @@ def send_result(dfs: Mapping[str, pd.DataFrame], context: Mapping[str, Any]) -> 
     execution_date = get_execution_date(context=context, use_tz=True)
     nom_projet = get_project_name(context=context)
     projet_contact = get_list_contact(nom_projet=nom_projet)
-    mail_to = [
-        contact.contact_mail for contact in projet_contact if contact.is_mail_generic
-    ]
-    mail_cc = [
-        contact.contact_mail
-        for contact in projet_contact
-        if not contact.is_mail_generic
-    ]
-    tmp_path = Path(
-        f"/tmp/binomes_v{execution_date.strftime(format="%Y%m%d_%Hh%M")}.xlsx"
-    )
+    mail_to = [contact.contact_mail for contact in projet_contact if contact.is_mail_generic]
+    mail_cc = [contact.contact_mail for contact in projet_contact if not contact.is_mail_generic]
+    tmp_path = Path(f"/tmp/binomes_v{execution_date.strftime(format="%Y%m%d_%Hh%M")}.xlsx")
 
     # Sauvegarder dans un fichier Excel avec plusieurs onglets
     print(f"Saving file locally to {tmp_path}")
     with pd.ExcelWriter(path=tmp_path, engine="openpyxl") as writer:
-        dfs["df_binomes"].to_excel(
-            excel_writer=writer, sheet_name="Binômes", index=False
-        )
-        dfs["df_mentors_non_apparies"].to_excel(
-            excel_writer=writer, sheet_name="Mentors non appariés", index=False
-        )
-        dfs["df_mentores_non_apparies"].to_excel(
-            excel_writer=writer, sheet_name="Mentorés non appariés", index=False
-        )
+        dfs["df_binomes"].to_excel(excel_writer=writer, sheet_name="Binômes", index=False)
+        dfs["df_mentors_non_apparies"].to_excel(excel_writer=writer, sheet_name="Mentors non appariés", index=False)
+        dfs["df_mentores_non_apparies"].to_excel(excel_writer=writer, sheet_name="Mentorés non appariés", index=False)
 
     rapport = generer_rapport(dfs=dfs)
     print(rapport)
