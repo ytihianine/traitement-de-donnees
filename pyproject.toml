@@ -40,7 +40,7 @@ airflow = [
 
 # ---- Apache providers currently commented out (available on demand) --------
 airflow-providers = [
-    "apache-airflow-providers-amazon==9.28.0",
+    "apache-airflow-providers-amazon==9.32.0",
     "apache-airflow-providers-celery==3.22.0",
     "apache-airflow-providers-common-compat==1.16.0",
     "apache-airflow-providers-common-io==1.7.2",
