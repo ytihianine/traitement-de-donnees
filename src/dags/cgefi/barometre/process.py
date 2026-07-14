@@ -1,12 +1,12 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 def normalize_str(value: str) -> str:
     try:
         value = value.strip()
         value = value.upper()
-        value = value.replace("’", "'")
+        value = value.replace("'", "'")
         return value
     except Exception as e:
         print(f"Valeur problématique: {value}")
@@ -30,9 +30,7 @@ def split_df_organisme(df_orga: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFram
     return df_orga[cols_df_orga], df_orga[col_id + cols_df_orga_merge]  # type: ignore
 
 
-def process_organisme_hors_corpus(
-    df: pd.DataFrame, cols_to_rename: dict[str, str]
-) -> pd.DataFrame:
+def process_organisme_hors_corpus(df: pd.DataFrame, cols_to_rename: dict[str, str]) -> pd.DataFrame:
     df = df.rename(columns=cols_to_rename, errors="raise")
     type_rapport = ["Principal", "Rattaché"]
     df["rapport_annuel_attendu"] = df["type_rapport"].isin(type_rapport)
@@ -74,9 +72,7 @@ def process_organisme(df: pd.DataFrame, cols_to_rename: dict[str, str]) -> pd.Da
     return df
 
 
-def process_cartographie(
-    df: pd.DataFrame, df_orga_merge: pd.DataFrame, cols_to_rename: dict[str, str]
-) -> pd.DataFrame:
+def process_cartographie(df: pd.DataFrame, df_orga_merge: pd.DataFrame, cols_to_rename: dict[str, str]) -> pd.DataFrame:
     # Processing columns
     df = df.rename(columns=cols_to_rename, errors="raise")
     df = df.drop(columns=list(set(df.columns) - set(cols_to_rename.values())))
@@ -90,17 +86,13 @@ def process_cartographie(
         on=["denomination", "sigle"],
     )
 
-    df["cartographie_attendue"] = np.where(
-        df["cartographie_attendue"] == 1, True, False
-    )
+    df["cartographie_attendue"] = np.where(df["cartographie_attendue"] == 1, True, False)
     df["cartographie_recue"] = np.where(df["cartographie_recue"] == 1, True, False)
 
     return df
 
 
-def process_efc(
-    df: pd.DataFrame, df_orga_merge: pd.DataFrame, cols_to_rename: dict[str, str]
-) -> pd.DataFrame:
+def process_efc(df: pd.DataFrame, df_orga_merge: pd.DataFrame, cols_to_rename: dict[str, str]) -> pd.DataFrame:
     # Processing columns
     df = df.rename(columns=cols_to_rename, errors="raise")
     df = df.drop(columns=list(set(df.columns) - set(cols_to_rename.values())))
@@ -119,9 +111,7 @@ def process_efc(
     return df
 
 
-def process_fiches_signaletiques(
-    df: pd.DataFrame, cols_to_rename: dict[str, str]
-) -> pd.DataFrame:
+def process_fiche_signaletique(df: pd.DataFrame, cols_to_rename: dict[str, str]) -> pd.DataFrame:
     # Process columns
     df = df.rename(columns=cols_to_rename, errors="raise")
     df = df.drop(columns=list(set(df.columns) - set(cols_to_rename.values())))
@@ -151,18 +141,14 @@ def process_rapport_annuel(
 
     # Merge
     df = pd.merge(
-        left=df_orga_merge[
-            ["denomination", "sigle", "type_rapport", "rapport_annuel_attendu"]
-        ],
+        left=df_orga_merge[["denomination", "sigle", "type_rapport", "rapport_annuel_attendu"]],
         right=df,
         how="left",
         on=["denomination", "sigle"],
     )
     df = pd.merge(
         left=df,
-        right=df_date_retour_attendu[
-            ["denomination", "sigle", "date_du_retour_attendue"]
-        ],
+        right=df_date_retour_attendu[["denomination", "sigle", "date_du_retour_attendue"]],
         how="left",
         on=["denomination", "sigle"],
     )
@@ -170,9 +156,7 @@ def process_rapport_annuel(
     return df
 
 
-def process_date_retour_attendue(
-    df: pd.DataFrame, cols_to_rename: dict[str, str]
-) -> pd.DataFrame:
+def process_date_retour_attendue(df: pd.DataFrame, cols_to_rename: dict[str, str]) -> pd.DataFrame:
     # Process columns
     df = df.rename(columns=cols_to_rename, errors="raise")
     df = df.drop(columns=list(set(df.columns) - set(cols_to_rename.values())))
@@ -184,9 +168,7 @@ def process_date_retour_attendue(
     return df
 
 
-def process_recommandation(
-    df: pd.DataFrame, cols_to_rename: dict[str, str]
-) -> pd.DataFrame:
+def process_recommandation(df: pd.DataFrame, cols_to_rename: dict[str, str]) -> pd.DataFrame:
     # Process colnames
     df = df.rename(columns=cols_to_rename, errors="raise")
     df = df.drop(columns=list(set(df.columns) - set(cols_to_rename.values())))
@@ -207,7 +189,7 @@ def process_recommandation(
         .astype(str)
         .str.strip()
         .str.replace("%", "", regex=False)
-        .replace({"": None, "nan": None, "N/A": None})
+        .replace({"": None, "nan": None, "N/A": None})  # type: ignore
         .astype(float)
         / 100
     )
@@ -234,9 +216,7 @@ def calculer_fiches_signaletiques(df: pd.DataFrame) -> pd.DataFrame:
 
     # Traitement colonne "Bilan" du barometre
     df["bilan"] = np.where(
-        (df["immobilise_net"] > 0)
-        | (df["circulant_hors_tresorerie"] > 0)
-        | (df["tresorerie"] > 0),
+        (df["immobilise_net"] > 0) | (df["circulant_hors_tresorerie"] > 0) | (df["tresorerie"] > 0),
         True,
         False,
     )
@@ -266,10 +246,7 @@ def calculer_fiches_signaletiques(df: pd.DataFrame) -> pd.DataFrame:
 
     # Traitement colonne "Fiche signalétique" du barometre
     df["fiche_signaletique"] = np.where(
-        (df["fiche_rh"])
-        | (df["bilan"])
-        | (df["compte_de_resultat"])
-        | (df["fiche_financiere"]),
+        (df["fiche_rh"]) | (df["bilan"]) | (df["compte_de_resultat"]) | (df["fiche_financiere"]),
         True,
         False,
     )
@@ -277,9 +254,7 @@ def calculer_fiches_signaletiques(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def add_rapport_hors_corpus(
-    df_barometre: pd.DataFrame, df_hors_corpus: pd.DataFrame
-) -> pd.DataFrame:
+def add_rapport_hors_corpus(df_barometre: pd.DataFrame, df_hors_corpus: pd.DataFrame) -> pd.DataFrame:
     df_barometre["hors_corpus"] = False
     df_hors_corpus = df_hors_corpus.reindex(columns=df_barometre.columns)
     tmp_df = pd.concat([df_barometre, df_hors_corpus], axis=0, ignore_index=True)

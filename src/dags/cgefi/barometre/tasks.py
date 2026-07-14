@@ -1,8 +1,10 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from _types.dags import ETLStep, TaskConfig
-from src.common_tasks.etl import create_task
+from _types.dags import TaskConfig
+from src._types.readers import FileReaderStrategy
+from src._types.tasks import ETLTask, SingleInputStep
+from src._types.writers import FileWriterStrategy
 from src.dags.cgefi.barometre import process
 
 SELECTEUR_BAROMETRE = "barometre"
@@ -11,58 +13,114 @@ SELECTEUR_ORGA_MERGE = "organisme_merge"
 
 @task_group()
 def source_files() -> None:
-    cartographie = create_task(
+    cartographie = ETLTask(
         task_config=TaskConfig(task_id="cartographie"),
-        output_selecteur="cartographie",
-        input_selecteurs=["cartographie"],
-        steps=[ETLStep(fn=process.process_cartographie, read_data=True)],
+        target="cartographie",
+        reader=FileReaderStrategy(),
+        steps=[
+            SingleInputStep(
+                fn=process.process_cartographie,
+                input_key="cartographie",
+                output_key="cartographie",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    efc = create_task(
+    efc = ETLTask(
         task_config=TaskConfig(task_id="efc"),
-        output_selecteur="efc",
-        input_selecteurs=["efc"],
-        steps=[ETLStep(fn=process.process_efc, read_data=True)],
+        target="efc",
+        reader=FileReaderStrategy(),
+        steps=[
+            SingleInputStep(
+                fn=process.process_efc,
+                input_key="efc",
+                output_key="efc",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    recommandation = create_task(
+    recommandation = ETLTask(
         task_config=TaskConfig(task_id="recommandation"),
-        output_selecteur="recommandation",
-        input_selecteurs=["recommandation"],
-        steps=[ETLStep(fn=process.process_recommandation, read_data=True)],
+        target="recommandation",
+        reader=FileReaderStrategy(),
+        steps=[
+            SingleInputStep(
+                fn=process.process_recommandation,
+                input_key="recommandation",
+                output_key="recommandation",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    fiche_signaletique = create_task(
+    fiche_signaletique = ETLTask(
         task_config=TaskConfig(task_id="fiche_signaletique"),
-        output_selecteur="fiche_signaletique",
-        input_selecteurs=["fiche_signaletique"],
-        steps=[ETLStep(fn=process.process_fiches_signaletiques, read_data=True)],
+        target="fiche_signaletique",
+        reader=FileReaderStrategy(),
+        steps=[
+            SingleInputStep(
+                fn=process.process_fiche_signaletique,
+                input_key="fiche_signaletique",
+                output_key="fiche_signaletique",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    rapport_annuel = create_task(
+    rapport_annuel = ETLTask(
         task_config=TaskConfig(task_id="rapport_annuel"),
-        output_selecteur="rapport_annuel",
-        input_selecteurs=["rapport_annuel"],
-        steps=[ETLStep(fn=process.process_rapport_annuel, read_data=True)],
+        target="rapport_annuel",
+        reader=FileReaderStrategy(),
+        steps=[
+            SingleInputStep(
+                fn=process.process_rapport_annuel,
+                input_key="rapport_annuel",
+                output_key="rapport_annuel",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    organisme = create_task(
+    organisme = ETLTask(
         task_config=TaskConfig(task_id="organisme"),
-        output_selecteur="organisme",
-        input_selecteurs=["organisme"],
-        steps=[ETLStep(fn=process.process_organisme, read_data=True)],
+        target="organisme",
+        reader=FileReaderStrategy(),
+        steps=[
+            SingleInputStep(
+                fn=process.process_organisme,
+                input_key="organisme",
+                output_key="organisme",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
-    organisme_hc = create_task(
+    organisme_hc = ETLTask(
         task_config=TaskConfig(task_id="organisme_hors_corpus"),
-        output_selecteur="organisme_hors_corpus",
-        input_selecteurs=["organisme_hors_corpus"],
-        steps=[ETLStep(fn=process.process_organisme_hors_corpus, read_data=True)],
+        target="organisme_hors_corpus",
+        reader=FileReaderStrategy(),
+        steps=[
+            SingleInputStep(
+                fn=process.process_organisme_hors_corpus,
+                input_key="organisme_hors_corpus",
+                output_key="organisme_hors_corpus",
+            )
+        ],
+        writers=[FileWriterStrategy()],
+        add_metadata=True,
     )
 
     # ordre des tâches
     chain(
         [
-            cartographie(),
-            efc(),
-            recommandation(),
-            fiche_signaletique(),
-            rapport_annuel(),
-            organisme(),
-            organisme_hc(),
+            cartographie.create_task(),
+            efc.create_task(),
+            recommandation.create_task(),
+            fiche_signaletique.create_task(),
+            rapport_annuel.create_task(),
+            organisme.create_task(),
+            organisme_hc.create_task(),
         ]
     )
