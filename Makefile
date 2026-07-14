@@ -42,16 +42,10 @@ create-py-env: ## Créer un nouvel environnement python
 	@echo "L'environnement a été créé"
 	@echo "Exécuter dans votre terminal: source $(ENV_NAME)/bin/activate"
 
-install-airflow: ## Installer les packages liés à la version d'Airflow
-	@echo "Installation des packages Airflow python_version=$(PYTHON_VERSION) & airflow_version=$(AIRFLOW_VERSION)"
-	$(UV_PIP) "apache-airflow==$(AIRFLOW_VERSION)" \
-		--constraint "https://raw.githubusercontent.com/apache/airflow/constraints-$(AIRFLOW_VERSION)/constraints-$(PYTHON_VERSION).txt"
-
 install-packages: ## Installer les packages python complémentaires
-	@echo "Installation de uv"
+	@echo "Installation de uv et des dépendances depuis pyproject.toml"
 	$(VENV_BIN)/python -m pip install uv
-	$(UV_PIP) -e .
-	$(UV_PIP) -r requirements.txt --prerelease=allow
+	$(UV_PIP) -e ".[airflow,dev,iceberg]"
 
 install-pre-commit: ## Installer les pre-commits
 	@echo "Installation des pre-commits"
@@ -61,7 +55,7 @@ setup-git: ## Initialiser la configuration git
 	@echo "Init git config"
 	git config --global credential.helper 'cache --timeout=360000'
 
-setup-dev-env: create-py-env install-packages install-airflow install-pre-commit setup-git ## Installer tout l'environnement de développement
+setup-dev-env: create-py-env install-packages install-pre-commit setup-git ## Installer tout l'environnement de développement
 
 init-env-files: ## Initialiser les fichiers d'environnement des scripts
 	@echo "Initialisation des fichiers d'environnement"

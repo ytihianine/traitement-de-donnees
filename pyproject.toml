@@ -1,0 +1,127 @@
+# =============================================================================
+# airflow_project - pyproject.toml
+# =============================================================================
+# Centralized configuration migrated from setup.py + requirements.txt
+#
+# Usage with uv:
+#   uv pip install -e ".[dev]"   # install with dev deps
+#   uv pip install .              # production only
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Project metadata
+# ---------------------------------------------------------------------------
+[project]
+name = "airflow_project"
+version = "0.1"
+description = "Airflow ETL pipeline platform for DSCI / suite-donnee"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas==2.3.3",
+    "pydantic-settings==2.13.1",
+    "pyxlsb==1.0.10",
+    "openpyxl==3.1.5",
+    "xlrd==2.0.2",
+    "tenacity==9.1.2",
+    "trino==0.337.0",
+    "psycopg2-binary==2.9.12",
+]
+
+# ---------------------------------------------------------------------------
+# Dependencies groups
+# ---------------------------------------------------------------------------
+[project.optional-dependencies]
+# ---- Airflow core (use constraint URLs for production Airflow deployments) --
+airflow = [
+    "apache-airflow==3.2.1",
+    "apache-airflow-core==3.2.1",
+    "apache-airflow-task-sdk==1.2.1",
+]
+
+# ---- Apache providers currently commented out (available on demand) --------
+airflow-providers = [
+    "apache-airflow-providers-amazon==9.28.0",
+    "apache-airflow-providers-celery==3.19.0",
+    "apache-airflow-providers-common-io==1.7.2",
+    "apache-airflow-providers-common-messaging==2.0.3",
+    "apache-airflow-providers-common-sql==1.36.0",
+    "apache-airflow-providers-http==6.0.2",
+    "apache-airflow-providers-postgres==6.6.3",
+    "apache-airflow-providers-smtp==2.4.5",
+    "apache-airflow-providers-standard==1.12.3",
+    "apache-airflow-providers-common-compat==1.10.0",
+    "apache-airflow-providers-openlineage==2.9.0",
+]
+
+# ---- Data / Iceberg / S3 --------------------------------------------------
+iceberg = [
+    "pyiceberg[s3fs,pandas,pyarrow,sql-postgres]==0.11.1",
+    # boto3==1.35.99  # Uncomment to solve Nubonyxia MinIO issue
+]
+
+# ---- Development & tooling ------------------------------------------------
+dev = [
+    "pytest==9.0.3",
+    "pre-commit==4.6.0",
+]
+
+# ---------------------------------------------------------------------------
+# UV extras configuration
+# ---------------------------------------------------------------------------
+# Airflow constraint URL provider — use when running in strict constraint mode
+# uv pip install -c "https://raw.githubusercontent.com/apache/airflow/constraints-3.2.1/constraints-3.12.txt" .
+
+# ---------------------------------------------------------------------------
+# Package discovery
+# ---------------------------------------------------------------------------
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["src*"]
+exclude = ["scripts*", "docs*"]
+
+# ---------------------------------------------------------------------------
+# Black
+# ---------------------------------------------------------------------------
+[tool.black]
+line-length = 130
+target-version = ["py312"]
+
+# ---------------------------------------------------------------------------
+# Ruff
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 130
+target-version = "py312"
+src = ["src", "scripts", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+    "RUF",  # ruff-specific rules
+]
+ignore = [
+    "E501",  # line-length handled by black
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src", "common_tasks", "dags"]
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["src", "tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--tb=short",
+]
