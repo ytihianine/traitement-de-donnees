@@ -45,7 +45,7 @@ create-py-env: ## Créer un nouvel environnement python
 install-packages: ## Installer les packages python complémentaires
 	@echo "Installation de uv et des dépendances depuis pyproject.toml"
 	$(VENV_BIN)/python -m pip install uv
-	$(UV_PIP) -e ".[airflow,dev,iceberg]"
+	$(UV_PIP) -e ".[airflow,airflow-providers,dev,iceberg]"
 
 install-pre-commit: ## Installer les pre-commits
 	@echo "Installation des pre-commits"
