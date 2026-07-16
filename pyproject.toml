@@ -33,9 +33,9 @@ dependencies = [
 [project.optional-dependencies]
 # ---- Airflow core (use constraint URLs for production Airflow deployments) --
 airflow = [
-    "apache-airflow==3.3.0",
-    "apache-airflow-core==3.2.1",
-    "apache-airflow-task-sdk==1.3.0",
+    "apache-airflow==3.2.2",
+    "apache-airflow-core==3.2.2",
+    "apache-airflow-task-sdk==1.2.2",
 ]
 
 # ---- Apache providers currently commented out (available on demand) --------
