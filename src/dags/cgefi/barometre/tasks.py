@@ -1,7 +1,7 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from _types.dags import TaskConfig
+from src._types.dags import TaskConfig
 from src._types.readers import FileReaderStrategy
 from src._types.tasks import ETLTask, SingleInputStep
 from src._types.writers import FileWriterStrategy
