@@ -63,6 +63,10 @@ init-env-files: ## Initialiser les fichiers d'environnement des scripts
 	@./scripts/init_env.bash
 	@echo "Tous les fichiers .env créés à partir de example.env. Veuillez les personnaliser avec vos propres valeurs."
 
+
+run-pre-commit: ## Lancer pre-commit sur tous les fichiers
+	$(VENV_BIN)/pre-commit run --all-files
+
 clean: ## Nettoyer les fichiers temporaires Python
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
