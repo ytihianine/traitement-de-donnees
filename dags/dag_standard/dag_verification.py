@@ -4,35 +4,34 @@ from typing import Any
 
 from airflow.sdk import Variable, dag, get_current_context, task
 from airflow.sdk.bases.operator import chain
-
 from dags.dag_standard.config import storage_options
-from project.common_tasks.projet import config_projet_group, get_selecteur_config
-from project.common_tasks.s3 import del_iceberg_staging_table
-from project.common_tasks.sql import get_projet_snapshot  # , import_files_to_db
-from project.constants import (
+from modules.common_tasks.projet import config_projet_group, get_selecteur_config
+from modules.common_tasks.s3 import del_iceberg_staging_table
+from modules.common_tasks.sql import get_projet_snapshot  # , import_files_to_db
+from modules.constants import (
     DEFAULT_POLARIS_CATALOG,
     DEFAULT_POLARIS_HOST,
     DEFAULT_S3_CONN_ID,
     DEFAULT_TRINO_HOST,
 )
-from project.enums.dags import DagStatus
-from project.enums.filesystem import IcebergTableStatus
-from project.infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
-from project.infra.file_system.factory import create_default_s3_handler
-from project.infra.mails.default_smtp import (
+from modules.enums.dags import DagStatus
+from modules.enums.filesystem import IcebergTableStatus
+from modules.infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
+from modules.infra.file_system.factory import create_default_s3_handler
+from modules.infra.mails.default_smtp import (
     MailMessage,
     MailStatus,
     _callback,
     send_mail,
 )
-from project.types.dags import DBParams, FeatureFlagsEnable
-from project.types.projet import SelecteurConfig
-from project.utils.config.dag_params import (
+from modules.types.dags import DBParams, FeatureFlagsEnable
+from modules.types.projet import SelecteurConfig
+from modules.utils.config.dag_params import (
     create_dag_params,
     create_default_args,
     get_db_info,
 )
-from project.utils.config.tasks import get_list_source_fichier
+from modules.utils.config.tasks import get_list_source_fichier
 
 nom_projet = "Configuration des projets"
 
@@ -100,7 +99,7 @@ def dag_verification() -> None:
 
     @task
     def check_trino_hook() -> None:
-        from project.infra.database.trino import TrinoAdapter
+        from modules.infra.database.trino import TrinoAdapter
 
         trino_user = Variable.get(key="TRINO_USER")
 

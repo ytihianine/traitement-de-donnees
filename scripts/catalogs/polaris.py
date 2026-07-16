@@ -1,7 +1,6 @@
 import requests
+from modules.infra.catalog.polaris import PolarisCatalog
 from scripts.settings import get_settings
-
-from project.infra.catalog.polaris import PolarisCatalog
 
 settings = get_settings()
 

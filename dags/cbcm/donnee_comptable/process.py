@@ -5,11 +5,10 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from dags.cbcm.donnee_comptable.config import (
     DEFAULT_NULL_CC_CF,
 )
-from project.utils.process.text import (
+from modules.utils.process.text import (
     convert_str_cols_to_date,
     normalize_whitespace_columns,
 )

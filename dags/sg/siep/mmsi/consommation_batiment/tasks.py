@@ -1,10 +1,9 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
-
 from dags.sg.siep.mmsi.consommation_batiment import process
-from project.common_tasks.etl import create_file_etl_task, create_task
-from project.common_tasks.file import create_parquet_converter_task
-from project.types.dags import ETLStep, TaskConfig
+from modules.common_tasks.etl import create_file_etl_task, create_task
+from modules.common_tasks.file import create_parquet_converter_task
+from modules.types.dags import ETLStep, TaskConfig
 
 conso_mens_parquet = create_parquet_converter_task(
     selecteur="conso_mens_source",

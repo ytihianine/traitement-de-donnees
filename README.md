@@ -35,7 +35,7 @@ L'ensemble de la documentation se trouve dans le dossier `docs/`.
 |    ├── convention.md
 |    ├── dags.md
 |    ├── grist.md
-|    ├── project.infra.md
+|    ├── modules.infra.md
 |    └── utilitaires.md
 ```
 

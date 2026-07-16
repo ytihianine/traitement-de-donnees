@@ -1,9 +1,9 @@
 from dags.sg.srh.mentorat_merci import actions, process
-from project.common_tasks.etl import create_task
-from project.types.dags import ETLStep, TaskConfig
-from project.types.readers import GristReaderStrategy
-from project.types.tasks import ETLTask, SingleInputStep
-from project.types.writers import FileWriterStrategy
+from modules.common_tasks.etl import create_task
+from modules.types.dags import ETLStep, TaskConfig
+from modules.types.readers import GristReaderStrategy
+from modules.types.tasks import ETLTask, SingleInputStep
+from modules.types.writers import FileWriterStrategy
 
 agent_inscrit = ETLTask(
     task_config=TaskConfig(task_id="agent_inscrit"),

@@ -1,4 +1,4 @@
-from project.types.projet import SelecteurStorageOptions
+from modules.types.projet import SelecteurStorageOptions
 
 storage_options = {
     "accompagnement_cci_opportunite": SelecteurStorageOptions(tbl_order=6),

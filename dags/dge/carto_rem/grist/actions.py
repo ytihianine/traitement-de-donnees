@@ -3,19 +3,18 @@ from typing import Any
 
 import pandas as pd
 from airflow.sdk import Variable
-
-from project.constants import (
+from modules.constants import (
     AGENT,
     DEFAULT_GRIST_HOST,
     DEFAULT_PG_DATA_CONN_ID,
     PROXY,
 )
-from project.infra.database.factory import create_db_handler
-from project.infra.grist.client import GristAPI
-from project.infra.http_client.adapters import RequestsClient
-from project.infra.http_client.config import ClientConfig
-from project.utils.config.dag_params import get_db_info, get_project_name
-from project.utils.config.tasks import get_selecteur_storage_info
+from modules.infra.database.factory import create_db_handler
+from modules.infra.grist.client import GristAPI
+from modules.infra.http_client.adapters import RequestsClient
+from modules.infra.http_client.config import ClientConfig
+from modules.utils.config.dag_params import get_db_info, get_project_name
+from modules.utils.config.tasks import get_selecteur_storage_info
 
 
 def get_agent_db(context: Mapping[str, Any]) -> pd.DataFrame:

@@ -1,8 +1,7 @@
 from datetime import datetime
 
 import pandas as pd
-
-from project.utils.process.text import (
+from modules.utils.process.text import (
     convert_str_cols_to_date,
     normalize_whitespace_columns,
 )

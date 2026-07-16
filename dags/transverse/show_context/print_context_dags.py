@@ -5,8 +5,7 @@ from pprint import pprint
 import pytz
 from airflow.sdk import dag, task
 from airflow.sdk.bases.operator import chain
-
-from project.infra.mails.default_smtp import MailStatus, create_send_mail_callback
+from modules.infra.mails.default_smtp import MailStatus, create_send_mail_callback
 
 default_args = {
     "owner": "airflow",

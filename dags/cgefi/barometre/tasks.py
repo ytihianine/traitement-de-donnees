@@ -1,11 +1,10 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
-
 from dags.cgefi.barometre import process
-from project.types.dags import TaskConfig
-from project.types.readers import FileReaderStrategy
-from project.types.tasks import ETLTask, SingleInputStep
-from project.types.writers import FileWriterStrategy
+from modules.types.dags import TaskConfig
+from modules.types.readers import FileReaderStrategy
+from modules.types.tasks import ETLTask, SingleInputStep
+from modules.types.writers import FileWriterStrategy
 
 SELECTEUR_BAROMETRE = "barometre"
 SELECTEUR_ORGA_MERGE = "organisme_merge"

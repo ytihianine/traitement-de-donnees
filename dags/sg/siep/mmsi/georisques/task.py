@@ -1,11 +1,10 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
-
 from dags.sg.siep.mmsi.georisques import actions
-from project.common_tasks.etl import (
+from modules.common_tasks.etl import (
     create_task,
 )
-from project.types.dags import ETLStep, TaskConfig
+from modules.types.dags import ETLStep, TaskConfig
 
 
 @task_group

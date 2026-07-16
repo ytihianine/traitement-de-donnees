@@ -2,10 +2,9 @@ import os
 
 import pandas as pd
 import psycopg2
+from modules.constants import custom_logger
+from modules.utils.process.structures import are_lists_egal
 from scripts.settings import get_settings
-
-from project.constants import custom_logger
-from project.utils.process.structures import are_lists_egal
 
 settings = get_settings()
 

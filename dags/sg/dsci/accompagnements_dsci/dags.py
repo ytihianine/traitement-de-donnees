@@ -1,6 +1,5 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-
 from dags.sg.dsci.accompagnements_dsci.config import (
     storage_options,
 )
@@ -12,19 +11,19 @@ from dags.sg.dsci.accompagnements_dsci.tasks import (
     mission_innovation,
     referentiels,
 )
-from project.common_tasks.grist import download_grist_doc_to_s3
-from project.common_tasks.projet import get_selecteur_config
-from project.common_tasks.sql import (
+from modules.common_tasks.grist import download_grist_doc_to_s3
+from modules.common_tasks.projet import get_selecteur_config
+from modules.common_tasks.sql import (
     copy_tmp_table_to_real_table,
     create_tmp_tables,
     delete_tmp_tables,
     import_file_to_db,
 )
-from project.common_tasks.validation import validate_dag_parameters
-from project.enums.dags import DagStatus
-from project.infra.mails.default_smtp import MailStatus, create_send_mail_callback
-from project.types.dags import DBParams, FeatureFlagsEnable
-from project.utils.config.dag_params import create_dag_params, create_default_args
+from modules.common_tasks.validation import validate_dag_parameters
+from modules.enums.dags import DagStatus
+from modules.infra.mails.default_smtp import MailStatus, create_send_mail_callback
+from modules.types.dags import DBParams, FeatureFlagsEnable
+from modules.utils.config.dag_params import create_dag_params, create_default_args
 
 # Variables
 nom_projet = "Accompagnements DSCI"

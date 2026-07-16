@@ -1,5 +1,5 @@
-from project.enums.database import PartitionTimePeriod
-from project.types.projet import SelecteurStorageOptions
+from modules.enums.database import PartitionTimePeriod
+from modules.types.projet import SelecteurStorageOptions
 
 storage_options = {
     "service": SelecteurStorageOptions(

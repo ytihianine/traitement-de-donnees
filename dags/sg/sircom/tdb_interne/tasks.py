@@ -2,13 +2,12 @@ from functools import partial
 
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
-
 from dags.sg.sircom.tdb_interne import process
-from project.common_tasks.grist import generic_grist_processing
-from project.types.dags import TaskConfig
-from project.types.readers import GristReaderStrategy
-from project.types.tasks import ETLTask, SingleInputStep
-from project.types.writers import FileWriterStrategy
+from modules.common_tasks.grist import generic_grist_processing
+from modules.types.dags import TaskConfig
+from modules.types.readers import GristReaderStrategy
+from modules.types.tasks import ETLTask, SingleInputStep
+from modules.types.writers import FileWriterStrategy
 
 
 @task_group(group_id="abonnes_visites")

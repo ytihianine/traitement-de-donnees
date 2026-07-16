@@ -2,10 +2,9 @@ import logging
 
 import pandas as pd
 from airflow.sdk import Variable
-
 from dags.sg.siep.mmsi.api_operat.config import BASE_URL, ID_STRUCTURES
-from project.constants import AGENT, PROXY
-from project.infra.http_client.adapters import ClientConfig, HttpxClient
+from modules.constants import AGENT, PROXY
+from modules.infra.http_client.adapters import ClientConfig, HttpxClient
 
 
 # ================

@@ -7,12 +7,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import psycopg2
+from dags.applications.configuration_projets import process
+from modules.utils.logs import df_info
+from modules.utils.process.structures import normalize_grist_dataframe
 from psycopg2.extensions import AsIs, register_adapter
 from psycopg2.extras import execute_values
-
-from dags.applications.configuration_projets import process
-from project.utils.logs import df_info
-from project.utils.process.structures import normalize_grist_dataframe
 
 # Enregistrer l'adaptateur pour les entiers numpy
 register_adapter(typ=np.int64, callable=AsIs)

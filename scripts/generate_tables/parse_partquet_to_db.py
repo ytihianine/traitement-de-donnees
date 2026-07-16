@@ -3,9 +3,8 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+from modules.constants import custom_logger
 from scripts.settings import get_settings
-
-from project.constants import custom_logger
 
 settings = get_settings()
 

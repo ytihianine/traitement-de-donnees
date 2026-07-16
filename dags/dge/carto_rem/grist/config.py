@@ -1,4 +1,4 @@
-from project.types.projet import SelecteurStorageOptions
+from modules.types.projet import SelecteurStorageOptions
 
 storage_options = {
     "get_agent_db": SelecteurStorageOptions(

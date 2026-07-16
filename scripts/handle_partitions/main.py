@@ -1,4 +1,5 @@
 import psycopg2
+from modules.constants import custom_logger
 from scripts.handle_partitions import config
 from scripts.handle_partitions.commun import Actions, get_partitions, list_table_names
 from scripts.handle_partitions.partitions import (
@@ -8,8 +9,6 @@ from scripts.handle_partitions.partitions import (
     update_snapshot_id,
 )
 from scripts.settings import get_settings
-
-from project.constants import custom_logger
 
 # SETTINGS
 settings = get_settings()

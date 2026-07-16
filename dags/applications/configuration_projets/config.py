@@ -1,5 +1,5 @@
-from project.enums.database import LoadStrategy
-from project.types.projet import SelecteurStorageOptions
+from modules.enums.database import LoadStrategy
+from modules.types.projet import SelecteurStorageOptions
 
 storage_options = {
     "service": SelecteurStorageOptions(

@@ -3,9 +3,8 @@ import logging
 
 import numpy as np
 import pandas as pd
-
-from project.utils.process.number import is_in_range, is_upper
-from project.utils.process.structures import tag_last_value_rows
+from modules.utils.process.number import is_in_range, is_upper
+from modules.utils.process.structures import tag_last_value_rows
 
 
 def drop_additionals_columns(df: pd.DataFrame, columns: list[str] | None = None) -> pd.DataFrame:

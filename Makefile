@@ -13,7 +13,8 @@ else
     VENV_BIN := $(ENV_NAME)/bin
 endif
 
-UV_PIP := $(VENV_BIN)/uv pip install --python $(VENV_BIN)/python
+UV := $(VENV_BIN)/uv
+PYTHON := $(VENV_BIN)/python
 
 .PHONY: help install-sys-packages create-py-env install-airflow install-packages \
         install-pre-commit setup-git setup-dev-env init-env-files clean
@@ -44,8 +45,14 @@ create-py-env: ## Créer un nouvel environnement python
 
 install-packages: ## Installer les packages python complémentaires
 	@echo "Installation de uv et des dépendances depuis pyproject.toml"
-	$(VENV_BIN)/python -m pip install uv
-	$(UV_PIP) -e ".[airflow,airflow-providers,dev,iceberg]"
+	$(PYTHON) -m pip install uv
+	$(UV) pip install \
+		--python $(PYTHON) \
+		--group default \
+		--group airflow \
+		--group airflow-providers \
+		--group dev \
+		--group iceberg
 
 install-pre-commit: ## Installer les pre-commits
 	@echo "Installation des pre-commits"

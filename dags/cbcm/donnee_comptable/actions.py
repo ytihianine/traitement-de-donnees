@@ -2,17 +2,16 @@ import logging
 
 import pandas as pd
 from airflow.sdk import Variable
-
-from project.constants import (
+from modules.constants import (
     AGENT,
     DEFAULT_GRIST_HOST,
     DEFAULT_PG_DATA_CONN_ID,
     PROXY,
 )
-from project.infra.database.factory import create_db_handler
-from project.infra.grist.client import GristAPI
-from project.infra.http_client.adapters import RequestsClient
-from project.infra.http_client.config import ClientConfig
+from modules.infra.database.factory import create_db_handler
+from modules.infra.grist.client import GristAPI
+from modules.infra.http_client.adapters import RequestsClient
+from modules.infra.http_client.config import ClientConfig
 
 
 def load_new_sp(

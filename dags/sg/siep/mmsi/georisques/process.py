@@ -1,8 +1,7 @@
 from typing import Any
 
 import pandas as pd
-
-from project.infra.http_client.types import HTTPResponse
+from modules.infra.http_client.types import HTTPResponse
 
 
 def format_risque_results(code_bat_ter: int, api_response: HTTPResponse | None) -> list[dict[str, Any]]:

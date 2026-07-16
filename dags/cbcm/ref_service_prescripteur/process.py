@@ -1,8 +1,7 @@
 import logging
 
 import pandas as pd
-
-from project.constants import NO_PROCESS_MSG
+from modules.constants import NO_PROCESS_MSG
 
 
 # ======================================================

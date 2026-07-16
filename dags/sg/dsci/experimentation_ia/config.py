@@ -1,5 +1,5 @@
-from project.enums.database import LoadStrategy
-from project.types.projet import SelecteurStorageOptions
+from modules.enums.database import LoadStrategy
+from modules.types.projet import SelecteurStorageOptions
 
 storage_options = {
     "quota_par_entite": SelecteurStorageOptions(load_strategy=LoadStrategy.APPEND, keep_file_id_col=False),

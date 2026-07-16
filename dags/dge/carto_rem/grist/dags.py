@@ -1,27 +1,26 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-
 from dags.dge.carto_rem.grist.config import storage_options
 from dags.dge.carto_rem.grist.tasks import (
     referentiels,
     source_grist,
     # load_to_grist,
 )
-from project.common_tasks.grist import download_grist_doc_to_s3
-from project.common_tasks.projet import get_selecteur_config
-from project.common_tasks.s3 import (
+from modules.common_tasks.grist import download_grist_doc_to_s3
+from modules.common_tasks.projet import get_selecteur_config
+from modules.common_tasks.s3 import (
     copy_s3_files,
     copy_staging_to_prod,
     del_iceberg_staging_table,
     del_s3_files,
     import_file_to_iceberg,
 )
-from project.common_tasks.sql import get_projet_snapshot
-from project.common_tasks.validation import validate_dag_parameters
-from project.enums.dags import DagStatus
-from project.infra.mails.default_smtp import MailStatus, create_send_mail_callback
-from project.types.dags import DBParams, FeatureFlagsEnable
-from project.utils.config.dag_params import create_dag_params, create_default_args
+from modules.common_tasks.sql import get_projet_snapshot
+from modules.common_tasks.validation import validate_dag_parameters
+from modules.enums.dags import DagStatus
+from modules.infra.mails.default_smtp import MailStatus, create_send_mail_callback
+from modules.types.dags import DBParams, FeatureFlagsEnable
+from modules.utils.config.dag_params import create_dag_params, create_default_args
 
 # Mails
 nom_projet = "Cartographie rémunération - Grist"

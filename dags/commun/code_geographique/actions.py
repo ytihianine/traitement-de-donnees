@@ -1,12 +1,11 @@
 import numpy as np
 import pandas as pd
 from airflow.models.variable import Variable
-
 from dags.commun.code_geographique import process
-from project.constants import AGENT, DEFAULT_GRIST_HOST, PROXY
-from project.infra.grist.client import GristAPI
-from project.infra.http_client.adapters import ClientConfig, RequestsClient
-from project.utils.logs import df_info
+from modules.constants import AGENT, DEFAULT_GRIST_HOST, PROXY
+from modules.infra.grist.client import GristAPI
+from modules.infra.http_client.adapters import ClientConfig, RequestsClient
+from modules.utils.logs import df_info
 
 # Données COG
 PAGE_SIZE = "?page_size=0"  # get all data at once

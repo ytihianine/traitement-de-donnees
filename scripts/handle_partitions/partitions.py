@@ -1,9 +1,8 @@
 from datetime import datetime
 from typing import Any
 
+from modules.constants import custom_logger
 from psycopg2 import extensions, sql
-
-from project.constants import custom_logger
 
 
 def drop_partitions(

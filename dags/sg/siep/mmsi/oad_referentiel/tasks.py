@@ -1,8 +1,8 @@
 from dags.sg.siep.mmsi.oad_referentiel import process
-from project.types.dags import TaskConfig
-from project.types.readers import GristReaderStrategy
-from project.types.tasks import ETLTask, SingleInputStep
-from project.types.writers import FileWriterStrategy
+from modules.types.dags import TaskConfig
+from modules.types.readers import GristReaderStrategy
+from modules.types.tasks import ETLTask, SingleInputStep
+from modules.types.writers import FileWriterStrategy
 
 ref_typologie = ETLTask(
     task_config=TaskConfig(task_id="ref_typologie"),

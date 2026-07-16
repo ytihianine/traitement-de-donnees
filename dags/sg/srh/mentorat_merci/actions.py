@@ -5,11 +5,10 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-
 from dags.sg.srh.mentorat_merci import process
-from project.infra.mails.default_smtp import MailMessage, render_template, send_mail
-from project.utils.config.dag_params import get_execution_date, get_project_name
-from project.utils.config.tasks import get_list_contact
+from modules.infra.mails.default_smtp import MailMessage, render_template, send_mail
+from modules.utils.config.dag_params import get_execution_date, get_project_name
+from modules.utils.config.tasks import get_list_contact
 
 
 def trouver_meilleurs_binomes(df: pd.DataFrame) -> Mapping[str, pd.DataFrame]:

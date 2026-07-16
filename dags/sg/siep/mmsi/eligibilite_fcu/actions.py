@@ -2,16 +2,15 @@ import logging
 from typing import Any
 
 import pandas as pd
-
 from dags.sg.siep.mmsi.eligibilite_fcu.process import (
     get_eligibilite_fcu,
 )
-from project.constants import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
-from project.enums.http import HttpHandlerType
-from project.infra.database.factory import create_db_handler
-from project.infra.http_client.adapters import ClientConfig
-from project.infra.http_client.factory import create_http_client
-from project.utils.logs import df_info
+from modules.constants import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
+from modules.enums.http import HttpHandlerType
+from modules.infra.database.factory import create_db_handler
+from modules.infra.http_client.adapters import ClientConfig
+from modules.infra.http_client.factory import create_http_client
+from modules.utils.logs import df_info
 
 
 def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:

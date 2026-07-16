@@ -1,16 +1,15 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
-from wrapt import partial
-
 from dags.dge.carto_rem.grist import actions, process
-from project.common_tasks.etl import (
+from modules.common_tasks.etl import (
     create_task,
 )
-from project.common_tasks.grist import generic_grist_processing
-from project.types.dags import ETLStep, TaskConfig
-from project.types.readers import GristReaderStrategy
-from project.types.tasks import ETLTask, SingleInputStep
-from project.types.writers import FileWriterStrategy
+from modules.common_tasks.grist import generic_grist_processing
+from modules.types.dags import ETLStep, TaskConfig
+from modules.types.readers import GristReaderStrategy
+from modules.types.tasks import ETLTask, SingleInputStep
+from modules.types.writers import FileWriterStrategy
+from wrapt import partial
 
 
 @task_group

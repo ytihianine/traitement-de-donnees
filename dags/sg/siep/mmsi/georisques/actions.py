@@ -1,6 +1,19 @@
 import logging
 
 import pandas as pd
+from dags.sg.siep.mmsi.georisques.process import (
+    format_query_param,
+    format_risque_results,
+)
+from modules.constants import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
+from modules.enums.http import HttpHandlerType
+from modules.infra.database.factory import create_db_handler
+from modules.infra.http_client.base import HttpInterface
+from modules.infra.http_client.config import ClientConfig
+from modules.infra.http_client.exceptions import HTTPClientError
+from modules.infra.http_client.factory import create_http_client
+from modules.infra.http_client.types import HTTPResponse
+from modules.utils.config.dag_params import get_db_info
 from tenacity import (
     before_sleep_log,
     retry,
@@ -9,20 +22,6 @@ from tenacity import (
     stop_after_attempt,
     wait_exponential,
 )
-
-from dags.sg.siep.mmsi.georisques.process import (
-    format_query_param,
-    format_risque_results,
-)
-from project.constants import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
-from project.enums.http import HttpHandlerType
-from project.infra.database.factory import create_db_handler
-from project.infra.http_client.base import HttpInterface
-from project.infra.http_client.config import ClientConfig
-from project.infra.http_client.exceptions import HTTPClientError
-from project.infra.http_client.factory import create_http_client
-from project.infra.http_client.types import HTTPResponse
-from project.utils.config.dag_params import get_db_info
 
 logger = logging.getLogger(name=__name__)
 

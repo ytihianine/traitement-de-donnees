@@ -3,13 +3,12 @@ import subprocess
 from pathlib import Path
 
 from airflow.sdk import Variable, task
-
-from project.constants import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
-from project.enums.filesystem import FileHandlerType
-from project.infra.database.factory import create_db_handler
-from project.infra.file_system.factory import create_file_handler
-from project.utils.config.dag_params import get_project_name
-from project.utils.config.tasks import get_list_selecteur_storage_info
+from modules.constants import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
+from modules.enums.filesystem import FileHandlerType
+from modules.infra.database.factory import create_db_handler
+from modules.infra.file_system.factory import create_file_handler
+from modules.utils.config.dag_params import get_project_name
+from modules.utils.config.tasks import get_list_selecteur_storage_info
 
 
 @task

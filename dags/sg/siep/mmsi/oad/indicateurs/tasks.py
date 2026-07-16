@@ -1,10 +1,9 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
-
 from dags.sg.siep.mmsi.oad.indicateurs import process
-from project.common_tasks.etl import create_task
-from project.common_tasks.file import create_parquet_converter_task
-from project.types.dags import ETLStep, TaskConfig
+from modules.common_tasks.etl import create_task
+from modules.common_tasks.file import create_parquet_converter_task
+from modules.types.dags import ETLStep, TaskConfig
 
 oad_indic_to_parquet = create_parquet_converter_task(
     selecteur="oad_indic",

@@ -1,8 +1,8 @@
 from dags.sg.siep.mmsi.eligibilite_fcu import actions, process
-from project.common_tasks.etl import (
+from modules.common_tasks.etl import (
     create_task,
 )
-from project.types.dags import ETLStep, TaskConfig
+from modules.types.dags import ETLStep, TaskConfig
 
 get_eligibilite_fcu = create_task(
     task_config=TaskConfig(task_id="eligibilite_fcu_to_file"),
