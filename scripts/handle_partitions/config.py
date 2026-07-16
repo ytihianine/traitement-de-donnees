@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from scripts.handle_partitions.commun import Actions
 
-from src.constants import custom_logger
+from project.constants import custom_logger
 
 # Database
 schema = "siep"

@@ -1,5 +1,5 @@
 # =============================================================================
-# airflow_project - pyproject.toml
+# project - pyproject.toml
 # =============================================================================
 # Centralized configuration migrated from setup.py + requirements.txt
 #
@@ -12,7 +12,7 @@
 # Project metadata
 # ---------------------------------------------------------------------------
 [project]
-name = "airflow_project"
+name = "project"
 version = "0.1"
 description = "Airflow ETL pipeline platform for DSCI / suite-donnee"
 requires-python = ">=3.12"
@@ -76,7 +76,6 @@ dev = [
 # ---------------------------------------------------------------------------
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["src*"]
 exclude = ["scripts*", "docs*"]
 
 # ---------------------------------------------------------------------------

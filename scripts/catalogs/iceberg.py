@@ -1,8 +1,8 @@
 import pandas as pd
 from scripts.settings import get_settings
 
-from src._enums.filesystem import IcebergTableStatus
-from src.infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
+from project.enums.filesystem import IcebergTableStatus
+from project.infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
 
 settings = get_settings()
 

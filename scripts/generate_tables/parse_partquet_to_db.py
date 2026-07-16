@@ -5,7 +5,7 @@ from typing import Any
 import pandas as pd
 from scripts.settings import get_settings
 
-from src.constants import custom_logger
+from project.constants import custom_logger
 
 settings = get_settings()
 

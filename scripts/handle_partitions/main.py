@@ -9,7 +9,7 @@ from scripts.handle_partitions.partitions import (
 )
 from scripts.settings import get_settings
 
-from src.constants import custom_logger
+from project.constants import custom_logger
 
 # SETTINGS
 settings = get_settings()

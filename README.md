@@ -16,6 +16,7 @@ Ce repo contient des scripts et dags permettant de traiter des données.
 │    └── constants.py: variables globales
 ├── docs: Contient toute la documentation du repo
 ├── test: Contient tous les tests unitaires
+├── pyproject.toml: Contient tous les tests unitaires
 └── scripts: Contient différents scripts utilitaires
 ```
 
@@ -34,7 +35,7 @@ L'ensemble de la documentation se trouve dans le dossier `docs/`.
 |    ├── convention.md
 |    ├── dags.md
 |    ├── grist.md
-|    ├── src.infra.md
+|    ├── project.infra.md
 |    └── utilitaires.md
 ```
 

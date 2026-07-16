@@ -3,7 +3,7 @@ from typing import Any
 
 from psycopg2 import extensions, sql
 
-from src.constants import custom_logger
+from project.constants import custom_logger
 
 
 def drop_partitions(
