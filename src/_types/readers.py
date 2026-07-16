@@ -57,9 +57,7 @@ class GristReaderStrategy(ReaderStrategy):
         if selecteurs is None:
             raise ValueError("selecteurs mapping is required for GristReaderStrategy")
         if self.doc_selecteur_name not in selecteurs:
-            raise ValueError(
-                f"Document selecteur '{self.doc_selecteur_name}' not found in runtime configs"
-            )
+            raise ValueError(f"Document selecteur '{self.doc_selecteur_name}' not found in runtime configs")
 
         table_info = selecteur.storage_info
         document_config = selecteurs[self.doc_selecteur_name]
@@ -87,9 +85,7 @@ class GristReaderStrategy(ReaderStrategy):
         )
 
         # Download the Grist document locally
-        grist_doc = s3_handler.read(
-            file_path=document_info.get_full_s3_key(with_tmp_segment=True)
-        )
+        grist_doc = s3_handler.read(file_path=document_info.get_full_s3_key(with_tmp_segment=True))
 
         local_handler.write(
             file_path=str(doc_local_path),

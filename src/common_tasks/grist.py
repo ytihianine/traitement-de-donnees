@@ -1,26 +1,25 @@
-from datetime import timedelta
 import logging
-from typing import Callable
-from airflow.sdk import task
-from airflow.sdk import Variable
+from collections.abc import Callable
+from datetime import timedelta
+
 import pandas as pd
+from airflow.sdk import Variable, task
 
-from src.infra.file_system.factory import create_file_handler
-from src.infra.http_client.adapters import RequestsClient
-from src.infra.http_client.config import ClientConfig
-from src.infra.grist.client import GristAPI
-from src.utils.config.dag_params import get_project_name, should_skip_task
 from src._enums.dags import FeatureFlags
-from src.utils.config.tasks import get_selecteur_storage_info
-
 from src._enums.filesystem import FileHandlerType
 from src.constants import (
+    AGENT,
     DEFAULT_GRIST_HOST,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_CONN_ID,
     PROXY,
-    AGENT,
 )
+from src.infra.file_system.factory import create_file_handler
+from src.infra.grist.client import GristAPI
+from src.infra.http_client.adapters import RequestsClient
+from src.infra.http_client.config import ClientConfig
+from src.utils.config.dag_params import get_project_name, should_skip_task
+from src.utils.config.tasks import get_selecteur_storage_info
 from src.utils.process.dates import convert_grist_date_to_date
 from src.utils.process.structures import (
     handle_grist_boolean_columns,
@@ -50,13 +49,9 @@ def download_grist_doc_to_s3(
     if should_skip_task(context=context, feature_flag=FeatureFlags.DOWNLOAD_GRIST_DOC):
         return
 
-    selecteur_config = get_selecteur_storage_info(
-        nom_projet=nom_projet, selecteur=selecteur
-    )
+    selecteur_config = get_selecteur_storage_info(nom_projet=nom_projet, selecteur=selecteur)
     doc_id = selecteur_config.id_source
-    dest_tmp_key = selecteur_config.get_full_s3_key(
-        with_tmp_segment=True, use_id_source=False
-    )
+    dest_tmp_key = selecteur_config.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
 
     # Instanciate Grist client
     http_config = ClientConfig()
@@ -116,9 +111,7 @@ def generic_grist_processing(
         logging.info(msg=f"Keeping only mandatory columns: {cols_to_keep}")
         df = df.loc[:, cols_to_keep]
     else:
-        logging.info(
-            msg="No mandatory columns provided. Using all available columns in the dataframe."
-        )
+        logging.info(msg="No mandatory columns provided. Using all available columns in the dataframe.")
 
     # Rename columns
     if cols_mapping:

@@ -1,32 +1,28 @@
 from datetime import timedelta
 
+from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
-
-from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
 
 from src._enums.dags import DagStatus
-
 from src._types.dags import FeatureFlagsEnable
-from src.utils.config.dag_params import create_default_args, create_dag_params
-
-from src.utils.config.tasks import get_list_source_fichier
-from src.common_tasks.validation import validate_dag_parameters
 from src.common_tasks.s3 import copy_s3_files, del_s3_files
-
+from src.common_tasks.validation import validate_dag_parameters
+from src.dags.sg.srh.mentorat_merci.config import (
+    storage_options,
+)
 from src.dags.sg.srh.mentorat_merci.tasks import (
     agent_inscrit,
     generer_binomes,
 )
-from src.dags.sg.srh.mentorat_merci.config import (
-    storage_options,
-)
+from src.infra.mails.default_smtp import MailStatus, create_send_mail_callback
+from src.utils.config.dag_params import create_dag_params, create_default_args
+from src.utils.config.tasks import get_list_source_fichier
 
 # Mails
 nom_projet = "Mentorat MERCI"
-LINK_DOC_PIPELINE = "Non-défini"  # noqa
-LINK_DOC_DATA = "Non-défini"  # noqa
+LINK_DOC_PIPELINE = "Non-défini"
+LINK_DOC_DATA = "Non-défini"
 
 
 # Définition du DAG
@@ -37,15 +33,13 @@ LINK_DOC_DATA = "Non-défini"  # noqa
     max_consecutive_failed_dag_runs=1,
     catchup=False,
     tags=["SRH", "Mentorat MERCI"],
-    description="Génération de binômes pour le session Mentorat MERCI",  # noqa
+    description="Génération de binômes pour le session Mentorat MERCI",
     default_args=create_default_args(),
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=None,
-        feature_flags=FeatureFlagsEnable(
-            db=False, mail=True, s3=True, convert_files=False, download_grist_doc=False
-        ),
+        feature_flags=FeatureFlagsEnable(db=False, mail=True, s3=True, convert_files=False, download_grist_doc=False),
     ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,

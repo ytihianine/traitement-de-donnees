@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 
 class HTTPResponse:
@@ -7,12 +7,12 @@ class HTTPResponse:
     def __init__(self, raw: Any) -> None:
         self._raw = raw
 
-    def json(self) -> Dict[str, Any]:
+    def json(self) -> dict[str, Any]:
         """Return response body as JSON (if possible)."""
         try:
             return self._raw.json()
-        except Exception:
-            raise ValueError("Response content is not valid JSON")
+        except Exception as err:
+            raise ValueError("Response content is not valid JSON") from err
 
     @property
     def text(self) -> str:
@@ -30,7 +30,7 @@ class HTTPResponse:
         return getattr(self._raw, "status_code", 0)
 
     @property
-    def headers(self) -> Dict[str, Any]:
+    def headers(self) -> dict[str, Any]:
         """Return response headers."""
         return getattr(self._raw, "headers", {})
 

@@ -1,12 +1,13 @@
 import functools
-import pandas as pd
-import numpy as np
 
+import numpy as np
+import pandas as pd
+
+from src.dags.sg.siep.mmsi.consommation_batiment.enums import Statuts, TypeEnergie
 from src.utils.process.text import (
     convert_str_cols_to_date,
     normalize_whitespace_columns,
 )
-from src.dags.sg.siep.mmsi.consommation_batiment.enums import Statuts, TypeEnergie
 
 
 # ======================================================
@@ -49,9 +50,7 @@ def _unpivot_conso_mens(df: pd.DataFrame, use_conso_corrigee: bool) -> pd.DataFr
 
 
 def calculer_dju_moyen(df: pd.DataFrame) -> pd.DataFrame:
-    df_moyen = df.groupby(
-        by=["code_bat_gestionnaire", "mois_conso"], as_index=False
-    ).mean()
+    df_moyen = df.groupby(by=["code_bat_gestionnaire", "mois_conso"], as_index=False).mean()
     df_moyen = df_moyen.rename(columns={"degres_jours_de_chauffage": "dju_moyen"})
     return df_moyen
 
@@ -68,9 +67,7 @@ def determiner_ratio_par_fluide(df: pd.DataFrame) -> pd.DataFrame:
         )
     )
     df["ratio_autres_fluides"] = ratios_autres_fluides
-    df.sort_values(
-        by=["code_bat_gestionnaire", "annee_conso", "mois_conso"], inplace=True
-    )
+    df.sort_values(by=["code_bat_gestionnaire", "annee_conso", "mois_conso"], inplace=True)
     return df
 
 
@@ -85,24 +82,14 @@ def calculer_consommation_corrigee(df: pd.DataFrame) -> pd.DataFrame:
     df["conso_elec_corr_dju_mmsi"] = df["conso_elec"] * df["ratio_electricite"]
 
     df["conso_gaz_pci_corr_dju_mmsi"] = df["conso_gaz_pci"] * df["ratio_autres_fluides"]
-    df["conso_reseau_chaleur_corr_dju_mmsi"] = (
-        df["conso_reseau_chaleur"] * df["ratio_autres_fluides"]
-    )
-    df["conso_reseau_froid_corr_dju_mmsi"] = (
-        df["conso_reseau_froid"] * df["ratio_autres_fluides"]
-    )
-    df["conso_fioul_pci_corr_dju_mmsi"] = (
-        df["conso_fioul_pci"] * df["ratio_autres_fluides"]
-    )
-    df["conso_granule_bois_corr_dju_mmsi"] = (
-        df["conso_granule_bois"] * df["ratio_autres_fluides"]
-    )
+    df["conso_reseau_chaleur_corr_dju_mmsi"] = df["conso_reseau_chaleur"] * df["ratio_autres_fluides"]
+    df["conso_reseau_froid_corr_dju_mmsi"] = df["conso_reseau_froid"] * df["ratio_autres_fluides"]
+    df["conso_fioul_pci_corr_dju_mmsi"] = df["conso_fioul_pci"] * df["ratio_autres_fluides"]
+    df["conso_granule_bois_corr_dju_mmsi"] = df["conso_granule_bois"] * df["ratio_autres_fluides"]
     return df
 
 
-def determiner_ratio(
-    type_energie: str, mois_conso: float, dju_ref: float, dju_moy: float
-) -> float | None:
+def determiner_ratio(type_energie: str, mois_conso: float, dju_ref: float, dju_moy: float) -> float | None:
     ratio = 1
 
     if pd.isna(mois_conso):
@@ -146,20 +133,17 @@ def determiner_statut_fluide_global(
     lst_statut_par_fluide = [statut_gaz, statut_reseau_chaud, statut_reseau_froid]
 
     if statut_elec == Statuts.complet.value and all(
-        element is None or element == Statuts.complet.value
-        for element in lst_statut_par_fluide
+        element is None or element == Statuts.complet.value for element in lst_statut_par_fluide
     ):
         return Statuts.complet.value
 
     if statut_elec == Statuts.debut_exp.value and all(
-        element is None or element == Statuts.debut_exp.value
-        for element in lst_statut_par_fluide
+        element is None or element == Statuts.debut_exp.value for element in lst_statut_par_fluide
     ):
         return Statuts.debut_exp.value
 
     if statut_elec == Statuts.fin_exp.value and all(
-        element is None or element == Statuts.fin_exp.value
-        for element in lst_statut_par_fluide
+        element is None or element == Statuts.fin_exp.value for element in lst_statut_par_fluide
     ):
         return Statuts.fin_exp.value
 
@@ -169,9 +153,7 @@ def determiner_statut_fluide_global(
 def add_dju_moyen(df_conso_mens: pd.DataFrame) -> pd.DataFrame:
 
     df_dju_moyen = calculer_dju_moyen(
-        df=df_conso_mens.loc[
-            :, ["code_bat_gestionnaire", "mois_conso", "degres_jours_de_chauffage"]
-        ]
+        df=df_conso_mens.loc[:, ["code_bat_gestionnaire", "mois_conso", "degres_jours_de_chauffage"]]
     )
 
     # Besoin de merge les DF pour récupérer la colonne DJU moyen
@@ -253,12 +235,8 @@ def process_source_bien_info_comp(df: pd.DataFrame) -> pd.DataFrame:
         )
 
     # Regroupement
-    df_grouped = df.groupby(by=["code_bat_ter"], as_index=False)[
-        "code_bat_gestionnaire"
-    ].count()
-    df_grouped = df_grouped.rename(
-        columns={"code_bat_gestionnaire": "nb_code_bat_gestionnaire"}  # type: ignore
-    )
+    df_grouped = df.groupby(by=["code_bat_ter"], as_index=False)["code_bat_gestionnaire"].count()
+    df_grouped = df_grouped.rename(columns={"code_bat_gestionnaire": "nb_code_bat_gestionnaire"})  # type: ignore
 
     # Catégoriser les données
     df_grouped["gestion_mono_multi_mef"] = np.where(
@@ -276,20 +254,14 @@ def process_source_bien_info_comp(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Colonnes additionnelles
-    df["gestion_mono_multi_min"] = np.where(
-        df["gestion_mono_multi_min"], "Multi", "Mono"
-    )
+    df["gestion_mono_multi_min"] = np.where(df["gestion_mono_multi_min"], "Multi", "Mono")
     df["code_site"] = pd.to_numeric(arg=df["code_site"].str.split().str[-1])
 
     conditions = [
-        (df["gestion_mono_multi_min"] == "Mono")
-        & (df["gestion_mono_multi_mef"] == "Mono gest MEF"),
-        (df["gestion_mono_multi_min"] == "Mono")
-        & (df["gestion_mono_multi_mef"] == "MEF multi gest"),
-        (df["gestion_mono_multi_min"] == "Multi")
-        & (df["gestion_mono_multi_mef"] == "Mixte dont MEF mono gest"),
-        (df["gestion_mono_multi_min"] == "Multi")
-        & (df["gestion_mono_multi_mef"] == "Mixte dont MEF multi gest"),
+        (df["gestion_mono_multi_min"] == "Mono") & (df["gestion_mono_multi_mef"] == "Mono gest MEF"),
+        (df["gestion_mono_multi_min"] == "Mono") & (df["gestion_mono_multi_mef"] == "MEF multi gest"),
+        (df["gestion_mono_multi_min"] == "Multi") & (df["gestion_mono_multi_mef"] == "Mixte dont MEF mono gest"),
+        (df["gestion_mono_multi_min"] == "Multi") & (df["gestion_mono_multi_mef"] == "Mixte dont MEF multi gest"),
     ]
     choices = [
         "MEF mono gest",
@@ -297,9 +269,7 @@ def process_source_bien_info_comp(df: pd.DataFrame) -> pd.DataFrame:
         "Mixte dont MEF mono gest",
         "Mixte dont MEF multi gest",
     ]
-    df["gestion_categorie"] = np.select(
-        condlist=conditions, choicelist=choices, default="Indéterminé"
-    )
+    df["gestion_categorie"] = np.select(condlist=conditions, choicelist=choices, default="Indéterminé")
     return df
 
 
@@ -314,11 +284,7 @@ def process_conso_mensuelles(df: pd.DataFrame) -> pd.DataFrame:
 
     df["ligne_avec_conso"] = np.where(df["date_conso"].notna(), True, False)
 
-    cols_conso = [
-        col
-        for col in df.columns
-        if col.startswith("conso_") and "_surfacique" not in col
-    ]
+    cols_conso = [col for col in df.columns if col.startswith("conso_") and "_surfacique" not in col]
     for col in cols_conso:
         colname = col.replace("conso_", "conso_presente_")
         df[colname] = np.where(df[col].notna(), 1, 0)
@@ -417,21 +383,17 @@ def process_conso_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFrame
     df_filtered = df[(df["annee"] >= 2019)].copy()
 
     # Agrégation des consommations par année
-    conso_par_annee = df_filtered.groupby(
-        ["code_bat_gestionnaire", "annee", "fluide", "type_conso"], as_index=False
-    )["conso"].sum()
+    conso_par_annee = df_filtered.groupby(["code_bat_gestionnaire", "annee", "fluide", "type_conso"], as_index=False)[
+        "conso"
+    ].sum()
 
     # Création du référentiel complet (toutes les combinaisons bâtiment/fluide/type_conso)
-    referentiel_complet = conso_par_annee.loc[
-        :, ["code_bat_gestionnaire", "fluide", "type_conso"]
-    ].drop_duplicates()
+    referentiel_complet = conso_par_annee.loc[:, ["code_bat_gestionnaire", "fluide", "type_conso"]].drop_duplicates()
 
     # Liste de toutes les années disponibles
-    annees_disponibles = pd.DataFrame(
-        data={"annee": conso_par_annee.loc[:, "annee"].unique()}
-    )
+    annees_disponibles = pd.DataFrame(data={"annee": conso_par_annee.loc[:, "annee"].unique()})
 
-    # Produit cartésien : chaque bâtiment × fluide × année
+    # Produit cartésien : chaque bâtiment x fluide x année
     grille_complete = referentiel_complet.merge(right=annees_disponibles, how="cross")
 
     # Jointure avec les données réelles (LEFT JOIN)
@@ -511,9 +473,7 @@ def process_facture_annuelle_unpivot(df: pd.DataFrame) -> pd.DataFrame:
         value_name="montant_facture",
     )
     df = df.loc[df["fluide"].isin(list(correspondance_facture.keys()))]
-    df["type_facture"] = np.where(
-        df["fluide"].str.contains("htva|ht", regex=True), "HT/HTVA", "TTC"
-    )
+    df["type_facture"] = np.where(df["fluide"].str.contains("htva|ht", regex=True), "HT/HTVA", "TTC")
     df["fluide"] = df["fluide"].replace(correspondance_facture)
 
     return df
@@ -524,21 +484,17 @@ def process_facture_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFra
     df_filtered = df[(df["annee"] >= 2019)].copy()
 
     # Agrégation des montants par année
-    factures_par_annee = df_filtered.groupby(
-        ["code_bat_gestionnaire", "annee", "fluide", "type_facture"], as_index=False
-    )["montant_facture"].sum()
+    factures_par_annee = df_filtered.groupby(["code_bat_gestionnaire", "annee", "fluide", "type_facture"], as_index=False)[
+        "montant_facture"
+    ].sum()
 
     # Création du référentiel complet (toutes les combinaisons bâtiment/fluide/type_facture)
-    referentiel_complet = factures_par_annee.loc[
-        :, ["code_bat_gestionnaire", "fluide", "type_facture"]
-    ].drop_duplicates()
+    referentiel_complet = factures_par_annee.loc[:, ["code_bat_gestionnaire", "fluide", "type_facture"]].drop_duplicates()
 
     # Liste de toutes les années disponibles
-    annees_disponibles = pd.DataFrame(
-        data={"annee": factures_par_annee.loc[:, "annee"].unique()}
-    )
+    annees_disponibles = pd.DataFrame(data={"annee": factures_par_annee.loc[:, "annee"].unique()})
 
-    # Produit cartésien : chaque bâtiment × fluide × année
+    # Produit cartésien : chaque bâtiment x fluide x année
     grille_complete = referentiel_complet.merge(right=annees_disponibles, how="cross")
 
     # Jointure avec les données réelles (LEFT JOIN)
@@ -549,9 +505,7 @@ def process_facture_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFra
     )
 
     # Remplacement des valeurs manquantes par 0
-    factures_complete["montant_facture"] = factures_complete["montant_facture"].fillna(
-        0
-    )
+    factures_complete["montant_facture"] = factures_complete["montant_facture"].fillna(0)
 
     # Auto-jointure pour comparer chaque année avec toutes les années précédentes
     df = factures_complete.merge(
@@ -564,9 +518,7 @@ def process_facture_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFra
     df = df.loc[df["annee"] >= df["annee_comparaison"]]
 
     # Calcul de la différence
-    df["diff_vs_comparaison"] = (
-        df["montant_facture"] - df["montant_facture_comparaison"]
-    )
+    df["diff_vs_comparaison"] = df["montant_facture"] - df["montant_facture_comparaison"]
 
     # Sélection et renommage des colonnes finales
     df = df.loc[
@@ -589,9 +541,7 @@ def process_facture_annuelle_unpivot_comparaison(df: pd.DataFrame) -> pd.DataFra
 def process_conso_statut_par_fluide(df: pd.DataFrame) -> pd.DataFrame:
     # Unpivot du dataframe
     cols_id = ["code_bat_gestionnaire", "annee"]
-    cols_conso_presente = [
-        col for col in df.columns if col.startswith("conso_presente_")
-    ]
+    cols_conso_presente = [col for col in df.columns if col.startswith("conso_presente_")]
     df = pd.melt(
         frame=df,
         id_vars=cols_id,
@@ -601,9 +551,7 @@ def process_conso_statut_par_fluide(df: pd.DataFrame) -> pd.DataFrame:
     ).reset_index(drop=True)
 
     # Déterminer le statut de chaque fluide
-    df["statut_du_fluide"] = np.where(
-        df["conso_presente"] == 12, Statuts.complet.value, Statuts.incomplet.value
-    )
+    df["statut_du_fluide"] = np.where(df["conso_presente"] == 12, Statuts.complet.value, Statuts.incomplet.value)
 
     return df
 
@@ -616,11 +564,7 @@ def process_conso_statut_batiment(df: pd.DataFrame) -> pd.DataFrame:
     df_statut = (
         df.groupby(by=["code_bat_gestionnaire", "annee"])["statut_du_fluide"]
         .apply(
-            func=lambda x: (
-                Statuts.complet.value
-                if (x.str.upper() == Statuts.complet.value).all()
-                else Statuts.incomplet.value
-            )
+            func=lambda x: (Statuts.complet.value if (x.str.upper() == Statuts.complet.value).all() else Statuts.incomplet.value)
         )
         .reset_index()
     )

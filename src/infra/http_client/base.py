@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 from urllib.parse import urljoin
+
 from tenacity import RetryCallState, retry, retry_if_exception, stop_after_attempt
 
 from src.infra.http_client.config import ClientConfig
@@ -13,9 +14,7 @@ MAX_RETRY_ATTEMPTS = 5
 
 
 def _is_rate_limit_error(exception: BaseException) -> bool:
-    return isinstance(exception, RateLimitError) or (
-        getattr(exception, "status_code", None) == 429
-    )
+    return isinstance(exception, RateLimitError) or (getattr(exception, "status_code", None) == 429)
 
 
 def _retry_wait_from_429(retry_state: RetryCallState) -> float:
@@ -81,9 +80,7 @@ class HttpInterface(ABC):
         stop=stop_after_attempt(max_attempt_number=MAX_RETRY_ATTEMPTS),
         reraise=True,
     )
-    def get(
-        self, endpoint: str, params: dict[str, Any] | None = None, **kwargs
-    ) -> HTTPResponse:
+    def get(self, endpoint: str, params: dict[str, Any] | None = None, **kwargs) -> HTTPResponse:
         return self.request("GET", endpoint, params=params, **kwargs)
 
     @retry(

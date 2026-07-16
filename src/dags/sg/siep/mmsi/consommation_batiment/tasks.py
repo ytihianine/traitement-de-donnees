@@ -2,9 +2,8 @@ from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
 from src._types.dags import ETLStep, TaskConfig
-from src.common_tasks.file import create_parquet_converter_task
 from src.common_tasks.etl import create_file_etl_task, create_task
-
+from src.common_tasks.file import create_parquet_converter_task
 from src.dags.sg.siep.mmsi.consommation_batiment import process
 
 conso_mens_parquet = create_parquet_converter_task(
@@ -60,11 +59,7 @@ def additionnal_files():
         task_config=TaskConfig(task_id="conso_annuelle_unpivot_comparaison"),
         output_selecteur="conso_annuelle_unpivot_comparaison",
         input_selecteurs=["conso_annuelle_unpivot"],
-        steps=[
-            ETLStep(
-                fn=process.process_conso_annuelle_unpivot_comparaison, read_data=True
-            )
-        ],
+        steps=[ETLStep(fn=process.process_conso_annuelle_unpivot_comparaison, read_data=True)],
     )
     facture_annuelle_unpivot = create_task(
         task_config=TaskConfig(task_id="facture_annuelle_unpivot"),
@@ -76,11 +71,7 @@ def additionnal_files():
         task_config=TaskConfig(task_id="facture_annuelle_unpivot_comparaison"),
         output_selecteur="facture_annuelle_unpivot_comparaison",
         input_selecteurs=["facture_annuelle_unpivot"],
-        steps=[
-            ETLStep(
-                fn=process.process_facture_annuelle_unpivot_comparaison, read_data=True
-            )
-        ],
+        steps=[ETLStep(fn=process.process_facture_annuelle_unpivot_comparaison, read_data=True)],
     )
     facture_annuelle_unpivot = create_task(
         task_config=TaskConfig(task_id="facture_annuelle_unpivot"),
@@ -92,11 +83,7 @@ def additionnal_files():
         task_config=TaskConfig(task_id="facture_annuelle_unpivot_comparaison"),
         output_selecteur="facture_annuelle_unpivot_comparaison",
         input_selecteurs=["facture_annuelle_unpivot"],
-        steps=[
-            ETLStep(
-                fn=process.process_facture_annuelle_unpivot_comparaison, read_data=True
-            )
-        ],
+        steps=[ETLStep(fn=process.process_facture_annuelle_unpivot_comparaison, read_data=True)],
     )
     conso_statut_par_fluide = create_task(
         task_config=TaskConfig(task_id="conso_statut_par_fluide"),

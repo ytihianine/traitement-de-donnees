@@ -9,9 +9,7 @@ storage_options = {
     "enquete_360": SelecteurStorageOptions(),
     "enquete_satisfaction": SelecteurStorageOptions(),
     "etudes": SelecteurStorageOptions(),
-    "grist_doc": SelecteurStorageOptions(
-        write_to_s3_with_iceberg=False, write_to_db=False
-    ),
+    "grist_doc": SelecteurStorageOptions(write_to_s3_with_iceberg=False, write_to_db=False),
     "impact_actions_com": SelecteurStorageOptions(),
     "impressions_reseaux_sociaux": SelecteurStorageOptions(),
     "indicateurs_metiers": SelecteurStorageOptions(),

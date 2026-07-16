@@ -2,10 +2,8 @@ from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
 from src._types.dags import ETLStep, TaskConfig
-from src.dags.sg.siep.mmsi.api_operat import actions
 from src.common_tasks.etl import create_task
-
-from src.dags.sg.siep.mmsi.api_operat import process
+from src.dags.sg.siep.mmsi.api_operat import actions, process
 
 
 @task_group

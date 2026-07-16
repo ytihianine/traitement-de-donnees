@@ -1,13 +1,13 @@
 """Tests for S3FS (S3 file handler) using a mocked boto3 client."""
 
 import io
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import MagicMock
 
 import pytest
 
-from src.infra.file_system.s3 import S3FS
 from src.infra.file_system.exceptions import FileHandlerError, FileNotFoundError
+from src.infra.file_system.s3 import S3FS
 
 
 class FakeClientExceptions:
@@ -27,7 +27,7 @@ def _make_handler(files: dict[str, bytes] | None = None) -> S3FS:
             raise client.exceptions.NoSuchKey("not found")
         return {
             "ContentLength": len(store[Key]),
-            "LastModified": datetime(2025, 1, 1, tzinfo=timezone.utc),
+            "LastModified": datetime(2025, 1, 1, tzinfo=UTC),
             "ETag": '"abc123"',
             "ContentType": "application/octet-stream",
         }

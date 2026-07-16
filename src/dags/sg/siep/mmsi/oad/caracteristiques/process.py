@@ -1,12 +1,10 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 def keep_only_bien_mef(df: pd.DataFrame) -> pd.DataFrame:
     # Filtrer les biens pour ne conserver que ceux appartenant aux MEF
-    df = df.loc[
-        (df["presence_mef_bat"] == "Avec MEF") & (df["filtre_manuel_a_conserver"])
-    ]
+    df = df.loc[(df["presence_mef_bat"] == "Avec MEF") & (df["filtre_manuel_a_conserver"])]
 
     return df
 
@@ -30,11 +28,7 @@ def process_sites(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = df.loc[:, cols_to_keep]
 
-    df = (
-        df.dropna(subset=["code_site"])
-        .assign(libelle_site=df["libelle_site"].str.upper())
-        .convert_dtypes()
-    )
+    df = df.dropna(subset=["code_site"]).assign(libelle_site=df["libelle_site"].str.upper()).convert_dtypes()
 
     df = df.drop_duplicates(subset=["code_site", "libelle_site"], ignore_index=True)
 
@@ -73,11 +67,7 @@ def process_biens(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = df.loc[:, cols_to_keep]
 
-    df = (
-        df.dropna(subset=["code_bat_ter"])
-        .assign(libelle_bat_ter=df["libelle_bat_ter"].str.upper())
-        .convert_dtypes()
-    )
+    df = df.dropna(subset=["code_bat_ter"]).assign(libelle_bat_ter=df["libelle_bat_ter"].str.upper()).convert_dtypes()
     df = df.drop_duplicates(subset=["code_bat_ter"], keep="first", ignore_index=True)
     return df
 
@@ -99,17 +89,10 @@ def process_gestionnaires(df: pd.DataFrame) -> pd.DataFrame:
 
     df = (
         df.dropna(subset=["code_gestionnaire"])
-        .assign(
-            libelle_gestionnaire=df["libelle_gestionnaire"]
-            .str.upper()
-            .str.split()
-            .str.join(" ")
-        )
+        .assign(libelle_gestionnaire=df["libelle_gestionnaire"].str.upper().str.split().str.join(" "))
         .convert_dtypes()
     )
-    df = df.drop_duplicates(
-        subset=["code_gestionnaire"], keep="first", ignore_index=True
-    )
+    df = df.drop_duplicates(subset=["code_gestionnaire"], keep="first", ignore_index=True)
 
     return df
 
@@ -135,9 +118,7 @@ def process_biens_gestionnaires(df: pd.DataFrame) -> pd.DataFrame:
         ignore_index=True,
     )
     # Create calculated columns
-    df["code_bat_gestionnaire"] = (
-        df[["code_bat_ter", "code_gestionnaire"]].astype(str).agg("_".join, axis=1)
-    )
+    df["code_bat_gestionnaire"] = df[["code_bat_ter", "code_gestionnaire"]].astype(str).agg("_".join, axis=1)
     return df
 
 
@@ -177,9 +158,7 @@ def process_biens_occupants(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["code_bat_ter", "code_gestionnaire"]).convert_dtypes()
 
     # Create calculated columns
-    df["code_bat_gestionnaire"] = (
-        df[["code_bat_ter", "code_gestionnaire"]].astype(str).agg("_".join, axis=1)
-    )
+    df["code_bat_gestionnaire"] = df[["code_bat_ter", "code_gestionnaire"]].astype(str).agg("_".join, axis=1)
 
     # Reset index to ensure a clean row-based id (starting from 1)
     df = df.reset_index(drop=True)
@@ -191,8 +170,7 @@ def process_biens_occupants(df: pd.DataFrame) -> pd.DataFrame:
         df["occupant"],
     )
     df["service_occupant"] = np.where(
-        df["service_occupant"].isna()
-        | (df["service_occupant"].astype(str).str.strip() == ""),
+        df["service_occupant"].isna() | (df["service_occupant"].astype(str).str.strip() == ""),
         "NR - " + (df.index + 1).astype(str),
         df["service_occupant"],
     )

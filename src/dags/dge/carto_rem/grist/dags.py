@@ -1,29 +1,27 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 
-from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
-from src._types.dags import DBParams, FeatureFlagsEnable
-from src.utils.config.dag_params import create_dag_params, create_default_args
 from src._enums.dags import DagStatus
+from src._types.dags import DBParams, FeatureFlagsEnable
 from src.common_tasks.grist import download_grist_doc_to_s3
-
-from src.common_tasks.sql import get_projet_snapshot
+from src.common_tasks.projet import get_selecteur_config
 from src.common_tasks.s3 import (
     copy_s3_files,
-    del_s3_files,
-    import_file_to_iceberg,
     copy_staging_to_prod,
     del_iceberg_staging_table,
+    del_s3_files,
+    import_file_to_iceberg,
 )
-from src.common_tasks.projet import get_selecteur_config
-
+from src.common_tasks.sql import get_projet_snapshot
 from src.common_tasks.validation import validate_dag_parameters
+from src.dags.dge.carto_rem.grist.config import storage_options
 from src.dags.dge.carto_rem.grist.tasks import (
     referentiels,
     source_grist,
     # load_to_grist,
 )
-from src.dags.dge.carto_rem.grist.config import storage_options
+from src.infra.mails.default_smtp import MailStatus, create_send_mail_callback
+from src.utils.config.dag_params import create_dag_params, create_default_args
 
 # Mails
 nom_projet = "Cartographie rémunération - Grist"
@@ -43,9 +41,7 @@ nom_projet = "Cartographie rémunération - Grist"
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="cartographie_remuneration"),
-        feature_flags=FeatureFlagsEnable(
-            db=True, mail=False, s3=False, convert_files=False, download_grist_doc=True
-        ),
+        feature_flags=FeatureFlagsEnable(db=True, mail=False, s3=False, convert_files=False, download_grist_doc=True),
     ),
     on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )

@@ -1,16 +1,15 @@
 import logging
+
 import pandas as pd
 
+from src._enums.dags import TypeDocumentation
+from src.constants import NO_PROCESS_MSG
 from src.utils.process.structures import (
     validate_enum_column,
 )
-from src._enums.dags import TypeDocumentation
-from src.constants import NO_PROCESS_MSG
 
 
-def replace_values(
-    df: pd.DataFrame, to_replace: dict[str, str], cols: list[str] | None = None
-) -> pd.DataFrame:
+def replace_values(df: pd.DataFrame, to_replace: dict[str, str], cols: list[str] | None = None) -> pd.DataFrame:
     if cols:
         df[cols] = df[cols].replace(to_replace=to_replace)
     else:

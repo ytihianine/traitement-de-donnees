@@ -1,6 +1,5 @@
 """Factory for creating file handlers."""
 
-from typing import Optional, Union
 from pathlib import Path
 
 from src._enums.filesystem import FileHandlerType
@@ -16,7 +15,7 @@ DEFAULT_S3_BUCKET = "dsci"
 
 def create_file_handler(
     handler_type: FileHandlerType,
-    base_path: Optional[Union[str, Path]] = None,
+    base_path: str | Path | None = None,
     **kwargs,
 ) -> FSInterface:
     """
@@ -50,15 +49,12 @@ def create_file_handler(
         return S3FS(**kwargs)
 
     else:
-        raise ValueError(
-            f"Unsupported handler type: '{handler_type}'. "
-            f"Supported types: 'local', 's3'"
-        )
+        raise ValueError(f"Unsupported handler type: '{handler_type}'. " f"Supported types: 'local', 's3'")
 
 
 def create_default_s3_handler(
-    connection_id: Optional[str] = None,
-    bucket: Optional[str] = None,
+    connection_id: str | None = None,
+    bucket: str | None = None,
 ) -> FSInterface:
     """
     Create S3 handler with default DSCI bucket configuration.
@@ -74,13 +70,11 @@ def create_default_s3_handler(
     """
     connection_id = connection_id or DEFAULT_S3_CONNECTION_ID
     bucket = bucket or DEFAULT_S3_BUCKET
-    return create_file_handler(
-        FileHandlerType.S3, connection_id=connection_id, bucket=bucket
-    )
+    return create_file_handler(FileHandlerType.S3, connection_id=connection_id, bucket=bucket)
 
 
 def create_local_handler(
-    base_path: Optional[Union[str, Path]] = None,
+    base_path: str | Path | None = None,
 ) -> FSInterface:
     """
     Create local file handler.

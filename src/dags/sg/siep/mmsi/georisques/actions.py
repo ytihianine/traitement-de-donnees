@@ -1,30 +1,28 @@
 import logging
-from typing import Optional
 
+import pandas as pd
 from tenacity import (
+    before_sleep_log,
     retry,
-    stop_after_attempt,
-    wait_exponential,
     retry_if_exception,
     retry_if_result,
-    before_sleep_log,
+    stop_after_attempt,
+    wait_exponential,
 )
-from src.infra.http_client.types import HTTPResponse
-import pandas as pd
 
-from src.infra.database.factory import create_db_handler
-from src.infra.http_client.factory import create_http_client
-from src.infra.http_client.base import HttpInterface
-from src.infra.http_client.config import ClientConfig
-from src.infra.http_client.exceptions import HTTPClientError
-from src.utils.config.dag_params import get_db_info
 from src._enums.http import HttpHandlerType
-from src.constants import AGENT, PROXY, DEFAULT_PG_DATA_CONN_ID
-
+from src.constants import AGENT, DEFAULT_PG_DATA_CONN_ID, PROXY
 from src.dags.sg.siep.mmsi.georisques.process import (
     format_query_param,
     format_risque_results,
 )
+from src.infra.database.factory import create_db_handler
+from src.infra.http_client.base import HttpInterface
+from src.infra.http_client.config import ClientConfig
+from src.infra.http_client.exceptions import HTTPClientError
+from src.infra.http_client.factory import create_http_client
+from src.infra.http_client.types import HTTPResponse
+from src.utils.config.dag_params import get_db_info
 
 logger = logging.getLogger(name=__name__)
 
@@ -33,9 +31,7 @@ def get_bien_from_db(context: dict) -> pd.DataFrame:
     # Hook & config
     db_handler = create_db_handler(connection_id=DEFAULT_PG_DATA_CONN_ID)
     schema = get_db_info(context=context).prod_schema
-    snapshot_id = context["ti"].xcom_pull(
-        key="return_value", task_ids="get_projet_snapshot"
-    )
+    snapshot_id = context["ti"].xcom_pull(key="return_value", task_ids="get_projet_snapshot")
     logging.info(msg=f"Snapshot ID récupéré : {snapshot_id}")
 
     # Retrieve data
@@ -63,7 +59,7 @@ def get_bien_from_db(context: dict) -> pd.DataFrame:
     return df
 
 
-def _should_retry_response(response: Optional[HTTPResponse]) -> bool:
+def _should_retry_response(response: HTTPResponse | None) -> bool:
     """Determine if response should trigger a retry."""
     if response is None:
         return True
@@ -85,16 +81,11 @@ def _should_retry_exception(exception: BaseException) -> bool:
 @retry(
     stop=stop_after_attempt(max_attempt_number=30),
     wait=wait_exponential(multiplier=1, min=1, max=30),
-    retry=(
-        retry_if_exception(predicate=_should_retry_exception)
-        | retry_if_result(predicate=_should_retry_response)
-    ),
+    retry=(retry_if_exception(predicate=_should_retry_exception) | retry_if_result(predicate=_should_retry_response)),
     before_sleep=before_sleep_log(logger, log_level=logging.WARNING),
     reraise=False,
 )
-def get_risque(
-    http_client: HttpInterface, url: str, query_param: str
-) -> Optional[HTTPResponse]:
+def get_risque(http_client: HttpInterface, url: str, query_param: str) -> HTTPResponse | None:
     """
     Effectue une requête avec retry en cas d'erreur.
 
@@ -107,9 +98,7 @@ def get_risque(
         HTTPResponse ou None en cas d'échec après tous les retries
     """
     full_url = f"{url}?{query_param}"
-    response = http_client.get(
-        endpoint=full_url, timeout=180, check_response_statut=False
-    )
+    response = http_client.get(endpoint=full_url, timeout=180, check_response_statut=False)
 
     # Return response if successful (200) or non-retryable error
     if response and response.status_code == 200:
@@ -131,9 +120,7 @@ def get_risque(
 def get_georisques(df: pd.DataFrame) -> pd.DataFrame:
     # Http client
     http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
-    http_internet_client = create_http_client(
-        client_type=HttpHandlerType.REQUEST, config=http_config
-    )
+    http_internet_client = create_http_client(client_type=HttpHandlerType.REQUEST, config=http_config)
 
     # Get result from API
     api_host = "https://georisques.gouv.fr"
@@ -152,13 +139,9 @@ def get_georisques(df: pd.DataFrame) -> pd.DataFrame:
 
         api_response = None
         if query_param:
-            api_response = get_risque(
-                http_client=http_internet_client, url=url, query_param=query_param
-            )
+            api_response = get_risque(http_client=http_internet_client, url=url, query_param=query_param)
 
-        formated_risques = format_risque_results(
-            code_bat_ter=row.code_bat_ter, api_response=api_response
-        )
+        formated_risques = format_risque_results(code_bat_ter=row.code_bat_ter, api_response=api_response)
         logging.info(msg=formated_risques)
         risques_results.extend(formated_risques)
 

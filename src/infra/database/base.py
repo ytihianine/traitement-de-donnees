@@ -1,7 +1,7 @@
 """Base database handler interface and types."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 
@@ -18,50 +18,42 @@ class DBInterface(ABC):
     def get_conn(self) -> Any: ...
 
     @abstractmethod
-    def execute(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> None:
+    def execute(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> None:
         """Execute a query without returning results."""
         pass
 
     @abstractmethod
-    def fetch_one(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> Optional[Dict[str, Any]]:
+    def fetch_one(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> dict[str, Any] | None:
         """Fetch a single row as a dictionary."""
         pass
 
     @abstractmethod
-    def fetch_all(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> List[Dict[str, Any]]:
+    def fetch_all(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Fetch all rows as a list of dictionaries."""
         pass
 
     @abstractmethod
-    def fetch_df(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> pd.DataFrame:
+    def fetch_df(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> pd.DataFrame:
         """Fetch results as a pandas DataFrame."""
         pass
 
     @abstractmethod
-    def insert(self, table: str, data: Dict[str, Any]) -> None:
+    def insert(self, table: str, data: dict[str, Any]) -> None:
         """Insert a single row into a table."""
         pass
 
     @abstractmethod
-    def bulk_insert(self, table: str, data: List[Dict[str, Any]]) -> None:
+    def bulk_insert(self, table: str, data: list[dict[str, Any]]) -> None:
         """Insert multiple rows into a table."""
         pass
 
     @abstractmethod
-    def update(self, table: str, data: Dict[str, Any], where: Dict[str, Any]) -> None:
+    def update(self, table: str, data: dict[str, Any], where: dict[str, Any]) -> None:
         """Update rows in a table."""
         pass
 
     @abstractmethod
-    def delete(self, table: str, where: Dict[str, Any]) -> None:
+    def delete(self, table: str, where: dict[str, Any]) -> None:
         """Delete rows from a table."""
         pass
 

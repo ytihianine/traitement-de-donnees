@@ -1,10 +1,11 @@
 import logging
+
 import pandas as pd
 
+from src.constants import NO_PROCESS_MSG
 from src.utils.process.structures import (
     convert_str_of_list_to_list,
 )
-from src.constants import NO_PROCESS_MSG
 
 
 # =============================================================
@@ -271,9 +272,7 @@ def process_questionnaire_2_typologie_interaction(df: pd.DataFrame) -> pd.DataFr
 
 def process_questionnaire_2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
     # Convertion
-    df = convert_str_of_list_to_list(
-        df=df, col_to_convert="id_formation_ia_suivie_post_expe_"
-    )
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_formation_ia_suivie_post_expe_")
     df = df.explode(column="id_formation_ia_suivie_post_expe_")
     df = df.dropna(subset=["id_formation_ia_suivie_post_expe_"])
     df = df.drop_duplicates()
@@ -283,9 +282,7 @@ def process_questionnaire_2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_questionnaire_2_participation(df: pd.DataFrame) -> pd.DataFrame:
     # Convertion
-    df = convert_str_of_list_to_list(
-        df=df, col_to_convert="id_participation_programme_rdv"
-    )
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_participation_programme_rdv")
     df = df.explode(column="id_participation_programme_rdv")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_participation_programme_rdv"])
@@ -316,9 +313,7 @@ def process_questionnaire_2_facteurs_progression(df: pd.DataFrame) -> pd.DataFra
 
 def process_questionnaire_2_taches(df: pd.DataFrame) -> pd.DataFrame:
     # Convertion
-    df = convert_str_of_list_to_list(
-        df=df, col_to_convert="id_taches_realisees_avec_ia"
-    )
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_taches_realisees_avec_ia")
     df = df.explode(column="id_taches_realisees_avec_ia")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_taches_realisees_avec_ia"])
@@ -328,9 +323,7 @@ def process_questionnaire_2_taches(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_questionnaire_2_typologie_erreurs(df: pd.DataFrame) -> pd.DataFrame:
     # Convertion
-    df = convert_str_of_list_to_list(
-        df=df, col_to_convert="id_types_d_erreurs_frequentes2"
-    )
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_types_d_erreurs_frequentes2")
     df = df.explode(column="id_types_d_erreurs_frequentes2")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_types_d_erreurs_frequentes2"])
@@ -340,9 +333,7 @@ def process_questionnaire_2_typologie_erreurs(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_questionnaire_2_impact_observe(df: pd.DataFrame) -> pd.DataFrame:
     # Convertion
-    df = convert_str_of_list_to_list(
-        df=df, col_to_convert="id_observations_des_impacts"
-    )
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_observations_des_impacts")
     df = df.explode(column="id_observations_des_impacts")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_observations_des_impacts"])
@@ -352,9 +343,7 @@ def process_questionnaire_2_impact_observe(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_questionnaire_2_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
     # Convertion
-    df = convert_str_of_list_to_list(
-        df=df, col_to_convert="id_impacts_identifies_au_travail"
-    )
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_impacts_identifies_au_travail")
     df = df.explode(column="id_impacts_identifies_au_travail")
     # Nettoyage des lignes vides
     df = df.dropna(subset=["id_impacts_identifies_au_travail"])
@@ -383,7 +372,7 @@ def process_questionnaire_2_bis_raisons_non_utilisation(
 
 
 # =============================================================
-# Processing du questionnaire 3 : Usages et ressentis face à l’Assistant IA, en fin de phase de test
+# Processing du questionnaire 3 : Usages et ressentis face à l'Assistant IA, en fin de phase de test
 # =============================================================
 def process_questionnaire_3(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop_duplicates(subset="no_id", keep="last")

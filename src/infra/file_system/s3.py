@@ -4,9 +4,9 @@ import io
 import logging
 import mimetypes
 from pathlib import Path
-from typing import Any, BinaryIO, List, Optional, Union
+from typing import Any, BinaryIO
 
-from .base import FSInterface, FileMetadata
+from .base import FileMetadata, FSInterface
 from .exceptions import FileHandlerError, FileNotFoundError
 
 
@@ -16,8 +16,8 @@ class S3FS(FSInterface):
     def __init__(
         self,
         bucket: str,
-        connection_id: Optional[str] = None,
-        client: Optional[Any] = None,
+        connection_id: str | None = None,
+        client: Any | None = None,
     ):
         """
         Initialize S3 file handler.
@@ -51,7 +51,7 @@ class S3FS(FSInterface):
             self._client = self._hook.get_conn()
         return self._client
 
-    def read(self, file_path: Union[str, Path], validate: bool = True) -> BinaryIO:
+    def read(self, file_path: str | Path, validate: bool = True) -> BinaryIO:
         """Read file from S3."""
         key = str(file_path)
         try:
@@ -73,9 +73,9 @@ class S3FS(FSInterface):
 
     def write(
         self,
-        file_path: Union[str, Path],
-        content: Union[str, bytes, BinaryIO],
-        content_type: Optional[str] = None,
+        file_path: str | Path,
+        content: str | bytes | BinaryIO,
+        content_type: str | None = None,
     ) -> None:
         """
         Write content to S3.
@@ -121,9 +121,7 @@ class S3FS(FSInterface):
                 ContentType=content_type,
             )
 
-            logging.info(
-                msg=f"Successfully wrote {key} with content type: {content_type}"
-            )
+            logging.info(msg=f"Successfully wrote {key} with content type: {content_type}")
 
         except Exception as e:
             raise FileHandlerError(f"Error writing file to S3: {key}") from e
@@ -132,7 +130,7 @@ class S3FS(FSInterface):
         key = str(file_path)
         self.client.delete_object(Bucket=self.bucket, Key=key)
 
-    def delete(self, file_path: Union[str, Path]) -> None:
+    def delete(self, file_path: str | Path) -> None:
         """Delete file from S3."""
         key = str(file_path)
         try:
@@ -140,7 +138,7 @@ class S3FS(FSInterface):
         except Exception as e:
             raise FileHandlerError(f"Error deleting file from S3: {key}") from e
 
-    def exists(self, file_path: Union[str, Path]) -> bool:
+    def exists(self, file_path: str | Path) -> bool:
         """Check if file exists in S3."""
         key = str(file_path)
         try:
@@ -149,7 +147,7 @@ class S3FS(FSInterface):
         except Exception:
             return False
 
-    def get_metadata(self, file_path: Union[str, Path]) -> FileMetadata:
+    def get_metadata(self, file_path: str | Path) -> FileMetadata:
         """Get S3 file metadata."""
         key = str(file_path)
         try:
@@ -162,8 +160,7 @@ class S3FS(FSInterface):
                 size=response["ContentLength"],
                 created_at=response["LastModified"],
                 modified_at=response["LastModified"],
-                mime_type=mime_type
-                or response.get("ContentType", "application/octet-stream"),
+                mime_type=mime_type or response.get("ContentType", "application/octet-stream"),
                 checksum=response["ETag"].strip('"'),
                 extra={
                     "storage_class": response.get("StorageClass"),
@@ -171,19 +168,15 @@ class S3FS(FSInterface):
                     "metadata": response.get("Metadata", {}),
                 },
             )
-        except self.client.exceptions.NoSuchKey:
-            raise FileNotFoundError(f"File not found in S3: {key}")
+        except self.client.exceptions.NoSuchKey as err:
+            raise FileNotFoundError(f"File not found in S3: {key}") from err
         except Exception as e:
             raise FileHandlerError(f"Error getting S3 metadata: {key}") from e
 
-    def list_files(
-        self, directory: Union[str, Path], pattern: Optional[str] = None
-    ) -> List[str]:
+    def list_files(self, directory: str | Path, pattern: str | None = None) -> list[str]:
         """List files in S3 directory."""
         prefix = str(directory).rstrip("/") + "/"
-        logging.info(
-            msg=f"Listing files in S3 directory: {prefix} with pattern: {pattern}"
-        )
+        logging.info(msg=f"Listing files in S3 directory: {prefix} with pattern: {pattern}")
         try:
             keys: list[str] = []
             paginator = self.client.get_paginator("list_objects_v2")
@@ -205,7 +198,7 @@ class S3FS(FSInterface):
         except Exception as e:
             raise FileHandlerError(f"Error listing S3 directory: {prefix}") from e
 
-    def move(self, source: Union[str, Path], destination: Union[str, Path]) -> None:
+    def move(self, source: str | Path, destination: str | Path) -> None:
         """Move/rename file in S3."""
         src_key = str(source)
         dst_key = str(destination)
@@ -223,11 +216,9 @@ class S3FS(FSInterface):
         except FileNotFoundError:
             raise
         except Exception as e:
-            raise FileHandlerError(
-                f"Error moving file in S3: {src_key} -> {dst_key}"
-            ) from e
+            raise FileHandlerError(f"Error moving file in S3: {src_key} -> {dst_key}") from e
 
-    def copy(self, source: Union[str, Path], destination: Union[str, Path]) -> None:
+    def copy(self, source: str | Path, destination: str | Path) -> None:
         """Copy file in S3."""
         src_key = str(source)
         dst_key = str(destination)
@@ -244,6 +235,4 @@ class S3FS(FSInterface):
         except FileNotFoundError:
             raise
         except Exception as e:
-            raise FileHandlerError(
-                f"Error copying file in S3: {src_key} -> {dst_key}"
-            ) from e
+            raise FileHandlerError(f"Error copying file in S3: {src_key} -> {dst_key}") from e

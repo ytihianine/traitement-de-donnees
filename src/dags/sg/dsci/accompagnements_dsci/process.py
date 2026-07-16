@@ -1,4 +1,5 @@
 import logging
+
 import pandas as pd
 
 from src.constants import NO_PROCESS_MSG
@@ -105,9 +106,7 @@ def process_accompagnement_dsci_typologie(df: pd.DataFrame) -> pd.DataFrame:
     df = df.explode(column="id_typologie")
     # Nettoyage de ligne vide
     df = df.dropna(subset=["id_typologie"])
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_accompagnement", "id_typologie"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_accompagnement", "id_typologie"]], index=False) % (2**63)
     return df
 
 
@@ -119,9 +118,7 @@ def process_accompagnement_dsci_equipe(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["id_equipe_s_dsci"])
 
     # Ajout colonne ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_accompagnement", "id_equipe_s_dsci"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_accompagnement", "id_equipe_s_dsci"]], index=False) % (2**63)
     return df
 
 
@@ -132,9 +129,7 @@ def process_accompagnement_dsci_porteur(df: pd.DataFrame) -> pd.DataFrame:
     # Nettoyage de ligne vide
     df = df.dropna(subset=["id_porteur_dsci"])
     # Ajout colonne ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_accompagnement", "id_porteur_dsci"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_accompagnement", "id_porteur_dsci"]], index=False) % (2**63)
     return df
 
 
@@ -177,16 +172,12 @@ def process_animateur_fac(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_animateur_fac_certification(df: pd.DataFrame) -> pd.DataFrame:
     # Convertion
-    df = convert_str_of_list_to_list(
-        df=df, col_to_convert="id_certifications_souhaitees"
-    )
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_certifications_souhaitees")
     df = df.explode(column="id_certifications_souhaitees")
     # Nettoyage de ligne vide
     df = df.dropna(subset=["id_certifications_souhaitees"])
     # Ajout colonne ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_animateur_fac", "id_certifications_souhaitees"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_animateur_fac", "id_certifications_souhaitees"]], index=False) % (2**63)
     return df
 
 
@@ -197,9 +188,7 @@ def process_animateur_fac_certification_valide(df: pd.DataFrame) -> pd.DataFrame
     # Nettoyage de ligne vide
     df = df.dropna(subset=["id_certifications_validees"])
     # Ajout colonne ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_animateur_fac", "id_certifications_validees"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_animateur_fac", "id_certifications_validees"]], index=False) % (2**63)
     return df
 
 
@@ -215,9 +204,7 @@ def process_pleniere_quest_inscription(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_pleniere_quest_satisfaction(df: pd.DataFrame) -> pd.DataFrame:
-    df["note_globale"] = pd.to_numeric(df["note_globale"], errors="coerce").astype(  # type: ignore
-        "Int64"
-    )
+    df["note_globale"] = pd.to_numeric(df["note_globale"], errors="coerce").astype("Int64")  # type: ignore
     # Gestion de doublons
     df = df.drop_duplicates(subset=["mail"], keep="last")
     return df
@@ -269,9 +256,7 @@ def process_formation_fac_envie_suite_quest_satisfaction(
     # Nettoyage des lignes vides
     df = df.dropna(subset=["envies_pour_la_suite"])
     # Ajout colonne ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_formation_fac", "envies_pour_la_suite"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_formation_fac", "envies_pour_la_suite"]], index=False) % (2**63)
 
     return df
 
@@ -289,9 +274,9 @@ def process_fac_hors_bercylab_quest_type_accompagnement(
     #  Nettoyage
     df = df.dropna(subset=["type_d_accompagnement"])
     # Ajout colonne ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_formation_fac_hors_bercylab", "type_d_accompagnement"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_formation_fac_hors_bercylab", "type_d_accompagnement"]], index=False) % (
+        2**63
+    )
 
     return df
 
@@ -304,9 +289,7 @@ def process_fac_hors_bercylab_quest_accompagnement_partiicipants(
     #  Nettoyage
     df = df.dropna(subset=["participants"])
     # Ajout colonne ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_formation_fac_hors_bercylab", "participants"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_formation_fac_hors_bercylab", "participants"]], index=False) % (2**63)
 
     return df
 
@@ -320,9 +303,7 @@ def process_fac_hors_bercylab_quest_accompagnement_facilitateurs(
     #  Nettoyage
     df = df.dropna(subset=["id_facilitateurs"])
     # Ajout colonne ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_formation_fac_hors_bercylab", "id_facilitateurs"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_formation_fac_hors_bercylab", "id_facilitateurs"]], index=False) % (2**63)
 
     return df
 
@@ -332,9 +313,7 @@ def process_fac_hors_bercylab_quest_accompagnement_facilitateurs(
 # =======================================================
 def process_accompagnement_cci_opportunite(df: pd.DataFrame) -> pd.DataFrame:
     # securité pour les saisies manuelles sans passer par la reference
-    df["id_accompagnement"] = pd.to_numeric(
-        arg=df["id_accompagnement"], errors="coerce"
-    )
+    df["id_accompagnement"] = pd.to_numeric(arg=df["id_accompagnement"], errors="coerce")
 
     return df
 
@@ -384,9 +363,7 @@ def process_correspondant_profil(df: pd.DataFrame) -> pd.DataFrame:
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_type_de_correspondant")
     df = df.explode(column="id_type_de_correspondant")
     # Ajout colonne ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_correspondant", "id_type_de_correspondant"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_correspondant", "id_type_de_correspondant"]], index=False) % (2**63)
 
     return df
 
@@ -396,9 +373,7 @@ def process_correspondant_competence_particuliere(df: pd.DataFrame) -> pd.DataFr
     df = convert_str_of_list_to_list(df=df, col_to_convert="id_competence_particuliere")
     df = df.explode(column="id_competence_particuliere")
     # Ajout colonne ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_correspondant", "id_competence_particuliere"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_correspondant", "id_competence_particuliere"]], index=False) % (2**63)
 
     return df
 
@@ -410,8 +385,6 @@ def process_correspondant_connaissance_communaute(df: pd.DataFrame) -> pd.DataFr
     # Nettoyage de ligne vide
     df = df.dropna(subset=["connaissance_communaute"])
     # Ajout colonne ID unique
-    df["id"] = pd.util.hash_pandas_object(
-        obj=df[["id_correspondant", "connaissance_communaute"]], index=False
-    ) % (2**63)
+    df["id"] = pd.util.hash_pandas_object(obj=df[["id_correspondant", "connaissance_communaute"]], index=False) % (2**63)
 
     return df

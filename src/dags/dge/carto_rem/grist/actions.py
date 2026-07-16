@@ -1,19 +1,19 @@
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
+
 import pandas as pd
 from airflow.sdk import Variable
 
-from src.infra.http_client.adapters import RequestsClient
-from src.infra.http_client.config import ClientConfig
-
-from src.infra.grist.client import GristAPI
 from src.constants import (
     AGENT,
     DEFAULT_GRIST_HOST,
     DEFAULT_PG_DATA_CONN_ID,
     PROXY,
 )
-
 from src.infra.database.factory import create_db_handler
+from src.infra.grist.client import GristAPI
+from src.infra.http_client.adapters import RequestsClient
+from src.infra.http_client.config import ClientConfig
 from src.utils.config.dag_params import get_db_info, get_project_name
 from src.utils.config.tasks import get_selecteur_storage_info
 
@@ -52,9 +52,7 @@ def load_agent(
 ) -> None:
     # Get Grist doc_id
     nom_projet = get_project_name(context=context)
-    grist_doc_info = get_selecteur_storage_info(
-        nom_projet=nom_projet, selecteur=grist_doc_selecteur
-    )
+    grist_doc_info = get_selecteur_storage_info(nom_projet=nom_projet, selecteur=grist_doc_selecteur)
 
     # Merge pour comparer
     df = pd.merge(

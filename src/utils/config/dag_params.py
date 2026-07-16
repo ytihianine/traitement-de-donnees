@@ -1,16 +1,19 @@
 import logging
+from collections.abc import Mapping
 from dataclasses import asdict
 from datetime import datetime, timedelta
-from typing import Any, Mapping
+from typing import Any
 
 import pendulum
+import pytz
+
+from src._enums.dags import FeatureFlags
 from src._types.dags import (
-    DBParams,
     DagParams,
     DagStatus,
+    DBParams,
     FeatureFlagsEnable,
 )
-from src._enums.dags import FeatureFlags
 from src.constants import (
     FF_CONVERT_DISABLED_MSG,
     FF_DB_DISABLED_MSG,
@@ -18,7 +21,6 @@ from src.constants import (
     FF_MAIL_DISABLED_MSG,
     FF_S3_DISABLED_MSG,
 )
-import pytz
 
 _FF_DISABLED_MESSAGES: dict[FeatureFlags, str] = {
     FeatureFlags.DB: FF_DB_DISABLED_MSG,
@@ -50,9 +52,7 @@ def get_dag_status(context: Mapping[str, Any]) -> DagStatus:
     return DagStatus(value=dag_status)
 
 
-def get_execution_date(
-    context: Mapping[str, Any], use_tz: bool = False, tz_zone: str = "Europe/Paris"
-) -> datetime:
+def get_execution_date(context: Mapping[str, Any], use_tz: bool = False, tz_zone: str = "Europe/Paris") -> datetime:
     """Extract and validate execution date from context."""
     execution_date = context.get("data_interval_start")
 
@@ -63,10 +63,8 @@ def get_execution_date(
         try:
             tz = pytz.timezone(zone=tz_zone)
             execution_date = execution_date.astimezone(tz=tz)
-        except pytz.UnknownTimeZoneError:
-            raise ValueError(
-                f"Invalid timezone: {tz_zone}. Must be a valid IANA timezone."
-            )
+        except pytz.UnknownTimeZoneError as err:
+            raise ValueError(f"Invalid timezone: {tz_zone}. Must be a valid IANA timezone.") from err
 
     return execution_date
 
@@ -126,9 +124,7 @@ def should_skip_task(
     return False
 
 
-def create_default_args(
-    retries: int = 0, retry_delay: timedelta | None = None, **kwargs
-) -> dict:
+def create_default_args(retries: int = 0, retry_delay: timedelta | None = None, **kwargs) -> dict:
     """Create standard default_args for src.dags."""
     args = {
         "owner": DEFAULT_OWNER,

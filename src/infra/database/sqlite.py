@@ -3,7 +3,7 @@
 import logging
 import sqlite3
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 
@@ -22,7 +22,7 @@ class SQLiteAdapter(DBInterface):
             connection_id: Path to SQLite database file. Defaults to in-memory.
         """
         self.db_path = connection_id
-        self._conn: Optional[sqlite3.Connection] = None
+        self._conn: sqlite3.Connection | None = None
 
     @property
     def conn(self) -> sqlite3.Connection:
@@ -32,7 +32,7 @@ class SQLiteAdapter(DBInterface):
                 self._conn = sqlite3.connect(self.db_path)
                 self._conn.row_factory = sqlite3.Row  # enables dict-like access
             except Exception as e:
-                raise DatabaseError(f"Error connecting to SQLite DB: {str(e)}") from e
+                raise DatabaseError(f"Error connecting to SQLite DB: {e!s}") from e
         return self._conn
 
     def get_uri(self) -> str:
@@ -42,9 +42,7 @@ class SQLiteAdapter(DBInterface):
     def get_conn(self) -> Any:
         return self.conn
 
-    def execute(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> None:
+    def execute(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> None:
         """Execute a query without returning results."""
         try:
             start_time = time.time()
@@ -53,11 +51,9 @@ class SQLiteAdapter(DBInterface):
             self.conn.commit()
             logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
         except Exception as e:
-            raise DatabaseError(f"Error executing query: {str(e)}") from e
+            raise DatabaseError(f"Error executing query: {e!s}") from e
 
-    def fetch_one(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> Optional[Dict[str, Any]]:
+    def fetch_one(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> dict[str, Any] | None:
         """Fetch a single row as a dictionary."""
         try:
             start_time = time.time()
@@ -67,11 +63,9 @@ class SQLiteAdapter(DBInterface):
             logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
             return dict(row) if row else None
         except Exception as e:
-            raise DatabaseError(f"Error fetching row: {str(e)}") from e
+            raise DatabaseError(f"Error fetching row: {e!s}") from e
 
-    def fetch_all(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> List[Dict[str, Any]]:
+    def fetch_all(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Fetch all rows as a list of dictionaries."""
         try:
             start_time = time.time()
@@ -81,11 +75,9 @@ class SQLiteAdapter(DBInterface):
             logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
             return [dict(row) for row in rows]
         except Exception as e:
-            raise DatabaseError(f"Error fetching rows: {str(e)}") from e
+            raise DatabaseError(f"Error fetching rows: {e!s}") from e
 
-    def fetch_df(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> pd.DataFrame:
+    def fetch_df(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> pd.DataFrame:
         """Fetch results as a pandas DataFrame."""
         try:
             start_time = time.time()
@@ -93,9 +85,9 @@ class SQLiteAdapter(DBInterface):
             logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
             return df
         except Exception as e:
-            raise DatabaseError(f"Error fetching DataFrame: {str(e)}") from e
+            raise DatabaseError(f"Error fetching DataFrame: {e!s}") from e
 
-    def insert(self, table: str, data: Dict[str, Any]) -> None:
+    def insert(self, table: str, data: dict[str, Any]) -> None:
         """Insert a single row into a table."""
         columns = list(data.keys())
         values = list(data.values())
@@ -107,7 +99,7 @@ class SQLiteAdapter(DBInterface):
         """
         self.execute(query, tuple(values))
 
-    def bulk_insert(self, table: str, data: List[Dict[str, Any]]) -> None:
+    def bulk_insert(self, table: str, data: list[dict[str, Any]]) -> None:
         """Insert multiple rows into a table."""
         if not data:
             return
@@ -128,12 +120,12 @@ class SQLiteAdapter(DBInterface):
             self.conn.commit()
             logging.debug(f"Bulk insert executed in {time.time() - start_time:.2f}s")
         except Exception as e:
-            raise DatabaseError(f"Error during bulk insert: {str(e)}") from e
+            raise DatabaseError(f"Error during bulk insert: {e!s}") from e
 
-    def update(self, table: str, data: Dict[str, Any], where: Dict[str, Any]) -> None:
+    def update(self, table: str, data: dict[str, Any], where: dict[str, Any]) -> None:
         """Update rows in a table."""
-        set_clause = ", ".join([f"{k} = ?" for k in data.keys()])
-        where_clause = " AND ".join([f"{k} = ?" for k in where.keys()])
+        set_clause = ", ".join([f"{k} = ?" for k in data])
+        where_clause = " AND ".join([f"{k} = ?" for k in where])
 
         query = f"""
             UPDATE {table}
@@ -144,9 +136,9 @@ class SQLiteAdapter(DBInterface):
         parameters = tuple(data.values()) + tuple(where.values())
         self.execute(query, parameters)
 
-    def delete(self, table: str, where: Dict[str, Any]) -> None:
+    def delete(self, table: str, where: dict[str, Any]) -> None:
         """Delete rows from a table."""
-        where_clause = " AND ".join([f"{k} = ?" for k in where.keys()])
+        where_clause = " AND ".join([f"{k} = ?" for k in where])
 
         query = f"""
             DELETE FROM {table}
@@ -177,10 +169,10 @@ class SQLiteAdapter(DBInterface):
         """
         try:
             start_time = time.time()
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, encoding="utf-8") as f:
                 for line in f:
                     self.conn.execute(line.strip())
             self.conn.commit()
             logging.debug(f"File load executed in {time.time() - start_time:.2f}s")
         except Exception as e:
-            raise DatabaseError(f"Error during file load: {str(e)}") from e
+            raise DatabaseError(f"Error during file load: {e!s}") from e

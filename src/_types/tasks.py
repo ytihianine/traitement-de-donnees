@@ -1,11 +1,12 @@
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
 import logging
-from typing import Any, Callable
+from abc import ABC, abstractmethod
+from collections.abc import Callable
+from dataclasses import dataclass, field
 from datetime import datetime
-import pandas as pd
+from typing import Any
 
-from airflow.sdk import task, XComArg
+import pandas as pd
+from airflow.sdk import XComArg, task
 
 from src._types.dags import TaskConfig
 from src._types.projet import SelecteurConfig
@@ -75,10 +76,7 @@ class RuntimeContext:
 
         raw_selecteurs = context["ti"].xcom_pull(task_ids=selecteur_config_task_id)
         if not raw_selecteurs:
-            raise ValueError(
-                "No selecteur config found in XCom for "
-                f"task_id='{selecteur_config_task_id}'"
-            )
+            raise ValueError("No selecteur config found in XCom for " f"task_id='{selecteur_config_task_id}'")
 
         selecteurs = {}
         for raw_selecteur in raw_selecteurs:
@@ -130,8 +128,7 @@ class ETLTask(ABC):
 
         if self.target not in runtime.selecteurs:
             raise ValueError(
-                f"Target '{self.target}' not found in runtime selecteurs. "
-                f"Available: {list(runtime.selecteurs.keys())}"
+                f"Target '{self.target}' not found in runtime selecteurs. " f"Available: {list(runtime.selecteurs.keys())}"
             )
         target_selecteur = runtime.selecteurs[self.target]
 
@@ -146,10 +143,7 @@ class ETLTask(ABC):
             data_context = step(data_context)
 
         if self.target not in data_context.datasets:
-            raise ValueError(
-                f"Target '{self.target}' not found. "
-                f"Available: {list(data_context.datasets.keys())}"
-            )
+            raise ValueError(f"Target '{self.target}' not found. " f"Available: {list(data_context.datasets.keys())}")
 
         # extract output
         output_df = data_context.get(self.target)

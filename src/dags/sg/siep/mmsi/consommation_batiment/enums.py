@@ -1,14 +1,14 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class Statuts(str, Enum):
+class Statuts(StrEnum):
     debut_exp = "DEBUT EXP"
     fin_exp = "FIN EXP"
     incomplet = "INCOMPLET"
     complet = "COMPLET"
 
 
-class TypeEnergie(str, Enum):
+class TypeEnergie(StrEnum):
     electricite = "électricité"
     gaz = "gaz"
     fioul = "fioul"

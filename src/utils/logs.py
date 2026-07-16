@@ -1,13 +1,12 @@
 import logging
+
 import pandas as pd
 
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", 1000)
 
 
-def df_info(
-    df: pd.DataFrame, df_name: str, sample_size=5, full_logs: bool = True
-) -> None:
+def df_info(df: pd.DataFrame, df_name: str, sample_size=5, full_logs: bool = True) -> None:
     """
     Print important information about a Pandas DataFrame.
 
@@ -17,9 +16,7 @@ def df_info(
         sample_size (int): Number of rows to show as a sample (default is 5).
     """
     if not isinstance(df, pd.DataFrame):
-        logging.warning(
-            msg=f"{df_name} is not of type pd.DataFrame. It is of type {type(df)}"
-        )
+        logging.warning(msg=f"{df_name} is not of type pd.DataFrame. It is of type {type(df)}")
         return
 
     col_names = list(df.columns)
@@ -27,10 +24,7 @@ def df_info(
     if nb_none > 0:
         logging.info(msg=f"Warning: {nb_none} None values are in df column names !!")
     col_str_format = "\n".join(
-        [
-            ", ".join(str(col_name) for col_name in col_names[i : i + 5])
-            for i in range(0, len(col_names), 5)
-        ]
+        [", ".join(str(col_name) for col_name in col_names[i : i + 5]) for i in range(0, len(col_names), 5)]
     )
 
     if full_logs:

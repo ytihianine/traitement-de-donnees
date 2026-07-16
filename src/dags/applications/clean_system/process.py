@@ -1,14 +1,11 @@
 import re
 from datetime import datetime, timedelta
-from typing import Optional
 
 import pandas as pd
 
 
 def is_file_to_delete(s3_object_date, date_to_compare) -> bool:
-    if s3_object_date < date_to_compare:
-        return True
-    return False
+    return s3_object_date < date_to_compare
 
 
 def check_date_format(s3_date: str) -> bool:
@@ -29,7 +26,7 @@ def check_hour_format(s3_hour: str) -> bool:
     return False
 
 
-def safe_parse_date(date_str: str, is_date_format: bool) -> Optional[datetime]:
+def safe_parse_date(date_str: str, is_date_format: bool) -> datetime | None:
     if is_date_format:
         return datetime.strptime(date_str, "%Y%m%d")
     return None
@@ -60,8 +57,6 @@ def categorize_keys(df: pd.DataFrame) -> pd.DataFrame:
 
     # Step 3: Compare date to the max per group
     df_filtered = df_filtered.merge(max_dates, on=["year", "month"], how="left")
-    df_filtered["is_latest_in_month"] = (
-        df_filtered["date"] == df_filtered["max_month_date"]
-    )
+    df_filtered["is_latest_in_month"] = df_filtered["date"] == df_filtered["max_month_date"]
 
     return df_filtered

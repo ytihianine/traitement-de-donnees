@@ -1,22 +1,20 @@
-import logging
-import pandas as pd
-from typing import Union
 import datetime
+import logging
+
+import pandas as pd
 
 from src.constants import NO_PROCESS_MSG
 
 
-def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:
+def generate_date(year: int, semester: str) -> datetime.datetime | None:
     semester_values = {"S1": 6, "Total": 12}
 
     if year is None or semester is None:
         logging.info(msg="Either year or semester value is None.")
         return None
 
-    if semester not in semester_values.keys():
-        logging.info(
-            msg=f"Invalid semester value: {semester}. Must be one of {list(semester_values.keys())}"
-        )
+    if semester not in semester_values:
+        logging.info(msg=f"Invalid semester value: {semester}. Must be one of {list(semester_values.keys())}")
         return None
 
     try:
@@ -152,9 +150,7 @@ def process_taux_participation(df: pd.DataFrame) -> pd.DataFrame:
 
     # Ajouter un id
     df_unpivoted["annee"] = df_unpivoted["annee"].str.replace("c", "", regex=False)
-    df_unpivoted["id"] = (
-        df_unpivoted.sort_values(by=["annee", "tri"]).reset_index(drop=True).index
-    )
+    df_unpivoted["id"] = df_unpivoted.sort_values(by=["annee", "tri"]).reset_index(drop=True).index
     return df_unpivoted
 
 

@@ -1,17 +1,18 @@
+import json
 import os
-from pathlib import Path
 import sqlite3
 from datetime import datetime
-import pandas as pd
+from pathlib import Path
+
 import numpy as np
-import json
+import pandas as pd
 import psycopg2
-from psycopg2.extensions import register_adapter, AsIs
+from psycopg2.extensions import AsIs, register_adapter
 from psycopg2.extras import execute_values
 
-from src.utils.process.structures import normalize_grist_dataframe
-from src.utils.logs import df_info
 from src.dags.applications.configuration_projets import process
+from src.utils.logs import df_info
+from src.utils.process.structures import normalize_grist_dataframe
 
 # Enregistrer l'adaptateur pour les entiers numpy
 register_adapter(typ=np.int64, callable=AsIs)
@@ -98,9 +99,7 @@ def process_table(
     fetch_query = f"SELECT * FROM {schema}.{tbl_desc['tbl_name']} LIMIT 0;"
     pg_cur.execute(query=fetch_query)
     if pg_cur.description:
-        sorted_cols = sorted(
-            [col.name for col in pg_cur.description if col.name in df.columns]
-        )
+        sorted_cols = sorted([col.name for col in pg_cur.description if col.name in df.columns])
         print(sorted_cols)
 
         insert_records = df[sorted_cols].to_records(index=False).tolist()
@@ -121,7 +120,7 @@ if __name__ == "__main__":
     config_path = Path(dir, "config.json")
 
     # Load config
-    with open(file=config_path, mode="r") as f:
+    with open(file=config_path) as f:
         config = json.load(fp=f)
 
     # Variables

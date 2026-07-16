@@ -16,9 +16,7 @@ class TestPgAdapterInit:
         assert adapter._use_airflow is True
 
     def test_init_with_local_params(self) -> None:
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="pass"
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="pass")
         assert adapter._use_airflow is False
         assert adapter._local_params["host"] == "localhost"
         assert adapter._local_params["port"] == 5432
@@ -34,9 +32,7 @@ class TestPgAdapterInit:
 
 class TestPgAdapterGetUri:
     def test_get_uri_local_masks_password(self) -> None:
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="secret"
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="secret")
         uri = adapter.get_uri()
         assert "****" in uri
         assert "secret" not in uri
@@ -45,9 +41,7 @@ class TestPgAdapterGetUri:
 
 class TestPgAdapterHook:
     def test_hook_raises_in_local_mode(self) -> None:
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="pass"
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="pass")
         with pytest.raises(RuntimeError, match="not available in local mode"):
             _ = adapter.hook
 
@@ -63,9 +57,7 @@ class TestPgAdapterExecute:
         mock_conn.cursor.return_value.__exit__ = MagicMock(return_value=False)
         mock_psycopg2.connect.return_value = mock_conn
 
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="pass"
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="pass")
         adapter.execute("SELECT 1")
 
         mock_cursor.execute.assert_called_once_with("SELECT 1", None)
@@ -75,9 +67,7 @@ class TestPgAdapterExecute:
     def test_execute_raises_database_error(self, mock_psycopg2: MagicMock) -> None:
         mock_psycopg2.connect.side_effect = Exception("connection failed")
 
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="pass"
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="pass")
         with pytest.raises(DatabaseError):
             adapter.execute("SELECT 1")
 
@@ -95,9 +85,7 @@ class TestPgAdapterFetchOne:
         mock_conn.cursor.return_value.__exit__ = MagicMock(return_value=False)
         mock_psycopg2.connect.return_value = mock_conn
 
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="pass"
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="pass")
         result = adapter.fetch_one("SELECT * FROM users WHERE id = 1")
         assert result == {"id": 1, "name": "Alice"}
 
@@ -113,9 +101,7 @@ class TestPgAdapterFetchOne:
         mock_conn.cursor.return_value.__exit__ = MagicMock(return_value=False)
         mock_psycopg2.connect.return_value = mock_conn
 
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="pass"
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="pass")
         result = adapter.fetch_one("SELECT * FROM users WHERE id = 999")
         assert result is None
 
@@ -133,9 +119,7 @@ class TestPgAdapterFetchAll:
         mock_conn.cursor.return_value.__exit__ = MagicMock(return_value=False)
         mock_psycopg2.connect.return_value = mock_conn
 
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="pass"
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="pass")
         results = adapter.fetch_all("SELECT * FROM users")
         assert len(results) == 2
         assert results[0] == {"id": 1, "name": "Alice"}
@@ -144,15 +128,11 @@ class TestPgAdapterFetchAll:
 class TestPgAdapterFetchDf:
     @patch("src.infra.database.postgres.pd.read_sql")
     @patch("src.infra.database.postgres.create_engine")
-    def test_fetch_df_local_mode(
-        self, mock_engine: MagicMock, mock_read_sql: MagicMock
-    ) -> None:
+    def test_fetch_df_local_mode(self, mock_engine: MagicMock, mock_read_sql: MagicMock) -> None:
         expected_df = pd.DataFrame({"id": [1], "name": ["Alice"]})
         mock_read_sql.return_value = expected_df
 
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="pass"
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="pass")
         df = adapter.fetch_df("SELECT * FROM users")
         assert len(df) == 1
         mock_read_sql.assert_called_once()
@@ -161,9 +141,7 @@ class TestPgAdapterFetchDf:
 class TestPgAdapterInsert:
     @patch.object(PgAdapter, "execute")
     def test_insert_calls_execute(self, mock_execute: MagicMock) -> None:
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="pass"
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="pass")
         adapter.insert("users", {"id": 1, "name": "Alice"})
         mock_execute.assert_called_once()
         call_args = mock_execute.call_args
@@ -173,9 +151,7 @@ class TestPgAdapterInsert:
 class TestPgAdapterBulkInsert:
     @patch("src.infra.database.postgres.psycopg2")
     def test_bulk_insert_empty_list(self, mock_psycopg2: MagicMock) -> None:
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="pass"
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="pass")
         adapter.bulk_insert("users", [])  # should return early
 
     @patch("src.infra.database.postgres.psycopg2")
@@ -188,10 +164,6 @@ class TestPgAdapterBulkInsert:
         mock_conn.cursor.return_value.__exit__ = MagicMock(return_value=False)
         mock_psycopg2.connect.return_value = mock_conn
 
-        adapter = PgAdapter(
-            host="localhost", dbname="testdb", user="user", password="pass"
-        )
-        adapter.bulk_insert(
-            "users", [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]
-        )
+        adapter = PgAdapter(host="localhost", dbname="testdb", user="user", password="pass")
+        adapter.bulk_insert("users", [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}])
         mock_cursor.executemany.assert_called_once()

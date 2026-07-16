@@ -1,7 +1,8 @@
 import logging
-import pandas as pd
-import numpy as np
 from typing import Any
+
+import numpy as np
+import pandas as pd
 
 
 def split_declaration_and_adresse_efa(declarations: list) -> tuple[list, list]:
@@ -9,10 +10,7 @@ def split_declaration_and_adresse_efa(declarations: list) -> tuple[list, list]:
     rows_adresse_efa = []
 
     for declaration in declarations:
-        rows_adresse_efa.append(
-            declaration.pop("adresseEfa", None)
-            | {"idOccupantEfa": declaration["idOccupantEfa"]}
-        )
+        rows_adresse_efa.append(declaration.pop("adresseEfa", None) | {"idOccupantEfa": declaration["idOccupantEfa"]})
         rows_declaration.append(declaration)
 
     return rows_declaration, rows_adresse_efa
@@ -199,9 +197,7 @@ def process_detail_conso(raw_data: list[dict[str, Any]]) -> pd.DataFrame:
     df = df.rename(columns=colnames_mapping)
 
     # Convertir les données au bon format
-    df["date_debut_conso_reference"] = pd.to_datetime(
-        df["date_debut_conso_reference"], format="%d/%m/%Y"
-    )
+    df["date_debut_conso_reference"] = pd.to_datetime(df["date_debut_conso_reference"], format="%d/%m/%Y")
     default_cols = list(colnames_mapping.values())
     cols_to_convert = [
         col
@@ -279,9 +275,7 @@ def process_detail_conso_activite(raw_data: list[dict[str, Any]]) -> pd.DataFram
     df["dateDebutActivite"] = pd.to_datetime(df["dateFinActivite"], format="%d/%m/%Y")
     df["dateFinActivite"] = pd.to_datetime(df["dateFinActivite"], format="%d/%m/%Y")
     df["surfacePlancherM2"] = df["surfacePlancherM2"].str.replace(",", ".")
-    df["surfacePlancherM2"] = pd.to_numeric(
-        df["surfacePlancherM2"], downcast="float", errors="coerce"
-    )
+    df["surfacePlancherM2"] = pd.to_numeric(df["surfacePlancherM2"], downcast="float", errors="coerce")
     df = df.rename(columns=colnames_mapping)
 
     return df
@@ -291,9 +285,8 @@ def process_detail_conso_indicateur(raw_data: list[dict[str, Any]]) -> pd.DataFr
     max_num = max(
         [
             int(key.replace("nomIndicateur", ""))
-            for key in raw_data[0].keys()
-            if key.startswith("nomIndicateur")
-            and key.replace("nomIndicateur", "").isdigit()
+            for key in raw_data[0]
+            if key.startswith("nomIndicateur") and key.replace("nomIndicateur", "").isdigit()
         ]
     )
 

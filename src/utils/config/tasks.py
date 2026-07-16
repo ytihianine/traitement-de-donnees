@@ -1,31 +1,30 @@
 """Functions for retrieving and managing project configurations."""
 
-from collections.abc import Mapping
 import logging
-from typing import List
+from collections.abc import Mapping
 
+import pandas as pd
 from tenacity import (
+    before_sleep_log,
     retry,
+    retry_if_exception_type,
     stop_after_attempt,
     wait_exponential,
-    retry_if_exception_type,
-    before_sleep_log,
 )
-import pandas as pd
 
 from src._types.projet import (
     Contact,
     Documentation,
     ProjetS3,
+    SelecteurConfig,
     SelecteurStorageInfo,
     SelecteurStorageOptions,
-    SelecteurConfig,
 )
-from src.utils.exceptions import ConfigError
+from src.constants import DEFAULT_PG_DATA_CONN_ID
 from src.infra.database.base import DBInterface
 from src.infra.database.exceptions import DatabaseError
 from src.infra.database.factory import create_db_handler
-from src.constants import DEFAULT_PG_DATA_CONN_ID
+from src.utils.exceptions import ConfigError
 
 CONF_SCHEMA = "conf_projets"
 logger = logging.getLogger(name=__name__)
@@ -40,9 +39,7 @@ def _get_db(db: DBInterface | None = None) -> DBInterface:
 
 # Configuration du retry decorator
 db_retry = retry(
-    retry=retry_if_exception_type(
-        exception_types=(ConnectionError, TimeoutError, DatabaseError, OSError)
-    ),
+    retry=retry_if_exception_type(exception_types=(ConnectionError, TimeoutError, DatabaseError, OSError)),
     stop=stop_after_attempt(max_attempt_number=3),
     wait=wait_exponential(multiplier=1, min=2, max=10),
     before_sleep=before_sleep_log(logger, log_level=logging.WARNING),
@@ -76,9 +73,7 @@ def column_mapping_dataframe(
     return df
 
 
-def column_mapping_dict(
-    df_cols_map: pd.DataFrame, selecteur: str | None = None
-) -> dict:
+def column_mapping_dict(df_cols_map: pd.DataFrame, selecteur: str | None = None) -> dict:
     logger.debug("Colonnes du dataframe de mapping: %s", df_cols_map.columns.tolist())
     logger.debug(
         "Selecteurs du dataframe de mapping: %s",
@@ -92,11 +87,9 @@ def column_mapping_dict(
 
 
 @db_retry
-def get_list_contact(nom_projet: str, db: DBInterface | None = None) -> List[Contact]:
+def get_list_contact(nom_projet: str, db: DBInterface | None = None) -> list[Contact]:
     if not nom_projet:
-        raise ValueError(
-            "Variable nom_projet is required to fetch contact information. Current value is None or empty."
-        )
+        raise ValueError("Variable nom_projet is required to fetch contact information. Current value is None or empty.")
 
     db = _get_db(db)
 
@@ -115,11 +108,9 @@ def get_list_contact(nom_projet: str, db: DBInterface | None = None) -> List[Con
 def get_list_documentation(
     nom_projet: str,
     db: DBInterface | None = None,
-) -> List[Documentation]:
+) -> list[Documentation]:
     if not nom_projet:
-        raise ValueError(
-            "Variable nom_projet is required to fetch documentation. Current value is None or empty."
-        )
+        raise ValueError("Variable nom_projet is required to fetch documentation. Current value is None or empty.")
 
     db = _get_db(db)
 
@@ -152,9 +143,7 @@ def get_projet_s3_info(
         ConfigError: If no S3 configuration is found
     """
     if not nom_projet:
-        raise ValueError(
-            "Variable nom_projet is required to fetch S3 configuration. Current value is None or empty."
-        )
+        raise ValueError("Variable nom_projet is required to fetch S3 configuration. Current value is None or empty.")
 
     db = _get_db(db)
 
@@ -179,9 +168,9 @@ def get_projet_s3_info(
 
 
 def merge_selecteur_config(
-    storage_info: List[SelecteurStorageInfo],
+    storage_info: list[SelecteurStorageInfo],
     storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
-) -> List[SelecteurConfig]:
+) -> list[SelecteurConfig]:
     """Merge SelecteurStorageInfo from DB with local SelecteurStorageOptions config.
 
     Items like S3 paths and table names come from the DB (via ``storage_info``).
@@ -199,17 +188,13 @@ def merge_selecteur_config(
         List of SelecteurConfig objects combining DB info with local options.
     """
     if storage_options is None:
-        logger.info(
-            msg="No storage_options provided to merge_selecteur_config, using empty defaults."
-        )
+        logger.info(msg="No storage_options provided to merge_selecteur_config, using empty defaults.")
         storage_options = {}
 
     return [
         SelecteurConfig.load(
             storage_info=info,
-            storage_options=storage_options.get(
-                info.selecteur, SelecteurStorageOptions()
-            ),
+            storage_options=storage_options.get(info.selecteur, SelecteurStorageOptions()),
         )
         for info in storage_info
     ]
@@ -224,7 +209,7 @@ def _get_selecteur_storage_info(
     only_grist: bool = False,
     only_fichier: bool = False,
     db: DBInterface | None = None,
-) -> List[SelecteurStorageInfo]:
+) -> list[SelecteurStorageInfo]:
     """Get SelecteurStorageInfo for a project and optionally a specific selecteur.
 
     Args:
@@ -237,9 +222,7 @@ def _get_selecteur_storage_info(
         List of SelecteurStorageInfo objects
     """
     if not nom_projet:
-        raise ValueError(
-            "Variable nom_projet is required to fetch selecteur storage info. Current value is None or empty."
-        )
+        raise ValueError("Variable nom_projet is required to fetch selecteur storage info. Current value is None or empty.")
 
     db = _get_db(db)
 
@@ -280,7 +263,7 @@ def _get_selecteur_storage_info(
 def get_list_selecteur_storage_info(
     nom_projet: str,
     local_dir: str = "/tmp",
-) -> List[SelecteurStorageInfo]:
+) -> list[SelecteurStorageInfo]:
     """Get SelecteurStorageInfo for all selecteurs in a project.
 
     Args:
@@ -291,9 +274,7 @@ def get_list_selecteur_storage_info(
     Returns:
         List of SelecteurStorageInfo objects for all selecteurs
     """
-    return _get_selecteur_storage_info(
-        nom_projet=nom_projet, selecteur=None, local_dir=local_dir
-    )
+    return _get_selecteur_storage_info(nom_projet=nom_projet, selecteur=None, local_dir=local_dir)
 
 
 def get_selecteur_storage_info(
@@ -315,9 +296,7 @@ def get_selecteur_storage_info(
     Raises:
         ConfigError: If no configuration is found
     """
-    configs = _get_selecteur_storage_info(
-        nom_projet=nom_projet, selecteur=selecteur, local_dir=local_dir
-    )
+    configs = _get_selecteur_storage_info(nom_projet=nom_projet, selecteur=selecteur, local_dir=local_dir)
 
     if not configs:
         raise ConfigError(
@@ -329,9 +308,7 @@ def get_selecteur_storage_info(
     return configs[0]
 
 
-def get_list_source_fichier(nom_projet: str) -> List[str]:
+def get_list_source_fichier(nom_projet: str) -> list[str]:
     """Get SelecteurStorageInfo for all selecteurs with file source."""
-    selecteur_storage_info = _get_selecteur_storage_info(
-        nom_projet=nom_projet, only_source=True, only_fichier=True
-    )
+    selecteur_storage_info = _get_selecteur_storage_info(nom_projet=nom_projet, only_source=True, only_fichier=True)
     return [info.get_full_s3_key(use_id_source=True) for info in selecteur_storage_info]

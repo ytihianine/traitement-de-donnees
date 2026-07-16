@@ -3,7 +3,6 @@ from airflow.sdk.bases.operator import chain
 
 from src._types.dags import ETLStep, TaskConfig
 from src.common_tasks.etl import create_task
-
 from src.dags.commun.code_geographique import actions
 
 

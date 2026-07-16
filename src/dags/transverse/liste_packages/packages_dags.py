@@ -2,9 +2,9 @@ from typing import Literal
 
 from airflow.sdk import dag, task
 
+from src._enums.dags import DagStatus
 from src._types.dags import FeatureFlagsEnable
 from src.utils.config.dag_params import create_dag_params, create_default_args
-from src._enums.dags import DagStatus
 
 nom_projet = "Liste des packages installés"
 
@@ -22,9 +22,7 @@ nom_projet = "Liste des packages installés"
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=None,
-        feature_flags=FeatureFlagsEnable(
-            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
-        ),
+        feature_flags=FeatureFlagsEnable(db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False),
     ),
 )
 def liste_packages() -> None:

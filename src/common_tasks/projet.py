@@ -1,14 +1,16 @@
 """Configuration task group for retrieving project configuration at runtime."""
 
-from typing import Any, Mapping
-from airflow.sdk import chain, task, task_group
+from collections.abc import Mapping
 from dataclasses import asdict
+from typing import Any
+
+from airflow.sdk import chain, task, task_group
 
 from src._types.projet import SelecteurStorageOptions, custom_asdict_factory
 from src.utils.config.dag_params import get_project_name
 from src.utils.config.tasks import (
-    get_list_documentation,
     get_list_contact,
+    get_list_documentation,
     get_list_selecteur_storage_info,
     get_list_source_fichier,
     merge_selecteur_config,
@@ -16,9 +18,7 @@ from src.utils.config.tasks import (
 
 
 @task()
-def get_documentation_task(
-    nom_projet: str | None = None, **context
-) -> list[Mapping[str, Any]]:
+def get_documentation_task(nom_projet: str | None = None, **context) -> list[Mapping[str, Any]]:
     """Task to fetch project documentation at runtime."""
     if nom_projet is None:
         nom_projet = get_project_name(context=context)
@@ -27,9 +27,7 @@ def get_documentation_task(
 
 
 @task()
-def get_contact_task(
-    nom_projet: str | None = None, **context
-) -> list[Mapping[str, Any]]:
+def get_contact_task(nom_projet: str | None = None, **context) -> list[Mapping[str, Any]]:
     """Task to fetch project contacts at runtime."""
     if nom_projet is None:
         nom_projet = get_project_name(context=context)
@@ -54,34 +52,23 @@ def show_selecteur_config(config: Mapping[str, Any]) -> None:
 
 @task()
 def get_selecteur_config(
-    nom_projet: str | None = None,
-    storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
-    **context
+    nom_projet: str | None = None, storage_options: Mapping[str, SelecteurStorageOptions] | None = None, **context
 ) -> list[dict[str, Any]]:
     """Task to fetch the project selecteur configurations."""
     if nom_projet is None:
         nom_projet = get_project_name(context=context)
 
     selecteurs = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    merged_config = merge_selecteur_config(
-        storage_info=selecteurs, storage_options=storage_options
-    )
+    merged_config = merge_selecteur_config(storage_info=selecteurs, storage_options=storage_options)
 
-    configs = [
-        asdict(obj=sel_config, dict_factory=custom_asdict_factory)
-        for sel_config in merged_config
-    ]
+    configs = [asdict(obj=sel_config, dict_factory=custom_asdict_factory) for sel_config in merged_config]
     print(type(configs))
 
     return configs
 
 
 @task_group()
-def config_projet_group(
-    nom_projet: str,
-    storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
-    **context
-) -> None:
+def config_projet_group(nom_projet: str, storage_options: Mapping[str, SelecteurStorageOptions] | None = None, **context) -> None:
     """
     Groupe de tâches pour récupérer la configuration du projet
 

@@ -1,11 +1,12 @@
 import logging
-from airflow.sdk import task
-import pandas as pd
 
-from src.infra.file_system.factory import create_default_s3_handler
+import pandas as pd
+from airflow.sdk import task
+
 from src.constants import (
     DEFAULT_S3_CONN_ID,
 )
+from src.infra.file_system.factory import create_default_s3_handler
 
 
 @task()
@@ -68,9 +69,7 @@ def remove_airflow_db_logs() -> None:
     days_to_keep = 60
     date_to_clean_before = datetime.now() - timedelta(days=days_to_keep)
 
-    command = [
-        f"airflow db clean --clean-before-timestamp '{date_to_clean_before}' --verbose"
-    ]
+    command = [f"airflow db clean --clean-before-timestamp '{date_to_clean_before}' --verbose"]
 
     logging.info(msg=command)
 

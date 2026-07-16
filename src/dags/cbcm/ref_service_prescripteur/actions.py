@@ -1,16 +1,16 @@
-from airflow.sdk import Variable
-from src.infra.http_client.adapters import RequestsClient
-from src.infra.http_client.config import ClientConfig
 import pandas as pd
+from airflow.sdk import Variable
 
-from src.infra.grist.client import GristAPI
-from src.infra.database.factory import create_db_handler
 from src.constants import (
     AGENT,
     DEFAULT_GRIST_HOST,
     DEFAULT_PG_DATA_CONN_ID,
     PROXY,
 )
+from src.infra.database.factory import create_db_handler
+from src.infra.grist.client import GristAPI
+from src.infra.http_client.adapters import RequestsClient
+from src.infra.http_client.config import ClientConfig
 
 
 def get_all_cf_cc() -> pd.DataFrame:
@@ -188,7 +188,7 @@ def load_new_cf_cc(df_get_all_cf_cc: pd.DataFrame, df_sp: pd.DataFrame) -> None:
     df["import_timestamp"] = df["import_timestamp"].astype("string")
 
     # Conserver uniquement les nouvelles
-    df = df.loc[df["_merge"] == "left_only", on_cols + ["import_timestamp"]]
+    df = df.loc[df["_merge"] == "left_only", [*on_cols, "import_timestamp"]]
 
     # Intégrer ces lignes dans Grist
     http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
@@ -210,9 +210,7 @@ def load_new_cf_cc(df_get_all_cf_cc: pd.DataFrame, df_sp: pd.DataFrame) -> None:
     )
 
 
-def load_demande_achat(
-    df_get_demande_achat: pd.DataFrame, df_demande_achat_sp_manuel: pd.DataFrame
-) -> None:
+def load_demande_achat(df_get_demande_achat: pd.DataFrame, df_demande_achat_sp_manuel: pd.DataFrame) -> None:
     # Filtrer les lignes
     df_get_demande_achat = df_get_demande_achat.loc[
         (df_get_demande_achat["unique_multi"] == "Multiple")

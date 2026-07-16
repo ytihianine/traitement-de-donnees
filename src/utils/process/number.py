@@ -28,24 +28,16 @@ def is_lower(
     """
     Checks if all values are below seuil.
     """
-    if inclusive:
-        df_inf = df[cols_to_check].le(seuil)
-    else:
-        df_inf = df[cols_to_check].lt(seuil)
+    df_inf = df[cols_to_check].le(seuil) if inclusive else df[cols_to_check].lt(seuil)
 
     return df_inf.all(axis=None)  # type: ignore
 
 
-def is_upper(
-    df: pd.DataFrame, cols_to_check: list[str], seuil: float | int, inclusive=True
-) -> bool:
+def is_upper(df: pd.DataFrame, cols_to_check: list[str], seuil: float | int, inclusive=True) -> bool:
     """
     Checks if all values are above seuil.
     """
-    if inclusive:
-        df_sup = df[cols_to_check].ge(seuil)
-    else:
-        df_sup = df[cols_to_check].gt(seuil)
+    df_sup = df[cols_to_check].ge(seuil) if inclusive else df[cols_to_check].gt(seuil)
 
     return df_sup.all(axis=None)  # type: ignore
 
@@ -69,7 +61,4 @@ def is_in_range(
 
     df_union = df_inf & df_sup
 
-    if df_union.all(axis=None):
-        return True
-
-    return False
+    return df_union.all(axis=None)

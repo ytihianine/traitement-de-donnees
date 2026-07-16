@@ -1,11 +1,13 @@
+from collections.abc import Mapping
+from typing import Any
+
 import pandas as pd
-from typing import Any, List, Mapping, Tuple
 
 from src.dags.sg.srh.mentorat_merci.enums import ChoixDirection
 
 correspondance_objectifs = {
-    "Transmettre ma culture administrative et ministérielle": "Améliorer ma culture administrative et ministérielle",  # noqa
-    "Accompagner le mentoré dans la préparation des examens et concours": "Préparer un concours ou un examen professionnel",  # noqa
+    "Transmettre ma culture administrative et ministérielle": "Améliorer ma culture administrative et ministérielle",
+    "Accompagner le mentoré dans la préparation des examens et concours": "Préparer un concours ou un examen professionnel",
     "Transmettre mes compétences professionnelles, notamment d’un point de vue managérial": "Obtenir un accompagnement dans la montée en compétences d’un point de vue managérial",  # noqa
     "Développer mon réseau professionnel": "Développer mon réseau professionnel",
     "Partager mes compétences numériques": "Partager mes compétences numériques",
@@ -20,15 +22,11 @@ critere_categorie = {
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    df["27. Q9_Direction_Mentor"] = df["27. Q9_Direction_Mentor"].fillna(
-        "Pas de préférence"
-    )
+    df["27. Q9_Direction_Mentor"] = df["27. Q9_Direction_Mentor"].fillna("Pas de préférence")
     return df
 
 
-def verifier_categorie_compatible(
-    mentor: pd.Series, mentore: pd.Series
-) -> Tuple[bool, str]:
+def verifier_categorie_compatible(mentor: pd.Series, mentore: pd.Series) -> tuple[bool, str]:
     """
     Critère éliminatoire : Catégorie
     Vérifie si le mentor est dans la liste des catégories compatibles pour le mentoré
@@ -53,7 +51,7 @@ def verifier_categorie_compatible(
         )
 
 
-def calculer_score_categorie(mentor: pd.Series, mentore: pd.Series) -> Tuple[int, str]:
+def calculer_score_categorie(mentor: pd.Series, mentore: pd.Series) -> tuple[int, str]:
     """
     Critère 1: Catégorie (1000 points)
     Vérifie si le mentor est dans la liste des catégories compatibles pour le mentoré
@@ -77,7 +75,7 @@ def calculer_score_categorie(mentor: pd.Series, mentore: pd.Series) -> Tuple[int
         )
 
 
-def extraire_objectifs(row: pd.Series, column: str) -> List[str]:
+def extraire_objectifs(row: pd.Series, column: str) -> list[str]:
     """Extrait et ordonne les objectifs d'une personne"""
     objectifs = []
 
@@ -92,7 +90,7 @@ def extraire_objectifs(row: pd.Series, column: str) -> List[str]:
     return objectifs
 
 
-def calculer_score_objectifs(mentor: pd.Series, mentore: pd.Series) -> Tuple[int, str]:
+def calculer_score_objectifs(mentor: pd.Series, mentore: pd.Series) -> tuple[int, str]:
     """
     Critère 2: Objectifs (935 points par objectif correspondant)
     Le 1er objectif du mentor doit correspondre au 1er du mentoré, etc.
@@ -116,14 +114,11 @@ def calculer_score_objectifs(mentor: pd.Series, mentore: pd.Series) -> Tuple[int
         else:
             details.append(f"  Obj {i+1}: ✗ '{obj_mentor[i]}' ≠ '{obj_mentore[i]}'")
 
-    detail_str = (
-        f"Objectifs ({correspondance}/{max_compare} correspondances)\n"
-        + "\n".join(details)
-    )
+    detail_str = f"Objectifs ({correspondance}/{max_compare} correspondances)\n" + "\n".join(details)
     return score, detail_str
 
 
-def calculer_score_direction(mentor: pd.Series, mentore: pd.Series) -> Tuple[int, str]:
+def calculer_score_direction(mentor: pd.Series, mentore: pd.Series) -> tuple[int, str]:
     """
     Critère 3: Direction (200 points)
     Vérifie la préférence du mentor concernant la direction
@@ -157,7 +152,7 @@ def calculer_score_direction(mentor: pd.Series, mentore: pd.Series) -> Tuple[int
     return 0, f"Direction: préférence '{pref_dir}' non reconnue"
 
 
-def calculer_score_geographie(mentor: pd.Series, mentore: pd.Series) -> Tuple[int, str]:
+def calculer_score_geographie(mentor: pd.Series, mentore: pd.Series) -> tuple[int, str]:
     """
     Critère 4: Géographie (100 points)
     Même département

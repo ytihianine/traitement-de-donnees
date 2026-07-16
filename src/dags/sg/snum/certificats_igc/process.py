@@ -1,9 +1,10 @@
 from datetime import datetime
+
 import pandas as pd
 
 from src.utils.process.text import (
-    normalize_whitespace_columns,
     convert_str_cols_to_date,
+    normalize_whitespace_columns,
 )
 
 mapping_direction = {
@@ -144,9 +145,7 @@ mapping_direction = {
 }
 
 
-def get_direction_fom_nom_unite_geree(
-    nom_unite_geree: str, map_direction: dict = mapping_direction
-) -> str | None:
+def get_direction_fom_nom_unite_geree(nom_unite_geree: str, map_direction: dict = mapping_direction) -> str | None:
     """
     Déterminer la direction que gère l'AIP à partir du nom de l'unité gérée.
     Exemple de nom d'unité gérée :
@@ -168,7 +167,7 @@ def get_direction_fom_nom_unite_geree(
     if nom_unite_geree_split[-1].lower() == "centrale":
         nom_unite_geree_split = nom_unite_geree_split[:-1]
 
-    type_structure = map_direction.get(nom_unite_geree_split[-1], None)
+    type_structure = map_direction.get(nom_unite_geree_split[-1])
 
     if isinstance(type_structure, str):
         direction = type_structure
@@ -321,9 +320,7 @@ def determiner_certificat_direction(df: pd.DataFrame) -> pd.DataFrame:
     # A partir du DN
     df["certif_dir_dn"] = list(map(find_certificat_dir_in_dn, df["dn"]))
     # A partir du subjectid
-    df["certif_dir_subjectid"] = list(
-        map(find_certificat_dir_in_subjectid, df["subjectid"])
-    )
+    df["certif_dir_subjectid"] = list(map(find_certificat_dir_in_subjectid, df["subjectid"]))
     # A partir du contact
     df["certif_dir_contact"] = list(map(find_certificat_dir_in_contact, df["contact"]))
     # A partir du mail
@@ -456,9 +453,7 @@ def determiner_version_serveur(profile: str) -> str | None:
     return _match_mapping(text=profile, mapping=mapping)
 
 
-def map_agent_direction(
-    structure: str, mapping: dict = mapping_direction
-) -> str | None:
+def map_agent_direction(structure: str, mapping: dict = mapping_direction) -> str | None:
     if pd.isna(structure):
         return None
 
@@ -469,7 +464,7 @@ def map_agent_direction(
 
     structure_split = structure.split(sep="/")
 
-    direction = mapping.get(structure_split[-1], None)
+    direction = mapping.get(structure_split[-1])
 
     if direction is None:
         return None
@@ -507,9 +502,7 @@ def process_agent(df: pd.DataFrame) -> pd.DataFrame:
 def process_certificat(df: pd.DataFrame) -> pd.DataFrame:
     # df = df.fillna(np.nan).replace([np.nan], [None])
     date_cols = ["date_debut_validite", "date_fin_validite"]
-    df = convert_str_cols_to_date(
-        df=df, columns=date_cols, str_date_format="%Y-%m-%d %H:%M:%S", errors="raise"
-    )
+    df = convert_str_cols_to_date(df=df, columns=date_cols, str_date_format="%Y-%m-%d %H:%M:%S", errors="raise")
 
     # Normaliser les colonnes textuelles
     txt_cols = ["profile", "subjectid", "contact", "email"]
@@ -542,9 +535,7 @@ def process_mandataire(df: pd.DataFrame) -> pd.DataFrame:
 
     # Normaliser les dates
     date_cols = ["date"]
-    df = convert_str_cols_to_date(
-        df=df, columns=date_cols, str_date_format="%d/%m/%Y", errors="coerce"
-    )
+    df = convert_str_cols_to_date(df=df, columns=date_cols, str_date_format="%d/%m/%Y", errors="coerce")
 
     # Normaliser les sigles
     df["sigle"] = df["sigle"].str.replace("/", "", regex=False)

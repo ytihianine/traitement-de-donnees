@@ -1,22 +1,22 @@
 """Module for ETL task creation and execution."""
 
 import logging
-from typing import Callable, Optional, Any
+from collections.abc import Callable
+from typing import Any
 
 import pandas as pd
-from airflow.sdk import task, XComArg
+from airflow.sdk import XComArg, task
 
-
+from src._types.dags import ETLStep, TaskConfig
 from src.infra.file_system.dataframe import read_dataframe, write_dataframe
 from src.infra.file_system.factory import (
     create_default_s3_handler,
 )
-from src.utils.logs import df_info
+from src.utils.config.dag_params import get_execution_date, get_project_name
 from src.utils.config.tasks import (
     get_selecteur_storage_info,
 )
-from src.utils.config.dag_params import get_execution_date, get_project_name
-from src._types.dags import ETLStep, TaskConfig
+from src.utils.logs import df_info
 
 
 def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
@@ -31,9 +31,7 @@ def _add_import_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
 
 def _add_snapshot_id_metadata(df: pd.DataFrame, context: dict) -> pd.DataFrame:
     """Add snapshot_id column."""
-    snapshot_id = context["ti"].xcom_pull(
-        key="return_value", task_ids="get_projet_snapshot"
-    )
+    snapshot_id = context["ti"].xcom_pull(key="return_value", task_ids="get_projet_snapshot")
     if not snapshot_id:
         raise ValueError("snapshot_id is not defined")
 
@@ -85,7 +83,7 @@ def create_task(
     task_config: TaskConfig,
     output_selecteur: str,
     steps: list[ETLStep],
-    input_selecteurs: Optional[list[str]] = None,
+    input_selecteurs: list[str] | None = None,
     add_import_date: bool = True,
     add_snapshot_id: bool = True,
     export_output: bool = True,
@@ -155,9 +153,7 @@ def create_task(
             return
 
         # Resolve configs
-        output_config = get_selecteur_storage_info(
-            nom_projet=nom_projet, selecteur=output_selecteur
-        )
+        output_config = get_selecteur_storage_info(nom_projet=nom_projet, selecteur=output_selecteur)
 
         if add_import_date:
             result = _add_import_metadata(df=result, context=context)

@@ -1,7 +1,8 @@
 import pandas as pd
-from src.infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
-from src._enums.filesystem import IcebergTableStatus
 from scripts.settings import get_settings
+
+from src._enums.filesystem import IcebergTableStatus
+from src.infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
 
 settings = get_settings()
 
@@ -59,9 +60,7 @@ def drop_tables(catalog: IcebergCatalog) -> None:
         namespace=NAMESPACE,
         pattern=PATTERN,
     )
-    print(
-        f"Tables in namespace '{NAMESPACE}' with pattern '{PATTERN}': \n{iceberg_tbl_to_drop}"
-    )
+    print(f"Tables in namespace '{NAMESPACE}' with pattern '{PATTERN}': \n{iceberg_tbl_to_drop}")
 
     # Drop staging tables from Iceberg catalog
     for table in iceberg_tbl_to_drop:

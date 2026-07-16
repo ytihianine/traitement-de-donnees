@@ -2,17 +2,19 @@
 
 import logging
 from pathlib import Path
+
 import pandas as pd
+
+from src._enums.filesystem import FileFormat
 
 from .base import FSInterface
 from .data_serializer import (
-    DataSerializer,
     CSVSerializer,
-    ParquetSerializer,
+    DataSerializer,
     ExcelSerializer,
     JSONSerializer,
+    ParquetSerializer,
 )
-from src._enums.filesystem import FileFormat
 
 _serializer_registry: dict[FileFormat, DataSerializer] = {
     FileFormat.CSV: CSVSerializer(),
@@ -34,9 +36,7 @@ def detect_file_extension(filepath: str | Path) -> FileFormat:
     try:
         return FileFormat[format_name]
     except KeyError as exc:
-        raise ValueError(
-            f"Unsupported file extension '{ext}' for path: {filepath}"
-        ) from exc
+        raise ValueError(f"Unsupported file extension '{ext}' for path: {filepath}") from exc
 
 
 def read_dataframe(

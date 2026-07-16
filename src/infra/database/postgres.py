@@ -4,15 +4,17 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
 import psycopg2
 from sqlalchemy import create_engine
-from sqlalchemy.engine.base import Engine
 
 from .base import DBInterface
 from .exceptions import DatabaseError
+
+if TYPE_CHECKING:
+    from sqlalchemy.engine.base import Engine
 
 
 class PgAdapter(DBInterface):
@@ -25,13 +27,13 @@ class PgAdapter(DBInterface):
 
     def __init__(
         self,
-        connection_id: Optional[str] = None,
+        connection_id: str | None = None,
         *,
-        host: Optional[str] = None,
+        host: str | None = None,
         port: int = 5432,
-        dbname: Optional[str] = None,
-        user: Optional[str] = None,
-        password: Optional[str] = None,
+        dbname: str | None = None,
+        user: str | None = None,
+        password: str | None = None,
     ):
         """Initialize with either an Airflow connection ID or local psycopg2 parameters.
 
@@ -44,17 +46,13 @@ class PgAdapter(DBInterface):
             password: Database password (local mode).
         """
         if connection_id and host:
-            raise ValueError(
-                "Provide either connection_id (Airflow) or host/dbname/user/password (local), not both."
-            )
+            raise ValueError("Provide either connection_id (Airflow) or host/dbname/user/password (local), not both.")
         if not connection_id and not host:
-            raise ValueError(
-                "Provide either connection_id (Airflow) or host/dbname/user/password (local)."
-            )
+            raise ValueError("Provide either connection_id (Airflow) or host/dbname/user/password (local).")
 
         self._use_airflow = connection_id is not None
         self.connection_id = connection_id
-        self._local_params: Dict[str, Any] = {}
+        self._local_params: dict[str, Any] = {}
         if not self._use_airflow:
             self._local_params = {
                 "host": host,
@@ -64,16 +62,14 @@ class PgAdapter(DBInterface):
                 "password": password,
             }
 
-        self._hook: Optional[Any] = None
-        self._engine: Optional[Engine] = None
+        self._hook: Any | None = None
+        self._engine: Engine | None = None
 
     @property
     def hook(self) -> Any:
         """Lazy initialization of PostgresHook (Airflow mode only)."""
         if not self._use_airflow:
-            raise RuntimeError(
-                "hook is not available in local mode. Use get_conn() instead."
-            )
+            raise RuntimeError("hook is not available in local mode. Use get_conn() instead.")
         if self._hook is None:
             from airflow.providers.postgres.hooks.postgres import PostgresHook
 
@@ -85,7 +81,7 @@ class PgAdapter(DBInterface):
         """Get SQLAlchemy engine for DataFrame operations."""
         if self._engine is None:
             if self._use_airflow:
-                self._engine = cast(Engine, self.hook.get_sqlalchemy_engine())
+                self._engine = cast("Engine", self.hook.get_sqlalchemy_engine())
             else:
                 p = self._local_params
                 uri = f"postgresql://{p['user']}:{p['password']}@{p['host']}:{p['port']}/{p['dbname']}"
@@ -105,9 +101,7 @@ class PgAdapter(DBInterface):
             return self.hook.get_conn()
         return psycopg2.connect(**self._local_params)
 
-    def execute(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> None:
+    def execute(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> None:
         """Execute a query without returning results."""
         try:
             start_time = time.time()
@@ -120,57 +114,49 @@ class PgAdapter(DBInterface):
                     conn.commit()
             logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
         except Exception as e:
-            raise DatabaseError(f"Error executing query: {str(e)}") from e
+            raise DatabaseError(f"Error executing query: {e!s}") from e
 
-    def fetch_one(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> Optional[Dict[str, Any]]:
+    def fetch_one(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> dict[str, Any] | None:
         """Fetch a single row as a dictionary."""
         try:
             start_time = time.time()
-            with self.get_conn() as conn:
-                with conn.cursor() as cur:
-                    cur.execute(query, parameters)
-                    if cur.description is None:
-                        raise DatabaseError("Query did not return a result set")
-                    columns = [str(desc[0]) for desc in cur.description]
-                    result = cur.fetchone()
+            with self.get_conn() as conn, conn.cursor() as cur:
+                cur.execute(query, parameters)
+                if cur.description is None:
+                    raise DatabaseError("Query did not return a result set")
+                columns = [str(desc[0]) for desc in cur.description]
+                result = cur.fetchone()
 
             logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
             if result is None:
                 return None
-            return dict(zip(columns, result))
+            return dict(zip(columns, result, strict=False))
         except DatabaseError:
             raise
         except Exception as e:
-            raise DatabaseError(f"Error fetching row: {str(e)}") from e
+            raise DatabaseError(f"Error fetching row: {e!s}") from e
 
-    def fetch_all(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> List[Dict[str, Any]]:
+    def fetch_all(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Fetch all rows as a list of dictionaries."""
         try:
             start_time = time.time()
-            with self.get_conn() as conn:
-                with conn.cursor() as cur:
-                    cur.execute(query, parameters)
-                    if cur.description is None:
-                        raise DatabaseError("Query did not return a result set")
+            with self.get_conn() as conn, conn.cursor() as cur:
+                cur.execute(query, parameters)
+                if cur.description is None:
+                    raise DatabaseError("Query did not return a result set")
 
-                    columns = [str(desc[0]) for desc in cur.description]
-                    results = cur.fetchall()
+                columns = [str(desc[0]) for desc in cur.description]
+                results = cur.fetchall()
 
             logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
-            return [dict(zip(columns, row)) for row in results]
+            return [dict(zip(columns, row, strict=False)) for row in results]
 
         except DatabaseError:
             raise
         except Exception as e:
-            raise DatabaseError(f"Error fetching rows: {str(e)}") from e
+            raise DatabaseError(f"Error fetching rows: {e!s}") from e
 
-    def fetch_df(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> pd.DataFrame:
+    def fetch_df(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> pd.DataFrame:
         """Fetch results as a pandas DataFrame."""
         try:
             start_time = time.time()
@@ -182,9 +168,9 @@ class PgAdapter(DBInterface):
             logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
             return df
         except Exception as e:
-            raise DatabaseError(f"Error fetching DataFrame: {str(e)}") from e
+            raise DatabaseError(f"Error fetching DataFrame: {e!s}") from e
 
-    def insert(self, table: str, data: Dict[str, Any]) -> None:
+    def insert(self, table: str, data: dict[str, Any]) -> None:
         """Insert a single row into a table."""
         columns = list(data.keys())
         values = list(data.values())
@@ -197,7 +183,7 @@ class PgAdapter(DBInterface):
 
         self.execute(query, tuple(values))
 
-    def bulk_insert(self, table: str, data: List[Dict[str, Any]]) -> None:
+    def bulk_insert(self, table: str, data: list[dict[str, Any]]) -> None:
         """Insert multiple rows into a table."""
         if not data:
             return
@@ -216,10 +202,10 @@ class PgAdapter(DBInterface):
                 cur.executemany(query, values)
             conn.commit()
 
-    def update(self, table: str, data: Dict[str, Any], where: Dict[str, Any]) -> None:
+    def update(self, table: str, data: dict[str, Any], where: dict[str, Any]) -> None:
         """Update rows in a table."""
-        set_clause = ", ".join([f"{k} = %s" for k in data.keys()])
-        where_clause = " AND ".join([f"{k} = %s" for k in where.keys()])
+        set_clause = ", ".join([f"{k} = %s" for k in data])
+        where_clause = " AND ".join([f"{k} = %s" for k in where])
 
         query = f"""
             UPDATE {table}
@@ -230,9 +216,9 @@ class PgAdapter(DBInterface):
         parameters = tuple(list(data.values()) + list(where.values()))
         self.execute(query, parameters)
 
-    def delete(self, table: str, where: Dict[str, Any]) -> None:
+    def delete(self, table: str, where: dict[str, Any]) -> None:
         """Delete rows from a table."""
-        where_clause = " AND ".join([f"{k} = %s" for k in where.keys()])
+        where_clause = " AND ".join([f"{k} = %s" for k in where])
 
         query = f"""
             DELETE FROM {table}
@@ -267,10 +253,9 @@ class PgAdapter(DBInterface):
                 self.hook.copy_expert(sql, filepath)
             else:
                 with self.get_conn() as conn:
-                    with conn.cursor() as cur:
-                        with open(filepath, "r") as f:
-                            cur.copy_expert(sql, f)
+                    with conn.cursor() as cur, open(filepath) as f:
+                        cur.copy_expert(sql, f)
                     conn.commit()
             logging.debug(f"COPY operation executed in {time.time() - start_time:.2f}s")
         except Exception as e:
-            raise DatabaseError(f"Error during COPY operation: {str(e)}") from e
+            raise DatabaseError(f"Error during COPY operation: {e!s}") from e

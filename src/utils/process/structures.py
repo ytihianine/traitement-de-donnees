@@ -1,7 +1,8 @@
-from enum import Enum
-import pandas as pd
-import numpy as np
 import ast
+from enum import Enum
+
+import numpy as np
+import pandas as pd
 
 
 def remove_grist_internal_cols(df: pd.DataFrame) -> pd.DataFrame:
@@ -10,9 +11,7 @@ def remove_grist_internal_cols(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def convert_str_of_list_to_list(df: pd.DataFrame, col_to_convert: str) -> pd.DataFrame:
-    df[col_to_convert] = df[col_to_convert].apply(
-        lambda x: ast.literal_eval(x) if isinstance(x, str) else x
-    )
+    df[col_to_convert] = df[col_to_convert].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
     return df
 
 
@@ -28,9 +27,7 @@ def normalize_grist_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def handle_grist_null_references(
-    df: pd.DataFrame, columns: list[str], keep_zero: bool = False
-) -> pd.DataFrame:
+def handle_grist_null_references(df: pd.DataFrame, columns: list[str], keep_zero: bool = False) -> pd.DataFrame:
     for col in columns:
         df[col] = pd.to_numeric(arg=df[col], errors="coerce")
         if not keep_zero:
@@ -60,24 +57,18 @@ def are_lists_egal(list_A: list[str], list_B: list[str]) -> bool:
         return True
 
     if len(only_in_set_A) > 0:
-        print(
-            f"""Les éléments suivants sont présents dans la 1ère liste mais pas la 2nd:
+        print(f"""Les éléments suivants sont présents dans la 1ère liste mais pas la 2nd:
                 {only_in_set_A}
-            """
-        )
+            """)
     if len(only_in_set_B) > 0:
-        print(
-            f"""Les éléments suivants sont présents dans la 2nd liste mais pas la 1ère:
+        print(f"""Les éléments suivants sont présents dans la 2nd liste mais pas la 1ère:
                 {only_in_set_B}
-            """
-        )
+            """)
 
     return False
 
 
-def validate_enum_column(
-    df: pd.DataFrame, column: str, enum_class: type[Enum], allow_null: bool = True
-) -> None:
+def validate_enum_column(df: pd.DataFrame, column: str, enum_class: type[Enum], allow_null: bool = True) -> None:
     """
     Valide que toutes les valeurs d'une colonne correspondent aux valeurs d'un Enum.
 
@@ -97,17 +88,12 @@ def validate_enum_column(
     else:
         column_values = set(df[column].unique())
         if pd.isna(list(column_values)).any():
-            raise ValueError(
-                f"Valeurs null trouvées dans '{column}' alors que allow_null=False"
-            )
+            raise ValueError(f"Valeurs null trouvées dans '{column}' alors que allow_null=False")
 
     invalid_values = column_values - valid_values
 
     if invalid_values:
-        raise ValueError(
-            f"Valeurs invalides dans '{column}': {invalid_values}. "
-            f"Valeurs acceptées: {valid_values}"
-        )
+        raise ValueError(f"Valeurs invalides dans '{column}': {invalid_values}. " f"Valeurs acceptées: {valid_values}")
 
 
 def tag_last_value_rows(df: pd.DataFrame, colname_max_value: str) -> pd.DataFrame:

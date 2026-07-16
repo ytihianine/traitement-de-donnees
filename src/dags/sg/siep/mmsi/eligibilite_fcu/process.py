@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from src.infra.http_client.base import HttpInterface
 from src.utils.process.text import normalize_whitespace_columns
@@ -18,10 +18,7 @@ def can_perform_api_call(lat: float, lon: float) -> bool:
     if pd.isna(lat) or pd.isna(lon):
         return False
 
-    if not isinstance(lat, float) or not isinstance(lon, float):
-        return False
-
-    return True
+    return not (not isinstance(lat, float) or not isinstance(lon, float))
 
 
 def process_result(df: pd.DataFrame) -> pd.DataFrame:
@@ -60,9 +57,7 @@ def process_result(df: pd.DataFrame) -> pd.DataFrame:
     return df.convert_dtypes()
 
 
-def get_eligibilite_fcu(
-    api_client: HttpInterface, url: str, latitude: float, longitude: float
-) -> dict[str, str]:
+def get_eligibilite_fcu(api_client: HttpInterface, url: str, latitude: float, longitude: float) -> dict[str, str]:
     result_json = {}
 
     if not can_perform_api_call(lat=latitude, lon=longitude):

@@ -1,6 +1,8 @@
 from datetime import datetime
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from src.utils.process.text import normalize_whitespace_columns
 
 
@@ -16,9 +18,7 @@ def filter_bien(df: pd.DataFrame, df_bien: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def filtrer_oad_indic(
-    df_oad_indic: pd.DataFrame, df_biens: pd.DataFrame
-) -> pd.DataFrame:
+def filtrer_oad_indic(df_oad_indic: pd.DataFrame, df_biens: pd.DataFrame) -> pd.DataFrame:
     return filter_bien(df=df_oad_indic, df_bien=df_biens)
 
 
@@ -43,9 +43,7 @@ def process_accessibilite(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[:, cols_to_keep]
 
     df = df.assign(
-        date_mise_en_accessibilite=pd.to_datetime(
-            df["date_mise_en_accessibilite"], dayfirst=True
-        ),
+        date_mise_en_accessibilite=pd.to_datetime(df["date_mise_en_accessibilite"], dayfirst=True),
         motif_derogation=df["motif_derogation"].str.split().str.join(" "),
     ).replace({"Oui": True, "Non": False})
 
@@ -105,11 +103,7 @@ def process_accessibilite_detail(df: pd.DataFrame) -> pd.DataFrame:
         ],
         var_name="composant_bien",
         value_name="niveau",
-    ).assign(
-        composant_bien=lambda df: df["composant_bien"]
-        .str.replace("accessibilite_", "")
-        .str.title()
-    )
+    ).assign(composant_bien=lambda df: df["composant_bien"].str.replace("accessibilite_", "").str.title())
 
     # Create calculated columns
     df["niveau_fonctionnel"] = list(map(get_niveau_fonctionnel, df["niveau"]))
@@ -134,32 +128,17 @@ def process_bacs(df: pd.DataFrame) -> pd.DataFrame:
 
     df = (
         df.assign(
-            date_installation_gtb=pd.to_datetime(
-                df["date_installation_gtb"], dayfirst=True
-            ),
-            date_derniere_inspection=pd.to_datetime(
-                df["date_derniere_inspection"], dayfirst=True
-            ),
-            presence_gtb=df["presence_gtb"]
-            .str.lower()
-            .replace({"oui": True, "non": False}),
+            date_installation_gtb=pd.to_datetime(df["date_installation_gtb"], dayfirst=True),
+            date_derniere_inspection=pd.to_datetime(df["date_derniere_inspection"], dayfirst=True),
+            presence_gtb=df["presence_gtb"].str.lower().replace({"oui": True, "non": False}),
             split_decret_bacs=df["soumis_decret_bacs"].str.split(pat=" ", n=1),
             classe_gtb=df["classe_gtb"].str.upper(),
-            commentaire_soumission=df["commentaire_soumission"]
-            .str.split()
-            .str.join(" "),
+            commentaire_soumission=df["commentaire_soumission"].str.split().str.join(" "),
             commentaire_general=df["commentaire_general"].str.split().str.join(" "),
         )
         .assign(
-            soumis_decret_bacs=lambda df: (
-                df["split_decret_bacs"]
-                .str[0]
-                .str.lower()
-                .replace({"oui": True, "non": False})
-            ),
-            raison_soumis_decret_bacs=lambda df: (
-                df["split_decret_bacs"].str[1].str.replace("(", "").str.replace(")", "")
-            ),
+            soumis_decret_bacs=lambda df: (df["split_decret_bacs"].str[0].str.lower().replace({"oui": True, "non": False})),
+            raison_soumis_decret_bacs=lambda df: (df["split_decret_bacs"].str[1].str.replace("(", "").str.replace(")", "")),
         )
         .drop(columns=["split_decret_bacs"])
     )
@@ -179,12 +158,8 @@ def process_bails(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[:, cols_to_keep]
 
     df = df.assign(
-        date_debut_bail=df["date_debut_bail"].apply(
-            lambda x: datetime.strptime(x, "%d/%m/%Y") if isinstance(x, str) else pd.NaT
-        ),
-        date_fin_bail=df["date_fin_bail"].apply(
-            lambda x: datetime.strptime(x, "%d/%m/%Y") if isinstance(x, str) else pd.NaT
-        ),
+        date_debut_bail=df["date_debut_bail"].apply(lambda x: datetime.strptime(x, "%d/%m/%Y") if isinstance(x, str) else pd.NaT),
+        date_fin_bail=df["date_fin_bail"].apply(lambda x: datetime.strptime(x, "%d/%m/%Y") if isinstance(x, str) else pd.NaT),
         type_contrat=df["type_contrat"].str.split().str.join(" "),
     )
 
@@ -255,9 +230,7 @@ def process_deet_energie(df: pd.DataFrame) -> pd.DataFrame:
         annee2_conso_ef_et_ges=df["annee2_conso_ef_et_ges"].replace("-", None),
         annee1_conso_eau=df["annee1_conso_eau"].replace("-", None),
         annee2_conso_eau=df["annee2_conso_eau"].replace("-", None),
-        bat_assujettis_deet=df["bat_assujettis_deet"]
-        .str.lower()
-        .replace({"oui": True, "non": False}),
+        bat_assujettis_deet=df["bat_assujettis_deet"].str.lower().replace({"oui": True, "non": False}),
         deet_commentaire=df["deet_commentaire"].str.split().str.join(" "),
     )
 
@@ -347,47 +320,27 @@ def process_eds(df: pd.DataFrame) -> pd.DataFrame:
     common_col = ["code_bat_ter"]
 
     # Traitement partie "théorique"
-    theorique_cols = [
-        colname for colname in df.columns if colname.endswith("theorique")
-    ]
+    theorique_cols = [colname for colname in df.columns if colname.endswith("theorique")]
     df_theorique = df.loc[:, common_col + theorique_cols]
-    df_theorique = df_theorique.melt(
-        id_vars=common_col, var_name="composant_bien", value_name="eds_theorique"
-    )
+    df_theorique = df_theorique.melt(id_vars=common_col, var_name="composant_bien", value_name="eds_theorique")
     df_theorique = df_theorique.assign(
         composant_bien=lambda df: (
-            df["composant_bien"]
-            .str.replace("_theorique", "")
-            .str.replace("eds_", "")
-            .str.replace("_", " ")
-            .str.title()
+            df["composant_bien"].str.replace("_theorique", "").str.replace("eds_", "").str.replace("_", " ").str.title()
         )
     )
 
     # Traitement partie "constaté"
-    constate_cols = [
-        colname
-        for colname in df.columns
-        if colname.endswith("constate") or colname.endswith("general")
-    ]
+    constate_cols = [colname for colname in df.columns if colname.endswith("constate") or colname.endswith("general")]
     df_constate = df.loc[:, common_col + constate_cols]
-    df_constate = df_constate.melt(
-        id_vars=common_col, var_name="composant_bien", value_name="eds_constate"
-    )
+    df_constate = df_constate.melt(id_vars=common_col, var_name="composant_bien", value_name="eds_constate")
     df_constate = df_constate.assign(
         composant_bien=lambda df: (
-            df["composant_bien"]
-            .str.replace("_constate", "")
-            .str.replace("eds_", "")
-            .str.replace("_", " ")
-            .str.title()
+            df["composant_bien"].str.replace("_constate", "").str.replace("eds_", "").str.replace("_", " ").str.title()
         )
     )
 
     # Join
-    df = pd.merge(
-        df_theorique, df_constate, on=["code_bat_ter", "composant_bien"], how="outer"
-    )
+    df = pd.merge(df_theorique, df_constate, on=["code_bat_ter", "composant_bien"], how="outer")
 
     df = df.assign(
         composant_bien=lambda df: (
@@ -439,31 +392,19 @@ def process_exploitation(df: pd.DataFrame) -> pd.DataFrame:
     common_col = ["code_bat_ter"]
 
     # Traitement partie "théorique"
-    commentaire_cols = [
-        colname for colname in df.columns if colname.endswith("commentaire")
-    ]
+    commentaire_cols = [colname for colname in df.columns if colname.endswith("commentaire")]
     df_commentaire = df.loc[:, common_col + commentaire_cols]
-    df_commentaire = df_commentaire.melt(
-        id_vars=common_col, var_name="composant_bien", value_name="commentaire"
-    )
-    df_commentaire = df_commentaire.assign(
-        composant_bien=lambda df: (df["composant_bien"].str.replace("_commentaire", ""))
-    )
+    df_commentaire = df_commentaire.melt(id_vars=common_col, var_name="composant_bien", value_name="commentaire")
+    df_commentaire = df_commentaire.assign(composant_bien=lambda df: (df["composant_bien"].str.replace("_commentaire", "")))
 
     # Traitement partie "constaté"
     etat_cols = [colname for colname in df.columns if colname.endswith("etat")]
     df_etat = df.loc[:, common_col + etat_cols]
-    df_etat = df_etat.melt(
-        id_vars=common_col, var_name="composant_bien", value_name="etat_exploitation"
-    )
-    df_etat = df_etat.assign(
-        composant_bien=lambda df: (df["composant_bien"].str.replace("_etat", ""))
-    )
+    df_etat = df_etat.melt(id_vars=common_col, var_name="composant_bien", value_name="etat_exploitation")
+    df_etat = df_etat.assign(composant_bien=lambda df: (df["composant_bien"].str.replace("_etat", "")))
 
     # Join
-    df = pd.merge(
-        df_commentaire, df_etat, on=["code_bat_ter", "composant_bien"], how="outer"
-    )
+    df = pd.merge(df_commentaire, df_etat, on=["code_bat_ter", "composant_bien"], how="outer")
     df = df.assign(
         composant_bien=lambda df: (
             df["composant_bien"]
@@ -479,9 +420,7 @@ def process_exploitation(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_localisation(
-    df_oad_carac: pd.DataFrame, df_oad_indic: pd.DataFrame, df_biens: pd.DataFrame
-) -> pd.DataFrame:
+def process_localisation(df_oad_carac: pd.DataFrame, df_oad_indic: pd.DataFrame, df_biens: pd.DataFrame) -> pd.DataFrame:
     # Merging data from both sources
     df = pd.merge(left=df_oad_carac, right=df_oad_indic, on="code_bat_ter", how="left")
 
@@ -536,9 +475,7 @@ def process_localisation(
         (df["num_departement_normalisee"].str.len() == 3),
     ]
     choices = ["Etranger", "Métropole", "Outre-mer"]
-    df["metropole_outremer"] = np.select(
-        condlist=conditions, choicelist=choices, default="Indéterminé"
-    )
+    df["metropole_outremer"] = np.select(condlist=conditions, choicelist=choices, default="Indéterminé")
 
     return df
 
@@ -634,16 +571,12 @@ def process_reglementation(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Create calculated column
-    df["reglementation_corrigee"] = list(
-        map(get_reglementation_corrigee, df["reglementation"])
-    )
+    df["reglementation_corrigee"] = list(map(get_reglementation_corrigee, df["reglementation"]))
 
     return df
 
 
-def process_strategie(
-    df_oad_carac: pd.DataFrame, df_oad_indic: pd.DataFrame, df_biens: pd.DataFrame
-) -> pd.DataFrame:
+def process_strategie(df_oad_carac: pd.DataFrame, df_oad_indic: pd.DataFrame, df_biens: pd.DataFrame) -> pd.DataFrame:
     df = pd.merge(left=df_oad_carac, right=df_oad_indic, on="code_bat_ter", how="left")
     df = df.drop_duplicates(
         subset=["code_bat_ter"],

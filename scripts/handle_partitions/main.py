@@ -1,17 +1,15 @@
 import psycopg2
-
-from src.constants import custom_logger
-from scripts.settings import get_settings
-
-from scripts.handle_partitions.commun import list_table_names, get_partitions, Actions
+from scripts.handle_partitions import config
+from scripts.handle_partitions.commun import Actions, get_partitions, list_table_names
 from scripts.handle_partitions.partitions import (
-    drop_partitions,
     create_partitions,
+    drop_partitions,
     update_import_timestamp,
     update_snapshot_id,
 )
+from scripts.settings import get_settings
 
-from scripts.handle_partitions import config
+from src.constants import custom_logger
 
 # SETTINGS
 settings = get_settings()
@@ -33,11 +31,7 @@ if __name__ == "__main__":
         try:
             # Récupérer la liste des partitions
             partition_names = get_partitions(schema=config.schema, curseur=pg_cur)
-            partition_names = [
-                partition
-                for partition in partition_names
-                if partition[1].startswith(config.tbl_to_keep)
-            ]
+            partition_names = [partition for partition in partition_names if partition[1].startswith(config.tbl_to_keep)]
             drop_partitions(
                 partitions=partition_names,
                 cursor=pg_cur,
@@ -47,17 +41,13 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            custom_logger.info(
-                msg=f"✗ Erreur lors de la suppression de partitions dans le schéma {config.schema}: {e}"  # noqa
-            )
+            custom_logger.info(msg=f"✗ Erreur lors de la suppression de partitions dans le schéma {config.schema}: {e}")
 
     if config.action == Actions.CREATE:
         try:
             # Récupérer la liste des tables
             table_names = list_table_names(schema=config.schema, curseur=pg_cur)
-            table_names = [
-                tbl for tbl in table_names if tbl[0].startswith(config.tbl_to_keep)
-            ]
+            table_names = [tbl for tbl in table_names if tbl[0].startswith(config.tbl_to_keep)]
 
             create_partitions(
                 tbl_names=table_names,
@@ -69,17 +59,13 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            custom_logger.info(
-                msg=f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"  # noqa
-            )
+            custom_logger.info(msg=f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}")
 
     if config.action == Actions.UPDATE_TIMESTAMP:
         try:
             # Récupérer la liste des tables
             table_names = list_table_names(schema=config.schema, curseur=pg_cur)
-            table_names = [
-                tbl for tbl in table_names if tbl[0].startswith(config.tbl_to_keep)
-            ]
+            table_names = [tbl for tbl in table_names if tbl[0].startswith(config.tbl_to_keep)]
 
             update_import_timestamp(
                 tbl_names=table_names,
@@ -91,17 +77,13 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            custom_logger.info(
-                msg=f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"  # noqa
-            )
+            custom_logger.info(msg=f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}")
 
     if config.action == Actions.UPDATE_SNAPSHOT:
         try:
             # Récupérer la liste des tables
             table_names = list_table_names(schema=config.schema, curseur=pg_cur)
-            table_names = [
-                tbl for tbl in table_names if tbl[0].startswith(config.tbl_to_keep)
-            ]
+            table_names = [tbl for tbl in table_names if tbl[0].startswith(config.tbl_to_keep)]
 
             update_snapshot_id(
                 tbl_names=table_names,
@@ -113,6 +95,4 @@ if __name__ == "__main__":
             pg_conn.commit()
         except Exception as e:
             pg_conn.rollback()
-            custom_logger.info(
-                msg=f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}"  # noqa
-            )
+            custom_logger.info(msg=f"✗ Erreur lors de la création de partitions dans le schéma {config.schema}: {e}")

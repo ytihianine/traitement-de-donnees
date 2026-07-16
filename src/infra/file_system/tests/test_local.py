@@ -4,10 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from src.infra.file_system.local import LocalFS
 from src.infra.file_system.exceptions import (
     FileNotFoundError,
 )
+from src.infra.file_system.local import LocalFS
 
 
 @pytest.fixture
@@ -47,9 +47,7 @@ class TestWriteAndRead:
         handler.write("file.bin", io.BytesIO(b"stream"))
         assert (tmp_base / "file.bin").read_bytes() == b"stream"
 
-    def test_write_creates_subdirectories(
-        self, handler: LocalFS, tmp_base: Path
-    ) -> None:
+    def test_write_creates_subdirectories(self, handler: LocalFS, tmp_base: Path) -> None:
         handler.write("sub/dir/file.txt", b"nested")
         assert (tmp_base / "sub" / "dir" / "file.txt").read_bytes() == b"nested"
 

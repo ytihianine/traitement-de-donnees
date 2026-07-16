@@ -55,9 +55,7 @@ class TestTrinoAdapterInit:
 
 class TestTrinoAdapterGetUri:
     def test_get_uri(self) -> None:
-        adapter = TrinoAdapter(
-            host="trino.example.com", user="user", catalog="cat", port=443
-        )
+        adapter = TrinoAdapter(host="trino.example.com", user="user", catalog="cat", port=443)
         uri = adapter.get_uri()
         assert uri == "https://user@trino.example.com:443/cat"
 
@@ -154,9 +152,7 @@ class TestTrinoAdapterReadOnlyMethods:
 
 class TestTrinoAdapterConnectionError:
     @patch("src.infra.database.trino.trino.dbapi.connect")
-    def test_connection_error_raises_database_error(
-        self, mock_connect: MagicMock
-    ) -> None:
+    def test_connection_error_raises_database_error(self, mock_connect: MagicMock) -> None:
         mock_connect.side_effect = Exception("cannot connect")
         adapter = TrinoAdapter(host="bad", user="u", catalog="c")
         with pytest.raises(DatabaseError, match="Error connecting to Trino"):

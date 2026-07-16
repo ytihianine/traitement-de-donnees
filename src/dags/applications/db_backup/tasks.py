@@ -1,15 +1,15 @@
 import os
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 from airflow.sdk import Variable, task
 
+from src._enums.filesystem import FileHandlerType
+from src.constants import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
 from src.infra.database.factory import create_db_handler
 from src.infra.file_system.factory import create_file_handler
 from src.utils.config.dag_params import get_project_name
 from src.utils.config.tasks import get_list_selecteur_storage_info
-from src._enums.filesystem import FileHandlerType
-from src.constants import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
 
 
 @task
@@ -65,16 +65,12 @@ def dump_databases(**context) -> None:
         print(f"Executing dump for database: {db_name}")
 
         # Local + S3 dump
-        with subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
-        ) as proc:
+        with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) as proc:
             # Capture output and wait for process to finish
             stdout, stderr = proc.communicate()
 
             if proc.returncode != 0:
-                raise ValueError(
-                    f"Error dumping {db_name}: {stderr.decode().strip() or 'Unknown error'}"
-                )
+                raise ValueError(f"Error dumping {db_name}: {stderr.decode().strip() or 'Unknown error'}")
 
             # --- 1. Write dump locally (atomic write via file_handler) ---
             local_handler.write(file_path=local_path, content=stdout)
@@ -83,8 +79,6 @@ def dump_databases(**context) -> None:
             with open(file=local_path, mode="rb") as f:
                 s3_handler.write(file_path=dest_tmp_key, content=f)
 
-            print(
-                f"Successfully dumped {db_name} to local: {local_path}, and uploaded to S3: {dest_tmp_key}"  # noqa
-            )
+            print(f"Successfully dumped {db_name} to local: {local_path}, and uploaded to S3: {dest_tmp_key}")
 
             local_handler.delete(file_path=local_path)

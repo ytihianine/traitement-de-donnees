@@ -1,17 +1,16 @@
-import logging
-import pandas as pd
-import numpy as np
 import datetime
-from typing import Union
+import logging
+
+import numpy as np
+import pandas as pd
 
 from src.utils.process.number import is_in_range, is_upper
-
 from src.utils.process.structures import tag_last_value_rows
 
 
-def drop_additionals_columns(
-    df: pd.DataFrame, columns: list[str] = ["commentaire_archive"]
-) -> pd.DataFrame:
+def drop_additionals_columns(df: pd.DataFrame, columns: list[str] | None = None) -> pd.DataFrame:
+    if columns is None:
+        columns = ["commentaire_archive"]
     df = df.drop(columns=columns, errors="ignore")
     return df
 
@@ -23,17 +22,15 @@ def generic_convert_to_float(value: str | None) -> float | None:
     return None
 
 
-def generate_date(year: int, semester: str) -> Union[datetime.datetime, None]:
+def generate_date(year: int, semester: str) -> datetime.datetime | None:
     semester_values = {"S1": 6, "Total": 12}
 
     if year is None or semester is None:
         logging.info(msg="Either year or semester value is None.")
         return None
 
-    if semester not in semester_values.keys():
-        logging.info(
-            msg=f"Invalid semester value: {semester}. Must be one of {list(semester_values.keys())}"
-        )
+    if semester not in semester_values:
+        logging.info(msg=f"Invalid semester value: {semester}. Must be one of {list(semester_values.keys())}")
         return None
 
     try:
@@ -304,9 +301,7 @@ def process_collab_inter_structure(df: pd.DataFrame) -> pd.DataFrame:
 def process_obs_interne(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     df["indicateurs"] = df["indicateurs"].str.strip()
-    df["valeur"] = np.where(
-        df["unite"] == "%", df["valeur"].apply(generic_convert_to_float), df["valeur"]
-    )
+    df["valeur"] = np.where(df["unite"] == "%", df["valeur"].apply(generic_convert_to_float), df["valeur"])
     df = tag_last_value_rows(df=df, colname_max_value="annee")
     return df
 
@@ -406,9 +401,7 @@ def process_rh_contractuel(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["taux_agents_contractuels"])
 
     # Data control
-    if not is_in_range(
-        df=df, cols_to_check=["taux_agents_contractuels"], seuil_inf=0, seuil_sup=1
-    ):
+    if not is_in_range(df=df, cols_to_check=["taux_agents_contractuels"], seuil_inf=0, seuil_sup=1):
         raise ValueError("Certaines valeurs ne sont pas comprise entre 0 et 1 !")
 
     # Add additionnal info
@@ -424,9 +417,7 @@ def process_obs_interne_participation(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["taux_participation"])
 
     # Data control
-    if not is_in_range(
-        df=df, cols_to_check=["taux_participation"], seuil_inf=0, seuil_sup=1
-    ):
+    if not is_in_range(df=df, cols_to_check=["taux_participation"], seuil_inf=0, seuil_sup=1):
         raise ValueError("Certaines valeurs ne sont pas comprise entre 0 et 1 !")
 
     # Add additionnal info
@@ -459,9 +450,7 @@ def process_ouverture_lettre_alize(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["taux_ouverture"])
 
     # Data control
-    if not is_in_range(
-        df=df, cols_to_check=["taux_ouverture"], seuil_inf=0, seuil_sup=1
-    ):
+    if not is_in_range(df=df, cols_to_check=["taux_ouverture"], seuil_inf=0, seuil_sup=1):
         raise ValueError("Certaines valeurs ne sont pas comprise entre 0 et 1 !")
 
     return df
@@ -494,9 +483,7 @@ def process_engagement_environnement(df: pd.DataFrame) -> pd.DataFrame:
     choices = ["Sous-total d'accord", "Sous-total pas d'accord"]
 
     # Apply conditions to create new column
-    df["indicateurs_regroupement"] = np.select(
-        condlist=conditions, choicelist=choices, default=df["indicateurs"]
-    )
+    df["indicateurs_regroupement"] = np.select(condlist=conditions, choicelist=choices, default=df["indicateurs"])
 
     df.replace(values_to_replace, inplace=True)
     # Clean
@@ -577,9 +564,7 @@ def process_impact_actions_com(df: pd.DataFrame) -> pd.DataFrame:
     )
     # Conv de l'annee en string
     df["annee"] = df["annee"].astype(str).str.strip()
-    df["date"] = pd.to_datetime(df["annee"], format="%Y", errors="coerce").astype(
-        "datetime64[s]"
-    )
+    df["date"] = pd.to_datetime(df["annee"], format="%Y", errors="coerce").astype("datetime64[s]")
     df = df.drop(columns=["annee"])
     df = df.dropna(subset=["date"])  # lignes ou annee invalide
     cols_numeriques = ["nombre_article", "nombre_vue"]
@@ -602,9 +587,7 @@ def process_recommandation_strat(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     df["annee"] = df["annee"].astype(str).str.strip()
-    df["date"] = pd.to_datetime(df["annee"], format="%Y", errors="coerce").astype(
-        "datetime64[s]"
-    )
+    df["date"] = pd.to_datetime(df["annee"], format="%Y", errors="coerce").astype("datetime64[s]")
     df = df.drop(columns=["annee"])
     df = df.dropna(subset=["date"])  # del invalide date
     cols_numeriques = ["nombre_recommandation"]
@@ -612,9 +595,7 @@ def process_recommandation_strat(df: pd.DataFrame) -> pd.DataFrame:
         df[col] = pd.to_numeric(df[col], errors="coerce")
         df[col] = df[col].fillna(0).astype(int)
     if not is_upper(df=df, cols_to_check=cols_numeriques, seuil=0, inclusive=True):
-        raise ValueError(
-            "Erreur : Le nombre de recommandations ne peut pas être négatif !"
-        )
+        raise ValueError("Erreur : Le nombre de recommandations ne peut pas être négatif !")
     df = tag_last_value_rows(df=df, colname_max_value="date")
 
     return df
@@ -622,12 +603,8 @@ def process_recommandation_strat(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_projets_graphiques(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
-    df = df.rename(
-        columns={"nombre_de_projets_graphiques_realises": "nombre_graphique_realise"}
-    )
-    df["date"] = pd.to_datetime(
-        df["annee"].astype(str).str.strip(), format="%Y", errors="coerce"
-    ).astype("datetime64[s]")
+    df = df.rename(columns={"nombre_de_projets_graphiques_realises": "nombre_graphique_realise"})
+    df["date"] = pd.to_datetime(df["annee"].astype(str).str.strip(), format="%Y", errors="coerce").astype("datetime64[s]")
     df = df.drop(columns=["annee"])
     df = df.dropna(subset=["date"])
 
@@ -639,7 +616,7 @@ def process_projets_graphiques(df: pd.DataFrame) -> pd.DataFrame:
         "secretariat_general",
         "part_de_la_dge",
     ]
-    cols_numeriques = [col_total] + cols_directions
+    cols_numeriques = [col_total, *cols_directions]
 
     # Data cleann
     for col in cols_numeriques:

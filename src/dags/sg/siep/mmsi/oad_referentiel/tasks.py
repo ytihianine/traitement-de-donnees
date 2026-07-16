@@ -1,8 +1,7 @@
-from src._types.tasks import SingleInputStep, ETLTask
-from src._types.readers import GristReaderStrategy
-from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
-
+from src._types.readers import GristReaderStrategy
+from src._types.tasks import ETLTask, SingleInputStep
+from src._types.writers import FileWriterStrategy
 from src.dags.sg.siep.mmsi.oad_referentiel import process
 
 ref_typologie = ETLTask(

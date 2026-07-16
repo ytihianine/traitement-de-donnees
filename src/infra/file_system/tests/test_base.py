@@ -3,30 +3,28 @@
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import BinaryIO, List, Optional, Union
+from typing import BinaryIO
 
 import pytest
 
-from src.infra.file_system.base import FSInterface, FileMetadata
+from src.infra.file_system.base import FileMetadata, FSInterface
 from src.infra.file_system.exceptions import FileNotFoundError
 
 
 class ConcreteFileHandler(FSInterface):
     """Minimal concrete implementation of FSInterface for testing."""
 
-    def __init__(self, base_path: Optional[Union[str, Path]] = None):
+    def __init__(self, base_path: str | Path | None = None):
         super().__init__(base_path)
         self._files: dict[str, bytes] = {}
 
-    def read(self, file_path: Union[str, Path], validate: bool = True) -> BinaryIO:
+    def read(self, file_path: str | Path, validate: bool = True) -> BinaryIO:
         key = str(file_path)
         if key not in self._files:
             raise FileNotFoundError(f"File not found: {file_path}")
         return BytesIO(self._files[key])
 
-    def write(
-        self, file_path: Union[str, Path], content: Union[str, bytes, BinaryIO]
-    ) -> None:
+    def write(self, file_path: str | Path, content: str | bytes | BinaryIO) -> None:
         if isinstance(content, str):
             self._files[str(file_path)] = content.encode()
         elif isinstance(content, bytes):
@@ -34,18 +32,18 @@ class ConcreteFileHandler(FSInterface):
         else:
             self._files[str(file_path)] = content.read()  # type: ignore
 
-    def delete(self, file_path: Union[str, Path]) -> None:
+    def delete(self, file_path: str | Path) -> None:
         key = str(file_path)
         if key in self._files:
             del self._files[key]
 
-    def delete_single(self, file_path: Union[str, Path]) -> None:
+    def delete_single(self, file_path: str | Path) -> None:
         self.delete(file_path)
 
-    def exists(self, file_path: Union[str, Path]) -> bool:
+    def exists(self, file_path: str | Path) -> bool:
         return str(file_path) in self._files
 
-    def get_metadata(self, file_path: Union[str, Path]) -> FileMetadata:
+    def get_metadata(self, file_path: str | Path) -> FileMetadata:
         key = str(file_path)
         if key not in self._files:
             raise FileNotFoundError(f"File not found: {file_path}")
@@ -59,15 +57,13 @@ class ConcreteFileHandler(FSInterface):
             checksum="abc123",
         )
 
-    def list_files(
-        self, directory: Union[str, Path], pattern: Optional[str] = None
-    ) -> List[str]:
+    def list_files(self, directory: str | Path, pattern: str | None = None) -> list[str]:
         return [k for k in self._files if k.startswith(str(directory))]
 
-    def move(self, source: Union[str, Path], destination: Union[str, Path]) -> None:
+    def move(self, source: str | Path, destination: str | Path) -> None:
         self._files[str(destination)] = self._files.pop(str(source))
 
-    def copy(self, source: Union[str, Path], destination: Union[str, Path]) -> None:
+    def copy(self, source: str | Path, destination: str | Path) -> None:
         self._files[str(destination)] = self._files[str(source)]
 
 

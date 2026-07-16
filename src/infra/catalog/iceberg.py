@@ -1,17 +1,18 @@
-import ssl
 import logging
+import ssl
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Any, Mapping
-import pyarrow as pa
-from tenacity import retry, wait_fixed, stop_after_attempt
+from typing import Any
 
+import pandas as pd
+import pyarrow as pa
+from airflow.sdk import Variable
 from pyiceberg.catalog import Catalog, load_catalog
 from pyiceberg.table import Table
-from airflow.sdk import Variable
-import pandas as pd
 from pyiceberg.typedef import Identifier
-from src._enums.filesystem import IcebergTableStatus
+from tenacity import retry, stop_after_attempt, wait_fixed
 
+from src._enums.filesystem import IcebergTableStatus
 from src.constants import (
     DEFAULT_POLARIS_CATALOG,
     DEFAULT_POLARIS_CLIENT_ID,
@@ -118,9 +119,7 @@ class IcebergCatalog:
             logging.info(msg=f"Creating namespace: {parent_namespace}")
             self.catalog.create_namespace_if_not_exists(namespace=parent_namespace)
 
-    def create_table(
-        self, table_name: str, df: pd.DataFrame, location: str | None = None
-    ) -> Table:
+    def create_table(self, table_name: str, df: pd.DataFrame, location: str | None = None) -> Table:
         # Générer le schéma à partir de la structure du DataFrame
         logging.info(msg=f"Creating table with name: {table_name}")
         table = self.catalog.create_table_if_not_exists(
@@ -145,9 +144,7 @@ class IcebergCatalog:
         return table
 
     @retry(wait=wait_fixed(wait=2), stop=stop_after_attempt(max_attempt_number=5))
-    def write_table(
-        self, table_name: str, df: pd.DataFrame, overwrite: bool = False
-    ) -> None:
+    def write_table(self, table_name: str, df: pd.DataFrame, overwrite: bool = False) -> None:
         self.create_table(table_name=table_name, df=df)
         table = self.update_table(table_name=table_name, df=df)
 
@@ -156,21 +153,12 @@ class IcebergCatalog:
         # Cast each column to the type stored in the table schema so that, for example,
         # an integer column (long) is written as double when the table expects double.
         table_arrow_schema = table.schema().as_arrow()
-        cast_fields = [
-            (
-                table_arrow_schema.field(f.name)
-                if f.name in table_arrow_schema.names
-                else f
-            )
-            for f in pa_data.schema
-        ]
+        cast_fields = [(table_arrow_schema.field(f.name) if f.name in table_arrow_schema.names else f) for f in pa_data.schema]
         pa_data = pa_data.cast(pa.schema(cast_fields))
 
         # Logic to write data to a table in the Iceberg catalog
         if df.empty:
-            logging.warning(
-                msg=f"Empty DataFrame provided for table {table_name}. Skipping write."
-            )
+            logging.warning(msg=f"Empty DataFrame provided for table {table_name}. Skipping write.")
             return
 
         if overwrite:
@@ -213,18 +201,12 @@ class IcebergCatalog:
             logging.info(msg=f"Purging table {table_name} - data will be removed")
             self.catalog.purge_table(identifier=table_name)
         else:
-            logging.info(
-                msg=f"Dropping table {table_name} - data will not be removed from s3. Set purge=True to delete data"
-            )
+            logging.info(msg=f"Dropping table {table_name} - data will not be removed from s3. Set purge=True to delete data")
             self.catalog.drop_table(identifier=table_name)
 
-    def list_tables(
-        self, namespace: str, pattern: str | None = None
-    ) -> list[Identifier]:
+    def list_tables(self, namespace: str, pattern: str | None = None) -> list[Identifier]:
         # Logic to list all tables in the Iceberg catalog
-        logging.info(
-            msg=f"Listing tables in catalog {self.name}, namespace: {namespace} and pattern: {pattern}"
-        )
+        logging.info(msg=f"Listing tables in catalog {self.name}, namespace: {namespace} and pattern: {pattern}")
         tables = self.catalog.list_tables(namespace=namespace)
         if pattern:
             import fnmatch

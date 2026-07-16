@@ -1,5 +1,5 @@
-from src._types.projet import SelecteurStorageOptions
 from src._enums.database import LoadStrategy
+from src._types.projet import SelecteurStorageOptions
 
 # Default NULL values
 DEFAULT_NULL_CC_CF = "Ind"

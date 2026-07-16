@@ -1,15 +1,17 @@
-from typing import Mapping, Any
-import uuid
 import json
-import pandas as pd
-import numpy as np
+import uuid
+from collections.abc import Mapping
+from typing import Any
 
+import numpy as np
+import pandas as pd
+
+from src.dags.cbcm.donnee_comptable.config import (
+    DEFAULT_NULL_CC_CF,
+)
 from src.utils.process.text import (
     convert_str_cols_to_date,
     normalize_whitespace_columns,
-)
-from src.dags.cbcm.donnee_comptable.config import (
-    DEFAULT_NULL_CC_CF,
 )
 
 corr_mois = {
@@ -109,9 +111,7 @@ def create_row_id(name_seed: str, row: Mapping[str, Any]) -> str:
 def process_demande_achat(df: pd.DataFrame) -> pd.DataFrame:
     """fichier INFBUD57"""
     # Remplacer les valeurs nulles
-    df[["centre_financier", "centre_cout"]] = df[
-        ["centre_financier", "centre_cout"]
-    ].fillna(DEFAULT_NULL_CC_CF)
+    df[["centre_financier", "centre_cout"]] = df[["centre_financier", "centre_cout"]].fillna(DEFAULT_NULL_CC_CF)
 
     # Nettoyer les champs textuels
     txt_cols = ["centre_financier", "centre_cout"]
@@ -119,24 +119,18 @@ def process_demande_achat(df: pd.DataFrame) -> pd.DataFrame:
 
     # Convertir les colonnes temporelles
     date_cols = ["date_creation_da", "date_replication"]
-    df = convert_str_cols_to_date(
-        df=df, columns=date_cols, str_date_format="%d/%m/%Y", errors="coerce"
-    )
+    df = convert_str_cols_to_date(df=df, columns=date_cols, str_date_format="%d/%m/%Y", errors="coerce")
 
     # Retirer les lignes sans date de réplication
     df = df.loc[df["date_replication"].notna()]
 
     # Ajouter les colonnes complémentaires
-    df["delai_traitement_da"] = (
-        df["date_replication"] - df["date_creation_da"]
-    ).dt.days
+    df["delai_traitement_da"] = (df["date_replication"] - df["date_creation_da"]).dt.days
     df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
 
     # Déterminer si la DA est unique ou multiple
     df_grouped = (  # pyright: ignore[reportCallIssue]
-        df.groupby(by=["id_da"], as_index=False)
-        .size()
-        .rename(columns={"size": "nb_id_da"})
+        df.groupby(by=["id_da"], as_index=False).size().rename(columns={"size": "nb_id_da"})
     )
 
     # Catégoriser les données
@@ -183,9 +177,7 @@ def process_demande_achat(df: pd.DataFrame) -> pd.DataFrame:
 def process_engagement_juridique(df: pd.DataFrame) -> pd.DataFrame:
     """fichier Z_LIST_EJ"""
     # Remplacer les valeurs nulles
-    df[["centre_financier", "centre_cout"]] = df[
-        ["centre_financier", "centre_cout"]
-    ].fillna(DEFAULT_NULL_CC_CF)
+    df[["centre_financier", "centre_cout"]] = df[["centre_financier", "centre_cout"]].fillna(DEFAULT_NULL_CC_CF)
 
     # Nettoyer les champs textuels
     txt_cols = ["centre_financier", "centre_cout", "type_ej"]
@@ -193,18 +185,14 @@ def process_engagement_juridique(df: pd.DataFrame) -> pd.DataFrame:
 
     # Convertir les colonnes temporelles
     date_cols = ["date_creation_ej"]
-    df = convert_str_cols_to_date(
-        df=df, columns=date_cols, str_date_format="%d.%m.%Y %H:%M:%S", errors="coerce"
-    )
+    df = convert_str_cols_to_date(df=df, columns=date_cols, str_date_format="%d.%m.%Y %H:%M:%S", errors="coerce")
 
     # Ajouter les colonnes complémentaires
     df["mois"] = df["date_creation_ej"].dt.month
     df["mois_nom"] = df.loc[:, "mois"].map(corr_num_mois).fillna("Non déterminé")
     df["mois_nombre_nom"] = df.loc[:, "mois_nom"].map(corr_mois).fillna(-1)
     df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
-    df["ej_cf_cc"] = (
-        df["id_ej"].astype(str) + "_" + df["centre_financier"] + "_" + df["centre_cout"]
-    )
+    df["ej_cf_cc"] = df["id_ej"].astype(str) + "_" + df["centre_financier"] + "_" + df["centre_cout"]
     df["annee_exercice"] = df.loc[:, "date_creation_ej"].dt.year
 
     # Suppression des doublons
@@ -254,25 +242,17 @@ def process_demande_paiement(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[df["statut_piece"] == "Comptabiliser"]
 
     # Ajouter les colonnes complémentaires
-    df["id_dp"] = (
-        df["annee_exercice"].astype(str) + df["societe"] + df["num_dp"].astype(str)
-    )
+    df["id_dp"] = df["annee_exercice"].astype(str) + df["societe"] + df["num_dp"].astype(str)
 
     # Convertir les colonnes temporelles
     date_cols = ["date_comptable"]
-    df = convert_str_cols_to_date(
-        df=df, columns=date_cols, str_date_format="%d.%m.%Y", errors="coerce"
-    )
+    df = convert_str_cols_to_date(df=df, columns=date_cols, str_date_format="%d.%m.%Y", errors="coerce")
 
     # Catégoriser les données
     df["mois"] = df["date_comptable"].dt.month
     df["mois_nom"] = df.loc[:, "mois"].map(corr_num_mois).fillna("Non déterminé")
     df["mois_nombre_nom"] = df.loc[:, "mois_nom"].map(corr_mois).fillna(-1)
-    df["nat_snat_nom"] = (
-        df.loc[:, "nature_sous_nature"]
-        .map(corr_nature_sous_nature)
-        .fillna("non determine")
-    )
+    df["nat_snat_nom"] = df.loc[:, "nature_sous_nature"].map(corr_nature_sous_nature).fillna("non determine")
     df["nat_snat_groupe"] = np.where(
         df["nature_sous_nature"].isin([2.1, 2.2, 2.3]),
         "Commande publique",
@@ -295,9 +275,7 @@ def process_demande_paiement_flux(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"type_flux": "dp_flux_3"})
 
     # Ajouter les colonnes complémentaires
-    df["id_dp"] = (
-        df["annee_exercice"].astype(str) + df["societe"] + df["num_dp_flux"].astype(str)
-    )
+    df["id_dp"] = df["annee_exercice"].astype(str) + df["societe"] + df["num_dp_flux"].astype(str)
 
     return df
 
@@ -309,11 +287,7 @@ def process_demande_paiement_sfp(df: pd.DataFrame) -> pd.DataFrame:
     df = normalize_whitespace_columns(df, columns=txt_cols)
 
     # Ajouter les colonnes complémentaires
-    df["id_dp"] = (
-        df["annee_exercice"].astype(str)
-        + df["societe"]
-        + df["num_piece_sfp"].astype(str)
-    )
+    df["id_dp"] = df["annee_exercice"].astype(str) + df["societe"] + df["num_piece_sfp"].astype(str)
 
     return df
 
@@ -339,11 +313,7 @@ def process_demande_paiement_carte_achat(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Ajouter les colonnes complémentaires
-    df["id_dp"] = (
-        df["annee_exercice"].astype(str)
-        + df["societe"]
-        + df["num_piece_dp_carte_achat"].astype(str)
-    )
+    df["id_dp"] = df["annee_exercice"].astype(str) + df["societe"] + df["num_piece_dp_carte_achat"].astype(str)
 
     # Suppression des doublons
     df = df.drop_duplicates(subset=["id_dp"])
@@ -353,20 +323,14 @@ def process_demande_paiement_carte_achat(df: pd.DataFrame) -> pd.DataFrame:
 def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     """fichier ZJDP"""
     # Remplacer les valeurs nulles
-    df[["centre_financier", "centre_cout"]] = df[
-        ["centre_financier", "centre_cout"]
-    ].fillna(DEFAULT_NULL_CC_CF)
+    df[["centre_financier", "centre_cout"]] = df[["centre_financier", "centre_cout"]].fillna(DEFAULT_NULL_CC_CF)
 
     # Nettoyer les champs textuels
     txt_cols = ["societe", "centre_cout", "centre_financier", "texte_de_poste"]
     df = normalize_whitespace_columns(df, columns=txt_cols)
 
     # Ajouter les colonnes complémentaires
-    df["id_dp"] = (
-        df["annee_exercice_piece_fi"].astype(str)
-        + df["societe"]
-        + df["num_piece_reference"].astype(str)
-    )
+    df["id_dp"] = df["annee_exercice_piece_fi"].astype(str) + df["societe"] + df["num_piece_reference"].astype(str)
     df["cf_cc"] = df["centre_financier"] + "_" + df["centre_cout"]
     df["id_dp_cf_cc"] = df["id_dp"] + df["cf_cc"]
 
@@ -384,9 +348,7 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     df_unique_cf_cc = df_unique_cf_cc.drop_duplicates(subset=["id_dp"])
 
     # Ajout des colonnes calculées
-    df = pd.merge(
-        left=df, right=df_grouped[["id_dp", "nb_poste"]], how="left", on="id_dp"
-    )
+    df = pd.merge(left=df, right=df_grouped[["id_dp", "nb_poste"]], how="left", on="id_dp")
     df = pd.merge(
         left=df,
         right=df_unique_cf_cc[["id_dp", "nb_unique_cf_cc", "unique_multi"]],
@@ -395,9 +357,7 @@ def process_demande_paiement_journal_pieces(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Suppression des doublons
-    df = df.drop_duplicates(
-        subset=["annee_exercice", "num_piece_reference", "societe", "poste_reference"]
-    )
+    df = df.drop_duplicates(subset=["annee_exercice", "num_piece_reference", "societe", "poste_reference"])
     df = df.drop(columns=["poste_reference"])
 
     return df
@@ -412,14 +372,12 @@ def process_demande_paiement_complet(
 ) -> pd.DataFrame:
     # Suppression des doublons sur df_demande_paiement_flux & df_demande_paiement
     # Pour les mêmes id_dp, on garde la première ligne (données identiques)
-    df_demande_paiement_flux = df_demande_paiement_flux.drop_duplicates(
-        subset=["id_dp"], keep="first"
-    )
+    df_demande_paiement_flux = df_demande_paiement_flux.drop_duplicates(subset=["id_dp"], keep="first")
 
     # Pour les mêmes id_dp, on garde la ligne avec le montant_dp le plus élevé
-    df_demande_paiement = df_demande_paiement.sort_values(
-        by="montant_dp", ascending=False
-    ).drop_duplicates(subset=["id_dp"], keep="first")
+    df_demande_paiement = df_demande_paiement.sort_values(by="montant_dp", ascending=False).drop_duplicates(
+        subset=["id_dp"], keep="first"
+    )
 
     # Fusionner les datasets
     df = pd.merge(
@@ -490,15 +448,9 @@ def process_demande_paiement_complet(
     )
 
     # Ajout des colonnes calculées
-    df["montant_poste"] = (
-        df["montant_poste_journal_pieces"]
-        .combine_first(df["montant_dp"])
-        .fillna(DEFAULT_NULL_CC_CF)
-    )
+    df["montant_poste"] = df["montant_poste_journal_pieces"].combine_first(df["montant_dp"]).fillna(DEFAULT_NULL_CC_CF)
     df["centre_financier"] = (
-        df["centre_financier_journal_pieces"]
-        .combine_first(df["centre_financier_demande_paiement"])
-        .fillna(DEFAULT_NULL_CC_CF)
+        df["centre_financier_journal_pieces"].combine_first(df["centre_financier_demande_paiement"]).fillna(DEFAULT_NULL_CC_CF)
     )
     df["centre_cout"] = df["centre_cout"].fillna(DEFAULT_NULL_CC_CF)
 
@@ -507,9 +459,7 @@ def process_demande_paiement_complet(
         (df["dp_flux_3"] == "Flux 3"),
     ]
     choices = ["DP automatisées", "DP non automatisées"]
-    df["flux_3_automatisation_compta"] = np.select(
-        condlist=conditions, choicelist=choices, default="Indéterminé"
-    )
+    df["flux_3_automatisation_compta"] = np.select(condlist=conditions, choicelist=choices, default="Indéterminé")
 
     return df
 
@@ -533,17 +483,14 @@ def process_delai_global_paiement(df: pd.DataFrame) -> pd.DataFrame:
 
     # Remplacer les valeurs nulles
     df["centre_cout"] = df["centre_cout"].replace({"#": DEFAULT_NULL_CC_CF})
-    df[["centre_financier", "centre_cout"]] = df[
-        ["centre_financier", "centre_cout"]
-    ].fillna(DEFAULT_NULL_CC_CF)
+    df[["centre_financier", "centre_cout"]] = df[["centre_financier", "centre_cout"]].fillna(DEFAULT_NULL_CC_CF)
 
     # Filtrer les lignes
     df = df.loc[df["societe"].isin(["ADCE", "CSND"])]
 
     # Ajouter un ID unique à chaque ligne
     df["id_dgp"] = [
-        create_row_id(name_seed="delai_global_paiement.INFDEP56", row=row)  # type: ignore
-        for row in df.to_dict("records")
+        create_row_id(name_seed="delai_global_paiement.INFDEP56", row=row) for row in df.to_dict("records")  # type: ignore
     ]
 
     # Ajouter les colonnes complémentaires

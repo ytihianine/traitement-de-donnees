@@ -1,11 +1,11 @@
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
-from collections.abc import Mapping
 
 from src._enums.dags import TypeSource
 from src._enums.database import LoadStrategy, PartitionTimePeriod
-from src.constants import DEFAULT_S3_CONN_ID, DEFAULT_PG_DATA_CONN_ID
+from src.constants import DEFAULT_PG_DATA_CONN_ID, DEFAULT_S3_CONN_ID
 
 
 def custom_asdict_factory(data) -> dict[str, Any]:
@@ -72,10 +72,7 @@ class SelecteurStorageInfo:
     id_source: str | None
 
     def __post_init__(self) -> None:
-        if (
-            not isinstance(self.type_source, TypeSource)
-            and self.type_source is not None
-        ):
+        if not isinstance(self.type_source, TypeSource) and self.type_source is not None:
             object.__setattr__(self, "type_source", TypeSource(value=self.type_source))
 
     def get_full_s3_key(
@@ -99,7 +96,7 @@ class SelecteurStorageInfo:
 
     def get_local_path(self) -> str:
         if self.filename is None:
-            return str(Path(self.local_dir) / "filename_undefined")  # noqa
+            return str(Path(self.local_dir) / "filename_undefined")
         return str(Path(self.local_dir) / self.filename)
 
     def get_iceberg_namespace(self, with_bucket: bool = False) -> str:
@@ -135,9 +132,7 @@ class SelecteurStorageOptions:
             )
 
         if not isinstance(self.load_strategy, LoadStrategy):
-            object.__setattr__(
-                self, "load_strategy", LoadStrategy(value=self.load_strategy)
-            )
+            object.__setattr__(self, "load_strategy", LoadStrategy(value=self.load_strategy))
 
 
 @dataclass(frozen=True)
@@ -174,10 +169,7 @@ class SelecteurConfig:
         Returns False for the special 'grist_doc' selecteur and when the
         write_to_s3_with_iceberg option is disabled.
         """
-        return (
-            self.storage_info.selecteur != "grist_doc"
-            and self.storage_options.write_to_s3_with_iceberg
-        )
+        return self.storage_info.selecteur != "grist_doc" and self.storage_options.write_to_s3_with_iceberg
 
     def should_write_to_db(self) -> bool:
         """Return True if this selecteur should be written to the database.

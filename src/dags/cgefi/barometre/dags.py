@@ -1,32 +1,29 @@
 from datetime import timedelta
 
+from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
+from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-from airflow.providers.standard.operators.empty import EmptyOperator
-from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
-
-from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
-from src._types.dags import DBParams, FeatureFlagsEnable
-from src.utils.config.dag_params import create_dag_params, create_default_args
 
 from src._enums.dags import DagStatus
-from src.common_tasks.validation import validate_dag_parameters
-from src.common_tasks.sql import (
-    create_tmp_tables,
-    copy_tmp_table_to_real_table,
-    import_file_to_db,
-    # set_dataset_last_update_date,
-)
-
+from src._types.dags import DBParams, FeatureFlagsEnable
+from src.common_tasks.projet import get_list_source_fichier, get_selecteur_config
 from src.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from src.common_tasks.projet import get_selecteur_config, get_list_source_fichier
-
+from src.common_tasks.sql import (
+    copy_tmp_table_to_real_table,
+    create_tmp_tables,
+    import_file_to_db,
+    # set_dataset_last_update_date,
+)
+from src.common_tasks.validation import validate_dag_parameters
 from src.dags.cgefi.barometre.tasks import (
     source_files,
 )
+from src.infra.mails.default_smtp import MailStatus, create_send_mail_callback
+from src.utils.config.dag_params import create_dag_params, create_default_args
 
 nom_projet = "Baromètre"
 
@@ -45,9 +42,7 @@ nom_projet = "Baromètre"
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="cgefi"),
-        feature_flags=FeatureFlagsEnable(
-            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
-        ),
+        feature_flags=FeatureFlagsEnable(db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False),
     ),
     on_failure_callback=create_send_mail_callback(mail_status=MailStatus.ERROR),
 )

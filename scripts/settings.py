@@ -66,15 +66,9 @@ class PolarisSettings(BaseSettings):
     url: str = Field(alias="POLARIS_URL", default="")
     realm: str = Field(alias="POLARIS_REALM", default="POLARIS")
     catalog_name: str = Field(alias="POLARIS_CATALOG_NAME", default="data_store")
-    principal_name: str = Field(
-        alias="POLARIS_PRINCIPAL_NAME", default="data_store_trino"
-    )
-    principal_role_name: str = Field(
-        alias="POLARIS_PRINCIPAL_ROLE_NAME", default="data_store_user_role"
-    )
-    catalog_role_name: str = Field(
-        alias="POLARIS_CATALOG_ROLE_NAME", default="data_store_catalog_role"
-    )
+    principal_name: str = Field(alias="POLARIS_PRINCIPAL_NAME", default="data_store_trino")
+    principal_role_name: str = Field(alias="POLARIS_PRINCIPAL_ROLE_NAME", default="data_store_user_role")
+    catalog_role_name: str = Field(alias="POLARIS_CATALOG_ROLE_NAME", default="data_store_catalog_role")
     ca_bundle: str = Field(alias="POLARIS_CA_BUNDLE", default="")
 
 
@@ -134,9 +128,7 @@ class LoadDatasetSettings(BaseSettings):
     db_id_colname: str = Field(alias="LOAD_DATASET_ID_COLNAME", default="id")
     import_timestamp: str = Field(alias="LOAD_DATASET_IMPORT_TIMESTAMP", default="")
     snapshot_id: str = Field(alias="LOAD_DATASET_SNAPSHOT_ID", default="")
-    tsv_file_path: str = Field(
-        alias="LOAD_DATASET_TSV_FILE_PATH", default="/tmp/df_result.tsv"
-    )
+    tsv_file_path: str = Field(alias="LOAD_DATASET_TSV_FILE_PATH", default="/tmp/df_result.tsv")
 
 
 class GenerateTablesSettings(BaseSettings):
@@ -149,9 +141,7 @@ class GenerateTablesSettings(BaseSettings):
     )
 
     dossier_parquet: str = Field(alias="GENERATE_TABLES_DOSSIER_PARQUET", default="")
-    fichier_sql: str = Field(
-        alias="GENERATE_TABLES_FICHIER_SQL", default="create_tables.sql"
-    )
+    fichier_sql: str = Field(alias="GENERATE_TABLES_FICHIER_SQL", default="create_tables.sql")
 
 
 class S3UserSettings(BaseSettings):

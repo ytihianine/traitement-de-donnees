@@ -2,7 +2,7 @@
 
 import logging
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 import trino.dbapi
@@ -60,14 +60,12 @@ class TrinoAdapter(DBInterface):
                     verify=self.verify,
                 )
             except Exception as e:
-                raise DatabaseError(f"Error connecting to Trino: {str(e)}") from e
+                raise DatabaseError(f"Error connecting to Trino: {e!s}") from e
         return self._conn
 
     def get_uri(self) -> str:
         """Return a Trino URI."""
-        return (
-            f"{self.http_scheme}://{self.user}@{self.host}:{self.port}/{self.catalog}"
-        )
+        return f"{self.http_scheme}://{self.user}@{self.host}:{self.port}/{self.catalog}"
 
     def get_conn(self) -> Any:
         return self.conn
@@ -76,9 +74,7 @@ class TrinoAdapter(DBInterface):
     # Read operations
     # ------------------------------------------------------------------
 
-    def fetch_one(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> Optional[Dict[str, Any]]:
+    def fetch_one(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> dict[str, Any] | None:
         """Fetch a single row as a dictionary."""
         try:
             start_time = time.time()
@@ -89,13 +85,11 @@ class TrinoAdapter(DBInterface):
             if row is None:
                 return None
             columns = [desc[0] for desc in cur.description]
-            return dict(zip(columns, row))
+            return dict(zip(columns, row, strict=False))
         except Exception as e:
-            raise DatabaseError(f"Error fetching row: {str(e)}") from e
+            raise DatabaseError(f"Error fetching row: {e!s}") from e
 
-    def fetch_all(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> List[Dict[str, Any]]:
+    def fetch_all(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Fetch all rows as a list of dictionaries."""
         try:
             start_time = time.time()
@@ -104,13 +98,11 @@ class TrinoAdapter(DBInterface):
             rows = cur.fetchall()
             logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
             columns = [desc[0] for desc in cur.description]
-            return [dict(zip(columns, row)) for row in rows]
-        except Exception as e:
-            raise DatabaseError(f"Error fetching rows: {str(e)}") from e
+            return [dict(zip(columns, row, strict=False)) for row in rows]
+        except Exception as err:
+            raise DatabaseError(f"Error fetching rows: {err!s}") from err
 
-    def fetch_df(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> pd.DataFrame:
+    def fetch_df(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> pd.DataFrame:
         """Fetch results as a pandas DataFrame."""
         try:
             start_time = time.time()
@@ -120,55 +112,35 @@ class TrinoAdapter(DBInterface):
             logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
             return df
         except Exception as e:
-            raise DatabaseError(f"Error fetching DataFrame: {str(e)}") from e
+            raise DatabaseError(f"Error fetching DataFrame: {e!s}") from e
 
     # ------------------------------------------------------------------
     # Unsupported write operations
     # ------------------------------------------------------------------
 
-    def execute(
-        self, query: str, parameters: Optional[Tuple[Any, ...] | dict[str, Any]] = None
-    ) -> None:
-        raise NotImplementedError(
-            "TrinoAdapter is read-only and does not support execute()."
-        )
+    def execute(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> None:
+        raise NotImplementedError("TrinoAdapter is read-only and does not support execute().")
 
-    def insert(self, table: str, data: Dict[str, Any]) -> None:
-        raise NotImplementedError(
-            "TrinoAdapter is read-only and does not support insert()."
-        )
+    def insert(self, table: str, data: dict[str, Any]) -> None:
+        raise NotImplementedError("TrinoAdapter is read-only and does not support insert().")
 
-    def bulk_insert(self, table: str, data: List[Dict[str, Any]]) -> None:
-        raise NotImplementedError(
-            "TrinoAdapter is read-only and does not support bulk_insert()."
-        )
+    def bulk_insert(self, table: str, data: list[dict[str, Any]]) -> None:
+        raise NotImplementedError("TrinoAdapter is read-only and does not support bulk_insert().")
 
-    def update(self, table: str, data: Dict[str, Any], where: Dict[str, Any]) -> None:
-        raise NotImplementedError(
-            "TrinoAdapter is read-only and does not support update()."
-        )
+    def update(self, table: str, data: dict[str, Any], where: dict[str, Any]) -> None:
+        raise NotImplementedError("TrinoAdapter is read-only and does not support update().")
 
-    def delete(self, table: str, where: Dict[str, Any]) -> None:
-        raise NotImplementedError(
-            "TrinoAdapter is read-only and does not support delete()."
-        )
+    def delete(self, table: str, where: dict[str, Any]) -> None:
+        raise NotImplementedError("TrinoAdapter is read-only and does not support delete().")
 
     def begin(self) -> None:
-        raise NotImplementedError(
-            "TrinoAdapter is read-only and does not support begin()."
-        )
+        raise NotImplementedError("TrinoAdapter is read-only and does not support begin().")
 
     def commit(self) -> None:
-        raise NotImplementedError(
-            "TrinoAdapter is read-only and does not support commit()."
-        )
+        raise NotImplementedError("TrinoAdapter is read-only and does not support commit().")
 
     def rollback(self) -> None:
-        raise NotImplementedError(
-            "TrinoAdapter is read-only and does not support rollback()."
-        )
+        raise NotImplementedError("TrinoAdapter is read-only and does not support rollback().")
 
     def copy_expert(self, sql: str, filepath: str) -> None:
-        raise NotImplementedError(
-            "TrinoAdapter is read-only and does not support copy_expert()."
-        )
+        raise NotImplementedError("TrinoAdapter is read-only and does not support copy_expert().")

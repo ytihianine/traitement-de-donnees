@@ -1,12 +1,11 @@
+import os
+from pathlib import Path
 from typing import Any
 
-
-import os
 import pandas as pd
-from pathlib import Path
+from scripts.settings import get_settings
 
 from src.constants import custom_logger
-from scripts.settings import get_settings
 
 settings = get_settings()
 
@@ -78,9 +77,7 @@ def generer_create_table(fichier_parquet, nom_table=None):
         return sql, nom_table, len(df)
 
     except Exception as e:
-        custom_logger.info(
-            msg=f"✗ Erreur avec {os.path.basename(fichier_parquet)}: {str(e)}"
-        )
+        custom_logger.info(msg=f"✗ Erreur avec {os.path.basename(fichier_parquet)}: {e!s}")
         return None, None, 0
 
 
@@ -95,9 +92,7 @@ def lire_fichiers_parquet(dossier) -> list[Any]:
 
 def main() -> None:
     """Fonction principale"""
-    custom_logger.info(
-        msg="Génération des scripts SQL CREATE TABLE depuis fichiers Parquet\n"
-    )
+    custom_logger.info(msg="Génération des scripts SQL CREATE TABLE depuis fichiers Parquet\n")
 
     # Trouver les fichiers Parquet
     fichiers = lire_fichiers_parquet(dossier=DOSSIER_PARQUET)
@@ -117,9 +112,7 @@ def main() -> None:
         if sql:
             scripts_sql.append(sql)
             tables_info.append((nom_table, nb_lignes, os.path.basename(fichier)))
-            custom_logger.info(
-                msg=f"✓ Script généré pour table '{nom_table}' ({nb_lignes} lignes)"
-            )
+            custom_logger.info(msg=f"✓ Script généré pour table '{nom_table}' ({nb_lignes} lignes)")
 
     # Écrire dans le fichier SQL
     if scripts_sql:

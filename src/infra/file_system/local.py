@@ -1,22 +1,22 @@
 """Local filesystem implementation of file handler."""
 
 import logging
+import mimetypes
 import os
 import shutil
 import tempfile
-import mimetypes
 from datetime import datetime
 from pathlib import Path
-from typing import BinaryIO, List, Optional, Union
+from typing import BinaryIO
 
-from .base import FSInterface, FileMetadata
+from .base import FileMetadata, FSInterface
 from .exceptions import FileHandlerError, FileNotFoundError, FilePermissionError
 
 
 class LocalFS(FSInterface):
     """Handler for local filesystem operations."""
 
-    def read(self, file_path: Union[str, Path], validate: bool = True) -> BinaryIO:
+    def read(self, file_path: str | Path, validate: bool = True) -> BinaryIO:
         """Read file content from local filesystem."""
         abs_path = self.get_absolute_path(file_path)
         try:
@@ -28,9 +28,7 @@ class LocalFS(FSInterface):
         except OSError as e:
             raise FileHandlerError(f"Error reading file: {abs_path}") from e
 
-    def write(
-        self, file_path: Union[str, Path], content: Union[str, bytes, BinaryIO]
-    ) -> None:
+    def write(self, file_path: str | Path, content: str | bytes | BinaryIO) -> None:
         """Write content to local filesystem."""
         abs_path = self.get_absolute_path(file_path)
         try:
@@ -63,7 +61,7 @@ class LocalFS(FSInterface):
         except OSError as e:
             raise FileHandlerError(f"Error writing file: {abs_path}") from e
 
-    def delete(self, file_path: Union[str, Path]) -> None:
+    def delete(self, file_path: str | Path) -> None:
         """Delete file from local filesystem."""
         abs_path = self.get_absolute_path(file_path)
         try:
@@ -78,15 +76,15 @@ class LocalFS(FSInterface):
         except OSError as e:
             raise FileHandlerError(f"Error deleting file: {abs_path}") from e
 
-    def delete_single(self, file_path: Union[str, Path]) -> None:
+    def delete_single(self, file_path: str | Path) -> None:
         """Delete file from local filesystem."""
         self.delete(file_path=file_path)
 
-    def exists(self, file_path: Union[str, Path]) -> bool:
+    def exists(self, file_path: str | Path) -> bool:
         """Check if file exists in local filesystem."""
         return self.get_absolute_path(file_path).exists()
 
-    def get_metadata(self, file_path: Union[str, Path]) -> FileMetadata:
+    def get_metadata(self, file_path: str | Path) -> FileMetadata:
         """Get metadata for local file."""
         abs_path = self.get_absolute_path(file_path)
         if not abs_path.exists():
@@ -112,9 +110,7 @@ class LocalFS(FSInterface):
         except OSError as e:
             raise FileHandlerError(f"Error getting metadata: {abs_path}") from e
 
-    def list_files(
-        self, directory: Union[str, Path], pattern: Optional[str] = None
-    ) -> List[str]:
+    def list_files(self, directory: str | Path, pattern: str | None = None) -> list[str]:
         """List files in local directory."""
         abs_path = self.get_absolute_path(directory)
         if not abs_path.exists():
@@ -131,7 +127,7 @@ class LocalFS(FSInterface):
         except OSError as e:
             raise FileHandlerError(f"Error listing directory: {abs_path}") from e
 
-    def move(self, source: Union[str, Path], destination: Union[str, Path]) -> None:
+    def move(self, source: str | Path, destination: str | Path) -> None:
         """Move file in local filesystem."""
         src_path = self.get_absolute_path(source)
         dst_path = self.get_absolute_path(destination)
@@ -144,15 +140,11 @@ class LocalFS(FSInterface):
             dst_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.move(str(src_path), str(dst_path))
         except PermissionError as e:
-            raise FilePermissionError(
-                f"Permission denied: {src_path} -> {dst_path}"
-            ) from e
+            raise FilePermissionError(f"Permission denied: {src_path} -> {dst_path}") from e
         except OSError as e:
-            raise FileHandlerError(
-                f"Error moving file: {src_path} -> {dst_path}"
-            ) from e
+            raise FileHandlerError(f"Error moving file: {src_path} -> {dst_path}") from e
 
-    def copy(self, source: Union[str, Path], destination: Union[str, Path]) -> None:
+    def copy(self, source: str | Path, destination: str | Path) -> None:
         """Copy file in local filesystem."""
         src_path = self.get_absolute_path(source)
         dst_path = self.get_absolute_path(destination)
@@ -165,10 +157,6 @@ class LocalFS(FSInterface):
             dst_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(str(src_path), str(dst_path))
         except PermissionError as e:
-            raise FilePermissionError(
-                f"Permission denied: {src_path} -> {dst_path}"
-            ) from e
+            raise FilePermissionError(f"Permission denied: {src_path} -> {dst_path}") from e
         except OSError as e:
-            raise FileHandlerError(
-                f"Error copying file: {src_path} -> {dst_path}"
-            ) from e
+            raise FileHandlerError(f"Error copying file: {src_path} -> {dst_path}") from e

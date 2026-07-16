@@ -31,9 +31,7 @@ class FileWriterStrategy(WriterStrategy):
             bucket=selecteur.storage_info.bucket,
         )
         s3_handler.write(
-            file_path=str(
-                selecteur.storage_info.get_full_s3_key(with_tmp_segment=True)
-            ),
+            file_path=str(selecteur.storage_info.get_full_s3_key(with_tmp_segment=True)),
             content=df.to_parquet(path=None, index=False),
         )
 

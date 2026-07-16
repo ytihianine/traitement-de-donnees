@@ -1,31 +1,30 @@
 from datetime import timedelta
+
+from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
-from src.infra.mails.default_smtp import create_send_mail_callback, MailStatus
-from src._types.dags import DBParams, FeatureFlagsEnable
-from src.utils.config.dag_params import create_dag_params, create_default_args
 from src._enums.dags import DagStatus
-from src.common_tasks.sql import (
-    create_tmp_tables,
-    copy_tmp_table_to_real_table,
-    get_projet_snapshot,
-    import_file_to_db,
-    delete_tmp_tables,
-    refresh_views,
-    # set_dataset_last_update_date,
-)
-
-from src.common_tasks.validation import validate_dag_parameters
+from src._types.dags import DBParams, FeatureFlagsEnable
+from src.common_tasks.projet import get_selecteur_config
 from src.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from src.utils.config.tasks import get_list_source_fichier
-from src.common_tasks.projet import get_selecteur_config
-
+from src.common_tasks.sql import (
+    copy_tmp_table_to_real_table,
+    create_tmp_tables,
+    delete_tmp_tables,
+    get_projet_snapshot,
+    import_file_to_db,
+    refresh_views,
+    # set_dataset_last_update_date,
+)
+from src.common_tasks.validation import validate_dag_parameters
 from src.dags.sg.siep.mmsi.oad_referentiel.tasks import ref_typologie
+from src.infra.mails.default_smtp import MailStatus, create_send_mail_callback
+from src.utils.config.dag_params import create_dag_params, create_default_args
+from src.utils.config.tasks import get_list_source_fichier
 
 # Mails
 nom_projet = "Outil aide diagnostic - référentiel"
@@ -45,9 +44,7 @@ nom_projet = "Outil aide diagnostic - référentiel"
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="siep"),
-        feature_flags=FeatureFlagsEnable(
-            db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False
-        ),
+        feature_flags=FeatureFlagsEnable(db=True, mail=False, s3=True, convert_files=False, download_grist_doc=False),
     ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,

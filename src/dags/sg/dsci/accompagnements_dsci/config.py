@@ -23,17 +23,11 @@ storage_options = {
     "correspondant_profil": SelecteurStorageOptions(tbl_order=7),
     "effectif_dsci": SelecteurStorageOptions(tbl_order=3),
     "fac_hors_bercylab_quest_accompagnement": SelecteurStorageOptions(tbl_order=6),
-    "fac_hors_bercylab_quest_accompagnement_facilitateurs": SelecteurStorageOptions(
-        tbl_order=6
-    ),
-    "fac_hors_bercylab_quest_accompagnement_participants": SelecteurStorageOptions(
-        tbl_order=6
-    ),
+    "fac_hors_bercylab_quest_accompagnement_facilitateurs": SelecteurStorageOptions(tbl_order=6),
+    "fac_hors_bercylab_quest_accompagnement_participants": SelecteurStorageOptions(tbl_order=6),
     "fac_hors_bercylab_quest_type_accompagnement": SelecteurStorageOptions(tbl_order=6),
     "formation_codev_quest_inscription": SelecteurStorageOptions(tbl_order=6),
-    "formation_fac_envie_suite_quest_satisfaction": SelecteurStorageOptions(
-        tbl_order=6
-    ),
+    "formation_fac_envie_suite_quest_satisfaction": SelecteurStorageOptions(tbl_order=6),
     "formation_fac_quest_satisfaction": SelecteurStorageOptions(tbl_order=6),
     "grist_doc": SelecteurStorageOptions(write_to_db=False),
     "laboratoires_territoriaux": SelecteurStorageOptions(tbl_order=7),

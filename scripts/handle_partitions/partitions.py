@@ -1,5 +1,6 @@
-from typing import Any, Optional
 from datetime import datetime
+from typing import Any
+
 from psycopg2 import extensions, sql
 
 from src.constants import custom_logger
@@ -9,7 +10,7 @@ def drop_partitions(
     partitions: list[tuple[Any, ...]],
     cursor: extensions.cursor,
     dry_run: bool = True,
-    from_date: Optional[list[datetime]] = None,
+    from_date: list[datetime] | None = None,
 ) -> None:
     """
     Supprime toutes les partitions d'un schéma spécifique.
@@ -25,15 +26,12 @@ def drop_partitions(
         partitions = [
             partition
             for partition in partitions
-            if any(
-                substring.strftime(format="%Y%m%d") in partition[0]
-                for substring in from_date
-            )
+            if any(substring.strftime(format="%Y%m%d") in partition[0] for substring in from_date)
         ]
 
     # Suppression des partitions
     dropped_count = 0
-    for partition_name, parent_table, schema in partitions:
+    for partition_name, _parent_table, schema in partitions:
         drop_query = sql.SQL(string="DROP TABLE IF EXISTS {}.{} CASCADE").format(
             sql.Identifier(schema), sql.Identifier(partition_name)
         )
@@ -46,13 +44,9 @@ def drop_partitions(
             dropped_count += 1
 
     if not dry_run:
-        custom_logger.info(
-            msg=f"\n{dropped_count}/{len(partitions)} partition(s) supprimée(s) avec succès"
-        )
+        custom_logger.info(msg=f"\n{dropped_count}/{len(partitions)} partition(s) supprimée(s) avec succès")
     else:
-        custom_logger.info(
-            msg=f"\n[DRY RUN] {len(partitions)} partition(s) seraient supprimées"
-        )
+        custom_logger.info(msg=f"\n[DRY RUN] {len(partitions)} partition(s) seraient supprimées")
 
     cursor.close()
 
@@ -88,19 +82,13 @@ def create_partitions(
             custom_logger.info(msg=f"[DRY RUN] {create_query}")
         else:
             cursor.execute(query=create_query)
-            custom_logger.info(
-                msg=f"✓ Partition {partition_name} created successfully."
-            )
+            custom_logger.info(msg=f"✓ Partition {partition_name} created successfully.")
             created_count += 1
 
     if not dry_run:
-        custom_logger.info(
-            msg=f"\n{created_count}/{len(tbl_names)} partitions(s) créé(s) avec succès"
-        )
+        custom_logger.info(msg=f"\n{created_count}/{len(tbl_names)} partitions(s) créé(s) avec succès")
     else:
-        custom_logger.info(
-            msg=f"\n[DRY RUN] {len(tbl_names)} partitions(s) seraient créées"
-        )
+        custom_logger.info(msg=f"\n[DRY RUN] {len(tbl_names)} partitions(s) seraient créées")
 
 
 def update_import_timestamp(
@@ -130,13 +118,9 @@ def update_import_timestamp(
             updated_count += 1
 
     if not dry_run:
-        custom_logger.info(
-            msg=f"\n{updated_count}/{len(tbl_names)} table(s) mise(s) à jour avec succès"
-        )
+        custom_logger.info(msg=f"\n{updated_count}/{len(tbl_names)} table(s) mise(s) à jour avec succès")
     else:
-        custom_logger.info(
-            msg=f"\n[DRY RUN] {len(tbl_names)} table(s) seraient misees à jour"
-        )
+        custom_logger.info(msg=f"\n[DRY RUN] {len(tbl_names)} table(s) seraient misees à jour")
 
 
 def update_snapshot_id(
@@ -165,10 +149,6 @@ def update_snapshot_id(
             updated_count += 1
 
     if not dry_run:
-        custom_logger.info(
-            msg=f"\n{updated_count}/{len(tbl_names)} table(s) mise(s) à jour avec succès"
-        )
+        custom_logger.info(msg=f"\n{updated_count}/{len(tbl_names)} table(s) mise(s) à jour avec succès")
     else:
-        custom_logger.info(
-            msg=f"\n[DRY RUN] {len(tbl_names)} table(s) seraient misees à jour"
-        )
+        custom_logger.info(msg=f"\n[DRY RUN] {len(tbl_names)} table(s) seraient misees à jour")

@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, StrEnum
 
 
 class ChoixDirection(Enum):
@@ -7,7 +7,7 @@ class ChoixDirection(Enum):
     AUTRE_DIR = "Une autre direction"
 
 
-class ColName(str, Enum):
+class ColName(StrEnum):
     nom = "A_NOM"
     prenom = "B_PRENOM"
     mail = "Mail"

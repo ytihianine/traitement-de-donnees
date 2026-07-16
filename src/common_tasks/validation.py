@@ -17,13 +17,14 @@ Usage example:
     )
 """
 
-from typing import Any, List, Mapping
 import logging
+from collections.abc import Mapping
+from typing import Any
 
 from airflow.sdk import task
 
-from src.utils.exceptions import ConfigError
 from src._enums.dags import DagStatus
+from src.utils.exceptions import ConfigError
 
 
 def _is_missing(value: Any) -> bool:
@@ -36,9 +37,7 @@ def _is_missing(value: Any) -> bool:
         return True
     if isinstance(value, str) and value.strip() == "":
         return True
-    if isinstance(value, (list, tuple, set, dict)) and len(value) == 0:
-        return True
-    return False
+    return bool(isinstance(value, (list, tuple, set, dict)) and len(value) == 0)
 
 
 @task(task_id="validate_dag_params")
@@ -47,7 +46,7 @@ def validate_dag_parameters(**context: Mapping[str, Any]) -> None:
 
     Returns a list of error messages. Empty list means validation passed.
     """
-    params = context.get("params", None)
+    params = context.get("params")
 
     if params is None:
         raise ConfigError("DAG params are required")
@@ -55,7 +54,7 @@ def validate_dag_parameters(**context: Mapping[str, Any]) -> None:
     if not isinstance(params, dict):
         raise ConfigError("DAG params must be a dictionary")
 
-    errors: List[str] = []
+    errors: list[str] = []
 
     # Check nom_projet
     if "nom_projet" not in params:
@@ -72,15 +71,11 @@ def validate_dag_parameters(**context: Mapping[str, Any]) -> None:
             try:
                 DagStatus[dag_status.upper()]
             except KeyError:
-                errors.append(
-                    f"Invalid dag_status: {dag_status}. Must be one of: {', '.join([s.name for s in DagStatus])}"
-                )
+                errors.append(f"Invalid dag_status: {dag_status}. Must be one of: {', '.join([s.name for s in DagStatus])}")
         elif isinstance(dag_status, int):
             valid_values = [s.value for s in DagStatus]
             if dag_status not in valid_values:
-                errors.append(
-                    f"Invalid dag_status value: {dag_status}. Must be one of: {valid_values}"
-                )
+                errors.append(f"Invalid dag_status value: {dag_status}. Must be one of: {valid_values}")
 
     # Check db (optional, but if present must be valid)
     if "db" in params and params["db"] is not None:
@@ -110,9 +105,7 @@ def validate_dag_parameters(**context: Mapping[str, Any]) -> None:
                 if flag not in enable:
                     errors.append(f"Missing required field: enable.{flag}")
                 elif not isinstance(enable[flag], bool):
-                    errors.append(
-                        f"Field 'enable.{flag}' must be a boolean, got {type(enable[flag]).__name__}"
-                    )
+                    errors.append(f"Field 'enable.{flag}' must be a boolean, got {type(enable[flag]).__name__}")
 
     if len(errors) > 0:
         logging.error("Validation errors: %s", errors)

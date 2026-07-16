@@ -1,13 +1,13 @@
 from functools import partial
+
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src.common_tasks.grist import generic_grist_processing
-from src._types.tasks import SingleInputStep, ETLTask
-from src._types.readers import GristReaderStrategy
-from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
-
+from src._types.readers import GristReaderStrategy
+from src._types.tasks import ETLTask, SingleInputStep
+from src._types.writers import FileWriterStrategy
+from src.common_tasks.grist import generic_grist_processing
 from src.dags.sg.dsci.accompagnements_dsci import process
 
 
@@ -1046,9 +1046,7 @@ def mission_innovation() -> None:
         add_metadata=True,
     )
     fac_hors_bercylab_quest_accompagnement_partiicipants = ETLTask(
-        task_config=TaskConfig(
-            task_id="fac_hors_bercylab_quest_accompagnement_partiicipants"
-        ),
+        task_config=TaskConfig(task_id="fac_hors_bercylab_quest_accompagnement_partiicipants"),
         target="fac_hors_bercylab_quest_accompagnement_partiicipants",
         reader=GristReaderStrategy(),
         steps=[
@@ -1068,9 +1066,7 @@ def mission_innovation() -> None:
         add_metadata=True,
     )
     fac_hors_bercylab_quest_accompagnement_facilitateurs = ETLTask(
-        task_config=TaskConfig(
-            task_id="fac_hors_bercylab_quest_accompagnement_facilitateurs"
-        ),
+        task_config=TaskConfig(task_id="fac_hors_bercylab_quest_accompagnement_facilitateurs"),
         target="fac_hors_bercylab_quest_accompagnement_facilitateurs",
         reader=GristReaderStrategy(),
         steps=[

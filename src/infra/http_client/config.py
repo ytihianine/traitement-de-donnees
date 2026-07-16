@@ -59,9 +59,7 @@ class ClientConfig:
 
         # Process auth token
         if self.auth_token:
-            self.default_headers["Authorization"] = (
-                f"{self.auth_type} {self.auth_token}"
-            )
+            self.default_headers["Authorization"] = f"{self.auth_type} {self.auth_token}"
 
     @property
     def proxies(self) -> dict[str, str]:
@@ -72,9 +70,6 @@ class ClientConfig:
 
     def with_updates(self, **kwargs) -> "ClientConfig":
         """Create a new config with updated values."""
-        new_data = {
-            field.name: getattr(self, field.name)
-            for field in self.__dataclass_fields__.values()
-        }
+        new_data = {field.name: getattr(self, field.name) for field in self.__dataclass_fields__.values()}
         new_data.update(kwargs)
         return ClientConfig(**new_data)

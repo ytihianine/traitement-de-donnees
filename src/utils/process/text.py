@@ -1,12 +1,11 @@
 """Text cleaning and normalization utilities."""
 
+import logging
 import re
 import unicodedata
-import logging
-from typing import List
-from pandas._typing import DateTimeErrorChoices
 
 import pandas as pd
+from pandas._typing import DateTimeErrorChoices
 
 
 def convert_str_cols_to_date(
@@ -19,9 +18,7 @@ def convert_str_cols_to_date(
         columns = [columns]
 
     for date_col in columns:
-        df[date_col] = pd.to_datetime(
-            df.loc[:, date_col], format=str_date_format, errors=errors
-        )
+        df[date_col] = pd.to_datetime(df.loc[:, date_col], format=str_date_format, errors=errors)
         df[date_col] = df[date_col].astype("datetime64[s]")
 
     return df
@@ -49,9 +46,7 @@ def normalize_whitespace_columns(df: pd.DataFrame, columns: list[str]) -> pd.Dat
             if isinstance(series, pd.Series):
                 df[col] = normalize_txt_column(series=series)
             else:
-                raise TypeError(
-                    f"df[col] with column name {col} is of type {type(df[col])}. Must be a pd.Series."
-                )
+                raise TypeError(f"df[col] with column name {col} is of type {type(df[col])}. Must be a pd.Series.")
         else:
             raise KeyError(f"Column {col} not found in DataFrame.")
     return df
@@ -70,9 +65,7 @@ def remove_accents(text: str) -> str:
         >>> remove_accents("été")
         "ete"
     """
-    return "".join(
-        c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c)
-    )
+    return "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c))
 
 
 def clean_text(
@@ -117,7 +110,7 @@ def clean_text(
     return text.strip()
 
 
-def check_emails_format(text: str) -> List[str]:
+def check_emails_format(text: str) -> list[str]:
     """Extract email addresses from text.
 
     Args:

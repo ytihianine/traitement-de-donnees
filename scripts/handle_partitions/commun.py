@@ -1,4 +1,5 @@
 from enum import Enum, auto
+
 from psycopg2 import extensions
 
 

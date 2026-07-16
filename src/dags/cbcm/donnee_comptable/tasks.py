@@ -1,12 +1,10 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src._types.tasks import SingleInputStep, MultiInputStep, ETLTask
-from src._types.readers import GristReaderStrategy
-from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
-
-
+from src._types.readers import GristReaderStrategy
+from src._types.tasks import ETLTask, MultiInputStep, SingleInputStep
+from src._types.writers import FileWriterStrategy
 from src.dags.cbcm.donnee_comptable import process
 
 

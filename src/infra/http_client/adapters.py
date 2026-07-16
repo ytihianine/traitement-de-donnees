@@ -1,15 +1,13 @@
 """HTTP client implementations."""
 
 import time
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import httpx
 import requests
-from requests.adapters import HTTPAdapter
 
 from src.infra.http_client.base import HttpInterface
 from src.infra.http_client.config import ClientConfig
-from src.infra.http_client.types import HTTPResponse
 from src.infra.http_client.exceptions import (
     APIError,
     AuthenticationError,
@@ -21,6 +19,10 @@ from src.infra.http_client.exceptions import (
     ResponseError,
     TimeoutError,
 )
+from src.infra.http_client.types import HTTPResponse
+
+if TYPE_CHECKING:
+    from requests.adapters import HTTPAdapter
 
 
 class HttpxClient(HttpInterface):
@@ -65,33 +67,23 @@ class HttpxClient(HttpInterface):
     def _handle_response(self, response: httpx.Response) -> HTTPResponse:
         try:
             response.raise_for_status()
-        except httpx.HTTPStatusError as e:
-            status = e.response.status_code
+        except httpx.HTTPStatusError as err:
+            status = response.status_code
             if status == 401:
-                raise AuthenticationError(
-                    message="Authentication failed", status_code=401, response=response
-                )
+                raise AuthenticationError(message="Authentication failed", status_code=401, response=response) from err
             if status == 403:
-                raise AuthorizationError(
-                    message="Authorization failed", status_code=403, response=response
-                )
+                raise AuthorizationError(message="Authorization failed", status_code=403, response=response) from err
             if status == 429:
-                raise RateLimitError(
-                    message="Rate limit exceeded", status_code=429, response=response
-                )
+                raise RateLimitError(message="Rate limit exceeded", status_code=429, response=response) from err
             if 400 <= status < 500:
-                raise RequestError(
-                    message=f"Client error: {e}", status_code=status, response=response
-                )
+                raise RequestError(message=f"Client error: {err}", status_code=status, response=response) from err
             if 500 <= status < 600:
-                raise APIError(
-                    message=f"Server error: {e}", status_code=status, response=response
-                )
+                raise APIError(message=f"Server error: {err}", status_code=status, response=response) from err
             raise ResponseError(
-                message=f"HTTP error occurred: {e}",
+                message=f"HTTP error occurred: {err}",
                 status_code=status,
                 response=response,
-            )
+            ) from err
 
         return HTTPResponse(raw=response)
 
@@ -170,43 +162,31 @@ class RequestsClient(HttpInterface):
             self._session.proxies.update(proxies)
             if self.config.user_agent:
                 https_adapter = cast(
-                    HTTPAdapter,
+                    "HTTPAdapter",
                     self._session.get_adapter(url="https://"),
                 )
-                https_adapter.proxy_manager_for(self.config.http_proxy).proxy_headers[
-                    "User-Agent"
-                ] = self.config.user_agent
+                https_adapter.proxy_manager_for(self.config.http_proxy).proxy_headers["User-Agent"] = self.config.user_agent
 
     def _handle_response(self, response: requests.Response) -> HTTPResponse:
         try:
             response.raise_for_status()
-        except requests.HTTPError as e:
+        except requests.HTTPError as err:
             status = response.status_code
             if status == 401:
-                raise AuthenticationError(
-                    message="Authentication failed", status_code=401, response=response
-                )
+                raise AuthenticationError(message="Authentication failed", status_code=401, response=response) from err
             if status == 403:
-                raise AuthorizationError(
-                    message="Authorization failed", status_code=403, response=response
-                )
+                raise AuthorizationError(message="Authorization failed", status_code=403, response=response) from err
             if status == 429:
-                raise RateLimitError(
-                    message="Rate limit exceeded", status_code=429, response=response
-                )
+                raise RateLimitError(message="Rate limit exceeded", status_code=429, response=response) from err
             if 400 <= status < 500:
-                raise RequestError(
-                    message=f"Client error: {e}", status_code=status, response=response
-                )
+                raise RequestError(message=f"Client error: {err}", status_code=status, response=response) from err
             if 500 <= status < 600:
-                raise APIError(
-                    message=f"Server error: {e}", status_code=status, response=response
-                )
+                raise APIError(message=f"Server error: {err}", status_code=status, response=response) from err
             raise ResponseError(
-                message=f"HTTP error occurred: {e}",
+                message=f"HTTP error occurred: {err}",
                 status_code=status,
                 response=response,
-            )
+            ) from err
 
         return HTTPResponse(raw=response)
 

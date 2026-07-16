@@ -1,15 +1,12 @@
-import pandas as pd
 import numpy as np
-
+import pandas as pd
 from airflow.models.variable import Variable
 
+from src.constants import AGENT, DEFAULT_GRIST_HOST, PROXY
+from src.dags.commun.code_geographique import process
 from src.infra.grist.client import GristAPI
 from src.infra.http_client.adapters import ClientConfig, RequestsClient
-from src.constants import AGENT, DEFAULT_GRIST_HOST, PROXY
 from src.utils.logs import df_info
-
-
-from src.dags.commun.code_geographique import process
 
 # Données COG
 PAGE_SIZE = "?page_size=0"  # get all data at once
@@ -30,9 +27,7 @@ def communes() -> pd.DataFrame:
     api_client = make_httpx_client()
     # URL
     url_communes = "/".join([BASE_URL, ID_DATASET_COMMUNE, "data", PAGE_SIZE])
-    url_communes_outre_mer = "/".join(
-        [BASE_URL, ID_DATASET_COMMUNE_OUTRE_MER, "data", PAGE_SIZE]
-    )
+    url_communes_outre_mer = "/".join([BASE_URL, ID_DATASET_COMMUNE_OUTRE_MER, "data", PAGE_SIZE])
     # Communes métropoles
     response = api_client.get(endpoint=url_communes)
     raw_communes = response.json()["data"]
@@ -64,11 +59,7 @@ def departements() -> pd.DataFrame:
     response = api_client.get(endpoint=url_departement)
     raw_departements = response.json()["data"]
     df = pd.DataFrame(raw_departements)
-    df = (
-        df.set_axis([colname.lower() for colname in df.columns], axis="columns")
-        .rename(columns={"__id": "id"})
-        .fillna(np.nan)
-    )
+    df = df.set_axis([colname.lower() for colname in df.columns], axis="columns").rename(columns={"__id": "id"}).fillna(np.nan)
     df_info(df=df, df_name="DF departements - Fin")
     return df
 
@@ -81,11 +72,7 @@ def regions() -> pd.DataFrame:
     response = api_client.get(endpoint=url_region)
     raw_regions = response.json()["data"]
     df = pd.DataFrame(raw_regions)
-    df = (
-        df.set_axis([colname.lower() for colname in df.columns], axis="columns")
-        .rename(columns={"__id": "id"})
-        .fillna(np.nan)
-    )
+    df = df.set_axis([colname.lower() for colname in df.columns], axis="columns").rename(columns={"__id": "id"}).fillna(np.nan)
     df_info(df=df, df_name="DF regions - Fin")
     return df
 
@@ -143,7 +130,9 @@ def code_iso_departement() -> pd.DataFrame:
 def region_geojson() -> pd.DataFrame:
     # API Client
     http_client = make_httpx_client()
-    url_region_geojson = "https://raw.githubusercontent.com/gregoiredavid/france-geojson/refs/heads/master/regions-avec-outre-mer.geojson"  # noqa
+    url_region_geojson = (
+        "https://raw.githubusercontent.com/gregoiredavid/france-geojson/refs/heads/master/regions-avec-outre-mer.geojson"
+    )
 
     response = http_client.get(endpoint=url_region_geojson)
     geojson = response.json()
@@ -170,7 +159,9 @@ def region_geojson() -> pd.DataFrame:
 def departement_geojson() -> pd.DataFrame:
     # API Client
     http_client = make_httpx_client()
-    url_departement_geojson = "https://raw.githubusercontent.com/gregoiredavid/france-geojson/refs/heads/master/departements-avec-outre-mer.geojson"  # noqa
+    url_departement_geojson = (
+        "https://raw.githubusercontent.com/gregoiredavid/france-geojson/refs/heads/master/departements-avec-outre-mer.geojson"
+    )
 
     response = http_client.get(endpoint=url_departement_geojson)
     geojson = response.json()

@@ -1,31 +1,31 @@
 """File processing task utilities using infrastructure handlers."""
 
 import logging
-from typing import Any, Callable, Dict, Optional
+from collections.abc import Callable
+from typing import Any
 
-from airflow.sdk import task
 import pandas as pd
+from airflow.sdk import task
 
-from src.infra.file_system.factory import create_default_s3_handler
-from src.infra.file_system.dataframe import read_dataframe
-
-from src.utils.config.dag_params import get_project_name, should_skip_task
 from src._enums.dags import FeatureFlags
-from src.utils.logs import df_info
+from src.infra.file_system.dataframe import read_dataframe
+from src.infra.file_system.factory import create_default_s3_handler
+from src.utils.config.dag_params import get_project_name, should_skip_task
 from src.utils.config.tasks import (
     column_mapping_dataframe,
     column_mapping_dict,
     get_selecteur_storage_info,
 )
+from src.utils.logs import df_info
 
-TaskParams = Dict[str, Any]
+TaskParams = dict[str, Any]
 
 
 def create_parquet_converter_task(
     selecteur: str,
-    task_params: Optional[TaskParams] = None,
-    process_func: Optional[Callable[[pd.DataFrame], pd.DataFrame]] = None,
-    read_options: Optional[dict[str, Any]] = None,
+    task_params: TaskParams | None = None,
+    process_func: Callable[[pd.DataFrame], pd.DataFrame] | None = None,
+    read_options: dict[str, Any] | None = None,
     apply_cols_mapping: bool = True,
 ) -> Callable:
     """Create a task that converts files to Parquet format.
@@ -59,16 +59,10 @@ def create_parquet_converter_task(
             return
 
         # Get input file path
-        logging.info(
-            msg=f"Getting configuration for project {nom_projet} and selector {selecteur}"
-        )
-        selecteur_config = get_selecteur_storage_info(
-            nom_projet=nom_projet, selecteur=selecteur
-        )
+        logging.info(msg=f"Getting configuration for project {nom_projet} and selector {selecteur}")
+        selecteur_config = get_selecteur_storage_info(nom_projet=nom_projet, selecteur=selecteur)
         source_key = selecteur_config.get_full_s3_key(use_id_source=True)
-        dest_tmp_key = selecteur_config.get_full_s3_key(
-            with_tmp_segment=True, use_id_source=False
-        )
+        dest_tmp_key = selecteur_config.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
 
         # Read input file based on extension
         logging.info(msg=f"Reading file from {source_key}")
@@ -82,9 +76,7 @@ def create_parquet_converter_task(
 
         if apply_cols_mapping:
             # Apply column mapping if available
-            cols_mapping = column_mapping_dataframe(
-                nom_projet=nom_projet, selecteur=selecteur
-            )
+            cols_mapping = column_mapping_dataframe(nom_projet=nom_projet, selecteur=selecteur)
             if cols_mapping.empty:
                 print(f"No column mapping found for selecteur {selecteur}")
             else:

@@ -10,9 +10,7 @@ from src.infra.database.sqlite import SQLiteAdapter
 def db() -> SQLiteAdapter:
     """Create an in-memory SQLite adapter for testing."""
     handler = SQLiteAdapter(connection_id=":memory:")
-    handler.execute(
-        "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)"
-    )
+    handler.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)")
     return handler
 
 
@@ -31,9 +29,7 @@ class TestSQLiteAdapterExecute:
     def test_execute_creates_table(self) -> None:
         handler = SQLiteAdapter(connection_id=":memory:")
         handler.execute("CREATE TABLE t (id INTEGER)")
-        result = handler.fetch_all(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='t'"
-        )
+        result = handler.fetch_all("SELECT name FROM sqlite_master WHERE type='table' AND name='t'")
         assert len(result) == 1
 
     def test_execute_invalid_sql_raises(self, db: SQLiteAdapter) -> None:
@@ -144,9 +140,7 @@ class TestSQLiteAdapterTransactions:
 class TestSQLiteAdapterCopyExpert:
     def test_copy_expert_loads_file(self, db: SQLiteAdapter, tmp_path) -> None:
         sql_file = tmp_path / "data.sql"
-        sql_file.write_text(
-            "INSERT INTO users (id, name, age) VALUES (1, 'Alice', 30);"
-        )
+        sql_file.write_text("INSERT INTO users (id, name, age) VALUES (1, 'Alice', 30);")
         db.copy_expert("", str(sql_file))
         result = db.fetch_one("SELECT * FROM users WHERE id = 1")
         assert result is not None

@@ -1,10 +1,11 @@
 import os
+
 import pandas as pd
 import psycopg2
+from scripts.settings import get_settings
 
 from src.constants import custom_logger
 from src.utils.process.structures import are_lists_egal
-from scripts.settings import get_settings
 
 settings = get_settings()
 
@@ -61,7 +62,7 @@ df.to_csv(path_or_buf=TSV_FILE_PATH, sep="\t", index=False)
 if not are_lists_egal(list_A=list(df.columns), list_B=db_columns):
     raise ValueError("Erreur")
 
-with open(file=TSV_FILE_PATH, mode="r") as f:
+with open(file=TSV_FILE_PATH) as f:
     pg_cur.copy_expert(
         sql=f"""
             COPY {SCHEMA}.{TABLE_NAME} ({', '.join(db_columns)})

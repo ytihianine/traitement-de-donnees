@@ -1,17 +1,15 @@
 from functools import partial
+
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
+from src._types.dags import ETLStep, TaskConfig
+from src._types.readers import GristReaderStrategy
+from src._types.tasks import ETLTask, SingleInputStep
+from src._types.writers import FileWriterStrategy
 from src.common_tasks.etl import create_task
 from src.common_tasks.grist import generic_grist_processing
-from src._types.tasks import SingleInputStep, ETLTask
-from src._types.readers import GristReaderStrategy
-from src._types.writers import FileWriterStrategy
-from src._types.dags import ETLStep, TaskConfig
-
-
-from src.dags.cbcm.ref_service_prescripteur import process
-from src.dags.cbcm.ref_service_prescripteur import actions
+from src.dags.cbcm.ref_service_prescripteur import actions, process
 
 
 @task_group(group_id="grist_source")

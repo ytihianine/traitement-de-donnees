@@ -5,36 +5,34 @@ from typing import Any
 from airflow.sdk import Variable, dag, get_current_context, task
 from airflow.sdk.bases.operator import chain
 
-from src.infra.mails.default_smtp import (
-    send_mail,
-    _callback,
-    MailStatus,
-    MailMessage,
-)
-from src.infra.file_system.factory import create_default_s3_handler
-from src.infra.catalog.iceberg import generate_catalog_properties, IcebergCatalog
-from src.utils.config.dag_params import (
-    create_default_args,
-    create_dag_params,
-    get_db_info,
-)
-from src.utils.config.tasks import get_list_source_fichier
-from src._types.dags import DBParams, FeatureFlagsEnable
-from src._types.projet import SelecteurConfig
 from src._enums.dags import DagStatus
 from src._enums.filesystem import IcebergTableStatus
-
-from src.common_tasks.sql import get_projet_snapshot  # , import_files_to_db
+from src._types.dags import DBParams, FeatureFlagsEnable
+from src._types.projet import SelecteurConfig
 from src.common_tasks.projet import config_projet_group, get_selecteur_config
 from src.common_tasks.s3 import del_iceberg_staging_table
-
+from src.common_tasks.sql import get_projet_snapshot  # , import_files_to_db
 from src.constants import (
+    DEFAULT_POLARIS_CATALOG,
     DEFAULT_POLARIS_HOST,
     DEFAULT_S3_CONN_ID,
-    DEFAULT_POLARIS_CATALOG,
     DEFAULT_TRINO_HOST,
 )
 from src.dags.dag_standard.config import storage_options
+from src.infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
+from src.infra.file_system.factory import create_default_s3_handler
+from src.infra.mails.default_smtp import (
+    MailMessage,
+    MailStatus,
+    _callback,
+    send_mail,
+)
+from src.utils.config.dag_params import (
+    create_dag_params,
+    create_default_args,
+    get_db_info,
+)
+from src.utils.config.tasks import get_list_source_fichier
 
 nom_projet = "Configuration des projets"
 
@@ -68,11 +66,7 @@ def dag_verification() -> None:
         pprint(object=context)
         pprint(object=context["dag"].__dict__)
         pprint(object=context["ti"].__dict__)
-        pprint(
-            object=context["ti"].xcom_pull(
-                key="snapshot_id", task_ids="get_projet_snapshot"
-            )
-        )
+        pprint(object=context["ti"].xcom_pull(key="snapshot_id", task_ids="get_projet_snapshot"))
 
     @task
     def send_simple_mail(**context) -> None:
@@ -98,9 +92,7 @@ def dag_verification() -> None:
         keys = s3_hook.list_files(directory="data_store/test_namespace/")
         print(keys)
         print(len(keys))
-        keys_with_pattern = s3_hook.list_files(
-            directory="data_store/test_namespace/", pattern="*_staging*"
-        )
+        keys_with_pattern = s3_hook.list_files(directory="data_store/test_namespace/", pattern="*_staging*")
         print(keys_with_pattern)
         print(len(keys_with_pattern))
 
@@ -120,9 +112,7 @@ def dag_verification() -> None:
             http_scheme="https",
             verify=False,
         )
-        df = trino_handler.fetch_df(
-            query='SELECT * FROM "infrastructure.configuration.projet".direction'
-        )
+        df = trino_handler.fetch_df(query='SELECT * FROM "infrastructure.configuration.projet".direction')
         print(df.head())
 
     @task
@@ -140,7 +130,7 @@ def dag_verification() -> None:
         key = "key/sub_key/my_table_test"
         key_split = key.split("/")
         tbl_name = key_split.pop(-1)
-        namespace = ".".join([db_schema] + key_split)
+        namespace = ".".join([db_schema, *key_split])
         catalog.write_table_and_namespace(
             df=df,
             table_status=IcebergTableStatus.PROD,
@@ -153,9 +143,7 @@ def dag_verification() -> None:
         lst_fichiers = get_list_source_fichier(nom_projet="Cartographie rémunération")
         print(lst_fichiers)
 
-    selecteur_configs = get_selecteur_config(
-        nom_projet=nom_projet, storage_options=storage_options
-    )
+    selecteur_configs = get_selecteur_config(nom_projet=nom_projet, storage_options=storage_options)
 
     @task(map_index_template="{{ import_task_name }}")
     def print_selecteur_config(

@@ -1,13 +1,13 @@
 from functools import partial
+
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 
-from src.common_tasks.grist import generic_grist_processing
-from src._types.tasks import SingleInputStep, ETLTask
-from src._types.readers import GristReaderStrategy
-from src._types.writers import FileWriterStrategy
 from src._types.dags import TaskConfig
-
+from src._types.readers import GristReaderStrategy
+from src._types.tasks import ETLTask, SingleInputStep
+from src._types.writers import FileWriterStrategy
+from src.common_tasks.grist import generic_grist_processing
 from src.dags.sg.dsci.experimentation_ia import process
 
 # Creation des taches
@@ -651,9 +651,7 @@ def repartition() -> None:
                         "referent_ia",
                         "courriel",
                     ],
-                    cols_mapping={
-                        "nbre_de_connexion_effective_au_05_03_2026": "nbre_connexion_effective"
-                    },
+                    cols_mapping={"nbre_de_connexion_effective_au_05_03_2026": "nbre_connexion_effective"},
                     txt_columns=[
                         "code",
                         "relance_dsci",

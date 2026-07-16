@@ -1,12 +1,11 @@
-from typing import Any
-import pandas as pd
 import json
+from typing import Any
+
+import pandas as pd
 
 
 def process_communes(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.set_axis(
-        labels=[colname.lower() for colname in df.columns], axis="columns"
-    ).drop(columns=["__id"])
+    df = df.set_axis(labels=[colname.lower() for colname in df.columns], axis="columns").drop(columns=["__id"])
     df["com"] = df["com"].to_string()
     return df
 
@@ -36,9 +35,7 @@ def get_code_iso_region(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df_region = df.loc[df["categorie_division"].isin(region_division)].copy()
     # Retrait de Paris et Lyon dans la liste des régions
-    df_region = df_region.loc[
-        ~df_region["libelle"].isin(["Métropole de Lyon", "Paris"])
-    ]
+    df_region = df_region.loc[~df_region["libelle"].isin(["Métropole de Lyon", "Paris"])]
 
     return df_region
 
@@ -51,9 +48,7 @@ def get_code_iso_departement(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df_departement = df.loc[df["categorie_division"].isin(departement_division)].copy()
     # Retrait de Paris et Lyon dans la liste des régions
-    df_departement = df_departement.loc[
-        ~df_departement["libelle"].isin(["Corse", "Métropole de Lyon"])
-    ]
+    df_departement = df_departement.loc[~df_departement["libelle"].isin(["Corse", "Métropole de Lyon"])]
 
     return df_departement
 
@@ -70,19 +65,11 @@ def process_code_iso(df: pd.DataFrame) -> pd.DataFrame:
     }
 
     df = df.rename(columns=cols_mapping, errors="raise").assign(
-        categorie_division=lambda df: df["categorie_division"]
-        .str.split()
-        .str.join(" "),
+        categorie_division=lambda df: df["categorie_division"].str.split().str.join(" "),
         code_iso_3166_2=lambda df: df["code_iso_3166_2"].str.split().str.join(" "),
-        libelle=lambda df: df["libelle"]
-        .str.split("(")
-        .str[0]
-        .str.split()
-        .str.join(" "),
+        libelle=lambda df: df["libelle"].str.split("(").str[0].str.split().str.join(" "),
     )
-    df = df.drop(
-        columns=["variant_local", "code_langue", "en_langue_romaine", "code_iso_parent"]
-    )
+    df = df.drop(columns=["variant_local", "code_langue", "en_langue_romaine", "code_iso_parent"])
     return df
 
 

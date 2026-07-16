@@ -1,12 +1,11 @@
-from typing import Any, Optional
+from typing import Any
 
-from src.infra.http_client.types import HTTPResponse
 import pandas as pd
 
+from src.infra.http_client.types import HTTPResponse
 
-def format_risque_results(
-    code_bat_ter: int, api_response: Optional[HTTPResponse]
-) -> list[dict[str, Any]]:
+
+def format_risque_results(code_bat_ter: int, api_response: HTTPResponse | None) -> list[dict[str, Any]]:
     # Cas d'erreur : pas de réponse API
     if api_response is None:
         return [
@@ -43,7 +42,7 @@ def format_risque_results(
     formated_risques = []
 
     # Traiter les risques naturels
-    for risque_type, risque_data in risques.get("risquesNaturels", {}).items():
+    for _risque_type, risque_data in risques.get("risquesNaturels", {}).items():
         formated_risques.append(
             {
                 **metadata,
@@ -54,7 +53,7 @@ def format_risque_results(
         )
 
     # Traiter les risques technologiques
-    for risque_type, risque_data in risques.get("risquesTechnologiques", {}).items():
+    for _risque_type, risque_data in risques.get("risquesTechnologiques", {}).items():
         formated_risques.append(
             {
                 **metadata,
@@ -67,9 +66,7 @@ def format_risque_results(
     return formated_risques
 
 
-def format_query_param(
-    adresse: str, latitude: float, longitude: float
-) -> Optional[str]:
+def format_query_param(adresse: str, latitude: float, longitude: float) -> str | None:
     if pd.isna(latitude) or pd.isna(longitude) or pd.isna(adresse):
         return None
 

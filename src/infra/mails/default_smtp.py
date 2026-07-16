@@ -1,26 +1,27 @@
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Mapping, Optional
-from jinja2 import Environment, FileSystemLoader
+from typing import Any
 
 from airflow.utils.email import send_email_smtp
+from jinja2 import Environment, FileSystemLoader
 
+from src._enums.mail import MailPriority, MailStatus
+from src._types.dags import DagStatus
+from src.constants import (
+    DEFAULT_MAIL_CC,
+    DEFAULT_SMTP_CONN_ID,
+    FF_MAIL_DISABLED_MSG,
+    PARIS_TZ,
+    get_root_folder,
+)
 from src.utils.config.dag_params import (
     get_dag_status,
     get_execution_date,
     get_feature_flags,
     get_project_name,
 )
-from src._types.dags import DagStatus
-from src._enums.mail import MailPriority, MailStatus
 from src.utils.config.tasks import get_list_contact, get_list_documentation
-from src.constants import (
-    FF_MAIL_DISABLED_MSG,
-    get_root_folder,
-    DEFAULT_SMTP_CONN_ID,
-    DEFAULT_MAIL_CC,
-    PARIS_TZ,
-)
 
 default_mail_config = {
     MailStatus.START: {
@@ -59,16 +60,16 @@ default_mail_config = {
 @dataclass
 class MailMessage:
     to: list[str]
-    mail_status: Optional[MailStatus] = None
-    subject: Optional[str] = None
+    mail_status: MailStatus | None = None
+    subject: str | None = None
     template_dir: Path | None = None
-    html_content: Optional[str] = None
+    html_content: str | None = None
     template_parameters: dict = field(default_factory=dict)
-    cc: Optional[list[str]] = None
-    bcc: Optional[list[str]] = None
-    from_email: Optional[str] = None
-    files: Optional[list[str]] = None
-    custom_headers: Optional[dict[str, Any]] = None
+    cc: list[str] | None = None
+    bcc: list[str] | None = None
+    from_email: str | None = None
+    files: list[str] | None = None
+    custom_headers: dict[str, Any] | None = None
 
     def __post_init__(self) -> None:
         # Cas 1: mail_status est précisé -> génération automatique du template
@@ -76,9 +77,7 @@ class MailMessage:
             config = default_mail_config.get(self.mail_status)
 
             if not config or not config.get("template_path"):
-                raise ValueError(
-                    f"Aucun template configuré pour le statut {self.mail_status.value}"
-                )
+                raise ValueError(f"Aucun template configuré pour le statut {self.mail_status.value}")
 
             self.html_content = render_template(
                 template_dir=self.template_dir,
@@ -90,9 +89,7 @@ class MailMessage:
 
         # Cas 2: mail_status n'est pas précisé -> html_content doit être fourni
         elif self.html_content is None or self.subject is None:
-            raise ValueError(
-                "html_content et subject doivent être fournis si mail_status n'est pas précisé"
-            )
+            raise ValueError("html_content et subject doivent être fournis si mail_status n'est pas précisé")
 
 
 def render_template(
@@ -152,19 +149,11 @@ def _callback(context: dict[str, Any], mail_status: MailStatus) -> None:
         return
 
     projet_contact = get_list_contact(nom_projet=nom_projet)
-    mail_to = [
-        contact.contact_mail for contact in projet_contact if contact.is_mail_generic
-    ]
-    mail_cc = [
-        contact.contact_mail
-        for contact in projet_contact
-        if not contact.is_mail_generic
-    ]
+    mail_to = [contact.contact_mail for contact in projet_contact if contact.is_mail_generic]
+    mail_cc = [contact.contact_mail for contact in projet_contact if not contact.is_mail_generic]
 
     projet_docs = get_list_documentation(nom_projet=nom_projet)
-    doc_pipeline = [
-        doc.lien for doc in projet_docs if doc.type_documentation == "pipeline"
-    ]
+    doc_pipeline = [doc.lien for doc in projet_docs if doc.type_documentation == "pipeline"]
     doc_data = [doc.lien for doc in projet_docs if doc.type_documentation == "data"]
     execution_date = get_execution_date(context=context)
 
@@ -180,9 +169,7 @@ def _callback(context: dict[str, Any], mail_status: MailStatus) -> None:
         template_parameters={
             "dag_name": context["dag"].dag_id,
             "dag_statut": mail_status.value,
-            "start_date": execution_date.replace(tzinfo=PARIS_TZ).strftime(
-                format="%d-%m-%Y %H:%M:%S"
-            ),
+            "start_date": execution_date.replace(tzinfo=PARIS_TZ).strftime(format="%d-%m-%Y %H:%M:%S"),
             "link_doc_pipeline": ";".join(doc_pipeline),
             "link_doc_donnees": ";".join(doc_data),
         },

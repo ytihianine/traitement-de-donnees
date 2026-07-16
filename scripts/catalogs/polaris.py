@@ -1,7 +1,7 @@
 import requests
+from scripts.settings import get_settings
 
 from src.infra.catalog.polaris import PolarisCatalog
-from scripts.settings import get_settings
 
 settings = get_settings()
 
@@ -22,39 +22,29 @@ ca_bundle = settings.polaris.ca_bundle
 polaris_client = PolarisCatalog(url=POLARIS_URL, realm=REALM)
 
 # Get root token
-token = polaris_client.get_root_access_token(
-    client_id=CLIENT_ID, client_secret=CLIENT_SECRET
-)
+token = polaris_client.get_root_access_token(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
 print("✓ Token retrieved")
 
 # Delete existing catalog if it exists
 delete_url = f"{POLARIS_URL}/api/management/v1/catalogs/{CATALOG_NAME}"
 # polaris_client.get_catalog_info(token=token, catalog_name=CATALOG_NAME)  # Check if catalog exists
 try:
-    polaris_client.delete_catalog(
-        token=token, catalog_name=CATALOG_NAME
-    )  # Delete if exists
+    polaris_client.delete_catalog(token=token, catalog_name=CATALOG_NAME)  # Delete if exists
 except Exception as e:
     print(f"✓ No existing catalog to delete: {e}")
 
 # Create catalog with credentials
 try:
-    polaris_client.create_catalog(
-        token=token, catalog_name=CATALOG_NAME, storage_config={}
-    )
+    polaris_client.create_catalog(token=token, catalog_name=CATALOG_NAME, storage_config={})
     print("✓ Catalog created")
 except Exception as e:
     print(f"✗ Catalog creation failed - might already exists: {e}")
 
 
 # Create principal
-client_id, client_secret = polaris_client.create_principal(
-    token, principal_name=PRINCIPAL_NAME
-)
+client_id, client_secret = polaris_client.create_principal(token, principal_name=PRINCIPAL_NAME)
 # Export credentials to .env file
-credentials_file = (
-    "/home/onyxia/work/traitement-des-donnees/scripts/catalogs/.env.polaris"
-)
+credentials_file = "/home/onyxia/work/traitement-des-donnees/scripts/catalogs/.env.polaris"
 with open(file=credentials_file, mode="w") as f:
     f.write(f"POLARIS_CLIENT_ID={client_id}\n")
     f.write(f"POLARIS_CLIENT_SECRET={client_secret}\n")
@@ -67,17 +57,13 @@ except Exception:
     print("✓ Principal role already exists")
 
 try:
-    polaris_client.create_catalog_role(
-        token, catalog_name=CATALOG_NAME, role_name=CATALOG_ROLE_NAME
-    )
+    polaris_client.create_catalog_role(token, catalog_name=CATALOG_NAME, role_name=CATALOG_ROLE_NAME)
     print("✓ Roles created")
 except Exception:
     print("✓ Catalog role already exists")
 
 # Assign roles
-polaris_client.assign_principal_role(
-    token, principal_name=PRINCIPAL_NAME, role_name=PRINCIPAL_ROLE_NAME
-)
+polaris_client.assign_principal_role(token, principal_name=PRINCIPAL_NAME, role_name=PRINCIPAL_ROLE_NAME)
 polaris_client.assign_catalog_role(
     token,
     principal_role_name=PRINCIPAL_ROLE_NAME,
