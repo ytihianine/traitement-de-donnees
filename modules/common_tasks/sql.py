@@ -429,19 +429,44 @@ def delete_tmp_tables(
         db.execute(query=f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
 
 
-def _create_append_copy_query(prod_table: str, tmp_table: str, cols: str) -> str:
+def _create_append_copy_query(prod_table: str, tmp_table: str, col_list: list[str]) -> str:
     """Create SQL query for APPEND load strategy."""
+    cols = ", ".join(col_list)
     return f"INSERT INTO {prod_table} ({cols}) SELECT {cols} FROM {tmp_table};"
 
 
-def _create_full_load_copy_query(prod_table: str, tmp_table: str, cols: str) -> str:
+def _create_full_load_copy_query(prod_table: str, tmp_table: str, col_list: list[str]) -> str:
     """Create SQL query for FULL_LOAD load strategy."""
+    cols = ", ".join(col_list)
     return f"DELETE FROM {prod_table}; INSERT INTO {prod_table} ({cols}) SELECT {cols} FROM {tmp_table};"
 
 
-def _create_incremental_copy_query() -> str:
+def _create_incremental_copy_query(
+    prod_table: str,
+    tmp_table: str,
+    col_list: list[str],
+    pk_cols: list[str],
+    merge_delete: bool = False,
+) -> str:
     """Create SQL query for INCREMENTAL load strategy."""
-    return ""
+    merge_query = f"""
+        MERGE INTO {prod_table} tbl_target
+        USING {tmp_table} tbl_source ON ({' AND '.join([f'tbl_source.{col} = tbl_target.{col}' for col in pk_cols])})
+        WHEN MATCHED THEN
+            UPDATE SET {", ".join([f"{col}=tbl_source.{col}" for col in col_list if col not in pk_cols])}
+        WHEN NOT MATCHED THEN
+            INSERT ({', '.join(col_list)})
+                VALUES ({', '.join([f'tbl_source.{col}' for col in col_list])})
+    """
+
+    if merge_delete:
+        merge_query += """
+            WHEN NOT MATCHED BY SOURCE THEN
+                DELETE
+            ;
+        """
+
+    return merge_query
 
 
 def _generate_copy_query(
@@ -472,46 +497,33 @@ def _generate_copy_query(
         selecteur_config=selecteur_config,
         schema=prod_schema,
     )
-    cols = ", ".join(col_list)
 
-    _registry = {
-        LoadStrategy.APPEND: _create_append_copy_query,
-        LoadStrategy.FULL_LOAD: _create_full_load_copy_query,
-        LoadStrategy.INCREMENTAL: _create_incremental_copy_query,
-    }
-    query = ""
-    if load_strategy == LoadStrategy.APPEND:
-        query = _registry[LoadStrategy.APPEND](prod_table=prod_table, tmp_table=tmp_table, cols=cols)
-
-    if load_strategy == LoadStrategy.FULL_LOAD:
-        del_query = f"DELETE FROM {prod_table};"
-        insert_query = f"INSERT INTO {prod_table} ({cols}) SELECT {cols} FROM {tmp_table};"
-        query = f"{del_query} {insert_query}"
-
-    if load_strategy == LoadStrategy.INCREMENTAL:
+    def _build_incremental_query() -> str:
         pk_cols = _get_primary_keys(schema=prod_schema, table=tbl_name, db_handler=db_handler)
         logging.info(msg=f"Table <{tbl_name}> primary key: {pk_cols}")
+        return _create_incremental_copy_query(
+            prod_table=prod_table,
+            tmp_table=tmp_table,
+            col_list=col_list,
+            pk_cols=pk_cols,
+            merge_delete=merge_delete,
+        )
 
-        merge_query = f"""
-            MERGE INTO {prod_table} tbl_target
-            USING {tmp_table} tbl_source ON ({' AND '.join([f'tbl_source.{col} = tbl_target.{col}' for col in pk_cols])})
-            WHEN MATCHED THEN
-                UPDATE SET {", ".join([f"{col}=tbl_source.{col}" for col in col_list if col not in pk_cols])}
-            WHEN NOT MATCHED THEN
-                INSERT ({', '.join(col_list)})
-                    VALUES ({', '.join([f'tbl_source.{col}' for col in col_list])})
-        """
+    _registry = {
+        LoadStrategy.APPEND: lambda: _create_append_copy_query(
+            prod_table=prod_table,
+            tmp_table=tmp_table,
+            col_list=col_list,
+        ),
+        LoadStrategy.FULL_LOAD: lambda: _create_full_load_copy_query(
+            prod_table=prod_table,
+            tmp_table=tmp_table,
+            col_list=col_list,
+        ),
+        LoadStrategy.INCREMENTAL: _build_incremental_query,
+    }
 
-        if merge_delete:
-            merge_query += """
-                WHEN NOT MATCHED BY SOURCE THEN
-                    DELETE
-                ;
-            """
-
-        query = merge_query
-
-    return query
+    return _registry[load_strategy]()
 
 
 @task(task_id="copy_tmp_table_to_real_table")
