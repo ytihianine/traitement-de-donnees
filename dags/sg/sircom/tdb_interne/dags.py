@@ -71,7 +71,7 @@ def tdb_sircom() -> None:
         ressources_humaines(),
         create_tmp_tables(reset_id_seq=False),
         import_file_to_db.expand(selecteur_config=selecteur_configs),
-        copy_tmp_table_to_real_table(),
+        copy_tmp_table_to_real_table(storage_options=storage_options),
         update_projet_snapshot_status(),
         delete_tmp_tables(),
     )
