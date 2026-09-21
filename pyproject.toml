@@ -24,8 +24,8 @@ default = [
     "openpyxl==3.1.5",
     "xlrd==2.0.2",
     "tenacity==9.1.4",
-    "trino==0.338.0",
-    "psycopg2-binary==2.9.12",
+    "trino==0.339.0",
+    "psycopg2-binary==2.9.13",
 ]
 
 # ---- Airflow core ----------------------------------------------------------
@@ -39,23 +39,23 @@ airflow = [
 # ---- Airflow providers -----------------------------------------------------
 
 airflow-providers = [
-    "apache-airflow-providers-amazon==9.34.0",
+    "apache-airflow-providers-amazon==9.35.1",
     "apache-airflow-providers-celery==3.23.1",
     "apache-airflow-providers-common-compat==1.18.0",
     "apache-airflow-providers-common-io==1.8.0",
     "apache-airflow-providers-common-messaging==2.0.4",
-    "apache-airflow-providers-common-sql==2.1.0",
+    "apache-airflow-providers-common-sql==2.1.1",
     "apache-airflow-providers-http==6.0.5",
-    "apache-airflow-providers-postgres==7.0.1",
+    "apache-airflow-providers-postgres==7.0.2",
     "apache-airflow-providers-smtp==3.0.3",
-    "apache-airflow-providers-standard==1.17.0",
-    "apache-airflow-providers-openlineage==2.20.0",
+    "apache-airflow-providers-standard==1.18.0",
+    "apache-airflow-providers-openlineage==2.20.1",
 ]
 
 # ---- Iceberg / S3 ----------------------------------------------------------
 
 iceberg = [
-    "pyiceberg[s3fs,pandas,pyarrow,sql-postgres]==0.11.1",
+    "pyiceberg[s3fs,pandas,pyarrow,sql-postgres]==0.12.0",
 ]
 
 # ---- Development -----------------------------------------------------------
@@ -63,7 +63,7 @@ iceberg = [
 dev = [
     "pytest==9.1.1",
     "pre-commit==4.6.2",
-    "complexipy==7.0.1",
+    "complexipy==8.0.1",
 ]
 
 
