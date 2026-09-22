@@ -20,7 +20,6 @@ from modules.domain.projet.model import (
 from modules.infra.database.base import DBInterface
 from modules.infra.database.exceptions import DatabaseError
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
-from modules.utils.exceptions import ConfigError
 
 CONF_SCHEMA = "conf_projets"
 logger = logging.getLogger(name=__name__)
@@ -120,10 +119,7 @@ def get_projet_s3_info(
     df = db.fetch_df(query, parameters=(nom_projet,))
 
     if df.empty:
-        raise ConfigError(
-            message=f"No S3 configuration found for project {nom_projet}",
-            nom_projet=nom_projet,
-        )
+        raise ValueError(f"No S3 configuration found for project {nom_projet}")
 
     record = df.iloc[0].to_dict(into=dict)
     return ProjetS3(**record)  # type: ignore

@@ -19,7 +19,6 @@ from modules.domain.selecteur.model import (
 from modules.infra.database.base import DBInterface
 from modules.infra.database.exceptions import DatabaseError
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
-from modules.utils.exceptions import ConfigError
 
 CONF_SCHEMA = "conf_projets"
 logger = logging.getLogger(name=__name__)
@@ -218,10 +217,8 @@ def get_selecteur_storage_info(
     configs = _get_selecteur_storage_info(nom_projet=nom_projet, selecteur=selecteur, local_dir=local_dir)
 
     if not configs:
-        raise ConfigError(
-            message=f"No storage info found for project {nom_projet} and selecteur {selecteur}",
-            nom_projet=nom_projet,
-            selecteur=selecteur,
+        raise AttributeError(
+            f"No storage info found for project {nom_projet} and selecteur {selecteur}"
         )
 
     return configs[0]

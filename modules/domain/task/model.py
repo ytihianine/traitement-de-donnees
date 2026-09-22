@@ -15,8 +15,8 @@ from modules.domain.projet.model import ProjetMetadata
 from modules.domain.selecteur.model import SelecteurConfig
 from modules.domain.task.data_readers import DataContext, ReaderStrategy
 from modules.domain.task.data_writers import WriterStrategy
-from modules.utils.config.dag_params import get_execution_date, get_project_name
-from modules.utils.config.tasks import get_projet_metadata
+from modules.domain.dag.service import get_execution_date, get_project_name
+from modules.domain.projet.service import get_projet_metadata
 from modules.utils.logs import df_info
 
 
