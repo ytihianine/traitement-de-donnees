@@ -7,16 +7,15 @@ from typing import Any
 import pandas as pd
 from airflow.sdk import task
 
-from modules.enums.dags import FeatureFlags
-from modules.enums.filesystem import FileHandlerType
-from modules.infra.file_system.dataframe import read_dataframe
-from modules.infra.file_system.factory import FSConfig, create_file_handler
-from modules.utils.config.dag_params import get_project_name, should_skip_task
-from modules.utils.config.tasks import (
+from modules.domain.dag.model import FeatureFlags
+from modules.domain.selecteur.selecteur_service import (
     column_mapping_dataframe,
     column_mapping_dict,
     get_selecteur_storage_info,
 )
+from modules.infra.airflow.service import get_project_name, should_skip_task
+from modules.infra.file_system.dataframe import read_dataframe
+from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 from modules.utils.logs import df_info
 
 TaskParams = dict[str, Any]

@@ -7,7 +7,6 @@ from typing import Any
 from airflow.sdk import task
 
 from modules.domain.dag.model import DagConfig
-from modules.utils.exceptions import ConfigError
 
 
 @task(task_id="validate_dag_params")
@@ -19,10 +18,10 @@ def validate_dag_parameters(**context: Mapping[str, Any]) -> None:
     params = context.get("params")
 
     if params is None:
-        raise ConfigError("DAG params are required")
+        raise AttributeError("DAG params are required")
 
     if not isinstance(params, dict):
-        raise ConfigError("DAG params must be a dictionary")
+        raise AttributeError("DAG params must be a dictionary")
 
     # Init class to check for errors.
     DagConfig.from_dag_context(context_params=params)

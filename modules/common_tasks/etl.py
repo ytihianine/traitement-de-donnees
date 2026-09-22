@@ -7,23 +7,21 @@ from typing import Any
 import pandas as pd
 from airflow.sdk import XComArg, task
 
-from modules.enums.filesystem import FileHandlerType
+from modules.domain.selecteur.selecteur_service import get_selecteur_storage_info
+from modules.domain.task.model import ETLStep, TaskConfig
+from modules.infra.airflow.service import get_project_name
 from modules.infra.file_system.dataframe import read_dataframe, write_dataframe
 from modules.infra.file_system.factory import (
+    FileHandlerType,
     FSConfig,
     create_file_handler,
 )
-from modules.types.dags import ETLStep, TaskConfig
-from modules.utils.config.dag_params import get_project_name
-from modules.utils.config.tasks import (
-    get_projet_metadata,
-    get_selecteur_storage_info,
-)
+from modules.infra.project.postgres import PostgresProjectRepository
 from modules.utils.logs import df_info
 
 
 def _add_metadata(df: pd.DataFrame, nom_projet: str) -> pd.DataFrame:
-    metadata = get_projet_metadata(nom_projet=nom_projet)
+    metadata = PostgresProjectRepository().get_projet_metadata(nom_projet=nom_projet)
 
     df["import_timestamp"] = metadata.import_timestamp
     df["snapshot_id"] = str(metadata.snapshot_id)
