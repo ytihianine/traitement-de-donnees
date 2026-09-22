@@ -1,9 +1,33 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import timedelta
+from enum import Enum, auto
 from typing import Any
 
 from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
+
+
+class PartitionTimePeriod(Enum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values) -> str:
+        return name.upper()
+
+    DAY = auto()
+    WEEK = auto()
+    MONTH = auto()
+    YEAR = auto()
+
+
+class LoadStrategy(Enum):
+    """Load strategies for data ingestion."""
+
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values) -> str:
+        return name.upper()
+
+    FULL_LOAD = auto()
+    INCREMENTAL = auto()
+    APPEND = auto()
 
 
 @dataclass(frozen=True)
