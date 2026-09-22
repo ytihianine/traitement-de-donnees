@@ -5,6 +5,9 @@ from typing import Any
 from modules.constants import DEFAULT_TMP_SCHEMA
 
 
+# =================
+# Enums
+# =================
 class DagStatus(Enum):
     """DAG status"""
 
@@ -12,6 +15,19 @@ class DagStatus(Enum):
     DEV = auto()
 
 
+class FeatureFlags(Enum):
+    """Feature flags for conditional task execution"""
+
+    DB = "db"
+    MAIL = "mail"
+    S3 = "s3"
+    CONVERT_FILES = "convert_files"
+    DOWNLOAD_GRIST_DOC = "download_grist_doc"
+
+
+# =================
+# Dataclasses
+# =================
 @dataclass(frozen=True)
 class DBParams:
     prod_schema: str
