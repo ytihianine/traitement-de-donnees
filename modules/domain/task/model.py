@@ -9,13 +9,19 @@ import pandas as pd
 from airflow.sdk import XComArg, task
 from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
 
-from modules.domain.dag.service import get_execution_date, get_project_name
 from modules.domain.projet.model import ProjetMetadata
-from modules.domain.projet.service import get_projet_metadata
+from modules.domain.projet.repository import ProjectRepository
 from modules.domain.selecteur.model import SelecteurConfig
 from modules.domain.task.data_readers import DataContext, ReaderStrategy
 from modules.domain.task.data_writers import WriterStrategy
+from modules.infra.airflow.service import get_execution_date, get_project_name
 from modules.utils.logs import df_info
+
+
+def _default_project_repository() -> ProjectRepository:
+    from modules.infra.project.postgres import PostgresProjectRepository
+
+    return PostgresProjectRepository()
 
 
 @dataclass(frozen=True)
@@ -87,10 +93,12 @@ class RuntimeContext:
         cls,
         context: dict[str, Any],
         selecteur_config_task_id: str,
+        project_repository: ProjectRepository | None = None,
     ) -> "RuntimeContext":
         project_name = get_project_name(context=context)
         execution_date = get_execution_date(context=context)
-        metadata = get_projet_metadata(nom_projet=project_name)
+        repository = project_repository or _default_project_repository()
+        metadata = repository.get_projet_metadata(nom_projet=project_name)
         snapshot_id = metadata.snapshot_id
 
         if not snapshot_id:
@@ -126,6 +134,7 @@ class ETLTask(ABC):
     writers: list[WriterStrategy] = field(default_factory=list)
     add_metadata: bool = True
     selecteur_config_task_id: str = "get_selecteur_config"
+    project_repository: ProjectRepository | None = None
 
     def _add_metadata(
         self,
@@ -146,6 +155,7 @@ class ETLTask(ABC):
         runtime = RuntimeContext.from_airflow(
             context=context,
             selecteur_config_task_id=self.selecteur_config_task_id,
+            project_repository=self.project_repository,
         )
 
         if self.target not in runtime.selecteurs:

@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any
 
 from modules.constants import DEFAULT_TMP_SCHEMA
 
@@ -59,11 +58,6 @@ class FeatureFlagsEnable:
     s3: bool
     convert_files: bool
     download_grist_doc: bool
-
-
-def is_key_in_dict(key: str, d: dict[str, Any]) -> bool:
-    """Check if a key is present in a dictionary and not None."""
-    return key in d
 
 
 @dataclass(frozen=True)
