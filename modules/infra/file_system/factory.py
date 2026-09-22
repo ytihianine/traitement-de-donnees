@@ -1,13 +1,39 @@
 """Factory for creating file handlers."""
 
 from dataclasses import dataclass
+from enum import Enum, auto
 from pathlib import Path
 
 from modules.constants import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
-from modules.enums.filesystem import FileHandlerType
 from modules.infra.file_system.base import FSInterface
 from modules.infra.file_system.local import LocalFS
 from modules.infra.file_system.s3 import S3FS
+
+
+class FileHandlerType(Enum):
+    """File handler types enumeration."""
+
+    S3 = auto()
+    LOCAL = auto()
+
+
+class FileFormat(Enum):
+    """Supported file formats for ETL operations."""
+
+    CSV = auto()
+    EXCEL = auto()
+    XLSX = auto()
+    XLS = auto()
+    XLSB = auto()
+    PARQUET = auto()
+    JSON = auto()
+    AUTO = auto()
+
+
+class IcebergTableStatus(Enum):
+
+    STAGING = auto()
+    PROD = auto()
 
 
 @dataclass(frozen=True)
@@ -57,8 +83,8 @@ def create_file_handler(
         ValueError: If handler_type is unsupported or required args are missing
 
     Examples:
-        >>> handler = create_file_handler(FileHandlerType.LOCAL, config=FSConfig(base_path="/data"))
-        >>> handler = create_file_handler(FileHandlerType.S3, config=FSConfig(bucket="my-bucket", connection_id="s3_conn"))
+        handler = create_file_handler(FileHandlerType.LOCAL, config=FSConfig(base_path="/data"))
+        handler = create_file_handler(FileHandlerType.S3, config=FSConfig(bucket="my-bucket", connection_id="s3_conn"))
     """
     _handler_registry = {
         FileHandlerType.LOCAL: _create_local_handler,

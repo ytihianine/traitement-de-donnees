@@ -1,5 +1,6 @@
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -13,8 +14,7 @@ from modules.constants import (
     PARIS_TZ,
     get_root_folder,
 )
-from modules.enums.mail import MailPriority, MailStatus
-from modules.types.dags import DagStatus
+from modules.domain.models.dags import DagStatus
 from modules.utils.config.dag_params import (
     get_dag_status,
     get_execution_date,
@@ -22,6 +22,26 @@ from modules.utils.config.dag_params import (
     get_project_name,
 )
 from modules.utils.config.tasks import get_list_contact, get_list_documentation
+
+
+class MailStatus(Enum):
+    """Mail notification status types."""
+
+    START = "Début"
+    SUCCESS = "Succès"
+    ERROR = "Erreur"
+    SKIP = "Skip"
+    WARNING = "Warning"
+    INFO = "Information"
+
+
+class MailPriority(Enum):
+    """Mail priority levels."""
+
+    NORMAL = 0
+    LOW = 1
+    HIGH = 2
+
 
 default_mail_config = {
     MailStatus.START: {
