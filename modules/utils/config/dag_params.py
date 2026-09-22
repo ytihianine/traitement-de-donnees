@@ -14,11 +14,11 @@ from modules.constants import (
     FF_MAIL_DISABLED_MSG,
     FF_S3_DISABLED_MSG,
 )
-from modules.enums.dags import FeatureFlags
-from modules.types.dags import (
-    DagParams,
+from modules.domain.models.dags import (
+    DagConfig,
     DagStatus,
     DBParams,
+    FeatureFlags,
     FeatureFlagsEnable,
 )
 
@@ -147,8 +147,8 @@ def create_dag_params(
     feature_flags: FeatureFlagsEnable,
 ) -> dict:
     """Create standard params for dags."""
-    # Using DagParams for type checking
-    dag_params = DagParams(
+    # Using DagConfig for type checking
+    dag_params = DagConfig(
         nom_projet=nom_projet,
         dag_status=dag_status.value,
         db=db_params,
