@@ -14,7 +14,7 @@ from modules.constants import (
     FF_MAIL_DISABLED_MSG,
     FF_S3_DISABLED_MSG,
 )
-from modules.domain.models.dags import (
+from modules.domain.dag.model import (
     DagConfig,
     DagStatus,
     DBParams,
