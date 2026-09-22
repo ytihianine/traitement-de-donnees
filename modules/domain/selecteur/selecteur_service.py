@@ -13,14 +13,11 @@ from tenacity import (
 )
 
 from modules.constants import DEFAULT_PG_DATA_CONN_ID
-from modules.enums.database import DatabaseType
 from modules.infra.database.base import DBInterface
 from modules.infra.database.exceptions import DatabaseError
-from modules.infra.database.factory import DbConfig, create_db_handler
-from modules.types.projet import (
+from modules.infra.database.factory import DbConfig, DatabaseType, create_db_handler
+from modules.domain.selecteur.model import (
     SelecteurConfig,
-    SelecteurStorageInfo,
-    SelecteurStorageOptions,
 )
 from modules.utils.exceptions import ConfigError
 
