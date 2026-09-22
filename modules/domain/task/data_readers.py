@@ -5,12 +5,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from modules.domain.models.selecteurs import SelecteurConfig
-from modules.enums.database import DatabaseType
-from modules.enums.filesystem import FileHandlerType
-from modules.infra.database.factory import DbConfig, create_db_handler
+from modules.domain.selecteur.model import SelecteurConfig
+from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 from modules.infra.file_system.dataframe import read_dataframe
-from modules.infra.file_system.factory import FSConfig, create_file_handler
+from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 
 
 @dataclass

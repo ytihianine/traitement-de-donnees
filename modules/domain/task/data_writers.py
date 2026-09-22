@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from modules.domain.models.selecteurs import SelecteurConfig
+from modules.domain.selecteur.model import SelecteurConfig
 from modules.enums.filesystem import FileHandlerType
 from modules.infra.file_system.factory import FSConfig, create_file_handler
 

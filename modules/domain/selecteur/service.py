@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
 
-from modules.domain.models.projet import Contact, Documentation
-from modules.domain.models.selecteurs import SelecteurConfig
+from modules.domain.projet.model import Contact, Documentation
+from modules.domain.selecteur.model import SelecteurConfig
 from modules.infra.database.base import DBInterface
 
 

@@ -11,10 +11,10 @@ from airflow.sdk import XComArg, task
 from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
 
 from modules.constants import DEFAULT_PG_DATA_CONN_ID, DEFAULT_S3_CONN_ID
-from modules.domain.models.projet import ProjetMetadata
-from modules.domain.models.selecteurs import SelecteurConfig
-from modules.domain.services.data_readers import DataContext, ReaderStrategy
-from modules.domain.services.data_writers import WriterStrategy
+from modules.domain.projet.model import ProjetMetadata
+from modules.domain.selecteur.model import SelecteurConfig
+from modules.domain.task.data_readers import DataContext, ReaderStrategy
+from modules.domain.task.data_writers import WriterStrategy
 from modules.utils.config.dag_params import get_execution_date, get_project_name
 from modules.utils.config.tasks import get_projet_metadata
 from modules.utils.logs import df_info
