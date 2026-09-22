@@ -4,8 +4,7 @@ from dataclasses import dataclass
 import pandas as pd
 
 from modules.domain.selecteur.model import SelecteurConfig
-from modules.enums.filesystem import FileHandlerType
-from modules.infra.file_system.factory import FSConfig, create_file_handler
+from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 
 
 class WriterStrategy(ABC):
@@ -28,12 +27,12 @@ class FileWriterStrategy(WriterStrategy):
         s3_handler = create_file_handler(
             handler_type=FileHandlerType.S3,
             config=FSConfig(
-                bucket=selecteur.storage_info.bucket,
-                connection_id=selecteur.storage_options.s3_conn_id,
+                bucket=selecteur.bucket,
+                connection_id=selecteur.execution_options.s3_conn_id,
             ),
         )
         s3_handler.write(
-            file_path=str(selecteur.storage_info.get_full_s3_key(with_tmp_segment=True)),
+            file_path=str(selecteur.get_full_s3_key(with_tmp_segment=True)),
             content=df.to_parquet(path=None, index=False),
         )
 

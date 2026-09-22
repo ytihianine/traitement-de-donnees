@@ -57,19 +57,15 @@ class GristReaderStrategy(ReaderStrategy):
         if self.doc_selecteur_name not in selecteurs:
             raise ValueError(f"Document selecteur '{self.doc_selecteur_name}' not found in runtime configs")
 
-        table_info = selecteur.storage_info
-        document_config = selecteurs[self.doc_selecteur_name]
-        document_info = document_config.storage_info
-
-        if table_info.id_source is None:
-            raise ValueError(f"id_source must be defined for '{table_info.selecteur}'.")
+        if selecteur.id_source is None:
+            raise ValueError(f"id_source must be defined for '{selecteur.selecteur}'.")
 
         # Handlers
         s3_handler = create_file_handler(
             handler_type=FileHandlerType.S3,
             config=FSConfig(
-                bucket=table_info.bucket,
-                connection_id=selecteur.storage_options.s3_conn_id,
+                bucket=selecteur.bucket,
+                connection_id=selecteur.execution_options.s3_conn_id,
             ),
         )
         local_handler = create_file_handler(
@@ -79,7 +75,7 @@ class GristReaderStrategy(ReaderStrategy):
             ),
         )
 
-        doc_local_path = Path("/tmp") / document_info.filename
+        doc_local_path = Path("/tmp") / selecteur.filename
 
         sqlite_handler = create_db_handler(
             db_type=DatabaseType.SQLITE,
@@ -89,7 +85,7 @@ class GristReaderStrategy(ReaderStrategy):
         )
 
         # Download the Grist document locally
-        grist_doc = s3_handler.read(file_path=document_info.get_full_s3_key(with_tmp_segment=True))
+        grist_doc = s3_handler.read(file_path=selecteur.get_full_s3_key(with_tmp_segment=True))
 
         local_handler.write(
             file_path=str(doc_local_path),
@@ -97,9 +93,9 @@ class GristReaderStrategy(ReaderStrategy):
         )
 
         # Read the requested table
-        df = sqlite_handler.fetch_df(query=f"SELECT * FROM {table_info.id_source}")
+        df = sqlite_handler.fetch_df(query=f"SELECT * FROM {selecteur.id_source}")
 
-        self.context.add(name=table_info.selecteur, df=df)
+        self.context.add(name=selecteur.selecteur, df=df)
         return self.context
 
 
@@ -115,16 +111,16 @@ class FileReaderStrategy(ReaderStrategy):
         fs_handler = create_file_handler(
             handler_type=self.fs_type,
             config=FSConfig(
-                bucket=selecteur.storage_info.bucket,
-                connection_id=selecteur.storage_options.s3_conn_id,
+                bucket=selecteur.bucket,
+                connection_id=selecteur.execution_options.s3_conn_id,
             ),
         )
         df = read_dataframe(
             file_handler=fs_handler,
-            file_path=selecteur.storage_info.get_full_s3_key(use_id_source=True),
-            read_options=selecteur.storage_options.read_options,
+            file_path=selecteur.get_full_s3_key(use_id_source=True),
+            read_options=selecteur.execution_options.read_options,
         )
-        self.context.add(name=selecteur.storage_info.selecteur, df=df)
+        self.context.add(name=selecteur.selecteur, df=df)
         return self.context
 
 
@@ -140,9 +136,9 @@ class DbReaderStrategy(ReaderStrategy):
         db_handler = create_db_handler(
             db_type=DatabaseType.POSTGRES,
             db_config=DbConfig(
-                connection_id=selecteur.storage_options.db_conn_id,
+                connection_id=selecteur.execution_options.db_conn_id,
             ),
         )
         df = db_handler.fetch_df(query=self.query)
-        self.context.add(name=selecteur.storage_info.selecteur, df=df)
+        self.context.add(name=selecteur.selecteur, df=df)
         return self.context
