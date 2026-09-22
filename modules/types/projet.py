@@ -1,13 +1,11 @@
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-from modules.constants import DEFAULT_PG_DATA_CONN_ID, DEFAULT_S3_CONN_ID
 from modules.enums.dags import TypeSource
-from modules.enums.database import LoadStrategy, PartitionTimePeriod
 
 
 def custom_asdict_factory(data) -> dict[str, Any]:
@@ -96,10 +94,11 @@ class Contact:
 # Selecteur
 # ==================
 @dataclass(frozen=True)
-class SelecteurStorageInfo:
+class SelecteurConfig:
     projet: str
     selecteur: str
     # s3 info
+    s3_conn_id: str
     bucket: str
     s3_key: str
     filename: str
@@ -111,7 +110,7 @@ class SelecteurStorageInfo:
     id_source: str | None
 
     def __post_init__(self) -> None:
-        if not isinstance(self.type_source, TypeSource) and self.type_source is not None:
+        if not isinstance(self.type_source, TypeSource):
             object.__setattr__(self, "type_source", TypeSource(value=self.type_source))
 
     def get_full_s3_key(
@@ -143,77 +142,17 @@ class SelecteurStorageInfo:
         namespace_split = s3_key.split(sep=".")[0].split(sep="/")[:-1]
         return ".".join(namespace_split)
 
-
-@dataclass(frozen=True, kw_only=True)
-class SelecteurStorageOptions:
-    # S3
-    s3_conn_id: str = DEFAULT_S3_CONN_ID
-    write_to_s3: bool = True
-    write_to_s3_with_iceberg: bool = True
-    read_options: dict[str, Any] = field(default_factory=dict)
-    # Database
-    db_conn_id: str = DEFAULT_PG_DATA_CONN_ID
-    write_to_db: bool = True
-    use_prod_schema: bool = True
-    tbl_order: int = 0
-    keep_file_id_col: bool = True
-    is_partitioned: bool = True
-    partition_period: PartitionTimePeriod = PartitionTimePeriod.DAY
-    load_strategy: LoadStrategy = LoadStrategy.APPEND
-
-    def __post_init__(self) -> None:
-        # Convert partition_period and load_strategy to their respective Enum types if they are provided as strings
-        if not isinstance(self.partition_period, PartitionTimePeriod):
-            object.__setattr__(
-                self,
-                "partition_period",
-                PartitionTimePeriod(value=self.partition_period),
-            )
-
-        if not isinstance(self.load_strategy, LoadStrategy):
-            object.__setattr__(self, "load_strategy", LoadStrategy(value=self.load_strategy))
-
-
-@dataclass(frozen=True)
-class SelecteurConfig:
-    storage_info: SelecteurStorageInfo
-    storage_options: SelecteurStorageOptions
-
     @classmethod
     def load(
         cls,
-        storage_info: SelecteurStorageInfo,
-        storage_options: SelecteurStorageOptions,
+        config: Mapping[str, Any],
     ) -> "SelecteurConfig":
         return cls(
-            storage_info=storage_info,
-            storage_options=storage_options,
+            **config,
         )
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "SelecteurConfig":
+    def from_dict(cls, config: Mapping[str, Any]) -> "SelecteurConfig":
         return cls(
-            storage_info=SelecteurStorageInfo(**data["storage_info"]),
-            storage_options=SelecteurStorageOptions(**data["storage_options"]),
+            **config,
         )
-
-    # Methods to early-exit tasks based on the configuration options
-    def should_write_to_s3(self) -> bool:
-        """Return True if this selecteur should be written to S3."""
-        return self.storage_options.write_to_s3
-
-    def should_write_to_iceberg(self) -> bool:
-        """Return True if this selecteur should be written to the Iceberg catalog.
-
-        Returns False for the special 'grist_doc' selecteur and when the
-        write_to_s3_with_iceberg option is disabled.
-        """
-        return self.storage_info.selecteur != "grist_doc" and self.storage_options.write_to_s3_with_iceberg
-
-    def should_write_to_db(self) -> bool:
-        """Return True if this selecteur should be written to the database.
-
-        Returns False when the write_to_db option is disabled or when no
-        tbl_name is defined for this selecteur.
-        """
-        return self.storage_options.write_to_db and bool(self.storage_info.tbl_name)
