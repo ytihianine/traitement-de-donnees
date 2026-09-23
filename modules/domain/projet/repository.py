@@ -1,11 +1,11 @@
-"""ProjectRepository port: read access to project configuration and metadata."""
+"""ProjetRepository port: read access to project configuration and metadata."""
 
 from abc import ABC, abstractmethod
 
 from modules.domain.projet.model import Contact, Documentation, ProjetMetadata, ProjetS3
 
 
-class ProjectRepository(ABC):
+class ProjetRepository(ABC):
     """Read access to project configuration and snapshot metadata.
 
     Implementations live outside the domain (see

@@ -35,15 +35,15 @@ class DBParams:
     @classmethod
     def from_dag_context(cls, context_params: dict) -> "DBParams":
         if "db" not in context_params:
-            raise AttributeError("Field 'db' is required")
+            raise KeyError("Field 'db' is required")
 
         db_params = context_params["db"]
 
         if not isinstance(db_params, dict):
-            raise AttributeError("Field 'db' must be a dictionary")
+            raise KeyError("Field 'db' must be a dictionary")
 
         if "prod_schema" not in db_params:
-            raise AttributeError("Field 'prod_schema' is required in 'db'")
+            raise KeyError("Field 'prod_schema' is required in 'db'")
 
         return cls(
             prod_schema=db_params["prod_schema"],
@@ -85,7 +85,7 @@ class DagConfig:
             errors.append("Field 'enable' is required")
 
         if len(errors) > 0:
-            raise AttributeError("DAG params validation failed.")
+            raise KeyError("DAG params validation failed.")
 
         return cls(
             nom_projet=context_params["nom_projet"],
