@@ -35,6 +35,8 @@ class LoadStrategy(Enum):
 
 @dataclass(frozen=True)
 class ExecutionOptions:
+    export_result: bool = True
+    add_metadata: bool = True
     # S3
     s3_conn_id: str = DEFAULT_S3_CONN_ID
     write_to_s3: bool = True
