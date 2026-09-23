@@ -74,7 +74,6 @@ class Dataset:
     storage: DatasetStorage
 
 
-@dataclass(frozen=True)
 class DatasetReader(ABC):
 
     @abstractmethod
@@ -84,7 +83,6 @@ class DatasetReader(ABC):
     ) -> pd.DataFrame: ...
 
 
-@dataclass(frozen=True)
 class DatasetWriter(ABC):
 
     @abstractmethod
