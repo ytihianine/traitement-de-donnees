@@ -1,9 +1,6 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-
-import pandas as pd
 
 
 # =================
@@ -72,18 +69,3 @@ class Dataset:
     id_projet: int
     name: str
     storage: DatasetStorage
-
-
-class DatasetReader(ABC):
-
-    @abstractmethod
-    def read(
-        self,
-        dataset: Dataset,
-    ) -> pd.DataFrame: ...
-
-
-class DatasetWriter(ABC):
-
-    @abstractmethod
-    def write(self, df: pd.DataFrame, dataset: Dataset) -> None: ...
