@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
 from modules.domain.dataset.model import Dataset, DatasetStorage
 
@@ -7,7 +6,6 @@ from modules.domain.dataset.model import Dataset, DatasetStorage
 # =================
 # Dataclasses
 # =================
-@dataclass(frozen=True)
 class DatasetRepository(ABC):
     @abstractmethod
     def get(self, id_projet: int, name: str) -> Dataset: ...
@@ -16,7 +14,6 @@ class DatasetRepository(ABC):
     def get_list(self, id_projet: int) -> list[Dataset]: ...
 
 
-@dataclass(frozen=True)
 class DatasetStorageRepository(ABC):
 
     @abstractmethod
