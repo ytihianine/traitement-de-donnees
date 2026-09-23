@@ -8,7 +8,6 @@ import pandas as pd
 import trino.dbapi
 
 from .base import DBInterface
-from .exceptions import DatabaseError
 
 
 class TrinoAdapter(DBInterface):
@@ -49,18 +48,15 @@ class TrinoAdapter(DBInterface):
     def conn(self) -> trino.dbapi.Connection:
         """Lazy initialization of Trino connection."""
         if self._conn is None:
-            try:
-                self._conn = trino.dbapi.connect(
-                    host=self.host,
-                    port=self.port,
-                    user=self.user,
-                    catalog=self.catalog,
-                    schema=self.schema,
-                    http_scheme=self.http_scheme,
-                    verify=self.verify,
-                )
-            except Exception as e:
-                raise DatabaseError(f"Error connecting to Trino: {e!s}") from e
+            self._conn = trino.dbapi.connect(
+                host=self.host,
+                port=self.port,
+                user=self.user,
+                catalog=self.catalog,
+                schema=self.schema,
+                http_scheme=self.http_scheme,
+                verify=self.verify,
+            )
         return self._conn
 
     @property
@@ -82,43 +78,34 @@ class TrinoAdapter(DBInterface):
         self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None
     ) -> dict[str, Any] | None:
         """Fetch a single row as a dictionary."""
-        try:
-            start_time = time.time()
-            cur = self.conn.cursor()
-            cur.execute(query, parameters)
-            row = cur.fetchone()
-            logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
-            if row is None:
-                return None
-            columns = [desc[0] for desc in cur.description]
-            return dict(zip(columns, row, strict=False))
-        except Exception as e:
-            raise DatabaseError(f"Error fetching row: {e!s}") from e
+        start_time = time.time()
+        cur = self.conn.cursor()
+        cur.execute(query, parameters)
+        row = cur.fetchone()
+        logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
+        if row is None:
+            return None
+        columns = [desc[0] for desc in cur.description]
+        return dict(zip(columns, row, strict=False))
 
     def fetch_all(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Fetch all rows as a list of dictionaries."""
-        try:
-            start_time = time.time()
-            cur = self.conn.cursor()
-            cur.execute(query, parameters)
-            rows = cur.fetchall()
-            logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
-            columns = [desc[0] for desc in cur.description]
-            return [dict(zip(columns, row, strict=False)) for row in rows]
-        except Exception as err:
-            raise DatabaseError(f"Error fetching rows: {err!s}") from err
+        start_time = time.time()
+        cur = self.conn.cursor()
+        cur.execute(query, parameters)
+        rows = cur.fetchall()
+        logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
+        columns = [desc[0] for desc in cur.description]
+        return [dict(zip(columns, row, strict=False)) for row in rows]
 
     def fetch_df(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> pd.DataFrame:
         """Fetch results as a pandas DataFrame."""
-        try:
-            start_time = time.time()
-            logging.info(msg=f"Running statement:\n {query}")
-            rows = self.fetch_all(query, parameters)
-            df = pd.DataFrame(data=rows)
-            logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
-            return df
-        except Exception as e:
-            raise DatabaseError(f"Error fetching DataFrame: {e!s}") from e
+        start_time = time.time()
+        logging.info(msg=f"Running statement:\n {query}")
+        rows = self.fetch_all(query, parameters)
+        df = pd.DataFrame(data=rows)
+        logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
+        return df
 
     # ------------------------------------------------------------------
     # Unsupported write operations
