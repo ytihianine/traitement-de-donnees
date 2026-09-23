@@ -12,6 +12,7 @@ from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_
 class FileReaderStrategy(DatasetReader):
     fs_config: FSConfig
     fs_type: FileHandlerType = field(default=FileHandlerType.S3)
+    read_options: dict = field(default_factory=dict)
 
     def read(
         self,
@@ -24,7 +25,7 @@ class FileReaderStrategy(DatasetReader):
         df = read_dataframe(
             file_handler=fs_handler,
             file_path=dataset.storage.get_full_s3_key(use_id_source=True),
-            read_options=dataset.storage.read_options,
+            read_options=self.read_options,
         )
         return df
 

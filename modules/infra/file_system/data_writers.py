@@ -7,22 +7,21 @@ from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_
 
 
 @dataclass(frozen=True)
-class GristWriterStrategy(DatasetWriter):
+class GristDatasetWriter(DatasetWriter):
 
     def write(self, df: pd.DataFrame, dataset: Dataset) -> None:
-        raise NotImplementedError("GristWriterStrategy is not wired yet")
+        raise NotImplementedError("GristDatasetWriter is not wired yet")
 
 
 @dataclass(frozen=True)
-class FileWriterStrategy(DatasetWriter):
+class FileDatasetWriter(DatasetWriter):
+    fs_config: FSConfig
+    fs_type: FileHandlerType = FileHandlerType.S3
 
     def write(self, df: pd.DataFrame, dataset: Dataset) -> None:
         s3_handler = create_file_handler(
-            handler_type=FileHandlerType.S3,
-            config=FSConfig(
-                bucket=dataset.storage.bucket,
-                connection_id=dataset.storage.s3_conn_id,
-            ),
+            handler_type=self.fs_type,
+            config=self.fs_config,
         )
         s3_handler.write(
             file_path=str(dataset.storage.get_full_s3_key(with_tmp_segment=True)),
@@ -31,7 +30,7 @@ class FileWriterStrategy(DatasetWriter):
 
 
 @dataclass(frozen=True)
-class DbWriterStrategy(DatasetWriter):
+class DbDatasetWriter(DatasetWriter):
 
     def write(self, df: pd.DataFrame, dataset: Dataset) -> None:
-        raise NotImplementedError("DbWriterStrategy is not wired yet")
+        raise NotImplementedError("DbDatasetWriter is not wired yet")
