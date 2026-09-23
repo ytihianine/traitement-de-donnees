@@ -1,4 +1,4 @@
-"""PostgreSQL adapter for the ProjectRepository port."""
+"""PostgreSQL adapter for the ProjetRepository port."""
 
 import logging
 
@@ -11,16 +11,15 @@ from tenacity import (
 )
 
 from modules.domain.projet.model import Contact, Documentation, ProjetMetadata, ProjetS3
-from modules.domain.projet.repository import ProjectRepository
+from modules.domain.projet.repository import ProjetRepository
 from modules.infra.database.base import DBInterface
-from modules.infra.database.exceptions import DatabaseError
 
 logger = logging.getLogger(name=__name__)
 
 CONF_SCHEMA = "conf_projets"
 
 db_retry = retry(
-    retry=retry_if_exception_type(exception_types=(ConnectionError, TimeoutError, DatabaseError, OSError)),
+    retry=retry_if_exception_type(exception_types=(ConnectionError, TimeoutError, OSError)),
     stop=stop_after_attempt(max_attempt_number=3),
     wait=wait_exponential(multiplier=1, min=2, max=10),
     before_sleep=before_sleep_log(logger, log_level=logging.WARNING),
@@ -28,8 +27,8 @@ db_retry = retry(
 )
 
 
-class PostgresProjectRepository(ProjectRepository):
-    """ProjectRepository backed by the ``conf_projets`` Postgres schema."""
+class PostgresProjetRepository(ProjetRepository):
+    """ProjetRepository backed by the ``conf_projets`` Postgres schema."""
 
     def __init__(self, db: DBInterface | None = None) -> None:
         if db is None:

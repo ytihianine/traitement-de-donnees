@@ -10,13 +10,13 @@ from airflow.sdk import XComArg, task
 from modules.domain.selecteur.selecteur_service import get_selecteur_storage_info
 from modules.domain.task.model import ETLStep, TaskConfig
 from modules.infra.airflow.service import get_project_name
+from modules.infra.database.postgres.projet_repository import PostgresProjectRepository
 from modules.infra.file_system.dataframe import read_dataframe, write_dataframe
 from modules.infra.file_system.factory import (
     FileHandlerType,
     FSConfig,
     create_file_handler,
 )
-from modules.infra.project.postgres import PostgresProjectRepository
 from modules.utils.logs import df_info
 
 

@@ -10,7 +10,7 @@ import pandas as pd
 import psycopg2
 from sqlalchemy import create_engine
 
-from .base import DBInterface
+from modules.infra.database.base import DBInterface
 
 if TYPE_CHECKING:
     from airflow.providers.common.sql.hooks.sql import DbApiHook

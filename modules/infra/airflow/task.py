@@ -3,11 +3,14 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import timedelta
 
+import pandas as pd
 from airflow.sdk import XComArg, task
 from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
 
 from modules.domain.pipeline.model import ExecutionOptions, PipelineDescriptor
+from modules.domain.projet.model import ProjetMetadata
 from modules.infra.airflow.dag import get_project_name
+from modules.infra.database.postgres.projet_repository import PostgresProjetRepository
 from modules.infra.file_system.data_writers import FileDatasetWriter
 from modules.infra.file_system.factory import FileHandlerType, FSConfig
 from modules.logs import df_info
@@ -25,6 +28,15 @@ class TaskConfig:
     on_success_callback: TaskStateChangeCallback | list[TaskStateChangeCallback] | None = None
     on_retry_callback: TaskStateChangeCallback | list[TaskStateChangeCallback] | None = None
     on_skipped_callback: TaskStateChangeCallback | list[TaskStateChangeCallback] | None = None
+
+
+def _add_metadata(df: pd.DataFrame, metadata: ProjetMetadata) -> pd.DataFrame:
+
+    df["import_timestamp"] = metadata.import_timestamp
+    df["snapshot_id"] = str(metadata.snapshot_id)
+    df["snapshot_id_parent"] = str(metadata.snapshot_id_parent) if metadata.snapshot_id_parent is not None else None
+
+    return df
 
 
 def create_task(
@@ -76,18 +88,17 @@ def create_task(
             logging.info(msg=f"Transformation information: {step}")
             result = step(result)
 
-        # Export final result - always a DataFrame and the last step output
-        if not execution_options.export_result:
-            return
-
         if execution_options.add_metadata:
-            projet_metadata = 
-            result = _add_metadata(df=result, nom_projet=nom_projet)
+            projet_repository = PostgresProjetRepository()
+            projet_metadata = projet_repository.get_projet_metadata(nom_projet=nom_projet)
+            result = _add_metadata(df=result, metadata=projet_metadata)
 
         # Log the final DataFrame information
         df_info(df=result, df_name=f"{pipeline.output_dataset.name} - df to export")
 
-        # Export result
+        # Export final result - always a DataFrame and the last step output
+        if not execution_options.export_result:
+            return
         writer = FileDatasetWriter(
             fs_config=FSConfig(
                 bucket=pipeline.output_dataset.storage.bucket,
