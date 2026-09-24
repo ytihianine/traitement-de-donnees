@@ -8,15 +8,14 @@ from airflow.sdk import chain, task, task_group
 
 from modules.infra.airflow.dag import AirflowDagRepository
 from modules.infra.database.postgres.projet_repository import PostgresProjetRepository
-from modules.infra.database.postgres.dataset_repository import PostgresDatasetRepository
 from modules.types.projet import SelecteurStorageOptions, custom_asdict_factory
-
 
 
 def _check_nom_projet(nom_projet: str | None, context: dict[str, Any]) -> str:
     if nom_projet is None:
         nom_projet = AirflowDagRepository().get_project_name(context=context)
     return nom_projet
+
 
 @task()
 def get_documentation_task(nom_projet: str | None = None, **context) -> list[Mapping[str, Any]]:

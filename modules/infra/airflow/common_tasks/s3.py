@@ -4,7 +4,6 @@ import logging
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
-from modules.domain.pipeline.model import ExecutionOptions
 
 from airflow.sdk import get_current_context, task
 
@@ -13,14 +12,13 @@ from modules.constants import (
     DEFAULT_POLARIS_HOST,
     DEFAULT_S3_CONN_ID,
 )
-from modules.infra.airflow.dag import AirflowDagRepository, should_skip_task
 from modules.domain.dag.model import FeatureFlags
 from modules.domain.dataset.model import Dataset, TypeSource
-from modules.infra.file_system.factory import FileHandlerType
+from modules.domain.pipeline.model import ExecutionOptions
+from modules.infra.airflow.dag import AirflowDagRepository, should_skip_task
 from modules.infra.catalog.iceberg import IcebergCatalog, IcebergTableStatus, generate_catalog_properties
 from modules.infra.file_system.dataframe import read_dataframe
-from modules.infra.file_system.factory import FSConfig, create_file_handler
-
+from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 
 
 @task
@@ -50,13 +48,12 @@ def copy_s3_files(
     curr_day = execution_date.strftime(format="%Y%m%d")
     curr_time = execution_date.strftime(format="%Hh%M")
 
-
     # Copier la liste des sources dans le dossier final
     for dataset in datasets:
         dataset_execution_options = execution_options.get(dataset.name)
         if dataset_execution_options is None:
             raise ValueError(f"No execution options found for dataset <{dataset.name}>")
-    
+
         logging.info(
             msg=f"Processing copy to S3 for selecteur <{dataset.name}> "
             f"with type source <{dataset.storage.type_source}> ..."
@@ -77,8 +74,6 @@ def copy_s3_files(
         logging.info(msg=f"Copying {key} to {target_key}")
         s3_handler.copy(source=key, destination=target_key)
         logging.info(msg="Copy successful")
-
-
 
 
 @task
