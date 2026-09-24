@@ -2,7 +2,8 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from modules.domain.dataset.model import Dataset, DatasetWriter
+from modules.domain.dataset.model import Dataset
+from modules.domain.dataset.ports import DatasetWriter
 from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 
 
