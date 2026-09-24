@@ -2,14 +2,15 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from modules.domain.dataset.model import Dataset, DatasetReader
+from modules.domain.dataset.model import Dataset
+from modules.domain.dataset.ports import DatasetReader
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 from modules.infra.file_system.dataframe import read_dataframe
 from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 
 
 @dataclass(frozen=True)
-class FileReaderStrategy(DatasetReader):
+class FileDatasetReader(DatasetReader):
     fs_config: FSConfig
     fs_type: FileHandlerType = field(default=FileHandlerType.S3)
     read_options: dict = field(default_factory=dict)
@@ -31,7 +32,7 @@ class FileReaderStrategy(DatasetReader):
 
 
 @dataclass(frozen=True)
-class DbReaderStrategy(DatasetReader):
+class DbDatasetReader(DatasetReader):
     query: str
     db_type: DatabaseType = field(default=DatabaseType.POSTGRES)
     db_config: DbConfig = field(default_factory=DbConfig)
