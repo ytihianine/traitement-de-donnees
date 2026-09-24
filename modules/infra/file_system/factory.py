@@ -30,12 +30,6 @@ class FileFormat(Enum):
     AUTO = auto()
 
 
-class IcebergTableStatus(Enum):
-
-    STAGING = auto()
-    PROD = auto()
-
-
 @dataclass(frozen=True)
 class FSConfig:
     """Configuration for file system handlers."""

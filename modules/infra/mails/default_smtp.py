@@ -14,14 +14,9 @@ from modules.constants import (
     PARIS_TZ,
     get_root_folder,
 )
-from modules.domain.models.dags import DagStatus
-from modules.utils.config.dag_params import (
-    get_dag_status,
-    get_execution_date,
-    get_feature_flags,
-    get_project_name,
-)
-from modules.utils.config.tasks import get_list_contact, get_list_documentation
+from modules.domain.dag.model import DagStatus
+from modules.infra.airflow.dag import AirflowDagRepository
+from modules.infra.database.postgres.projet_repository import PostgresProjetRepository
 
 
 class MailStatus(Enum):
@@ -156,9 +151,11 @@ def send_mail(mail_message: MailMessage, conn_id: str = DEFAULT_SMTP_CONN_ID) ->
 
 def _callback(context: dict[str, Any], mail_status: MailStatus) -> None:
     # If debug mode is ON, we don't want to send any mail
-    mail_enable = get_feature_flags(context=context).mail
-    dag_status = get_dag_status(context=context)
-    nom_projet = get_project_name(context=context)
+    projet_repository = PostgresProjetRepository()
+    dag_repository = AirflowDagRepository()
+    mail_enable = dag_repository.get_feature_flags(context=context).mail
+    dag_status = dag_repository.get_dag_status(context=context)
+    nom_projet = dag_repository.get_project_name(context=context)
 
     if dag_status == DagStatus.DEV:
         print("Dag status parameter is set to DEV -> skipping this task ...")
@@ -168,14 +165,14 @@ def _callback(context: dict[str, Any], mail_status: MailStatus) -> None:
         print(FF_MAIL_DISABLED_MSG)
         return
 
-    projet_contact = get_list_contact(nom_projet=nom_projet)
+    projet_contact = projet_repository.get_list_contact(nom_projet=nom_projet)
     mail_to = [contact.contact_mail for contact in projet_contact if contact.is_mail_generic]
     mail_cc = [contact.contact_mail for contact in projet_contact if not contact.is_mail_generic]
 
-    projet_docs = get_list_documentation(nom_projet=nom_projet)
+    projet_docs = projet_repository.get_list_documentation(nom_projet=nom_projet)
     doc_pipeline = [doc.lien for doc in projet_docs if doc.type_documentation == "pipeline"]
     doc_data = [doc.lien for doc in projet_docs if doc.type_documentation == "data"]
-    execution_date = get_execution_date(context=context)
+    execution_date = dag_repository.get_execution_date(context=context)
 
     if isinstance(mail_cc, list):
         mail_cc.extend(DEFAULT_MAIL_CC)

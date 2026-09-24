@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from modules.enums.filesystem import FileFormat
+from modules.infra.file_system.factory import FileFormat
 
 from .base import FSInterface
 from .data_serializer import (

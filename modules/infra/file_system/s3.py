@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 from modules.infra.file_system.base import FileMetadata, FSInterface
-from modules.infra.file_system.exceptions import FileHandlerError, FileNotFoundError
 
 
 @dataclass
@@ -34,22 +33,16 @@ class S3FS(FSInterface):
     def read(self, file_path: str | Path, validate: bool = True) -> BinaryIO:
         """Read file from S3."""
         key = str(file_path)
-        try:
-            logging.info(msg=f"Reading file from {key}")
-            if validate:
-                self.validate(key)
+        logging.info(msg=f"Reading file from {key}")
+        if validate:
+            self.validate(key)
 
-            if not self.exists(key):
-                raise FileNotFoundError(f"File not found in S3: {key}")
+        if not self.exists(key):
+            raise FileNotFoundError(f"File not found in S3: {key}")
 
-            response = self.client.get_object(Bucket=self.bucket, Key=key)
-            content = response["Body"].read()
-            return io.BytesIO(content)
-
-        except FileNotFoundError:
-            raise
-        except Exception as e:
-            raise FileHandlerError(f"Error reading file from S3: {key}") from e
+        response = self.client.get_object(Bucket=self.bucket, Key=key)
+        content = response["Body"].read()
+        return io.BytesIO(content)
 
     def write(
         self,
@@ -68,43 +61,39 @@ class S3FS(FSInterface):
             content_type: Optional MIME type. If not provided, will be inferred from file extension
         """
         key = str(file_path)
-        try:
-            logging.info(msg=f"Writing file to {key}")
+        logging.info(msg=f"Writing file to {key}")
 
-            # Infer content type if not provided
+        # Infer content type if not provided
+        if content_type is None:
+            content_type, _ = mimetypes.guess_type(key)
             if content_type is None:
-                content_type, _ = mimetypes.guess_type(key)
-                if content_type is None:
-                    content_type = "application/octet-stream"
+                content_type = "application/octet-stream"
 
-            # Convert content to bytes if it's a string
-            if isinstance(content, str):
-                content_bytes = content.encode("utf-8")
-                file_obj = io.BytesIO(initial_bytes=content_bytes)
-            # If already bytes, wrap in BytesIO
-            elif isinstance(content, bytes):
-                file_obj = io.BytesIO(initial_bytes=content)
-            # If it's already a file-like object, use it directly
-            elif hasattr(content, "read"):
-                file_obj = content
-            else:
-                raise ValueError(f"Unsupported content type: {type(content)}")
+        # Convert content to bytes if it's a string
+        if isinstance(content, str):
+            content_bytes = content.encode("utf-8")
+            file_obj = io.BytesIO(initial_bytes=content_bytes)
+        # If already bytes, wrap in BytesIO
+        elif isinstance(content, bytes):
+            file_obj = io.BytesIO(initial_bytes=content)
+        # If it's already a file-like object, use it directly
+        elif hasattr(content, "read"):
+            file_obj = content
+        else:
+            raise ValueError(f"Unsupported content type: {type(content)}")
 
-            # Ensure we're at the beginning of the stream
-            if hasattr(file_obj, "seek"):
-                file_obj.seek(0)  # type: ignore
+        # Ensure we're at the beginning of the stream
+        if hasattr(file_obj, "seek"):
+            file_obj.seek(0)  # type: ignore
 
-            self.client.put_object(
-                Bucket=self.bucket,
-                Key=key,
-                Body=file_obj,
-                ContentType=content_type,
-            )
+        self.client.put_object(
+            Bucket=self.bucket,
+            Key=key,
+            Body=file_obj,
+            ContentType=content_type,
+        )
 
-            logging.info(msg=f"Successfully wrote {key} with content type: {content_type}")
-
-        except Exception as e:
-            raise FileHandlerError(f"Error writing file to S3: {key}") from e
+        logging.info(msg=f"Successfully wrote {key} with content type: {content_type}")
 
     def delete_single(self, file_path: str | Path) -> None:
         key = str(file_path)
@@ -113,10 +102,7 @@ class S3FS(FSInterface):
     def delete(self, file_path: str | Path) -> None:
         """Delete file from S3."""
         key = str(file_path)
-        try:
-            self.client.delete_object(Bucket=self.bucket, Key=key)
-        except Exception as e:
-            raise FileHandlerError(f"Error deleting file from S3: {key}") from e
+        self.client.delete_object(Bucket=self.bucket, Key=key)
 
     def exists(self, file_path: str | Path) -> bool:
         """Check if file exists in S3."""
@@ -130,28 +116,23 @@ class S3FS(FSInterface):
     def get_metadata(self, file_path: str | Path) -> FileMetadata:
         """Get S3 file metadata."""
         key = str(file_path)
-        try:
-            response = self.client.head_object(Bucket=self.bucket, Key=key)
+        response = self.client.head_object(Bucket=self.bucket, Key=key)
 
-            mime_type, _ = mimetypes.guess_type(key)
+        mime_type, _ = mimetypes.guess_type(key)
 
-            return FileMetadata(
-                name=Path(key).name,
-                size=response["ContentLength"],
-                created_at=response["LastModified"],
-                modified_at=response["LastModified"],
-                mime_type=mime_type or response.get("ContentType", "application/octet-stream"),
-                checksum=response["ETag"].strip('"'),
-                extra={
-                    "storage_class": response.get("StorageClass"),
-                    "version_id": response.get("VersionId"),
-                    "metadata": response.get("Metadata", {}),
-                },
-            )
-        except self.client.exceptions.NoSuchKey as err:
-            raise FileNotFoundError(f"File not found in S3: {key}") from err
-        except Exception as e:
-            raise FileHandlerError(f"Error getting S3 metadata: {key}") from e
+        return FileMetadata(
+            name=Path(key).name,
+            size=response["ContentLength"],
+            created_at=response["LastModified"],
+            modified_at=response["LastModified"],
+            mime_type=mime_type or response.get("ContentType", "application/octet-stream"),
+            checksum=response["ETag"].strip('"'),
+            extra={
+                "storage_class": response.get("StorageClass"),
+                "version_id": response.get("VersionId"),
+                "metadata": response.get("Metadata", {}),
+            },
+        )
 
     def list_files(self, directory: str | Path, pattern: str | None = None) -> list[str]:
         """List files in S3 directory."""
@@ -179,36 +160,26 @@ class S3FS(FSInterface):
         src_key = str(source)
         dst_key = str(destination)
 
-        try:
-            if not self.exists(src_key):
-                raise FileNotFoundError(f"Source file not found in S3: {src_key}")
+        if not self.exists(src_key):
+            raise FileNotFoundError(f"Source file not found in S3: {src_key}")
 
-            self.client.copy_object(
-                Bucket=self.bucket,
-                Key=dst_key,
-                CopySource={"Bucket": self.bucket, "Key": src_key},
-            )
-            self.delete(src_key)
-        except FileNotFoundError:
-            raise
-        except Exception as e:
-            raise FileHandlerError(f"Error moving file in S3: {src_key} -> {dst_key}") from e
+        self.client.copy_object(
+            Bucket=self.bucket,
+            Key=dst_key,
+            CopySource={"Bucket": self.bucket, "Key": src_key},
+        )
+        self.delete(src_key)
 
     def copy(self, source: str | Path, destination: str | Path) -> None:
         """Copy file in S3."""
         src_key = str(source)
         dst_key = str(destination)
 
-        try:
-            if not self.exists(src_key):
-                raise FileNotFoundError(f"Source file not found in S3: {src_key}")
+        if not self.exists(src_key):
+            raise FileNotFoundError(f"Source file not found in S3: {src_key}")
 
-            self.client.copy_object(
-                Bucket=self.bucket,
-                Key=dst_key,
-                CopySource={"Bucket": self.bucket, "Key": src_key},
-            )
-        except FileNotFoundError:
-            raise
-        except Exception as e:
-            raise FileHandlerError(f"Error copying file in S3: {src_key} -> {dst_key}") from e
+        self.client.copy_object(
+            Bucket=self.bucket,
+            Key=dst_key,
+            CopySource={"Bucket": self.bucket, "Key": src_key},
+        )

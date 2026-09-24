@@ -2,6 +2,7 @@ import logging
 import ssl
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from enum import Enum, auto
 from typing import Any
 
 import pandas as pd
@@ -17,7 +18,12 @@ from modules.constants import (
     DEFAULT_POLARIS_CLIENT_ID,
     DEFAULT_POLARIS_CLIENT_SECRET,
 )
-from modules.enums.filesystem import IcebergTableStatus
+
+
+class IcebergTableStatus(Enum):
+
+    STAGING = auto()
+    PROD = auto()
 
 
 def generate_catalog_properties(

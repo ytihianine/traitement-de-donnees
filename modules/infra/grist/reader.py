@@ -1,38 +1,32 @@
-from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
-from modules.domain.selecteur.model import SelecteurConfig
-from modules.domain.task.data_readers import DataContext, ReaderStrategy
+import pandas as pd
+
+from modules.domain.dataset.model import Dataset
+from modules.domain.dataset.ports import DatasetReader
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 
 
 @dataclass(frozen=True)
-class GristReaderStrategy(ReaderStrategy):
+class GristReaderStrategy(DatasetReader):
+    fs_config: FSConfig
+    fs_type: FileHandlerType = FileHandlerType.S3
     doc_selecteur_name: str = "grist_doc"
 
     def read(
         self,
-        selecteur: SelecteurConfig,
-        selecteurs: Mapping[str, SelecteurConfig] | None = None,
-    ) -> DataContext:
+        dataset: Dataset,
+    ) -> pd.DataFrame:
 
-        if selecteurs is None:
-            raise ValueError("selecteurs mapping is required for GristReaderStrategy")
-        if self.doc_selecteur_name not in selecteurs:
-            raise ValueError(f"Document selecteur '{self.doc_selecteur_name}' not found in runtime configs")
-
-        if selecteur.id_source is None:
-            raise ValueError(f"id_source must be defined for '{selecteur.selecteur}'.")
+        if dataset.storage.id_source is None:
+            raise ValueError(f"id_source must be defined for '{dataset.name}'.")
 
         # Handlers
         s3_handler = create_file_handler(
-            handler_type=FileHandlerType.S3,
-            config=FSConfig(
-                bucket=selecteur.bucket,
-                connection_id=selecteur.execution_options.s3_conn_id,
-            ),
+            handler_type=self.fs_type,
+            config=self.fs_config,
         )
         local_handler = create_file_handler(
             handler_type=FileHandlerType.LOCAL,
@@ -41,7 +35,7 @@ class GristReaderStrategy(ReaderStrategy):
             ),
         )
 
-        doc_local_path = Path("/tmp") / selecteur.filename
+        doc_local_path = Path("/tmp") / dataset.storage.filename
 
         sqlite_handler = create_db_handler(
             db_type=DatabaseType.SQLITE,
@@ -51,7 +45,7 @@ class GristReaderStrategy(ReaderStrategy):
         )
 
         # Download the Grist document locally
-        grist_doc = s3_handler.read(file_path=selecteur.get_full_s3_key(with_tmp_segment=True))
+        grist_doc = s3_handler.read(file_path=dataset.storage.get_full_s3_key(with_tmp_segment=True))
 
         local_handler.write(
             file_path=str(doc_local_path),
@@ -59,7 +53,6 @@ class GristReaderStrategy(ReaderStrategy):
         )
 
         # Read the requested table
-        df = sqlite_handler.fetch_df(query=f"SELECT * FROM {selecteur.id_source}")
+        df = sqlite_handler.fetch_df(query=f"SELECT * FROM {dataset.storage.id_source}")
 
-        self.context.add(name=selecteur.selecteur, df=df)
-        return self.context
+        return df
