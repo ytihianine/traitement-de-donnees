@@ -9,7 +9,7 @@ from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCa
 
 from modules.domain.pipeline.model import ExecutionOptions, PipelineDescriptor
 from modules.domain.projet.model import ProjetMetadata
-from modules.infra.airflow.dag import get_project_name
+from modules.infra.airflow.dag import AirflowDagRepository
 from modules.infra.database.postgres.projet_repository import PostgresProjetRepository
 from modules.infra.file_system.data_readers import FileDatasetReader
 from modules.infra.file_system.data_writers import FileDatasetWriter
@@ -78,7 +78,8 @@ def create_task(
     def _task(**context) -> None:
         """The actual generic task function."""
         # Hooks & variables
-        nom_projet = get_project_name(context=context)
+        dag_repository = AirflowDagRepository()
+        nom_projet = dag_repository.get_project_name(context=context)
 
         # Read data
         input_data = {}
