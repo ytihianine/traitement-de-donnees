@@ -11,6 +11,7 @@ from modules.domain.pipeline.model import ExecutionOptions, PipelineDescriptor
 from modules.domain.projet.model import ProjetMetadata
 from modules.infra.airflow.dag import get_project_name
 from modules.infra.database.postgres.projet_repository import PostgresProjetRepository
+from modules.infra.file_system.data_readers import FileDatasetReader
 from modules.infra.file_system.data_writers import FileDatasetWriter
 from modules.infra.file_system.factory import FileHandlerType, FSConfig
 from modules.logs import df_info
@@ -80,9 +81,21 @@ def create_task(
         nom_projet = get_project_name(context=context)
 
         # Read data
+        input_data = {}
+        for dataset in pipeline.input_datasets:
+            logging.info(msg=f"▶ Reading dataset: {dataset.name}")
+            reader = FileDatasetReader(
+                fs_config=FSConfig(
+                    bucket=dataset.storage.bucket,
+                    connection_id=dataset.storage.s3_conn_id,
+                ),
+                fs_type=FileHandlerType.S3,
+            )
+            df = reader.read(dataset=dataset)
+            input_data[dataset.name] = df
 
         # Apply transformations
-        result = None
+        result = pd.DataFrame()  # Initialize an empty DataFrame to hold the result
         for idx, step in enumerate(pipeline.transformations):
             logging.info(msg=f"▶ Executing transformation: step_{idx}")
             logging.info(msg=f"Transformation information: {step}")
@@ -99,6 +112,7 @@ def create_task(
         # Export final result - always a DataFrame and the last step output
         if not execution_options.export_result:
             return
+
         writer = FileDatasetWriter(
             fs_config=FSConfig(
                 bucket=pipeline.output_dataset.storage.bucket,
