@@ -21,6 +21,7 @@ from modules.domain.dag.model import (
     FeatureFlags,
     FeatureFlagsEnable,
 )
+from modules.domain.dag.repository import DagRepository
 
 _FF_DISABLED_MESSAGES: dict[FeatureFlags, str] = {
     FeatureFlags.DB: FF_DB_DISABLED_MSG,
@@ -36,63 +37,62 @@ DEFAULT_EMAIL_CC = ["labo-data@finances.gouv.fr"]
 DEFAULT_TMP_SCHEMA = "temporaire"
 
 
-def get_project_name(context: Mapping[str, Any]) -> str:
-    """Extract and validate project name from context."""
-    nom_projet = context.get("params", {}).get("nom_projet")
-    if not nom_projet:
-        raise ValueError("nom_projet must be defined in DAG parameters")
-    return nom_projet
+class AirflowDagRepository(DagRepository):
+    def get_project_name(self, context: Mapping[str, Any]) -> str:
+        """Extract project name from context."""
+        nom_projet = context.get("params", {}).get("nom_projet")
+        if not nom_projet:
+            raise ValueError("nom_projet must be defined in DAG parameters")
+        return nom_projet
 
+    def get_dag_status(self, context: Mapping[str, Any]) -> DagStatus:
+        """Extract DAG status from context."""
+        dag_status = context.get("params", {}).get("dag_status")
+        if not dag_status:
+            raise ValueError("dag_status must be defined in DAG parameters")
+        return DagStatus(value=dag_status)
 
-def get_dag_status(context: Mapping[str, Any]) -> DagStatus:
-    """Extract and validate project name from context."""
-    dag_status = context.get("params", {}).get("dag_status")
-    if not dag_status:
-        raise ValueError("dag_status must be defined in DAG parameters")
-    return DagStatus(value=dag_status)
+    def get_execution_date(
+        self, context: Mapping[str, Any], use_tz: bool = False, tz_zone: str = "Europe/Paris"
+    ) -> datetime:
+        """Extract execution date from context."""
+        execution_date = context.get("data_interval_start")
 
+        if not execution_date or not isinstance(execution_date, datetime):
+            raise ValueError("Invalid execution date in Airflow context")
 
-def get_execution_date(context: Mapping[str, Any], use_tz: bool = False, tz_zone: str = "Europe/Paris") -> datetime:
-    """Extract and validate execution date from context."""
-    execution_date = context.get("data_interval_start")
+        if use_tz:
+            try:
+                tz = pytz.timezone(zone=tz_zone)
+                execution_date = execution_date.astimezone(tz=tz)
+            except pytz.UnknownTimeZoneError as err:
+                raise ValueError(f"Invalid timezone: {tz_zone}. Must be a valid IANA timezone.") from err
 
-    if not execution_date or not isinstance(execution_date, datetime):
-        raise ValueError("Invalid execution date in Airflow context")
+        return execution_date
 
-    if use_tz:
-        try:
-            tz = pytz.timezone(zone=tz_zone)
-            execution_date = execution_date.astimezone(tz=tz)
-        except pytz.UnknownTimeZoneError as err:
-            raise ValueError(f"Invalid timezone: {tz_zone}. Must be a valid IANA timezone.") from err
+    def get_db_info(self, context: Mapping[str, Any]) -> DBParams:
+        """Extract database info from context."""
+        db_params = context.get("params", {}).get("db", {})
+        prod_schema = db_params.get("prod_schema")
+        tmp_schema = db_params.get("tmp_schema")
 
-    return execution_date
+        if not prod_schema:
+            raise ValueError("prod_schema must be defined in DAG parameters under db")
+        if not tmp_schema:
+            raise ValueError("tmp_schema must be defined in DAG parameters under db")
 
+        return DBParams(prod_schema=prod_schema, tmp_schema=tmp_schema)
 
-def get_db_info(context: Mapping[str, Any]) -> DBParams:
-    """Extract and validate database info from context."""
-    db_params = context.get("params", {}).get("db", {})
-    prod_schema = db_params.get("prod_schema")
-    tmp_schema = db_params.get("tmp_schema")
-
-    if not prod_schema:
-        raise ValueError("prod_schema must be defined in DAG parameters under db")
-    if not tmp_schema:
-        raise ValueError("tmp_schema must be defined in DAG parameters under db")
-
-    return DBParams(prod_schema=prod_schema, tmp_schema=tmp_schema)
-
-
-def get_feature_flags(context: Mapping[str, Any]) -> FeatureFlagsEnable:
-    """Extract and validate feature flags from context."""
-    feature_flags = context.get("params", {}).get("enable", {})
-    return FeatureFlagsEnable(
-        db=feature_flags.get("db", False),
-        mail=feature_flags.get("mail", False),
-        s3=feature_flags.get("s3", False),
-        convert_files=feature_flags.get("convert_files", False),
-        download_grist_doc=feature_flags.get("download_grist_doc", False),
-    )
+    def get_feature_flags(self, context: Mapping[str, Any]) -> FeatureFlagsEnable:
+        """Extract feature flags from context."""
+        feature_flags = context.get("params", {}).get("enable", {})
+        return FeatureFlagsEnable(
+            db=feature_flags.get("db", False),
+            mail=feature_flags.get("mail", False),
+            s3=feature_flags.get("s3", False),
+            convert_files=feature_flags.get("convert_files", False),
+            download_grist_doc=feature_flags.get("download_grist_doc", False),
+        )
 
 
 def should_skip_task(
@@ -108,13 +108,14 @@ def should_skip_task(
     Returns:
         True if the task should be skipped, False otherwise.
     """
-    dag_status = get_dag_status(context=context)
+    dag_repository = AirflowDagRepository()
+    dag_status = dag_repository.get_dag_status(context=context)
     if dag_status == DagStatus.DEV:
         logging.info(msg="Dag status parameter is set to DEV -> skipping this task ...")
         return True
 
     if feature_flag is not None:
-        flags = get_feature_flags(context=context)
+        flags = dag_repository.get_feature_flags(context=context)
         flag_value = getattr(flags, feature_flag.value)
         if not flag_value:
             msg = _FF_DISABLED_MESSAGES.get(feature_flag, f"{feature_flag} is disabled")
