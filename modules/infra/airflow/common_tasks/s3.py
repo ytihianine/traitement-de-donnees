@@ -4,6 +4,7 @@ import logging
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
+from modules.domain.pipeline.model import ExecutionOptions
 
 from airflow.sdk import get_current_context, task
 
@@ -12,36 +13,28 @@ from modules.constants import (
     DEFAULT_POLARIS_HOST,
     DEFAULT_S3_CONN_ID,
 )
-from modules.enums.dags import FeatureFlags, TypeSource
-from modules.enums.filesystem import FileHandlerType, IcebergTableStatus
-from modules.infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
+from modules.infra.airflow.dag import AirflowDagRepository, should_skip_task
+from modules.domain.dag.model import FeatureFlags
+from modules.domain.dataset.model import Dataset, TypeSource
+from modules.infra.file_system.factory import FileHandlerType
+from modules.infra.catalog.iceberg import IcebergCatalog, IcebergTableStatus, generate_catalog_properties
 from modules.infra.file_system.dataframe import read_dataframe
-from modules.infra.file_system.exceptions import FileHandlerError
 from modules.infra.file_system.factory import FSConfig, create_file_handler
-from modules.types.projet import SelecteurConfig, SelecteurStorageOptions
-from modules.utils.config.dag_params import (
-    get_execution_date,
-    get_project_name,
-    should_skip_task,
-)
-from modules.utils.config.tasks import (
-    get_list_selecteur_storage_info,
-    get_projet_s3_info,
-    merge_selecteur_config,
-)
+
 
 
 @task
 def copy_s3_files(
-    storage_options: Mapping[str, SelecteurStorageOptions] = {},
-    connection_id: str = DEFAULT_S3_CONN_ID,
+    datasets: list[Dataset],
+    execution_options: Mapping[str, ExecutionOptions],
     **context: Mapping[str, Any],
 ) -> None:
     """Copy files from one place to another in S3 storage.
 
     Args:
-        storage_options: Mapping of selecteur options
-        connection_id: S3 connection ID
+        datasets: Mapping of selecteur options
+        execution_options: Mapping of execution options
+        connection_id: S3 connection ID (from execution options)
         context: Airflow context
 
     Raises:
@@ -52,56 +45,53 @@ def copy_s3_files(
     if should_skip_task(context=context, feature_flag=FeatureFlags.S3):
         return
 
-    nom_projet = get_project_name(context=context)
-    execution_date = get_execution_date(context=context, use_tz=False)
+    dag_repository = AirflowDagRepository()
+    execution_date = dag_repository.get_execution_date(context=context, use_tz=False)
     curr_day = execution_date.strftime(format="%Y%m%d")
     curr_time = execution_date.strftime(format="%Hh%M")
 
-    # Créer les hooks
-    s3_handler = create_file_handler(
-        handler_type=FileHandlerType.S3,
-        config=FSConfig(connection_id=connection_id),
-    )
-
-    # Get selecteur config
-    storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    selecteur_config = merge_selecteur_config(storage_info=storage_info, storage_options=storage_options)
 
     # Copier la liste des sources dans le dossier final
-    for config in selecteur_config:
-        if not config.should_write_to_s3():
-            logging.info(msg=f"Skipping S3 copy for selecteur <{config.storage_info.selecteur}>")
-            continue
-
+    for dataset in datasets:
+        dataset_execution_options = execution_options.get(dataset.name)
+        if dataset_execution_options is None:
+            raise ValueError(f"No execution options found for dataset <{dataset.name}>")
+    
         logging.info(
-            msg=f"Processing copy to S3 for selecteur <{config.storage_info.selecteur}> "
-            f"with type source <{config.storage_info.type_source}> ..."
+            msg=f"Processing copy to S3 for selecteur <{dataset.name}> "
+            f"with type source <{dataset.storage.type_source}> ..."
         )
 
-        target_key = f"{config.storage_info.s3_key}/{curr_day}/{curr_time}/{config.storage_info.filename}"
-        try:
-            # Copy tmp file if exists
-            key = config.storage_info.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
-            logging.info(msg=f"Copying {key} to {target_key}")
-            s3_handler.copy(source=key, destination=target_key)
-            logging.info(msg="Copy successful")
+        if not dataset_execution_options.write_to_s3:
+            logging.info(msg="Skipping S3 copy")
+            continue
 
-        except Exception as e:
-            logging.error(msg=f"Unexpected error copying tmp file to {target_key}: {e!s}")
-            raise
+        s3_handler = create_file_handler(
+            handler_type=FileHandlerType.S3,
+            config=FSConfig(connection_id=dataset_execution_options.s3_conn_id),
+        )
+
+        target_key = f"{dataset.storage.s3_key}/{curr_day}/{curr_time}/{dataset.storage.filename}"
+        # Copy tmp file if exists
+        key = dataset.storage.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
+        logging.info(msg=f"Copying {key} to {target_key}")
+        s3_handler.copy(source=key, destination=target_key)
+        logging.info(msg="Copy successful")
+
+
 
 
 @task
 def del_s3_files(
-    storage_options: Mapping[str, SelecteurStorageOptions] = {},
-    s3_conn_id: str = DEFAULT_S3_CONN_ID,
+    datasets: list[Dataset],
+    execution_options: Mapping[str, ExecutionOptions],
     **context: Mapping[str, Any],
 ) -> None:
     """Delete files from MinIO/S3 storage.
 
     Args:
-        storage_options: Mapping of selecteur options
-        s3_conn_id: S3 connection ID
+        datasets: Mapping of selecteur options
+        execution_options: Mapping of execution options
         context: Airflow context
 
     Raises:
@@ -112,41 +102,33 @@ def del_s3_files(
     if should_skip_task(context=context, feature_flag=FeatureFlags.S3):
         return
 
-    nom_projet = get_project_name(context=context)
+    dag_repository = AirflowDagRepository()
+    nom_projet = dag_repository.get_project_name(context=context)
 
-    # Créer les hooks
-    s3_handler = create_file_handler(
-        handler_type=FileHandlerType.S3,
-        config=FSConfig(connection_id=s3_conn_id),
-    )
+    for dataset in datasets:
+        dataset_execution_options = execution_options.get(dataset.name)
+        if dataset_execution_options is None:
+            raise ValueError(f"No execution options found for dataset <{dataset.name}>")
 
-    # Get selecteur config
-    storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    selecteur_config = merge_selecteur_config(storage_info=storage_info, storage_options=storage_options)
-
-    for config in selecteur_config:
-        logging.info(msg=f"{config}")
-        if config.storage_info.type_source != TypeSource.FILE:
+        logging.info(msg=f"{dataset.name}")
+        if dataset.storage.type_source != TypeSource.FILE:
             continue
 
-        s3_key_source = config.storage_info.get_full_s3_key(use_id_source=True)
-        try:
-            logging.info(msg=f"Deleting source file {s3_key_source}")
-            s3_handler.delete_single(file_path=s3_key_source)
-            logging.info(msg="Source file deleted successfully")
-        except FileHandlerError as e:
-            logging.error(msg=f"Failed to delete source file {s3_key_source}: {e!s}")
-            raise
+        s3_handler = create_file_handler(
+            handler_type=FileHandlerType.S3,
+            config=FSConfig(connection_id=dataset_execution_options.s3_conn_id),
+        )
 
-        if config.storage_options.write_to_s3 is True:
-            s3_key = config.storage_info.get_full_s3_key(with_tmp_segment=True)
-            try:
-                logging.info(msg=f"Deleting {s3_key} source files")
-                s3_handler.delete_single(file_path=s3_key)
-                logging.info(msg="Source files deleted successfully")
-            except FileHandlerError as e:
-                logging.error(msg=f"Failed to delete source files: {e!s}")
-                raise
+        s3_key_source = dataset.storage.get_full_s3_key(use_id_source=True)
+        logging.info(msg=f"Deleting source file {s3_key_source}")
+        s3_handler.delete_single(file_path=s3_key_source)
+        logging.info(msg="Source file deleted successfully")
+
+        if dataset_execution_options.write_to_s3 is True:
+            s3_key = dataset.storage.get_full_s3_key(with_tmp_segment=True)
+            logging.info(msg=f"Deleting {s3_key} source files")
+            s3_handler.delete_single(file_path=s3_key)
+            logging.info(msg="Source files deleted successfully")
 
 
 @task
