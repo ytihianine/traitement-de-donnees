@@ -13,10 +13,10 @@ from modules.domain.selecteur.selecteur_service import (
     column_mapping_dict,
     get_selecteur_storage_info,
 )
-from modules.infra.airflow.service import get_project_name, should_skip_task
+from modules.infra.airflow.dag import AirflowDagRepository, should_skip_task
 from modules.infra.file_system.dataframe import read_dataframe
 from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
-from modules.utils.logs import df_info
+from modules.logs import df_info
 
 TaskParams = dict[str, Any]
 
@@ -56,7 +56,7 @@ def create_parquet_converter_task(
             config=FSConfig(),
         )
 
-        nom_projet = get_project_name(context=context)
+        nom_projet = AirflowDagRepository().get_project_name(context=context)
 
         if should_skip_task(context=context, feature_flag=FeatureFlags.CONVERT_FILES):
             return
