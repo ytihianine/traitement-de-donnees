@@ -91,6 +91,7 @@ def activite() -> None:
                     txt_columns=[
                         "accompagnement",
                     ],
+                    date_columns=["date_de_la_demande"],
                     num_columns=["charge_estimee", "charge_consommee", "ecart_de_charge"],
                     ref_columns=["id_direction", "id_type_intervention", "id_assignation"],
                     custom_fn=process.process_accompagnement,
