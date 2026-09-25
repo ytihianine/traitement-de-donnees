@@ -5,7 +5,7 @@ from dags.commun.code_geographique import process
 from modules.constants import AGENT, DEFAULT_GRIST_HOST, PROXY
 from modules.infra.grist.client import GristClient
 from modules.infra.http_client.adapters import ClientConfig, RequestsClient
-from modules.utils.logs import df_info
+from modules.logs import df_info
 
 # Données COG
 PAGE_SIZE = "?page_size=0"  # get all data at once
