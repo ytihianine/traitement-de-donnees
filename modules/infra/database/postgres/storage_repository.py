@@ -1,13 +1,24 @@
 from dataclasses import dataclass
 
+from modules.constants import DEFAULT_PG_DATA_CONN_ID
 from modules.domain.dataset.model import StorageInfo
 from modules.domain.dataset.ports import StorageInfoProvider
 from modules.infra.database.base import DBInterface
+from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 
 
-@dataclass(frozen=True)
+@dataclass
 class PostgresStorageInfoRepository(StorageInfoProvider):
-    db_client: DBInterface
+    db_type: DatabaseType = DatabaseType.POSTGRES
+    db_connection_id: str = DEFAULT_PG_DATA_CONN_ID
+
+    @property
+    def db_client(self) -> DBInterface:
+        client = create_db_handler(
+            db_type=self.db_type,
+            db_config=DbConfig(connection_id=self.db_connection_id),
+        )
+        return client
 
     def get_by_dataset(self, nom_projet: str, dataset_name: str) -> StorageInfo:
         storage = self.db_client.fetch_one(
