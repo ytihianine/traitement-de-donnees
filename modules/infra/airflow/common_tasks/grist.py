@@ -10,21 +10,20 @@ from modules.constants import (
     DEFAULT_GRIST_HOST,
     PROXY,
 )
-from modules.enums.dags import FeatureFlags
-from modules.enums.filesystem import FileHandlerType
-from modules.infra.file_system.factory import FSConfig, create_file_handler
-from modules.infra.grist.client import GristClient
-from modules.infra.http_client.adapters import RequestsClient
-from modules.infra.http_client.config import ClientConfig
-from modules.utils.config.dag_params import get_project_name, should_skip_task
-from modules.utils.config.tasks import get_selecteur_storage_info
-from modules.utils.process.dates import convert_grist_date_to_date
-from modules.utils.process.structures import (
+from modules.domain.dag.model import FeatureFlags
+from modules.generic_processing.dates import convert_grist_date_to_date
+from modules.generic_processing.structures import (
     handle_grist_boolean_columns,
     handle_grist_null_references,
     normalize_grist_dataframe,
 )
-from modules.utils.process.text import normalize_whitespace_columns
+from modules.generic_processing.text import normalize_whitespace_columns
+from modules.infra.airflow.dag import AirflowDagRepository, should_skip_task
+from modules.infra.database.postgres.dataset_repository import PostgresDatasetRepository
+from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
+from modules.infra.grist.client import GristClient
+from modules.infra.http_client.adapters import RequestsClient
+from modules.infra.http_client.config import ClientConfig
 
 
 @task(
@@ -34,25 +33,28 @@ from modules.utils.process.text import normalize_whitespace_columns
     retry_exponential_backoff=True,
 )
 def download_grist_doc_to_s3(
-    selecteur: str,
+    grist_dataset_name: str,
     grist_host: str = DEFAULT_GRIST_HOST,
     api_token_key: str = "grist_secret_key",
     use_proxy: bool = True,
     **context,
 ) -> None:
     """Download SQLite from a specific Grist doc to S3"""
-    nom_projet = get_project_name(context=context)
-
     if should_skip_task(context=context, feature_flag=FeatureFlags.DOWNLOAD_GRIST_DOC):
         return
 
-    selecteur_config = get_selecteur_storage_info(nom_projet=nom_projet, selecteur=selecteur)
-    doc_id = selecteur_config.id_source
-    dest_tmp_key = selecteur_config.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
+    # Init repositories
+    dag_repository = AirflowDagRepository()
+    dataset_repository = PostgresDatasetRepository()
+
+    nom_projet = dag_repository.get_project_name(context=context)
+    dataset = dataset_repository.get(nom_projet=nom_projet, name=grist_dataset_name)
+    doc_id = dataset.storage.id_source
+    dest_tmp_key = dataset.storage.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
 
     if doc_id is None:
         raise ValueError(
-            f"doc_id is None for selecteur {selecteur} in project {nom_projet}. Please check the configuration."
+            f"doc_id is None for dataset {dataset.name} in project {nom_projet}. Please check the configuration."
         )
 
     # Instanciate Grist client
@@ -83,7 +85,7 @@ def download_grist_doc_to_s3(
         file_path=dest_tmp_key,
         content=grist_response.content,
     )
-    print("✅ Export done!")
+    logging.info(msg=f"Export done to {dest_tmp_key}!")
 
 
 def generic_grist_processing(
@@ -121,10 +123,10 @@ def generic_grist_processing(
 
     # Normalizing text columns
     if txt_columns:
-        logging.info(f"Normalizing text columns to string: {txt_columns}")
+        logging.info(msg=f"Normalizing text columns to string: {txt_columns}")
         df = normalize_whitespace_columns(df=df, columns=txt_columns)
     else:
-        logging.info("No text columns provided. Skipping ...")
+        logging.info(msg="No text columns provided. Skipping ...")
 
     # Convert numeric columns to float
     if num_columns:
