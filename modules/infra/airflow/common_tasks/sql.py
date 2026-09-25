@@ -4,7 +4,6 @@ import logging
 import textwrap
 from collections.abc import Mapping
 from datetime import datetime, timedelta
-from typing import Any
 from uuid import UUID, uuid4
 
 from airflow.sdk import get_current_context, task
@@ -14,36 +13,27 @@ from modules.constants import (
     DEFAULT_S3_CONN_ID,
     DEFAULT_TMP_SCHEMA,
 )
-from modules.enums.dags import FeatureFlags
-from modules.enums.database import (
-    DatabaseType,
+from modules.domain.dag.model import FeatureFlags
+from modules.domain.dataset.model import Dataset
+from modules.domain.pipeline.model import (
+    ExecutionOptions,
     LoadStrategy,
     PartitionTimePeriod,
 )
-from modules.enums.filesystem import FileHandlerType
+from modules.generic_processing.structures import are_lists_egal
+from modules.infra.airflow.dag import (
+    AirflowDagRepository,
+    should_skip_task,
+)
 from modules.infra.database.base import DBInterface
-from modules.infra.database.factory import DbConfig, create_db_handler
+from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
+from modules.infra.database.postgres.projet_repository import PostgresProjetRepository
 from modules.infra.file_system.dataframe import read_dataframe
 from modules.infra.file_system.factory import (
+    FileHandlerType,
     FSConfig,
     create_file_handler,
 )
-from modules.types.projet import (
-    SelecteurConfig,
-    SelecteurStorageOptions,
-)
-from modules.utils.config.dag_params import (
-    get_db_info,
-    get_execution_date,
-    get_project_name,
-    should_skip_task,
-)
-from modules.utils.config.tasks import (
-    get_list_selecteur_storage_info,
-    get_projet_metadata,
-    merge_selecteur_config,
-)
-from modules.utils.process.structures import are_lists_egal
 
 # ------------------------------------------------------------------------------
 # Internal functions
@@ -201,8 +191,9 @@ def create_projet_snapshot(
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    nom_projet = get_project_name(context=context)
-    execution_date = get_execution_date(context=context)
+    dag_repo = AirflowDagRepository()
+    nom_projet = dag_repo.get_project_name(context=context)
+    execution_date = dag_repo.get_execution_date(context=context)
 
     # Hook
     # db_client = create_db_handler(connection_id=pg_conn_id)
@@ -228,8 +219,11 @@ def update_projet_snapshot_status(
     Returns:
         None.
     """
+    dag_repo = AirflowDagRepository()
+    projet_repo = PostgresProjetRepository()
+
     if nom_projet is None:
-        nom_projet = get_project_name(context=context)
+        nom_projet = dag_repo.get_project_name(context=context)
 
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
@@ -240,7 +234,7 @@ def update_projet_snapshot_status(
         db_config=DbConfig(connection_id=pg_conn_id),
     )
 
-    projet_metadata = get_projet_metadata(nom_projet=nom_projet)
+    projet_metadata = projet_repo.get_projet_metadata(nom_projet=nom_projet)
 
     # Update is_dag_completed to True for the snapshot_id
     query = """
@@ -260,7 +254,8 @@ def update_projet_snapshot_status(
 
 @task(map_index_template="{{ import_task_name }}")
 def ensure_partition(
-    selecteur_config: Mapping[str, Any],
+    dataset: Dataset,
+    execution_options: Mapping[str, ExecutionOptions],
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     **context,
 ) -> None:
@@ -275,42 +270,42 @@ def ensure_partition(
     Returns:
         Le nom de la partition (créée ou existante)
     """
-    # Init selecteur_config to SelecteurConfig if it's a dict
-    config = SelecteurConfig.from_dict(data=selecteur_config)
-
     context = get_current_context()
-    context["import_task_name"] = config.storage_info.selecteur  # type: ignore
+    context["import_task_name"] = dataset.name  # type: ignore
 
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    tbl_name = config.storage_info.tbl_name
-    is_partitioned = config.storage_options.is_partitioned
-    partition_period = config.storage_options.partition_period
+    dataset_options = execution_options.get(dataset.name)
 
-    if config.storage_options.write_to_db is False:
-        logging.info(msg=f"write_to_db is set to False for selecteur {config.storage_info.selecteur} ... skipping")
+    if dataset_options is None:
+        raise ValueError(f"No execution options found for dataset {dataset.name}")
+
+    tbl_name = dataset.storage.tbl_name
+    is_partitioned = dataset_options.is_partitioned
+    partition_period = dataset_options.partition_period
+
+    if dataset_options.write_to_db is False:
+        logging.info(msg=f"write_to_db is set to False for selecteur {dataset.name} ... skipping")
         return
 
     if tbl_name is None or tbl_name == "":
-        logging.warning(
-            msg=f"No table name specified for selecteur {config.storage_info.selecteur} ... skipping partition creation"
-        )
+        logging.warning(msg=f"No table name specified for selecteur {dataset.name} ... skipping partition creation")
         return
 
     if not is_partitioned:
         logging.info(msg=f"{tbl_name} is not partitioned ... skipping")
         return
 
-    execution_date = get_execution_date(context=context)
-    db_info = get_db_info(context=context)
-    prod_schema = db_info.prod_schema
-
-    # Hook
+    # Init vars
+    dag_repo = AirflowDagRepository()
     db = create_db_handler(
         db_type=DatabaseType.POSTGRES,
         db_config=DbConfig(connection_id=pg_conn_id),
     )
+    execution_date = dag_repo.get_execution_date(context=context)
+    db_info = dag_repo.get_db_info(context=context)
+    prod_schema = db_info.prod_schema
 
     # Get partition period range
     from_date, to_date = determine_partition_period(
@@ -339,44 +334,46 @@ def ensure_partition(
 
 @task(task_id="create_tmp_tables")
 def create_tmp_tables(
+    datasets: list[Dataset],
+    execution_options: Mapping[str, ExecutionOptions],
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
-    storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
     reset_id_seq: bool = False,
     **context,
 ) -> None:
     """
     Used to create temporary tables in the database.
     """
-    nom_projet = get_project_name(context=context)
 
     if should_skip_task(context=context):
         return
 
-    db_info = get_db_info(context=context)
-    prod_schema = db_info.prod_schema
-    tmp_schema = db_info.tmp_schema
-    print(prod_schema, tmp_schema)
-
-    # Hook
+    # Init vars
+    dag_repo = AirflowDagRepository()
     db = create_db_handler(
         db_type=DatabaseType.POSTGRES,
         db_config=DbConfig(connection_id=pg_conn_id),
     )
 
-    # Get selecteur config
-    storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    selecteur_config = merge_selecteur_config(storage_info=storage_info, storage_options=storage_options)
+    db_info = dag_repo.get_db_info(context=context)
+    prod_schema = db_info.prod_schema
+    tmp_schema = db_info.tmp_schema
+    print(prod_schema, tmp_schema)
 
     drop_queries = []
     create_queries = []
     alter_queries = []
 
-    for config in selecteur_config:
-        if not config.should_write_to_db():
-            logging.info(msg=f"Skipping DB tmp table creation for selecteur <{config.storage_info.selecteur}>")
+    for dataset in datasets:
+        dataset_options = execution_options.get(dataset.name)
+
+        if dataset_options is None:
+            raise ValueError(f"No execution options found for dataset {dataset.name}")
+
+        if not dataset_options.write_to_db:
+            logging.info(msg=f"Skipping DB tmp table creation for selecteur <{dataset.name}>")
             continue
 
-        tbl_name = config.storage_info.tbl_name
+        tbl_name = dataset.storage.tbl_name
 
         drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
         create_queries.append(f"""CREATE TABLE
@@ -397,36 +394,34 @@ def create_tmp_tables(
 
 @task(task_id="delete_tmp_tables")
 def delete_tmp_tables(
+    datasets: list[Dataset],
+    execution_options: Mapping[str, ExecutionOptions],
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
-    storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
     **context,
 ) -> None:
     """
     Used to delete temporary tables in the database.
     """
-    nom_projet = get_project_name(context=context)
-
-    db_info = get_db_info(context=context)
-    tmp_schema = db_info.tmp_schema
-
-    # Get selecteur config
-    storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    selecteur_config = merge_selecteur_config(storage_info=storage_info, storage_options=storage_options)
-
-    # Hook
+    # Init vars
+    dag_repo = AirflowDagRepository()
     db = create_db_handler(
         db_type=DatabaseType.POSTGRES,
         db_config=DbConfig(connection_id=pg_conn_id),
     )
 
-    for config in selecteur_config:
-        if not config.should_write_to_db():
-            logging.info(msg=f"Skipping DB tmp table deletion for selecteur <{config.storage_info.selecteur}>")
+    db_info = dag_repo.get_db_info(context=context)
+
+    for dataset in datasets:
+        dataset_options = execution_options.get(dataset.name)
+
+        if dataset_options is None:
+            raise ValueError(f"No execution options found for dataset {dataset.name}")
+
+        if not dataset_options.write_to_db:
+            logging.info(msg=f"Skipping DB tmp table deletion for selecteur <{dataset.name}>")
             continue
 
-        tbl_name = config.storage_info.tbl_name
-
-        db.execute(query=f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
+        db.execute(query=f"DROP TABLE IF EXISTS {db_info.tmp_schema}.tmp_{dataset.storage.tbl_name};")
 
 
 def _create_append_copy_query(prod_table: str, tmp_table: str, col_list: list[str]) -> str:
@@ -470,7 +465,8 @@ def _create_incremental_copy_query(
 
 
 def _generate_copy_query(
-    selecteur_config: SelecteurConfig,
+    dataset: Dataset,
+    execution_options: ExecutionOptions,
     db_handler: DBInterface,
     prod_schema: str = DEFAULT_TMP_SCHEMA,
     tmp_schema: str = DEFAULT_TMP_SCHEMA,
@@ -480,21 +476,22 @@ def _generate_copy_query(
     Generate SQL query to copy data from temporary table to production table based on the specified strategy.
 
     Args:
-        selecteur_config: Selecteur configuration object.
+        dataset: Dataset object.
         db_handler: Database handler object.
         prod_schema: Production schema name.
         tmp_schema: Temporary schema name.
         merge_delete: Whether to perform merge delete operation.
     """
-    load_strategy = selecteur_config.storage_options.load_strategy
-    tbl_name = selecteur_config.storage_info.tbl_name
+    load_strategy = execution_options.load_strategy
+    tbl_name = dataset.storage.tbl_name
     assert tbl_name is not None  # guaranteed by should_write_to_db()
     prod_table = f"{prod_schema}.{tbl_name}"
     tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
 
     col_list = sort_db_colnames(
         db_handler=db_handler,
-        selecteur_config=selecteur_config,
+        execution_options=execution_options,
+        dataset=dataset,
         schema=prod_schema,
     )
 
@@ -528,7 +525,8 @@ def _generate_copy_query(
 
 @task(task_id="copy_tmp_table_to_real_table")
 def copy_tmp_table_to_real_table(
-    storage_options: Mapping[str, SelecteurStorageOptions] | None = None,
+    datasets: list[Dataset],
+    execution_options: Mapping[str, ExecutionOptions],
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     merge_delete: bool = False,
     **context,
@@ -541,12 +539,11 @@ def copy_tmp_table_to_real_table(
         INCREMENTAL    -> UPSERT + delete missing rows based on primary key
         APPEND    -> ADD all rows from tmp to prod
     """
-    nom_projet = get_project_name(context=context)
-
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    db_info = get_db_info(context=context)
+    dag_repo = AirflowDagRepository()
+    db_info = dag_repo.get_db_info(context=context)
     prod_schema = db_info.prod_schema
     tmp_schema = db_info.tmp_schema
 
@@ -556,21 +553,23 @@ def copy_tmp_table_to_real_table(
         db_config=DbConfig(connection_id=pg_conn_id),
     )
 
-    # Get selecteur config
-    storage_info = get_list_selecteur_storage_info(nom_projet=nom_projet)
-    selecteur_config = merge_selecteur_config(storage_info=storage_info, storage_options=storage_options)
     # Sort by tbl_order to handle foreign key dependencies
-    selecteur_config = sorted(selecteur_config, key=lambda x: x.storage_options.tbl_order)
-    logging.info(msg=f"Nombre de tables à copier: {len(selecteur_config)}")
+    logging.info(msg=f"Nombre de tables à copier: {len(datasets)}")
 
     queries = []
-    for config in selecteur_config:
-        if not config.should_write_to_db():
+    for dataset in datasets:
+        dataset_options = execution_options.get(dataset.name)
+
+        if dataset_options is None:
+            raise ValueError(f"No execution options found for dataset {dataset.name}")
+
+        if not dataset_options.write_to_db:
             continue
 
         queries.append(
             _generate_copy_query(
-                selecteur_config=config,
+                dataset=dataset,
+                execution_options=dataset_options,
                 db_handler=db_handler,
                 prod_schema=prod_schema,
                 tmp_schema=tmp_schema,
@@ -592,20 +591,21 @@ def copy_tmp_table_to_real_table(
 
 def sort_db_colnames(
     db_handler: DBInterface,
-    selecteur_config: SelecteurConfig,
+    dataset: Dataset,
+    execution_options: ExecutionOptions,
     schema: str = DEFAULT_TMP_SCHEMA,
 ) -> list[str]:
     """Get sorted column names from a table.
 
     Args:
-        selecteur_config: Selecteur configuration
+        dataset: Dataset object.
         schema: Schema name
 
     Returns:
         Sorted list of column names
     """
-    tbl_name = selecteur_config.storage_info.tbl_name
-    pg_conn_id = selecteur_config.storage_options.db_conn_id
+    tbl_name = dataset.storage.tbl_name
+    pg_conn_id = execution_options.db_conn_id
 
     if tbl_name is None or tbl_name == "":
         return []
@@ -653,27 +653,30 @@ def bulk_load_local_tsv_file_to_db(
 
 @task(map_index_template="{{ import_task_name }}")
 def import_file_to_db(
-    selecteur_config: Mapping[str, Any],
+    dataset: Dataset,
+    execution_options: Mapping[str, ExecutionOptions],
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     s3_conn_id: str = DEFAULT_S3_CONN_ID,
     **context,
 ) -> None:
-    # Init selecteur_config to SelecteurConfig if it's a dict
-    config = SelecteurConfig.from_dict(data=selecteur_config)
-    selecteur = config.storage_info.selecteur
-
-    db_info = get_db_info(context=context)
     context = get_current_context()
-    context["import_task_name"] = config.storage_info.selecteur  # type: ignore
+    context["import_task_name"] = dataset.name  # type: ignore
 
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    if config.storage_options.write_to_db is False:
-        logging.info(msg=f"write_to_db option is set to False for selecteur <{selecteur}>. Skipping import to db ...")
+    dag_repo = AirflowDagRepository()
+    dataset_options = execution_options.get(dataset.name)
+
+    if dataset_options is None:
+        raise ValueError(f"No execution options found for dataset {dataset.name}")
+
+    if dataset_options.write_to_db is False:
+        logging.info(msg=f"write_to_db option is set to False for dataset <{dataset.name}>. Skipping import to db ...")
         return
 
-    schema = db_info.prod_schema if config.storage_options.use_prod_schema else db_info.tmp_schema
+    db_info = dag_repo.get_db_info(context=context)
+    schema = db_info.prod_schema if dataset_options.use_prod_schema else db_info.tmp_schema
 
     # Define hooks
     db_handler = create_db_handler(
@@ -690,14 +693,14 @@ def import_file_to_db(
     )
 
     # Variables
-    tbl_name = config.storage_info.tbl_name
+    tbl_name = dataset.storage.tbl_name
 
     if tbl_name is None or tbl_name == "":
-        logging.info(msg=f"tbl_name is None for selecteur <{selecteur}>. Nothing to import to db")
+        logging.info(msg=f"tbl_name is None for selecteur <{dataset.name}>. Nothing to import to db")
     else:
         # Variables
-        local_filepath = config.storage_info.get_local_path()
-        s3_filepath = config.storage_info.get_full_s3_key(with_tmp_segment=True)
+        local_filepath = dataset.storage.get_local_path()
+        s3_filepath = dataset.storage.get_full_s3_key(with_tmp_segment=True)
 
         # Check if old file exists
         local_handler.delete(file_path=local_filepath)
@@ -718,7 +721,8 @@ def import_file_to_db(
         # Check if columns are the same between df and db table
         sorted_db_colnames = sort_db_colnames(
             db_handler=db_handler,
-            selecteur_config=config,
+            dataset=dataset,
+            execution_options=dataset_options,
             schema=schema,
         )
         if not are_lists_egal(list_A=sorted_df_cols, list_B=sorted_db_colnames):
@@ -745,7 +749,8 @@ def refresh_views(pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context) -> None:
     if should_skip_task(context=context):
         return
 
-    db_info = get_db_info(context=context)
+    dag_repo = AirflowDagRepository()
+    db_info = dag_repo.get_db_info(context=context)
     prod_schema = db_info.prod_schema
 
     db = create_db_handler(
