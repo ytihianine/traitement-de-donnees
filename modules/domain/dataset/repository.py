@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from modules.domain.dataset.model import Dataset
 
@@ -18,4 +19,4 @@ class DatasetRepository(ABC):
     def get_list_source_fichier(self, nom_projet: str) -> list[str]: ...
 
     @abstractmethod
-    def get_list_column_mapping(self, nom_projet: str, dataset_name: str) -> list[Mapping[str, str]]: ...
+    def get_list_column_mapping(self, nom_projet: str, dataset_name: str) -> Sequence[Mapping[str, Any]]: ...

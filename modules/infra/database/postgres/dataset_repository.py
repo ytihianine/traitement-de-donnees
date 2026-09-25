@@ -1,6 +1,7 @@
 import logging
+from collections.abc import Mapping, Sequence
+from typing import Any
 
-import pandas as pd
 from tenacity import (
     before_sleep_log,
     retry,
@@ -131,9 +132,9 @@ class PostgresDatasetRepository(DatasetRepository):
         )
         return [source["source_fichier"] for source in sources]
 
-    def get_list_column_mapping_as_df(self, nom_projet: str, dataset_name: str) -> pd.DataFrame:
+    def get_list_column_mapping(self, nom_projet: str, dataset_name: str) -> Sequence[Mapping[str, Any]]:
         column_mappings = self.db_client.fetch_all(
             query="SELECT * FROM column_mappings WHERE nom_projet = %s AND dataset_name = %s",
             parameters=(nom_projet, dataset_name),
         )
-        return pd.DataFrame(column_mappings)
+        return column_mappings
