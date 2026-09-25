@@ -1,6 +1,7 @@
 """PostgreSQL adapter for the ProjetRepository port."""
 
 import logging
+from dataclasses import dataclass
 
 from tenacity import (
     before_sleep_log,
@@ -10,7 +11,7 @@ from tenacity import (
     wait_exponential,
 )
 
-from modules.domain.projet.model import Contact, Documentation, ProjetMetadata, ProjetS3
+from modules.domain.projet.model import Contact, Documentation, Projet, ProjetMetadata, ProjetS3
 from modules.domain.projet.repository import ProjetRepository
 from modules.infra.database.base import DBInterface
 
@@ -27,23 +28,50 @@ db_retry = retry(
 )
 
 
+@dataclass
 class PostgresProjetRepository(ProjetRepository):
     """ProjetRepository backed by the ``conf_projets`` Postgres schema."""
 
-    def __init__(self, db: DBInterface | None = None) -> None:
-        if db is None:
+    db_client: DBInterface | None = None
+
+    def __post_init__(self) -> None:
+        if self.db_client is None:
             from modules.constants import DEFAULT_PG_DATA_CONN_ID
             from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 
-            db = create_db_handler(
+            self.db_client = create_db_handler(
                 db_type=DatabaseType.POSTGRES,
                 db_config=DbConfig(connection_id=DEFAULT_PG_DATA_CONN_ID),
             )
-        self._db = db
+
+    @property
+    def _db(self) -> DBInterface:
+        if self.db_client is None:
+            raise ValueError("Database client is not initialized.")
+        return self.db_client
+
+    @db_retry
+    def get(self, nom_projet: str) -> Projet:
+        df = self._db.fetch_df(
+            query=f"""
+                SELECT p.projet, p.id_projet
+                FROM {CONF_SCHEMA}.projet p
+                JOIN versioning.snapshot s ON p.id_projet = s.id_projet
+                WHERE p.projet = %s
+                ORDER BY s.import_timestamp DESC
+                LIMIT 1;
+            """,
+            parameters=(nom_projet,),
+        )
+
+        if df.empty:
+            raise ValueError(f"No project found with name {nom_projet}")
+
+        record = df.iloc[0].to_dict(into=dict)
+        return Projet(name=record["projet"], id=record["id_projet"])
 
     @db_retry
     def get_list_contact(self, nom_projet: str) -> list[Contact]:
-        self._validate_projet(nom_projet, context="contact information")
 
         df = self._db.fetch_df(
             query=f"""
@@ -58,7 +86,6 @@ class PostgresProjetRepository(ProjetRepository):
 
     @db_retry
     def get_list_documentation(self, nom_projet: str) -> list[Documentation]:
-        self._validate_projet(nom_projet, context="documentation")
 
         df = self._db.fetch_df(
             query=f"""
@@ -73,7 +100,6 @@ class PostgresProjetRepository(ProjetRepository):
 
     @db_retry
     def get_projet_s3_info(self, nom_projet: str) -> ProjetS3:
-        self._validate_projet(nom_projet, context="S3 configuration")
 
         df = self._db.fetch_df(
             query=f"""
@@ -94,7 +120,6 @@ class PostgresProjetRepository(ProjetRepository):
 
     @db_retry
     def get_projet_metadata(self, nom_projet: str, dag_completed: bool = False) -> ProjetMetadata:
-        self._validate_projet(nom_projet, context="snapshot metadata")
 
         query = """
             SELECT s.id_projet, s.snapshot_id, s.snapshot_id_parent, s.import_timestamp
@@ -116,13 +141,8 @@ class PostgresProjetRepository(ProjetRepository):
             raise ValueError(f"No metadata found for project {nom_projet}")
 
         return ProjetMetadata(
-            _id_projet=db_result["id_projet"],
-            _snapshot_id=db_result["snapshot_id"],
-            _snapshot_id_parent=db_result["snapshot_id_parent"],
-            _import_timestamp=db_result["import_timestamp"],
+            id_projet=db_result["id_projet"],
+            snapshot_id=db_result["snapshot_id"],
+            snapshot_id_parent=db_result["snapshot_id_parent"],
+            import_timestamp=db_result["import_timestamp"],
         )
-
-    @staticmethod
-    def _validate_projet(nom_projet: str, context: str) -> None:
-        if not nom_projet:
-            raise ValueError(f"Variable nom_projet is required to fetch {context}. Current value is None or empty.")
