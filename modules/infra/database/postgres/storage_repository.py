@@ -6,7 +6,7 @@ from modules.infra.database.base import DBInterface
 
 
 @dataclass(frozen=True)
-class PostgresStorageRepository(StorageInfoProvider):
+class PostgresStorageInfoRepository(StorageInfoProvider):
     db_client: DBInterface
 
     def get_by_dataset(self, nom_projet: str, dataset_name: str) -> StorageInfo:
