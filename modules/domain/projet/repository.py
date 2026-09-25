@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from modules.domain.projet.model import Contact, Documentation, ProjetMetadata, ProjetS3
+from modules.domain.projet.model import Contact, Documentation, Projet, ProjetMetadata, ProjetS3
 
 
 class ProjetRepository(ABC):
@@ -11,6 +11,10 @@ class ProjetRepository(ABC):
     Implementations live outside the domain (see
     ``modules.infra.project.PostgresProjectRepository``).
     """
+
+    @abstractmethod
+    def get(self, nom_projet: str) -> Projet:
+        """Get the contacts declared for a project."""
 
     @abstractmethod
     def get_list_contact(self, nom_projet: str) -> list[Contact]:
