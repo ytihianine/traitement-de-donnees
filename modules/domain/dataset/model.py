@@ -66,6 +66,6 @@ class DatasetStorage:
 
 @dataclass(frozen=True)
 class Dataset:
-    id_projet: int
+    nom_projet: str
     name: str
     storage: DatasetStorage

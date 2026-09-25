@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 
-import pandas as pd
-
-from modules.domain.dataset.model import Dataset, DatasetStorage
+from modules.domain.dataset.model import Dataset
 
 
 # =================
@@ -10,22 +9,13 @@ from modules.domain.dataset.model import Dataset, DatasetStorage
 # =================
 class DatasetRepository(ABC):
     @abstractmethod
-    def get(self, id_projet: int, name: str) -> Dataset: ...
+    def get(self, nom_projet: str, name: str) -> Dataset: ...
 
     @abstractmethod
-    def get_list(self, id_projet: int) -> list[Dataset]: ...
-
-
-class DatasetStorageRepository(ABC):
+    def get_list(self, nom_projet: str) -> list[Dataset]: ...
 
     @abstractmethod
-    def get(self, dataset: Dataset) -> DatasetStorage: ...
+    def get_list_source_fichier(self, nom_projet: str) -> list[str]: ...
 
     @abstractmethod
-    def get_list(self, id_projet: int) -> list[DatasetStorage]: ...
-
-    @abstractmethod
-    def get_list_source_fichier(self, id_projet: int) -> list[str]: ...
-
-    @abstractmethod
-    def get_list_column_mapping_as_df(self, id_projet: int, selecteur: str) -> pd.DataFrame: ...
+    def get_list_column_mapping(self, nom_projet: str, dataset_name: str) -> list[Mapping[str, str]]: ...
