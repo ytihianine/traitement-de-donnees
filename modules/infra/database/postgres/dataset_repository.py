@@ -10,7 +10,7 @@ from tenacity import (
 )
 
 from modules.domain.dataset.model import Dataset, DatasetStorage
-from modules.domain.dataset.repository import DatasetRepository, DatasetStorageRepository
+from modules.domain.dataset.repository import DatasetRepository
 from modules.infra.database.base import DBInterface
 from modules.infra.database.postgres.projet_repository import CONF_SCHEMA
 
@@ -30,23 +30,42 @@ db_retry = retry(
 class PostgresDatasetRepository(DatasetRepository):
     db_client: DBInterface
 
-    def get(self, id_projet: int, name: str) -> Dataset:
+    def get(self, nom_projet: str, name: str) -> Dataset:
         dataset = self.db_client.fetch_one(
-            query="SELECT * FROM datasets WHERE id_projet = %s AND name = %s", parameters=(id_projet, name)
+            query="SELECT * FROM datasets WHERE nom_projet = %s AND name = %s", parameters=(nom_projet, name)
         )
         if dataset is None:
-            raise ValueError(f"Dataset with id_projet={id_projet} and name={name} not found.")
-        return Dataset(**dataset)
-
-    def get_list(self, id_projet: int) -> list[Dataset]:
-        datasets = self.db_client.fetch_all(
-            query="SELECT * FROM datasets WHERE id_projet = %s", parameters=(id_projet,)
+            raise ValueError(f"Dataset with nom_projet={nom_projet} and name={name} not found.")
+        storage = DatasetStorage(
+            type_source=dataset["type_source"],
+            id_source=dataset["id_source"],
+            bucket=dataset["bucket"],
+            s3_key=dataset["s3_key"],
+            filename=dataset["filename"],
+            tbl_name=dataset["tbl_name"],
+            s3_conn_id=dataset["s3_conn_id"],
+            local_dir=dataset["local_dir"],
         )
-        return [Dataset(**dataset) for dataset in datasets]
+        return Dataset(nom_projet=nom_projet, name=dataset["name"], storage=storage)
 
-
-class PostgresDatasetStorageRepository(DatasetStorageRepository):
-    db_client: DBInterface
+    def get_list(self, nom_projet: str) -> list[Dataset]:
+        results = self.db_client.fetch_all(
+            query="SELECT * FROM datasets WHERE nom_projet = %s", parameters=(nom_projet,)
+        )
+        datasets = []
+        for dataset in results:
+            storage = DatasetStorage(
+                type_source=dataset["type_source"],
+                id_source=dataset["id_source"],
+                bucket=dataset["bucket"],
+                s3_key=dataset["s3_key"],
+                filename=dataset["filename"],
+                tbl_name=dataset["tbl_name"],
+                s3_conn_id=dataset["s3_conn_id"],
+                local_dir=dataset["local_dir"],
+            )
+            datasets.append(Dataset(nom_projet=nom_projet, name=dataset["name"], storage=storage))
+        return datasets
 
     @db_retry
     def _get_selecteur_storage_info(
@@ -106,29 +125,15 @@ class PostgresDatasetStorageRepository(DatasetStorageRepository):
         records = df.to_dict("records", into=dict)
         return [Dataset(**record) for record in records]
 
-    def get(self, dataset: Dataset) -> DatasetStorage:
-        storage = self.db_client.fetch_one(
-            query="SELECT * FROM dataset_storages WHERE id_dataset = %s", parameters=(dataset.id,)
-        )
-        if storage is None:
-            raise ValueError(f"DatasetStorage for dataset id={dataset.id} not found.")
-        return DatasetStorage(**storage)
-
-    def get_list(self, id_projet: int) -> list[DatasetStorage]:
-        storages = self.db_client.fetch_all(
-            query="SELECT * FROM dataset_storages WHERE id_projet = %s", parameters=(id_projet,)
-        )
-        return [DatasetStorage(**storage) for storage in storages]
-
-    def get_list_source_fichier(self, id_projet: int) -> list[str]:
+    def get_list_source_fichier(self, nom_projet: str) -> list[str]:
         sources = self.db_client.fetch_all(
-            query="SELECT DISTINCT source_fichier FROM dataset_storages WHERE id_projet = %s", parameters=(id_projet,)
+            query="SELECT DISTINCT source_fichier FROM dataset_storages WHERE nom_projet = %s", parameters=(nom_projet,)
         )
         return [source["source_fichier"] for source in sources]
 
-    def get_list_column_mapping_as_df(self, id_projet: int, selecteur: str) -> pd.DataFrame:
+    def get_list_column_mapping_as_df(self, nom_projet: str, dataset_name: str) -> pd.DataFrame:
         column_mappings = self.db_client.fetch_all(
-            query="SELECT * FROM column_mappings WHERE id_projet = %s AND selecteur = %s",
-            parameters=(id_projet, selecteur),
+            query="SELECT * FROM column_mappings WHERE nom_projet = %s AND dataset_name = %s",
+            parameters=(nom_projet, dataset_name),
         )
         return pd.DataFrame(column_mappings)
