@@ -72,6 +72,7 @@ def activite() -> None:
                 fn=partial(
                     generic_grist_processing,
                     cols_to_keep=[
+                        "id",
                         "date_de_la_demande",
                         "direction",
                         "accompagnement",
