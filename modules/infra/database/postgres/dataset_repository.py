@@ -10,7 +10,7 @@ from tenacity import (
     wait_exponential,
 )
 
-from modules.domain.dataset.model import Dataset, DatasetStorage
+from modules.domain.dataset.model import Dataset
 from modules.domain.dataset.repository import DatasetRepository
 from modules.infra.database.base import DBInterface
 from modules.infra.database.postgres.projet_repository import CONF_SCHEMA
@@ -37,17 +37,7 @@ class PostgresDatasetRepository(DatasetRepository):
         )
         if dataset is None:
             raise ValueError(f"Dataset with nom_projet={nom_projet} and name={name} not found.")
-        storage = DatasetStorage(
-            type_source=dataset["type_source"],
-            id_source=dataset["id_source"],
-            bucket=dataset["bucket"],
-            s3_key=dataset["s3_key"],
-            filename=dataset["filename"],
-            tbl_name=dataset["tbl_name"],
-            s3_conn_id=dataset["s3_conn_id"],
-            local_dir=dataset["local_dir"],
-        )
-        return Dataset(nom_projet=nom_projet, name=dataset["name"], storage=storage)
+        return Dataset(nom_projet=nom_projet, name=dataset["name"])
 
     def get_list(self, nom_projet: str) -> list[Dataset]:
         results = self.db_client.fetch_all(
@@ -55,17 +45,7 @@ class PostgresDatasetRepository(DatasetRepository):
         )
         datasets = []
         for dataset in results:
-            storage = DatasetStorage(
-                type_source=dataset["type_source"],
-                id_source=dataset["id_source"],
-                bucket=dataset["bucket"],
-                s3_key=dataset["s3_key"],
-                filename=dataset["filename"],
-                tbl_name=dataset["tbl_name"],
-                s3_conn_id=dataset["s3_conn_id"],
-                local_dir=dataset["local_dir"],
-            )
-            datasets.append(Dataset(nom_projet=nom_projet, name=dataset["name"], storage=storage))
+            datasets.append(Dataset(nom_projet=nom_projet, name=dataset["name"]))
         return datasets
 
     @db_retry
