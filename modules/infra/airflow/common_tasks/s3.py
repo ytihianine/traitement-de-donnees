@@ -97,9 +97,6 @@ def del_s3_files(
     if should_skip_task(context=context, feature_flag=FeatureFlags.S3):
         return
 
-    dag_repository = AirflowDagRepository()
-    nom_projet = dag_repository.get_project_name(context=context)
-
     for dataset in datasets:
         dataset_execution_options = execution_options.get(dataset.name)
         if dataset_execution_options is None:
@@ -128,65 +125,63 @@ def del_s3_files(
 
 @task
 def del_iceberg_staging_table(
-    nom_projet: str | None = None,
+    datasets: list[Dataset],
+    execution_options: Mapping[str, ExecutionOptions],
     catalog_name: str = DEFAULT_POLARIS_CATALOG,
     s3_conn_id: str = DEFAULT_S3_CONN_ID,
-    **context,
 ) -> None:
     """Delete Iceberg staging table."""
-    if nom_projet is None:
-        nom_projet = get_project_name(context=context)
-
-    # Get project s3
-    s3_key = get_projet_s3_info(nom_projet=nom_projet).key
-
     # Get catalog
     properties = generate_catalog_properties(
         uri=DEFAULT_POLARIS_HOST,
     )
     catalog = IcebergCatalog(name=catalog_name, properties=properties)
 
-    # Get all tables
-    tables = catalog.list_tables(namespace=s3_key.replace("/", "."), pattern="*_staging*")
+    for dataset in datasets:
+        dataset_execution_options = execution_options.get(dataset.name)
+        if dataset_execution_options is None:
+            raise ValueError(f"No execution options found for dataset <{dataset.name}>")
+        logging.info(msg=f"{dataset.name}")
+        s3_handler = create_file_handler(
+            handler_type=FileHandlerType.S3,
+            config=FSConfig(connection_id=s3_conn_id),
+        )
 
-    # Drop staging tables from Iceberg catalog
-    for table in tables:
-        logging.info(msg=f"Dropping staging table {table} ...")
-        catalog.drop_table(table_name=".".join(table), purge=False)
-        logging.info(msg=f"Staging table {table} dropped successfully !")
+        s3_key = dataset.storage.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
+        iceberg_tbl_name = s3_key.replace("/", ".") + "_staging"
+        # Delete staging table from Iceberg catalog
+        logging.info(msg=f"Dropping iceberg staging table {iceberg_tbl_name} ...")
+        catalog.drop_table(table_name=iceberg_tbl_name, purge=False)
+        logging.info(msg=f"Staging table {iceberg_tbl_name} dropped successfully !")
 
-    # Delete staging files from S3
-    s3_handler = create_file_handler(
-        handler_type=FileHandlerType.S3,
-        config=FSConfig(connection_id=s3_conn_id),
-    )
-    staging_keys = s3_handler.list_files(directory=catalog_name + "/" + s3_key, pattern="*_staging*")
-    for key in staging_keys:
-        logging.info(msg=f"Deleting staging file {key} ...")
-        s3_handler.delete_single(file_path=key)
-        logging.info(msg=f"Staging file {key} deleted successfully !")
+        # Delete staging files from s3
+        logging.info(msg=f"Deleting staging file {s3_key} ...")
+        s3_handler.delete_single(file_path=s3_key)
+        logging.info(msg=f"Staging file {s3_key} deleted successfully !")
 
 
 @task(map_index_template="{{ task_name }}")
 def copy_staging_to_prod(
-    selecteur_config: Mapping[str, Any],
+    dataset: Dataset,
+    execution_options: Mapping[str, ExecutionOptions],
     catalog_uri: str = DEFAULT_POLARIS_HOST,
     catalog_name: str = DEFAULT_POLARIS_CATALOG,
 ) -> None:
     """Copy Iceberg tables from staging key to prod key"""
-    # Init selecteur_config to SelecteurConfig if it's a dict
-    config = SelecteurConfig.from_dict(data=selecteur_config)
-
     context = get_current_context()
-    context["task_name"] = config.storage_info.selecteur  # type: ignore
+    context["task_name"] = dataset.name  # type: ignore
 
-    if not config.should_write_to_iceberg():
-        logging.info(msg=f"Skipping Iceberg write for selecteur <{config.storage_info.selecteur}>")
+    dataset_execution_options = execution_options.get(dataset.name)
+    if dataset_execution_options is None:
+        raise ValueError(f"No execution options found for dataset <{dataset.name}>")
+
+    if not dataset_execution_options.write_to_s3_with_iceberg:
+        logging.info(msg=f"Skipping Iceberg write for dataset <{dataset.name}>")
         return
 
     # Dag info
-    namespace = config.storage_info.get_iceberg_namespace(with_bucket=False)
-    tbl_name = Path(config.storage_info.filename).stem
+    namespace = dataset.storage.get_iceberg_namespace(with_bucket=False)
+    tbl_name = Path(dataset.storage.filename).stem
 
     # Get catalog
     properties = generate_catalog_properties(
@@ -209,20 +204,22 @@ def copy_staging_to_prod(
 
 @task(map_index_template="{{ task_name }}")
 def import_file_to_iceberg(
-    selecteur_config: Mapping[str, Any],
+    dataset: Dataset,
+    execution_options: Mapping[str, ExecutionOptions],
     s3_conn_id: str = DEFAULT_S3_CONN_ID,
     catalog_uri: str = DEFAULT_POLARIS_HOST,
     catalog_name: str = DEFAULT_POLARIS_CATALOG,
 ) -> None:
     """Copy Iceberg tables from staging key to prod key"""
-    # Init selecteur_config to SelecteurConfig if it's a dict
-    config = SelecteurConfig.from_dict(data=selecteur_config)
-
     context = get_current_context()
-    context["task_name"] = config.storage_info.selecteur  # type: ignore
+    context["task_name"] = dataset.name  # type: ignore
 
-    if not config.should_write_to_iceberg():
-        logging.info(msg=f"Skipping Iceberg write for selecteur <{config.storage_info.selecteur}>")
+    dataset_execution_options = execution_options.get(dataset.name)
+    if dataset_execution_options is None:
+        raise ValueError(f"No execution options found for dataset <{dataset.name}>")
+
+    if not dataset_execution_options.write_to_s3_with_iceberg:
+        logging.info(msg=f"Skipping Iceberg write for dataset <{dataset.name}>")
         return
 
     s3_handler = create_file_handler(
@@ -233,13 +230,13 @@ def import_file_to_iceberg(
     catalog = IcebergCatalog(name=catalog_name, properties=properties)
 
     # Dag info
-    namespace = config.storage_info.get_iceberg_namespace(with_bucket=False)
-    tbl_name = Path(config.storage_info.filename).stem
+    namespace = dataset.storage.get_iceberg_namespace(with_bucket=False)
+    tbl_name = Path(dataset.storage.filename).stem
 
     # Read tmp data
     df = read_dataframe(
         file_handler=s3_handler,
-        file_path=config.storage_info.get_full_s3_key(with_tmp_segment=True),
+        file_path=dataset.storage.get_full_s3_key(with_tmp_segment=True),
     )
 
     # Write prod table
