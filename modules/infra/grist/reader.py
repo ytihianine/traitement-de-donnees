@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from modules.domain.dataset.model import Dataset
+from modules.domain.dataset.model import StorageInfo
 from modules.domain.dataset.ports import DatasetReader
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
@@ -17,11 +17,11 @@ class GristReaderStrategy(DatasetReader):
 
     def read(
         self,
-        dataset: Dataset,
+        storage_info: StorageInfo,
     ) -> pd.DataFrame:
 
-        if dataset.storage.id_source is None:
-            raise ValueError(f"id_source must be defined for '{dataset.name}'.")
+        if storage_info.id_source is None:
+            raise ValueError(f"id_source must be defined for '{storage_info.filename}'.")
 
         # Handlers
         s3_handler = create_file_handler(
@@ -35,7 +35,7 @@ class GristReaderStrategy(DatasetReader):
             ),
         )
 
-        doc_local_path = Path("/tmp") / dataset.storage.filename
+        doc_local_path = Path("/tmp") / storage_info.filename
 
         sqlite_handler = create_db_handler(
             db_type=DatabaseType.SQLITE,
@@ -45,7 +45,7 @@ class GristReaderStrategy(DatasetReader):
         )
 
         # Download the Grist document locally
-        grist_doc = s3_handler.read(file_path=dataset.storage.get_full_s3_key(with_tmp_segment=True))
+        grist_doc = s3_handler.read(file_path=storage_info.get_full_s3_key(with_tmp_segment=True))
 
         local_handler.write(
             file_path=str(doc_local_path),
@@ -53,6 +53,6 @@ class GristReaderStrategy(DatasetReader):
         )
 
         # Read the requested table
-        df = sqlite_handler.fetch_df(query=f"SELECT * FROM {dataset.storage.id_source}")
+        df = sqlite_handler.fetch_df(query=f"SELECT * FROM {storage_info.id_source}")
 
         return df

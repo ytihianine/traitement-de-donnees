@@ -16,7 +16,7 @@ from modules.constants import (
 )
 from modules.domain.dag.model import DagStatus
 from modules.infra.airflow.dag import AirflowDagRepository
-from modules.infra.database.postgres.projet_repository import PostgresProjetRepository
+from modules.infra.database.repository.projet import DbProjetRepository
 
 
 class MailStatus(Enum):
@@ -151,7 +151,7 @@ def send_mail(mail_message: MailMessage, conn_id: str = DEFAULT_SMTP_CONN_ID) ->
 
 def _callback(context: dict[str, Any], mail_status: MailStatus) -> None:
     # If debug mode is ON, we don't want to send any mail
-    projet_repository = PostgresProjetRepository()
+    projet_repository = DbProjetRepository()
     dag_repository = AirflowDagRepository()
     mail_enable = dag_repository.get_feature_flags(context=context).mail
     dag_status = dag_repository.get_dag_status(context=context)

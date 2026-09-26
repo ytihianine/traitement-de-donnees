@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from modules.domain.dataset.model import Dataset
+from modules.domain.dataset.model import StorageInfo
 from modules.domain.dataset.ports import DatasetReader
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 from modules.infra.file_system.dataframe import read_dataframe
@@ -17,7 +17,7 @@ class FileDatasetReader(DatasetReader):
 
     def read(
         self,
-        dataset: Dataset,
+        storage_info: StorageInfo,
     ) -> pd.DataFrame:
         fs_handler = create_file_handler(
             handler_type=self.fs_type,
@@ -25,7 +25,7 @@ class FileDatasetReader(DatasetReader):
         )
         df = read_dataframe(
             file_handler=fs_handler,
-            file_path=dataset.storage.get_full_s3_key(use_id_source=True),
+            file_path=storage_info.get_full_s3_key(use_id_source=True),
             read_options=self.read_options,
         )
         return df
@@ -39,7 +39,7 @@ class DbDatasetReader(DatasetReader):
 
     def read(
         self,
-        dataset: Dataset,
+        storage_info: StorageInfo,
     ) -> pd.DataFrame:
         db_handler = create_db_handler(
             db_type=self.db_type,
