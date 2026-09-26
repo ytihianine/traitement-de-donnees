@@ -34,6 +34,7 @@ PARIS_TZ = pytz.timezone(zone="Europe/Paris")
 
 
 # DEFAULT VARIABLES
+DEFAULT_TASK_OWNER = "airflow"
 DEFAULT_SMTP_CONN_ID = "smtp_nubonyxia"
 DEFAULT_MAIL_CC = ["labo-data@finances.gouv.fr", "yanis.tihianine@finances.gouv.fr"]
 DEFAULT_TMP_SCHEMA = "temporaire"

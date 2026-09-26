@@ -8,6 +8,7 @@ import pendulum
 import pytz
 
 from modules.constants import (
+    DEFAULT_TASK_OWNER,
     FF_CONVERT_DISABLED_MSG,
     FF_DB_DISABLED_MSG,
     FF_DOWNLOAD_GRIST_DOC_DISABLED_MSG,
@@ -30,11 +31,6 @@ _FF_DISABLED_MESSAGES: dict[FeatureFlags, str] = {
     FeatureFlags.CONVERT_FILES: FF_CONVERT_DISABLED_MSG,
     FeatureFlags.DOWNLOAD_GRIST_DOC: FF_DOWNLOAD_GRIST_DOC_DISABLED_MSG,
 }
-
-DEFAULT_OWNER = "airflow"
-DEFAULT_EMAIL_TO = ["yanis.tihianine@finances.gouv.fr"]
-DEFAULT_EMAIL_CC = ["labo-data@finances.gouv.fr"]
-DEFAULT_TMP_SCHEMA = "temporaire"
 
 
 class AirflowDagRepository(DagRepository):
@@ -128,7 +124,7 @@ def should_skip_task(
 def create_default_args(retries: int = 0, retry_delay: timedelta | None = None, **kwargs) -> dict:
     """Create standard default_args for dags."""
     args = {
-        "owner": DEFAULT_OWNER,
+        "owner": DEFAULT_TASK_OWNER,
         "depends_on_past": False,
         "start_date": pendulum.today(tz="UTC").add(days=-1),
         "email_on_failure": False,
