@@ -4,7 +4,6 @@ import logging
 import textwrap
 from collections.abc import Mapping
 from datetime import datetime, timedelta
-from uuid import UUID, uuid4
 
 from airflow.sdk import get_current_context, task
 
@@ -37,91 +36,9 @@ from modules.infra.file_system.factory import (
     create_file_handler,
 )
 
-
 # ------------------------------------------------------------------------------
 # Internal functions
 # ------------------------------------------------------------------------------
-def _create_snapshot_id(nom_projet: str, execution_date: datetime, nom_projet_parent: str | None = None) -> None:
-    """
-    Créer un snapshot_id pour un projet donné et l'insérer dans la table conf_projets.projet_snapshot.
-    Une insertion est également faite dans la table versioning.snapshot_id.
-    Actuellement dans une phase de migration. L'insertion dans conf_projets.projet_snapshot sera supprimée à terme
-    """
-    # Init vars
-    snapshot_id = uuid4()
-    snapshot_id_parent = None
-    import_timestamp = execution_date.replace(tzinfo=None)
-    import_date = execution_date.date()
-
-    # Init hook
-    db_client = create_db_handler(
-        db_type=DatabaseType.POSTGRES,
-        db_config=DbConfig(connection_id=DEFAULT_PG_DATA_CONN_ID),
-    )
-
-    # Get project id
-    id_projet_result = db_client.fetch_one(
-        query="SELECT id_projet FROM conf_projets.projet WHERE projet = %(nom_projet)s;",
-        parameters={"nom_projet": nom_projet},
-    )
-    if id_projet_result is None:
-        raise ValueError(f"No project found with name {nom_projet}")
-
-    id_projet = id_projet_result.get("id_projet")
-    if id_projet is None:
-        raise ValueError(f"No id_projet found for project {nom_projet}")
-
-    # Get parent snapshot_id
-    if nom_projet_parent is not None:
-        snapshot_id_parent = _get_snapshot_id(nom_projet=nom_projet_parent, db_handler=db_client, dag_completed=True)
-
-    query = """
-        INSERT INTO versioning.snapshot (id_projet, snapshot_id, snapshot_id_parent, import_timestamp, import_date)
-        VALUES (%(id_projet)s, %(snapshot_id)s, %(snapshot_id_parent)s, %(import_timestamp)s, %(import_date)s);
-    """
-    params = {
-        "id_projet": id_projet,
-        "snapshot_id": snapshot_id,
-        "snapshot_id_parent": snapshot_id_parent,
-        "import_timestamp": import_timestamp,
-        "import_date": import_date,
-    }
-    # Exécution de la requête
-    db_client.execute(query, parameters=params)
-
-
-def _get_snapshot_id(nom_projet: str, db_handler: DBInterface, dag_completed: bool = False) -> UUID:
-    """
-    Get the latest completed snapshot for a project.
-    """
-
-    query = """
-        SELECT s.snapshot_id
-        FROM versioning.snapshot s
-        JOIN conf_projets.projet p
-            ON p.id_projet = s.id_projet
-        WHERE p.projet = %(nom_projet)s
-          AND s.is_dag_completed = %(is_dag_completed)s
-        ORDER BY s.import_timestamp DESC
-        LIMIT 1;
-    """
-
-    params = {"nom_projet": nom_projet, "is_dag_completed": dag_completed}
-
-    db_result = db_handler.fetch_one(
-        query,
-        parameters=params,
-    )
-
-    if db_result is None:
-        raise ValueError(f"No completed snapshot found for project {nom_projet}")
-
-    snapshot_id = db_result.get("snapshot_id")
-
-    if snapshot_id is None:
-        raise ValueError(f"No snapshot_id found for project {nom_projet}")
-
-    return snapshot_id
 
 
 def determine_partition_period(time_period: PartitionTimePeriod, execution_date: datetime) -> tuple[datetime, datetime]:
@@ -152,32 +69,34 @@ def determine_partition_period(time_period: PartitionTimePeriod, execution_date:
 # ------------------------------------------------------------------------------
 @task
 def create_projet_snapshot(
-    nom_projet_parent: str | None = None, pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID, **context
+    nom_projet_parent: str | None = None,
+    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    dag_repo: AirflowDagRepository = DEFAULT_DAG_REPO,
+    projet_repo: ProjetRepository = DEFAULT_PROJET_REPO,
+    **context,
 ) -> None:
     """ """
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    dag_repo = AirflowDagRepository()
     nom_projet = dag_repo.get_project_name(context=context)
     execution_date = dag_repo.get_execution_date(context=context)
 
-    # Hook
-    # db_client = create_db_handler(connection_id=pg_conn_id)
-
-    _create_snapshot_id(nom_projet=nom_projet, execution_date=execution_date, nom_projet_parent=nom_projet_parent)
+    projet_repo.create_projet_metadata(
+        nom_projet=nom_projet, execution_date=execution_date, nom_projet_parent=nom_projet_parent
+    )
 
 
 @task
 def update_projet_snapshot_status(
     nom_projet: str | None = None,
-    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    status: bool = True,
     projet_repo: ProjetRepository = DEFAULT_PROJET_REPO,
     **context,
 ) -> None:
     """
-    Lorsque le DAG est complété, mettre à jour le statut du snapshot_id du projet à TRUE
-    dans la table versioning.snapshot_id.
+    Lorsque le DAG est complété, mettre à jour le statut du snapshot_id du projet à la valeur de `status`
+    dans la table versioning.snapshot.
 
     Args:
         nom_projet (optionnel): Le nom du projet. A spécifier lorsque le nom du projet
@@ -196,28 +115,9 @@ def update_projet_snapshot_status(
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    # Hook
-    db_client = create_db_handler(
-        db_type=DatabaseType.POSTGRES,
-        db_config=DbConfig(connection_id=pg_conn_id),
-    )
-
-    projet_metadata = projet_repo.get_projet_metadata(nom_projet=nom_projet)
-
     # Update is_dag_completed to True for the snapshot_id
-    query = """
-        UPDATE versioning.snapshot
-        SET is_dag_completed = TRUE
-        WHERE id_projet = %(id_projet)s
-        AND snapshot_id = %(snapshot_id)s;
-    """
-    params = {
-        "id_projet": projet_metadata.id_projet,
-        "snapshot_id": projet_metadata.snapshot_id,
-    }
-
-    db_client.execute(query, parameters=params)
-    logging.info(msg="Updated latest snapshot_id. Set is_dag_completed to True")
+    projet_repo.update_projet_metadata_status(nom_projet=nom_projet, status=status)
+    logging.info(msg=f"Updated latest snapshot_id. Set is_dag_completed to {status}")
 
 
 @task(map_index_template="{{ import_task_name }}")

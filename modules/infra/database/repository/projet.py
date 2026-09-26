@@ -2,6 +2,8 @@
 
 import logging
 from dataclasses import dataclass
+from datetime import datetime
+from uuid import uuid4
 
 from tenacity import (
     before_sleep_log,
@@ -114,29 +116,108 @@ class DbProjetRepository(ProjetRepository):
 
     @db_retry
     def get_projet_metadata(self, nom_projet: str, dag_completed: bool = False) -> ProjetMetadata:
-
         query = """
-            SELECT s.id_projet, s.snapshot_id, s.snapshot_id_parent, s.import_timestamp
+            SELECT s.id_projet, s.snapshot_id, s.snapshot_id_parent, s.import_timestamp, s.status
             FROM versioning.snapshot s
             JOIN conf_projets.projet p
                 ON p.id_projet = s.id_projet
             WHERE p.projet = %(nom_projet)s
-              AND s.is_dag_completed IS %(is_dag_completed)s
+            AND s.is_dag_completed = %(is_dag_completed)s
             ORDER BY s.import_timestamp DESC
             LIMIT 1;
         """
 
+        params = {"nom_projet": nom_projet, "is_dag_completed": dag_completed}
+
         db_result = self.db_client.fetch_one(
             query,
-            parameters={"nom_projet": nom_projet, "is_dag_completed": dag_completed},
+            parameters=params,
         )
 
         if db_result is None:
-            raise ValueError(f"No metadata found for project {nom_projet}")
+            raise ValueError(f"No completed snapshot found for project {nom_projet}")
 
         return ProjetMetadata(
             id_projet=db_result["id_projet"],
             snapshot_id=db_result["snapshot_id"],
             snapshot_id_parent=db_result["snapshot_id_parent"],
             import_timestamp=db_result["import_timestamp"],
+            status=db_result["status"],
         )
+
+    @db_retry
+    def create_projet_metadata(
+        self, nom_projet: str, execution_date: datetime, nom_projet_parent: str | None = None
+    ) -> None:
+        """Create snapshot metadata for a project.
+
+        Args:
+            nom_projet: Project name.
+            execution_date: The execution date for the snapshot.
+            nom_projet_parent: The parent project name, if any.
+
+        Raises:
+            ValueError: If no matching snapshot is found.
+        """
+        # Init vars
+        snapshot_id = uuid4()
+        snapshot_id_parent = None
+        import_timestamp = execution_date.replace(tzinfo=None)
+        import_date = execution_date.date()
+
+        # Get project id
+        id_projet_result = self.db_client.fetch_one(
+            query="SELECT id_projet FROM conf_projets.projet WHERE projet = %(nom_projet)s;",
+            parameters={"nom_projet": nom_projet},
+        )
+        if id_projet_result is None:
+            raise ValueError(f"No project found with name {nom_projet}")
+
+        id_projet = id_projet_result.get("id_projet")
+        if id_projet is None:
+            raise ValueError(f"No id_projet found for project {nom_projet}")
+
+        # Get parent snapshot_id
+        if nom_projet_parent is not None:
+            snapshot_id_parent = self.get_projet_metadata(nom_projet=nom_projet_parent, dag_completed=True).snapshot_id
+
+        query = """
+            INSERT INTO versioning.snapshot (id_projet, snapshot_id, snapshot_id_parent, import_timestamp, import_date)
+            VALUES (%(id_projet)s, %(snapshot_id)s, %(snapshot_id_parent)s, %(import_timestamp)s, %(import_date)s);
+        """
+        params = {
+            "id_projet": id_projet,
+            "snapshot_id": snapshot_id,
+            "snapshot_id_parent": snapshot_id_parent,
+            "import_timestamp": import_timestamp,
+            "import_date": import_date,
+        }
+        # Exécution de la requête
+        self.db_client.execute(query, parameters=params)
+
+    @db_retry
+    def update_projet_metadata_status(self, nom_projet: str, status: bool) -> None:
+        """Update snapshot metadata status for a project.
+
+        Args:
+            nom_projet: Project name.
+            status: The new status for the snapshot metadata.
+
+        Raises:
+            ValueError: If no matching snapshot is found.
+        """
+        projet_metadata = self.get_projet_metadata(nom_projet=nom_projet, dag_completed=False)
+
+        query = """
+            UPDATE versioning.snapshot
+            SET is_dag_completed = %(status)s
+            WHERE id_projet = %(id_projet)s
+            AND snapshot_id = %(snapshot_id)s;
+        """
+        params = {
+            "id_projet": projet_metadata.id_projet,
+            "snapshot_id": projet_metadata.snapshot_id,
+            "status": status,
+        }
+
+        self.db_client.execute(query, parameters=params)
