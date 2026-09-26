@@ -7,7 +7,7 @@ import pandas as pd
 from airflow.sdk import XComArg, task
 from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
 
-from modules.constants import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO
+from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.repository import DagRepository
 from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import ExecutionOptions, PipelineDescriptor

@@ -8,12 +8,11 @@ from typing import Any
 from airflow.sdk import get_current_context, task
 
 from modules.constants import (
-    DEFAULT_DAG_REPO,
-    DEFAULT_DATASET_CONTEXT_REPO,
     DEFAULT_POLARIS_CATALOG,
     DEFAULT_POLARIS_HOST,
     DEFAULT_S3_CONN_ID,
 )
+from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import FeatureFlags
 from modules.domain.dag.repository import DagRepository
 from modules.domain.dataset.model import DatasetContext, TypeSource

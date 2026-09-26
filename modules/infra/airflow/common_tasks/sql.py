@@ -9,12 +9,11 @@ from uuid import UUID, uuid4
 from airflow.sdk import get_current_context, task
 
 from modules.constants import (
-    DEFAULT_DAG_REPO,
     DEFAULT_PG_DATA_CONN_ID,
-    DEFAULT_PROJET_REPO,
     DEFAULT_S3_CONN_ID,
     DEFAULT_TMP_SCHEMA,
 )
+from modules.containers import DEFAULT_DAG_REPO, DEFAULT_PROJET_REPO
 from modules.domain.dag.model import FeatureFlags
 from modules.domain.dag.repository import DagRepository
 from modules.domain.dataset.model import DatasetContext

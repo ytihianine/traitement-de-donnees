@@ -6,10 +6,6 @@ import sys
 
 import pytz
 
-from modules.infra.airflow.dag import AirflowDagRepository
-from modules.infra.database.repository.dataset_context import DbDatasetContextRepository
-from modules.infra.database.repository.projet import DbProjetRepository
-
 
 def get_root_folder() -> str:
     """Get root folder based on environment."""
@@ -35,11 +31,6 @@ AGENT = ENV_VAR.get("AIRFLOW_USER_AGENT", None)
 
 # Timezone configuration
 PARIS_TZ = pytz.timezone(zone="Europe/Paris")
-
-# DEFAULT REPOSITORIES
-DEFAULT_DAG_REPO = AirflowDagRepository()
-DEFAULT_PROJET_REPO = DbProjetRepository()
-DEFAULT_DATASET_CONTEXT_REPO = DbDatasetContextRepository()
 
 
 # DEFAULT VARIABLES

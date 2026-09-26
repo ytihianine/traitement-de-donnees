@@ -7,11 +7,10 @@ from airflow.sdk import Variable, task
 
 from modules.constants import (
     AGENT,
-    DEFAULT_DAG_REPO,
-    DEFAULT_DATASET_CONTEXT_REPO,
     DEFAULT_GRIST_HOST,
     PROXY,
 )
+from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import FeatureFlags
 from modules.domain.dag.repository import DagRepository
 from modules.domain.dataset.repository import DatasetContextRepository
