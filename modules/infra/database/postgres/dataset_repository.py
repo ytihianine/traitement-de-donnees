@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from typing import Any
 
 from tenacity import (
@@ -30,6 +31,7 @@ db_retry = retry(
 # =================
 # Dataclasses
 # =================
+@dataclass(frozen=True)
 class PostgresDatasetRepository(DatasetRepository):
     """ProjetRepository backed by the ``conf_projets`` Postgres schema."""
 

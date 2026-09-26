@@ -7,7 +7,7 @@ from modules.infra.database.base import DBInterface
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 
 
-@dataclass
+@dataclass(frozen=True)
 class PostgresStorageInfoRepository(StorageInfoProvider):
     db_type: DatabaseType = DatabaseType.POSTGRES
     db_connection_id: str = DEFAULT_PG_DATA_CONN_ID

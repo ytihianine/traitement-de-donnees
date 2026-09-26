@@ -30,7 +30,7 @@ db_retry = retry(
 )
 
 
-@dataclass
+@dataclass(frozen=True)
 class PostgresProjetRepository(ProjetRepository):
     """ProjetRepository backed by the ``conf_projets`` Postgres schema."""
 
