@@ -1,6 +1,7 @@
 """ProjetRepository port: read access to project configuration and metadata."""
 
 from abc import ABC, abstractmethod
+from datetime import datetime
 
 from modules.domain.projet.model import Contact, Documentation, Projet, ProjetMetadata, ProjetS3
 
@@ -42,4 +43,31 @@ class ProjetRepository(ABC):
 
         Raises:
             ValueError: If no matching snapshot is found.
+        """
+
+    @abstractmethod
+    def create_projet_metadata(
+        self, nom_projet: str, execution_date: datetime, nom_projet_parent: str | None = None
+    ) -> None:
+        """Create snapshot metadata for a project.
+
+        Args:
+            nom_projet: Project name.
+            execution_date: The execution date for the snapshot.
+            nom_projet_parent: The parent project name, if any.
+
+        Raises:
+            ValueError: If the snapshot metadata could not be created.
+        """
+
+    @abstractmethod
+    def update_projet_metadata_status(self, nom_projet: str, status: bool) -> None:
+        """Update snapshot metadata status for a project.
+
+        Args:
+            nom_projet: Project name.
+            status: The new status for the snapshot metadata.
+
+        Raises:
+            ValueError: If the snapshot metadata could not be updated.
         """

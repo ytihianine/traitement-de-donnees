@@ -61,6 +61,7 @@ class ProjetMetadata:
     snapshot_id: UUID
     snapshot_id_parent: UUID
     import_timestamp: datetime
+    status: bool
 
 
 @dataclass
