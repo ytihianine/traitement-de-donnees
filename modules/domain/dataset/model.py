@@ -24,6 +24,7 @@ class Dataset:
 
 @dataclass(frozen=True)
 class StorageInfo:
+    dataset_name: str
     # s3 info
     s3_conn_id: str
     bucket: str
