@@ -81,6 +81,6 @@ class ExecutionOptions:
 class PipelineDescriptor:
     input_datasets: tuple[Dataset]
     output_dataset: Dataset
-    transformations: tuple[Callable[..., pd.DataFrame]]
+    transformation: Callable[..., pd.DataFrame]
     add_metadata: bool = True
     selecteur_config_task_id: str = "get_selecteur_config"
