@@ -32,6 +32,7 @@ class StorageInfo:
     filename: str
     local_dir: str
     # db info
+    db_conn_id: str
     tbl_name: str | None
     # Source info
     type_source: TypeSource
