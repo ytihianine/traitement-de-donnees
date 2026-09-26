@@ -6,7 +6,7 @@ from pathlib import Path
 
 from modules.constants import DEFAULT_PG_DATA_CONN_ID
 from modules.infra.database.base import DBInterface
-from modules.infra.database.postgres.postgres import PgAdapter
+from modules.infra.database.postgres import PgAdapter
 from modules.infra.database.sqlite import SQLiteAdapter
 from modules.infra.database.trino import TrinoAdapter
 
