@@ -43,7 +43,6 @@ def _add_metadata(df: pd.DataFrame, metadata: ProjetMetadata) -> pd.DataFrame:
 
 
 def create_task(
-    config: TaskConfig,
     pipeline: PipelineDescriptor,
     execution_options: ExecutionOptions,
     dag_repo: DagRepository = DEFAULT_DAG_REPO,
@@ -72,16 +71,7 @@ def create_task(
     """
 
     @task(
-        task_id=config.task_id,
-        retries=config.retries,
-        retry_delay=config.retry_delay,
-        retry_exponential_backoff=config.retry_exponential_backoff,
-        max_retry_delay=config.max_retry_delay,
-        on_execute_callback=config.on_execute_callback,
-        on_failure_callback=config.on_failure_callback,
-        on_success_callback=config.on_success_callback,
-        on_retry_callback=config.on_retry_callback,
-        on_skipped_callback=config.on_skipped_callback,
+        task_id=pipeline.output_dataset.name,
     )
     def _task(**context) -> None:
         """The actual generic task function."""
@@ -101,14 +91,14 @@ def create_task(
                 fs_type=FileHandlerType.S3,
             )
             df = reader.read(storage_info=dataset_context.storage_info)
-            input_data[dataset.name] = df
+            input_data[f"df_{dataset.name}"] = df
+
+        if len(input_data) == 1:
+            input_data = {"df": next(iter(input_data.values()))}
 
         # Apply transformations
-        result = pd.DataFrame()  # Initialize an empty DataFrame to hold the result
-        for idx, step in enumerate(pipeline.transformations):
-            logging.info(msg=f"▶ Executing transformation: step_{idx}")
-            logging.info(msg=f"Transformation information: {step}")
-            result = step(result)
+        logging.info(msg=f"Running pipeline transformation: {pipeline.transformations.__name__}")
+        result = pipeline.transformations(**input_data)
 
         if execution_options.add_metadata:
             projet_metadata = projet_repo.get_projet_metadata(nom_projet=nom_projet)
