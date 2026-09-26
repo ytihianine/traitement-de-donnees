@@ -8,15 +8,13 @@ from airflow.sdk import Variable, task
 from modules.constants import (
     AGENT,
     DEFAULT_DAG_REPO,
-    DEFAULT_DATASET_REPO,
+    DEFAULT_DATASET_CONTEXT_REPO,
     DEFAULT_GRIST_HOST,
-    DEFAULT_STORAGE_REPO,
     PROXY,
 )
 from modules.domain.dag.model import FeatureFlags
 from modules.domain.dag.repository import DagRepository
-from modules.domain.dataset.ports import StorageInfoProvider
-from modules.domain.dataset.repository import DatasetRepository
+from modules.domain.dataset.repository import DatasetContextRepository
 from modules.generic_processing.dates import convert_grist_date_to_date
 from modules.generic_processing.structures import (
     handle_grist_boolean_columns,
@@ -43,8 +41,7 @@ def download_grist_doc_to_s3(
     api_token_key: str = "grist_secret_key",
     use_proxy: bool = True,
     dag_repo: DagRepository = DEFAULT_DAG_REPO,
-    dataset_repo: DatasetRepository = DEFAULT_DATASET_REPO,
-    storage_repo: StorageInfoProvider = DEFAULT_STORAGE_REPO,
+    datasetcontext_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
     **context,
 ) -> None:
     """Download SQLite from a specific Grist doc to S3"""
@@ -52,14 +49,13 @@ def download_grist_doc_to_s3(
         return
 
     nom_projet = dag_repo.get_project_name(context=context)
-    dataset = dataset_repo.get(nom_projet=nom_projet, name=dataset_name)
-    storage_info = storage_repo.get_by_dataset(nom_projet=nom_projet, dataset_name=dataset_name)
-    doc_id = storage_info.id_source
-    dest_tmp_key = storage_info.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
+    dataset_context = datasetcontext_repo.get(nom_projet=nom_projet, nom_dataset=dataset_name)
+    doc_id = dataset_context.storage_info.id_source
+    dest_tmp_key = dataset_context.storage_info.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
 
     if doc_id is None:
         raise ValueError(
-            f"doc_id is None for dataset {dataset.name} in project {nom_projet}. Please check the configuration."
+            f"doc_id is None for dataset {dataset_name} in project {nom_projet}. Please check the configuration."
         )
 
     # Instanciate Grist client

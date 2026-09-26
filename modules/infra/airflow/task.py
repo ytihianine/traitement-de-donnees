@@ -7,12 +7,12 @@ import pandas as pd
 from airflow.sdk import XComArg, task
 from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
 
-from modules.constants import DEFAULT_DAG_REPO, DEFAULT_STORAGE_REPO
+from modules.constants import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.repository import DagRepository
+from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import ExecutionOptions, PipelineDescriptor
 from modules.domain.projet.model import ProjetMetadata
-from modules.infra.database.postgres.projet_repository import PostgresProjetRepository
-from modules.infra.database.postgres.storage_repository import PostgresStorageInfoRepository
+from modules.infra.database.repository.projet import DbProjetRepository
 from modules.infra.file_system.data_readers import FileDatasetReader
 from modules.infra.file_system.data_writers import FileDatasetWriter
 from modules.infra.file_system.factory import FileHandlerType, FSConfig
@@ -46,8 +46,8 @@ def create_task(
     config: TaskConfig,
     pipeline: PipelineDescriptor,
     execution_options: ExecutionOptions,
-    dag_repository: DagRepository = DEFAULT_DAG_REPO,
-    storage_repository: PostgresStorageInfoRepository = DEFAULT_STORAGE_REPO,
+    dag_repo: DagRepository = DEFAULT_DAG_REPO,
+    dataset_context_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
 ) -> Callable[..., XComArg]:
     """
     Create a generic Airflow task based on the provided TaskConfig.
@@ -56,8 +56,8 @@ def create_task(
         config: Configuration for the task
         pipeline: Pipeline descriptor
         execution_options: Execution options for the task
-        dag_repository: Repository for interacting with Airflow DAGs, defaults to AirflowDagRepository()
-        storage_repository: Repository for interacting with project storage, defaults to PostgresProjetRepository()
+        dag_repo: Repository for interacting with Airflow DAGs, defaults to AirflowDagRepository()
+        dataset_context_repo: Repository for interacting with project storage, defaults to DbProjetRepository()
 
     Returns:
         An Airflow task that performs the defined ETL steps
@@ -84,21 +84,21 @@ def create_task(
     def _task(**context) -> None:
         """The actual generic task function."""
         # Hooks & variables
-        nom_projet = dag_repository.get_project_name(context=context)
+        nom_projet = dag_repo.get_project_name(context=context)
 
         # Read data
         input_data = {}
         for dataset in pipeline.input_datasets:
             logging.info(msg=f"▶ Reading dataset: {dataset.name}")
-            dataset_storage_info = storage_repository.get_by_dataset(nom_projet=nom_projet, dataset_name=dataset.name)
+            dataset_context = dataset_context_repo.get(nom_projet=nom_projet, nom_dataset=dataset.name)
             reader = FileDatasetReader(
                 fs_config=FSConfig(
-                    bucket=dataset_storage_info.bucket,
-                    connection_id=dataset_storage_info.s3_conn_id,
+                    bucket=dataset_context.storage_info.bucket,
+                    connection_id=dataset_context.storage_info.s3_conn_id,
                 ),
                 fs_type=FileHandlerType.S3,
             )
-            df = reader.read(dataset=dataset)
+            df = reader.read(storage_info=dataset_context.storage_info)
             input_data[dataset.name] = df
 
         # Apply transformations
@@ -109,7 +109,7 @@ def create_task(
             result = step(result)
 
         if execution_options.add_metadata:
-            projet_repository = PostgresProjetRepository()
+            projet_repository = DbProjetRepository()
             projet_metadata = projet_repository.get_projet_metadata(nom_projet=nom_projet)
             result = _add_metadata(df=result, metadata=projet_metadata)
 
@@ -120,16 +120,16 @@ def create_task(
         if not execution_options.export_result:
             return
 
-        output_storage_info = storage_repository.get_by_dataset(
-            nom_projet=nom_projet, dataset_name=pipeline.output_dataset.name
+        output_dataset_context = dataset_context_repo.get(
+            nom_projet=nom_projet, nom_dataset=pipeline.output_dataset.name
         )
         writer = FileDatasetWriter(
             fs_config=FSConfig(
-                bucket=output_storage_info.bucket,
-                connection_id=output_storage_info.s3_conn_id,
+                bucket=output_dataset_context.storage_info.bucket,
+                connection_id=output_dataset_context.storage_info.s3_conn_id,
             ),
             fs_type=FileHandlerType.S3,
         )
-        writer.write(df=result, dataset=pipeline.output_dataset)
+        writer.write(df=result, storage_info=output_dataset_context.storage_info)
 
     return _task

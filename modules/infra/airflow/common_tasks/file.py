@@ -7,11 +7,10 @@ from typing import Any
 import pandas as pd
 from airflow.sdk import task
 
-from modules.constants import DEFAULT_DAG_REPO, DEFAULT_DATASET_REPO, DEFAULT_STORAGE_REPO
+from modules.constants import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import FeatureFlags
 from modules.domain.dag.repository import DagRepository
-from modules.domain.dataset.ports import StorageInfoProvider
-from modules.domain.dataset.repository import DatasetRepository
+from modules.domain.dataset.repository import DatasetContextRepository
 from modules.infra.airflow.dag import should_skip_task
 from modules.infra.airflow.task import TaskConfig
 from modules.infra.file_system.dataframe import read_dataframe
@@ -32,8 +31,7 @@ def create_parquet_converter_task(
     read_options: dict[str, Any] | None = None,
     apply_cols_mapping: bool = True,
     dag_repo: DagRepository = DEFAULT_DAG_REPO,
-    dataset_repo: DatasetRepository = DEFAULT_DATASET_REPO,
-    storage_repo: StorageInfoProvider = DEFAULT_STORAGE_REPO,
+    datasetcontext_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
 ) -> Callable:
     """Create a task that converts files to Parquet format.
 
@@ -77,9 +75,9 @@ def create_parquet_converter_task(
         nom_projet = dag_repo.get_project_name(context=context)
 
         logging.info(msg=f"Getting configuration for project {nom_projet} and dataset {dataset_name}")
-        storage_info = storage_repo.get_by_dataset(nom_projet=nom_projet, dataset_name=dataset_name)
-        source_key = storage_info.get_full_s3_key(use_id_source=True)
-        dest_tmp_key = storage_info.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
+        dataset_context = datasetcontext_repo.get(nom_projet=nom_projet, nom_dataset=dataset_name)
+        source_key = dataset_context.storage_info.get_full_s3_key(use_id_source=True)
+        dest_tmp_key = dataset_context.storage_info.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
 
         # Read input file based on extension
         logging.info(msg=f"Reading file from {source_key}")
@@ -97,7 +95,7 @@ def create_parquet_converter_task(
         )
         if apply_cols_mapping:
             # Apply column mapping if available
-            cols_mapping = dataset_repo.get_list_column_mapping(nom_projet=nom_projet, dataset_name=dataset_name)
+            cols_mapping = datasetcontext_repo.get_list_column_mapping(nom_projet=nom_projet, dataset_name=dataset_name)
             if len(cols_mapping) == 0:
                 print(f"No column mapping found for dataset {dataset_name}")
             else:
