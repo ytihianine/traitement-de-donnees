@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from enum import Enum, auto
 from typing import Any
 
@@ -50,6 +51,30 @@ class ExecutionOptions:
     is_partitioned: bool = True
     partition_period: PartitionTimePeriod = PartitionTimePeriod.DAY
     load_strategy: LoadStrategy = LoadStrategy.APPEND
+
+    def determine_partition_period(
+        self, time_period: PartitionTimePeriod, execution_date: datetime
+    ) -> tuple[datetime, datetime]:
+        """Determine the start and end dates for a partition based on the time period."""
+        if time_period == PartitionTimePeriod.YEAR:
+            from_date_period = execution_date.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+            to_date_period = from_date_period.replace(year=from_date_period.year + 1)
+        elif time_period == PartitionTimePeriod.MONTH:
+            from_date_period = execution_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            if from_date_period.month == 12:
+                to_date_period = from_date_period.replace(year=from_date_period.year + 1, month=1)
+            else:
+                to_date_period = from_date_period.replace(month=from_date_period.month + 1)
+        elif time_period == PartitionTimePeriod.WEEK:
+            from_date_period = execution_date - timedelta(days=execution_date.weekday())
+            from_date_period = from_date_period.replace(hour=0, minute=0, second=0, microsecond=0)
+            to_date_period = from_date_period + timedelta(weeks=1)
+        elif time_period == PartitionTimePeriod.DAY:
+            from_date_period = execution_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            to_date_period = from_date_period + timedelta(days=1)
+        else:
+            raise ValueError(f"Unsupported time period: {time_period}")
+        return (from_date_period, to_date_period)
 
 
 @dataclass(frozen=True)
