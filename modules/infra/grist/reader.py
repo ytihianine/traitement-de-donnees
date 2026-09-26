@@ -13,7 +13,6 @@ from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_
 class GristReaderStrategy(DatasetReader):
     fs_config: FSConfig
     fs_type: FileHandlerType = FileHandlerType.S3
-    doc_selecteur_name: str = "grist_doc"
 
     def read(
         self,

@@ -13,8 +13,8 @@ from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import ExecutionOptions, PipelineDescriptor
 from modules.domain.projet.model import ProjetMetadata
 from modules.domain.projet.repository import ProjetRepository
-from modules.infra.file_system.data_readers import FileDatasetReader
 from modules.infra.file_system.data_writers import FileDatasetWriter
+from modules.infra.file_system.dataset_reader_factory import create_dataset_reader
 from modules.infra.file_system.factory import FileHandlerType, FSConfig
 from modules.logs import df_info
 
@@ -83,13 +83,7 @@ def create_task(
         for dataset in pipeline.input_datasets:
             logging.info(msg=f"▶ Reading dataset: {dataset.name}")
             dataset_context = dataset_context_repo.get(nom_projet=nom_projet, nom_dataset=dataset.name)
-            reader = FileDatasetReader(
-                fs_config=FSConfig(
-                    bucket=dataset_context.storage_info.bucket,
-                    connection_id=dataset_context.storage_info.s3_conn_id,
-                ),
-                fs_type=FileHandlerType.S3,
-            )
+            reader = create_dataset_reader(storage_info=dataset_context.storage_info)
             df = reader.read(storage_info=dataset_context.storage_info)
             input_data[f"df_{dataset.name}"] = df
 
