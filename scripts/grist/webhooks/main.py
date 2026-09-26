@@ -1,10 +1,9 @@
 from collections.abc import Iterable, Sequence
 
 from modules.constants import DEFAULT_GRIST_HOST, custom_logger
-from modules.enums.http import HttpHandlerType
 from modules.infra.grist.client import GristClient
 from modules.infra.http_client.config import ClientConfig
-from modules.infra.http_client.factory import create_http_client
+from modules.infra.http_client.factory import HttpHandlerType, create_http_client
 from scripts.settings import get_settings
 
 EVENT_TYPES = ["add", "update"]

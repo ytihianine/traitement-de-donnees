@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import psycopg2
 from modules.constants import custom_logger
-from modules.utils.process.structures import are_lists_egal
+from modules.generic_processing.structures import are_lists_egal
 from scripts.settings import get_settings
 
 settings = get_settings()

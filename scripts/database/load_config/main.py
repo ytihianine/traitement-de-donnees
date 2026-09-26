@@ -10,9 +10,9 @@ import numpy as np
 import pandas as pd
 import psycopg2
 from dags.applications.configuration_projets import process
-from modules.common_tasks.grist import generic_grist_processing
+from modules.generic_processing.structures import normalize_grist_dataframe
+from modules.infra.airflow.common_tasks.grist import generic_grist_processing
 from modules.logs import df_info
-from modules.utils.process.structures import normalize_grist_dataframe
 from psycopg2.extensions import AsIs, register_adapter
 from psycopg2.extras import execute_values
 
