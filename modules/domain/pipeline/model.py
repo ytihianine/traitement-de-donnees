@@ -1,4 +1,3 @@
-from abc import ABC
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum, auto
@@ -54,7 +53,7 @@ class ExecutionOptions:
 
 
 @dataclass(frozen=True)
-class PipelineDescriptor(ABC):
+class PipelineDescriptor:
     input_datasets: tuple[Dataset]
     output_dataset: Dataset
     transformations: tuple[Callable[..., pd.DataFrame]]
