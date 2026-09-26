@@ -7,12 +7,12 @@ import pandas as pd
 from airflow.sdk import XComArg, task
 from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
 
-from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO
+from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO, DEFAULT_PROJET_REPO
 from modules.domain.dag.repository import DagRepository
 from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import ExecutionOptions, PipelineDescriptor
 from modules.domain.projet.model import ProjetMetadata
-from modules.infra.database.repository.projet import DbProjetRepository
+from modules.domain.projet.repository import ProjetRepository
 from modules.infra.file_system.data_readers import FileDatasetReader
 from modules.infra.file_system.data_writers import FileDatasetWriter
 from modules.infra.file_system.factory import FileHandlerType, FSConfig
@@ -47,6 +47,7 @@ def create_task(
     pipeline: PipelineDescriptor,
     execution_options: ExecutionOptions,
     dag_repo: DagRepository = DEFAULT_DAG_REPO,
+    projet_repo: ProjetRepository = DEFAULT_PROJET_REPO,
     dataset_context_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
 ) -> Callable[..., XComArg]:
     """
@@ -56,8 +57,9 @@ def create_task(
         config: Configuration for the task
         pipeline: Pipeline descriptor
         execution_options: Execution options for the task
-        dag_repo: Repository for interacting with Airflow DAGs, defaults to AirflowDagRepository()
-        dataset_context_repo: Repository for interacting with project storage, defaults to DbProjetRepository()
+        dag_repo: Repository for interacting with Airflow DAGs, defaults to DEFAULT_DAG_REPO
+        projet_repo: Repository for interacting with project storage, defaults to DEFAULT_PROJET_REPO
+        dataset_context_repo: Repository for interacting with project storage, defaults to DEFAULT_DATASET_CONTEXT_REPO
 
     Returns:
         An Airflow task that performs the defined ETL steps
@@ -109,8 +111,7 @@ def create_task(
             result = step(result)
 
         if execution_options.add_metadata:
-            projet_repository = DbProjetRepository()
-            projet_metadata = projet_repository.get_projet_metadata(nom_projet=nom_projet)
+            projet_metadata = projet_repo.get_projet_metadata(nom_projet=nom_projet)
             result = _add_metadata(df=result, metadata=projet_metadata)
 
         # Log the final DataFrame information
