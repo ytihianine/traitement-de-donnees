@@ -44,8 +44,17 @@ class DBInterface(ABC):
         pass
 
     @abstractmethod
-    def fetch_table_columns(self, schema: str, table: str) -> list[str]:
-        """Fetch the column names of a table."""
+    def fetch_table_columns(self, schema: str, table: str, sorted: bool = True) -> list[str]:
+        """Fetch the column names of a table.
+
+        Args:
+            schema: Schema name.
+            table: Table name.
+            sorted: Whether to return the column names sorted.
+
+        Returns:
+            List of column names.
+        """
         pass
 
     @abstractmethod

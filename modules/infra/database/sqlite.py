@@ -73,7 +73,7 @@ class SQLiteAdapter(DBInterface):
         logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
         return df
 
-    def fetch_table_columns(self, schema: str, table: str) -> list[str]:
+    def fetch_table_columns(self, schema: str, table: str, sorted: bool = True) -> list[str]:
         """Fetch the column names of a table."""
         raise NotImplementedError("SQLiteAdapter does not support fetch_table_columns().")
 
