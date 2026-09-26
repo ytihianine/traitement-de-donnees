@@ -73,6 +73,14 @@ class SQLiteAdapter(DBInterface):
         logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
         return df
 
+    def fetch_table_columns(self, schema: str, table: str) -> list[str]:
+        """Fetch the column names of a table."""
+        raise NotImplementedError("SQLiteAdapter does not support fetch_table_columns().")
+
+    def fetch_table_pk(self, schema: str, table: str) -> list[str]:
+        """Fetch the primary key column of a table."""
+        raise NotImplementedError("SQLiteAdapter does not support fetch_table_pk().")
+
     def insert(self, table: str, data: dict[str, Any]) -> None:
         """Insert a single row into a table."""
         columns = list(data.keys())

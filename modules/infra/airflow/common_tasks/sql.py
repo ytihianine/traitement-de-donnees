@@ -37,45 +37,10 @@ from modules.infra.file_system.factory import (
     create_file_handler,
 )
 
+
 # ------------------------------------------------------------------------------
 # Internal functions
 # ------------------------------------------------------------------------------
-
-
-def _get_primary_keys(schema: str, table: str, db_handler: DBInterface) -> list[str]:
-    """Get primary key columns of a table."""
-    query = """
-        SELECT kcu.column_name
-        FROM information_schema.table_constraints tc
-        JOIN information_schema.key_column_usage kcu
-            ON tc.constraint_name = kcu.constraint_name
-                AND tc.constraint_schema = kcu.constraint_schema
-        WHERE tc.table_schema = %s
-            AND tc.table_name = %s
-            AND tc.constraint_type = 'PRIMARY KEY'
-        ORDER BY kcu.ordinal_position;
-    """
-    df = db_handler.fetch_df(query, parameters=(schema, table))
-    return df.loc[:, "column_name"].tolist()
-
-
-def _get_table_columns(schema: str, table: str, db_handler: DBInterface) -> list[str]:
-    df = db_handler.fetch_df(
-        query="""
-            SELECT isc.table_catalog, isc.table_schema, isc.table_name, isc.column_name
-            FROM information_schema.columns isc
-            WHERE
-                isc.table_schema = %s
-                AND isc.table_name = %s
-                AND isc.column_default IS NULL
-                AND isc.is_identity = 'NO'
-            ORDER BY table_schema ASC, table_name ASC, column_name ASC;
-        """,
-        parameters=(schema, table),
-    )
-    return df.loc[:, "column_name"].tolist()
-
-
 def _create_snapshot_id(nom_projet: str, execution_date: datetime, nom_projet_parent: str | None = None) -> None:
     """
     Créer un snapshot_id pour un projet donné et l'insérer dans la table conf_projets.projet_snapshot.
@@ -503,7 +468,7 @@ def _generate_copy_query(
     )
 
     def _build_incremental_query() -> str:
-        pk_cols = _get_primary_keys(schema=prod_schema, table=tbl_name, db_handler=db_handler)
+        pk_cols = db_handler.fetch_table_pk(schema=prod_schema, table=tbl_name)
         logging.info(msg=f"Table <{tbl_name}> primary key: {pk_cols}")
         return _create_incremental_copy_query(
             prod_table=prod_table,
@@ -605,8 +570,9 @@ def sort_db_colnames(
     """Get sorted column names from a table.
 
     Args:
+        db_handler: Database handler object.
         dataset_context: DatasetContext object.
-        schema: Schema name
+        schema: Schema name.
 
     Returns:
         Sorted list of column names
@@ -617,7 +583,7 @@ def sort_db_colnames(
     if tbl_name is None or tbl_name == "":
         return []
 
-    tbl_cols = _get_table_columns(schema=schema, table=tbl_name, db_handler=db_handler)
+    tbl_cols = db_handler.fetch_table_columns(schema=schema, table=tbl_name)
 
     sorted_cols = sorted(tbl_cols)
     logging.info(msg=f"Sorted columns for > {pg_conn_id} - {schema}.{tbl_name}: {sorted_cols}")

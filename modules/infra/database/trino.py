@@ -107,6 +107,14 @@ class TrinoAdapter(DBInterface):
         logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
         return df
 
+    def fetch_table_columns(self, schema: str, table: str) -> list[str]:
+        """Fetch the column names of a table."""
+        raise NotImplementedError("TrinoAdapter does not support fetch_table_columns().")
+
+    def fetch_table_pk(self, schema: str, table: str) -> list[str]:
+        """Fetch the primary key column of a table."""
+        raise NotImplementedError("TrinoAdapter does not support fetch_table_pk().")
+
     # ------------------------------------------------------------------
     # Unsupported write operations
     # ------------------------------------------------------------------

@@ -161,6 +161,39 @@ class PgAdapter(DBInterface):
         logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
         return df
 
+    def fetch_table_columns(self, schema: str, table: str) -> list[str]:
+        """Fetch the column names of a table."""
+        df = self.fetch_df(
+            query="""
+                SELECT isc.table_catalog, isc.table_schema, isc.table_name, isc.column_name
+                FROM information_schema.columns isc
+                WHERE
+                    isc.table_schema = %s
+                    AND isc.table_name = %s
+                    AND isc.column_default IS NULL
+                    AND isc.is_identity = 'NO'
+                ORDER BY table_schema ASC, table_name ASC, column_name ASC;
+            """,
+            parameters=(schema, table),
+        )
+        return df.loc[:, "column_name"].tolist()
+
+    def fetch_table_pk(self, schema: str, table: str) -> list[str]:
+        """Fetch the primary key column of a table."""
+        query = """
+            SELECT kcu.column_name
+            FROM information_schema.table_constraints tc
+            JOIN information_schema.key_column_usage kcu
+                ON tc.constraint_name = kcu.constraint_name
+                    AND tc.constraint_schema = kcu.constraint_schema
+            WHERE tc.table_schema = %s
+                AND tc.table_name = %s
+                AND tc.constraint_type = 'PRIMARY KEY'
+            ORDER BY kcu.ordinal_position;
+        """
+        df = self.fetch_df(query, parameters=(schema, table))
+        return df.loc[:, "column_name"].tolist()
+
     def insert(self, table: str, data: dict[str, Any]) -> None:
         """Insert a single row into a table."""
         columns = list(data.keys())
