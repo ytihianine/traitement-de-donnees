@@ -77,3 +77,15 @@ class DatasetContext:
     projet: Projet
     dataset: Dataset
     storage_info: StorageInfo
+
+    @property
+    def projet_name(self) -> str:
+        return self.projet.name
+
+    @property
+    def projet_id(self) -> int:
+        return self.projet.id
+
+    @property
+    def dataset_name(self) -> str:
+        return self.dataset.name
