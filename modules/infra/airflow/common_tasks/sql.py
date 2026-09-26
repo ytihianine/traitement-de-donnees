@@ -11,10 +11,11 @@ from modules.constants import (
     DEFAULT_S3_CONN_ID,
     DEFAULT_TMP_SCHEMA,
 )
-from modules.containers import DEFAULT_DAG_REPO, DEFAULT_PROJET_REPO
+from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO, DEFAULT_PROJET_REPO
 from modules.domain.dag.model import FeatureFlags
 from modules.domain.dag.repository import DagRepository
 from modules.domain.dataset.model import DatasetContext
+from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import (
     ExecutionOptions,
     LoadStrategy,
@@ -179,11 +180,12 @@ def ensure_partition(
 
 @task(task_id="create_tmp_tables")
 def create_tmp_tables(
-    datasets_context: list[DatasetContext],
     execution_options: Mapping[str, ExecutionOptions],
+    nom_projet: str | None = None,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     reset_id_seq: bool = False,
     dag_repo: AirflowDagRepository = DEFAULT_DAG_REPO,
+    dataset_context_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
     **context,
 ) -> None:
     """
@@ -193,16 +195,20 @@ def create_tmp_tables(
     if should_skip_task(context=context):
         return
 
+    if nom_projet is None:
+        nom_projet = dag_repo.get_project_name(context=context)
+
+    db_info = dag_repo.get_db_info(context=context)
+    prod_schema = db_info.prod_schema
+    tmp_schema = db_info.tmp_schema
+    logging.info(msg=f"Prod schema: {prod_schema}, Tmp schema: {tmp_schema}")
+
     # Init vars
     db = create_db_handler(
         db_type=DatabaseType.POSTGRES,
         db_config=DbConfig(connection_id=pg_conn_id),
     )
-
-    db_info = dag_repo.get_db_info(context=context)
-    prod_schema = db_info.prod_schema
-    tmp_schema = db_info.tmp_schema
-    print(prod_schema, tmp_schema)
+    datasets_context = dataset_context_repo.get_list(nom_projet=nom_projet)
 
     drop_queries = []
     create_queries = []
@@ -239,10 +245,11 @@ def create_tmp_tables(
 
 @task(task_id="delete_tmp_tables")
 def delete_tmp_tables(
-    datasets_context: list[DatasetContext],
     execution_options: Mapping[str, ExecutionOptions],
+    nom_projet: str | None = None,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     dag_repo: AirflowDagRepository = DEFAULT_DAG_REPO,
+    dataset_context_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
     **context,
 ) -> None:
     """
@@ -255,6 +262,9 @@ def delete_tmp_tables(
     )
 
     db_info = dag_repo.get_db_info(context=context)
+    if nom_projet is None:
+        nom_projet = dag_repo.get_project_name(context=context)
+    datasets_context = dataset_context_repo.get_list(nom_projet=nom_projet)
 
     for dataset_context in datasets_context:
         dataset_options = execution_options.get(dataset_context.dataset_name)
@@ -368,11 +378,12 @@ def _generate_copy_query(
 
 @task(task_id="copy_tmp_table_to_real_table")
 def copy_tmp_table_to_real_table(
-    datasets_context: list[DatasetContext],
     execution_options: Mapping[str, ExecutionOptions],
+    nom_projet: str | None = None,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     merge_delete: bool = False,
     dag_repo: DagRepository = DEFAULT_DAG_REPO,
+    dataset_context_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
     **context,
 ) -> None:
     """
@@ -386,6 +397,8 @@ def copy_tmp_table_to_real_table(
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
+    if nom_projet is None:
+        nom_projet = dag_repo.get_project_name(context=context)
     db_info = dag_repo.get_db_info(context=context)
     prod_schema = db_info.prod_schema
     tmp_schema = db_info.tmp_schema
@@ -395,6 +408,7 @@ def copy_tmp_table_to_real_table(
         db_type=DatabaseType.POSTGRES,
         db_config=DbConfig(connection_id=pg_conn_id),
     )
+    datasets_context = dataset_context_repo.get_list(nom_projet=nom_projet)
 
     # Sort by tbl_order to handle foreign key dependencies
     logging.info(msg=f"Nombre de tables à copier: {len(datasets_context)}")
