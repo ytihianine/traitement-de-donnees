@@ -7,9 +7,8 @@ import sys
 import pytz
 
 from modules.infra.airflow.dag import AirflowDagRepository
-from modules.infra.database.postgres.dataset_repository import PostgresDatasetRepository
-from modules.infra.database.postgres.projet_repository import PostgresProjetRepository
-from modules.infra.database.postgres.storage_repository import PostgresStorageInfoRepository
+from modules.infra.database.repository.datasetcontext import DbDatasetContextRepository
+from modules.infra.database.repository.projet import DbProjetRepository
 
 
 def get_root_folder() -> str:
@@ -39,9 +38,8 @@ PARIS_TZ = pytz.timezone(zone="Europe/Paris")
 
 # DEFAULT REPOSITORIES
 DEFAULT_DAG_REPO = AirflowDagRepository()
-DEFAULT_PROJET_REPO = PostgresProjetRepository()
-DEFAULT_DATASET_REPO = PostgresDatasetRepository()
-DEFAULT_STORAGE_REPO = PostgresStorageInfoRepository()
+DEFAULT_PROJET_REPO = DbProjetRepository()
+DEFAULT_DATASET_CONTEXT_REPO = DbDatasetContextRepository()
 
 
 # DEFAULT VARIABLES
