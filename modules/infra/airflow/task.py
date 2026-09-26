@@ -97,8 +97,8 @@ def create_task(
             input_data = {"df": next(iter(input_data.values()))}
 
         # Apply transformations
-        logging.info(msg=f"Running pipeline transformation: {pipeline.transformations.__name__}")
-        result = pipeline.transformations(**input_data)
+        logging.info(msg=f"Running pipeline transformation: {pipeline.transformation.__name__}")
+        result = pipeline.transformation(**input_data)
 
         if execution_options.add_metadata:
             projet_metadata = projet_repo.get_projet_metadata(nom_projet=nom_projet)
