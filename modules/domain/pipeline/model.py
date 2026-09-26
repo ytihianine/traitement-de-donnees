@@ -83,4 +83,4 @@ class PipelineDescriptor:
     output_dataset: Dataset
     transformation: Callable[..., pd.DataFrame]
     add_metadata: bool = True
-    selecteur_config_task_id: str = "get_selecteur_config"
+    datasets_context_task_id: str = "get_projet_datasets_context"

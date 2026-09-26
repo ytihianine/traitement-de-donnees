@@ -63,7 +63,7 @@ class DbDatasetContextRepository(DatasetContextRepository):
         if df.empty:
             raise ValueError(f"No project found with name {nom_projet}")
 
-        dataset_contexts = []
+        datasets_context = []
         for _, row in df.iterrows():
             record = row.to_dict(into=dict)
             dataset_context = DatasetContext(
@@ -81,8 +81,8 @@ class DbDatasetContextRepository(DatasetContextRepository):
                     id_source=record["id_source"],
                 ),
             )
-            dataset_contexts.append(dataset_context)
-        return dataset_contexts
+            datasets_context.append(dataset_context)
+        return datasets_context
 
     @db_retry
     def get(self, nom_projet: str, nom_dataset: str) -> DatasetContext:

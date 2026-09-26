@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 from pandas.core.frame import DataFrame
 
-from modules.utils.process.number import is_in_range, is_lower, is_upper
+from modules.generic_processing.number import is_in_range, is_lower, is_upper
 
 
 @pytest.fixture

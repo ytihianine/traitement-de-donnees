@@ -6,7 +6,7 @@ from typing import Any
 
 from airflow.sdk import chain, task, task_group
 
-from modules.domain.dataset.model import Dataset
+from modules.domain.dataset.model import DatasetContext
 from modules.infra.airflow.dag import AirflowDagRepository
 from modules.infra.database.repository.dataset_context import DbDatasetContextRepository
 from modules.infra.database.repository.projet import DbProjetRepository
@@ -46,13 +46,13 @@ def get_source_fichier_task(nom_projet: str | None = None, **context) -> list[st
 
 
 @task()
-def get_projet_datasets(nom_projet: str | None = None, **context) -> list[Dataset]:
-    """Task to fetch the project selecteur configurations."""
+def get_projet_datasets_context(nom_projet: str | None = None, **context) -> list[DatasetContext]:
+    """Task to fetch the project datasets context."""
     nom_projet = _check_nom_projet(nom_projet=nom_projet, context=context)
-    dataset_repository = DbDatasetContextRepository()
-    datasets_context = dataset_repository.get_list(nom_projet=nom_projet)
+    dataset_context_repo = DbDatasetContextRepository()
+    datasets_context = dataset_context_repo.get_list(nom_projet=nom_projet)
 
-    return [Dataset(name=dataset_context.dataset.name) for dataset_context in datasets_context]
+    return datasets_context
 
 
 @task_group()
@@ -71,8 +71,9 @@ def config_projet_group(nom_projet: str | None = None, **context) -> None:
             get_documentation_task(nom_projet=nom_projet, context=context),
             get_contact_task(nom_projet=nom_projet, context=context),
             get_source_fichier_task(nom_projet=nom_projet, context=context),
-            get_projet_datasets(
+            get_projet_datasets_context(
                 nom_projet=nom_projet,
+                context=context,
             ),
         ]
     )
