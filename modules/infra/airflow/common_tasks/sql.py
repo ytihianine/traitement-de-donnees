@@ -3,7 +3,6 @@
 import logging
 import textwrap
 from collections.abc import Mapping
-from datetime import datetime, timedelta
 
 from airflow.sdk import get_current_context, task
 
@@ -19,7 +18,6 @@ from modules.domain.dataset.model import DatasetContext
 from modules.domain.pipeline.model import (
     ExecutionOptions,
     LoadStrategy,
-    PartitionTimePeriod,
 )
 from modules.domain.projet.repository import ProjetRepository
 from modules.generic_processing.structures import are_lists_egal
@@ -36,41 +34,14 @@ from modules.infra.file_system.factory import (
     create_file_handler,
 )
 
-# ------------------------------------------------------------------------------
-# Internal functions
-# ------------------------------------------------------------------------------
-
-
-def determine_partition_period(time_period: PartitionTimePeriod, execution_date: datetime) -> tuple[datetime, datetime]:
-    """Determine the start and end dates for a partition based on the time period."""
-    if time_period == PartitionTimePeriod.YEAR:
-        from_date_period = execution_date.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-        to_date_period = from_date_period.replace(year=from_date_period.year + 1)
-    elif time_period == PartitionTimePeriod.MONTH:
-        from_date_period = execution_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        if from_date_period.month == 12:
-            to_date_period = from_date_period.replace(year=from_date_period.year + 1, month=1)
-        else:
-            to_date_period = from_date_period.replace(month=from_date_period.month + 1)
-    elif time_period == PartitionTimePeriod.WEEK:
-        from_date_period = execution_date - timedelta(days=execution_date.weekday())
-        from_date_period = from_date_period.replace(hour=0, minute=0, second=0, microsecond=0)
-        to_date_period = from_date_period + timedelta(weeks=1)
-    elif time_period == PartitionTimePeriod.DAY:
-        from_date_period = execution_date.replace(hour=0, minute=0, second=0, microsecond=0)
-        to_date_period = from_date_period + timedelta(days=1)
-    else:
-        raise ValueError(f"Unsupported time period: {time_period}")
-    return (from_date_period, to_date_period)
-
 
 # ------------------------------------------------------------------------------
 # SQL tasks
 # ------------------------------------------------------------------------------
 @task
 def create_projet_snapshot(
+    nom_projet: str | None = None,
     nom_projet_parent: str | None = None,
-    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     dag_repo: AirflowDagRepository = DEFAULT_DAG_REPO,
     projet_repo: ProjetRepository = DEFAULT_PROJET_REPO,
     **context,
@@ -79,7 +50,8 @@ def create_projet_snapshot(
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    nom_projet = dag_repo.get_project_name(context=context)
+    if nom_projet is None:
+        nom_projet = dag_repo.get_project_name(context=context)
     execution_date = dag_repo.get_execution_date(context=context)
 
     projet_repo.create_projet_metadata(
@@ -91,6 +63,7 @@ def create_projet_snapshot(
 def update_projet_snapshot_status(
     nom_projet: str | None = None,
     status: bool = True,
+    dag_repo: AirflowDagRepository = DEFAULT_DAG_REPO,
     projet_repo: ProjetRepository = DEFAULT_PROJET_REPO,
     **context,
 ) -> None:
@@ -101,7 +74,8 @@ def update_projet_snapshot_status(
     Args:
         nom_projet (optionnel): Le nom du projet. A spécifier lorsque le nom du projet
             dans le DAG est différent de celui qui génère le snapshot_id,
-        pg_conn_id: Connexion Postgres. Valeur par défaut
+        dag_repo: Instance du repository pour accéder aux informations du DAG. Par défaut, utilise DEFAULT_DAG_REPO.
+        pg_conn_id: Connexion Postgres. Valeur par défaut utilise DEFAULT_PG_DATA_CONN_ID.
         projet_repo: Instance du repository pour accéder aux informations du projet. Par défaut, utilise DEFAULT_PROJET_REPO.
 
     Returns:
@@ -109,7 +83,6 @@ def update_projet_snapshot_status(
     """
 
     if nom_projet is None:
-        dag_repo = AirflowDagRepository()
         nom_projet = dag_repo.get_project_name(context=context)
 
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
@@ -180,7 +153,7 @@ def ensure_partition(
     prod_schema = db_info.prod_schema
 
     # Get partition period range
-    from_date, to_date = determine_partition_period(
+    from_date, to_date = dataset_options.determine_partition_period(
         time_period=partition_period,
         execution_date=execution_date,
     )
@@ -210,6 +183,7 @@ def create_tmp_tables(
     execution_options: Mapping[str, ExecutionOptions],
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     reset_id_seq: bool = False,
+    dag_repo: AirflowDagRepository = DEFAULT_DAG_REPO,
     **context,
 ) -> None:
     """
@@ -220,7 +194,6 @@ def create_tmp_tables(
         return
 
     # Init vars
-    dag_repo = AirflowDagRepository()
     db = create_db_handler(
         db_type=DatabaseType.POSTGRES,
         db_config=DbConfig(connection_id=pg_conn_id),
@@ -269,13 +242,13 @@ def delete_tmp_tables(
     datasets_context: list[DatasetContext],
     execution_options: Mapping[str, ExecutionOptions],
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    dag_repo: AirflowDagRepository = DEFAULT_DAG_REPO,
     **context,
 ) -> None:
     """
     Used to delete temporary tables in the database.
     """
     # Init vars
-    dag_repo = AirflowDagRepository()
     db = create_db_handler(
         db_type=DatabaseType.POSTGRES,
         db_config=DbConfig(connection_id=pg_conn_id),
@@ -360,11 +333,9 @@ def _generate_copy_query(
     prod_table = f"{prod_schema}.{tbl_name}"
     tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
 
-    col_list = sort_db_colnames(
-        db_handler=db_handler,
-        execution_options=execution_options,
-        dataset_context=dataset_context,
+    col_list = db_handler.fetch_table_columns(
         schema=prod_schema,
+        table=tbl_name,
     )
 
     def _build_incremental_query() -> str:
@@ -459,35 +430,6 @@ def copy_tmp_table_to_real_table(
         except Exception as e:
             logging.error(msg=f"Failed to execute query: {q}")
             raise e
-
-
-def sort_db_colnames(
-    db_handler: DBInterface,
-    dataset_context: DatasetContext,
-    execution_options: ExecutionOptions,
-    schema: str = DEFAULT_TMP_SCHEMA,
-) -> list[str]:
-    """Get sorted column names from a table.
-
-    Args:
-        db_handler: Database handler object.
-        dataset_context: DatasetContext object.
-        schema: Schema name.
-
-    Returns:
-        Sorted list of column names
-    """
-    tbl_name = dataset_context.storage_info.tbl_name
-    pg_conn_id = execution_options.db_conn_id
-
-    if tbl_name is None or tbl_name == "":
-        return []
-
-    tbl_cols = db_handler.fetch_table_columns(schema=schema, table=tbl_name)
-
-    sorted_cols = sorted(tbl_cols)
-    logging.info(msg=f"Sorted columns for > {pg_conn_id} - {schema}.{tbl_name}: {sorted_cols}")
-    return sorted_cols
 
 
 def bulk_load_local_tsv_file_to_db(
@@ -594,11 +536,9 @@ def import_file_to_db(
         )
 
         # Check if columns are the same between df and db table
-        sorted_db_colnames = sort_db_colnames(
-            db_handler=db_handler,
-            dataset_context=dataset_context,
-            execution_options=dataset_options,
+        sorted_db_colnames = db_handler.fetch_table_columns(
             schema=schema,
+            table=tbl_name,
         )
         if not are_lists_egal(list_A=sorted_df_cols, list_B=sorted_db_colnames):
             raise ValueError(textwrap.dedent(text="""
