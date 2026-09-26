@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
+from modules.domain.projet.model import Projet
+
 
 # =================
 # Enums
@@ -18,13 +20,11 @@ class TypeSource(Enum):
 # =================
 @dataclass(frozen=True)
 class Dataset:
-    nom_projet: str
     name: str
 
 
 @dataclass(frozen=True)
 class StorageInfo:
-    dataset_name: str
     # s3 info
     s3_conn_id: str
     bucket: str
@@ -69,3 +69,10 @@ class StorageInfo:
         s3_key = self.get_full_s3_key(with_bucket=with_bucket)
         namespace_split = s3_key.split(sep=".")[0].split(sep="/")[:-1]
         return ".".join(namespace_split)
+
+
+@dataclass(frozen=True)
+class DatasetContext:
+    projet: Projet
+    dataset: Dataset
+    storage_info: StorageInfo

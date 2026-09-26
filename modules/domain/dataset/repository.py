@@ -2,18 +2,18 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-from modules.domain.dataset.model import Dataset
+from modules.domain.dataset.model import DatasetContext
 
 
 # =================
 # Dataclasses
 # =================
-class DatasetRepository(ABC):
+class DatasetContextRepository(ABC):
     @abstractmethod
-    def get(self, nom_projet: str, name: str) -> Dataset: ...
+    def get_list(self, nom_projet: str) -> list[DatasetContext]: ...
 
     @abstractmethod
-    def get_list(self, nom_projet: str) -> list[Dataset]: ...
+    def get(self, nom_projet: str, nom_dataset: str) -> DatasetContext: ...
 
     @abstractmethod
     def get_list_source_fichier(self, nom_projet: str) -> list[str]: ...
