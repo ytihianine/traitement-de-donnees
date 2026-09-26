@@ -7,10 +7,16 @@ from airflow.sdk import Variable, task
 
 from modules.constants import (
     AGENT,
+    DEFAULT_DAG_REPO,
+    DEFAULT_DATASET_REPO,
     DEFAULT_GRIST_HOST,
+    DEFAULT_STORAGE_REPO,
     PROXY,
 )
 from modules.domain.dag.model import FeatureFlags
+from modules.domain.dag.repository import DagRepository
+from modules.domain.dataset.ports import StorageInfoProvider
+from modules.domain.dataset.repository import DatasetRepository
 from modules.generic_processing.dates import convert_grist_date_to_date
 from modules.generic_processing.structures import (
     handle_grist_boolean_columns,
@@ -18,8 +24,7 @@ from modules.generic_processing.structures import (
     normalize_grist_dataframe,
 )
 from modules.generic_processing.text import normalize_whitespace_columns
-from modules.infra.airflow.dag import AirflowDagRepository, should_skip_task
-from modules.infra.database.postgres.dataset_repository import PostgresDatasetRepository
+from modules.infra.airflow.dag import should_skip_task
 from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 from modules.infra.grist.client import GristClient
 from modules.infra.http_client.adapters import RequestsClient
@@ -33,24 +38,24 @@ from modules.infra.http_client.config import ClientConfig
     retry_exponential_backoff=True,
 )
 def download_grist_doc_to_s3(
-    grist_dataset_name: str,
+    dataset_name: str,
     grist_host: str = DEFAULT_GRIST_HOST,
     api_token_key: str = "grist_secret_key",
     use_proxy: bool = True,
+    dag_repo: DagRepository = DEFAULT_DAG_REPO,
+    dataset_repo: DatasetRepository = DEFAULT_DATASET_REPO,
+    storage_repo: StorageInfoProvider = DEFAULT_STORAGE_REPO,
     **context,
 ) -> None:
     """Download SQLite from a specific Grist doc to S3"""
     if should_skip_task(context=context, feature_flag=FeatureFlags.DOWNLOAD_GRIST_DOC):
         return
 
-    # Init repositories
-    dag_repository = AirflowDagRepository()
-    dataset_repository = PostgresDatasetRepository()
-
-    nom_projet = dag_repository.get_project_name(context=context)
-    dataset = dataset_repository.get(nom_projet=nom_projet, name=grist_dataset_name)
-    doc_id = dataset.storage.id_source
-    dest_tmp_key = dataset.storage.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
+    nom_projet = dag_repo.get_project_name(context=context)
+    dataset = dataset_repo.get(nom_projet=nom_projet, name=dataset_name)
+    storage_info = storage_repo.get_by_dataset(nom_projet=nom_projet, dataset_name=dataset_name)
+    doc_id = storage_info.id_source
+    dest_tmp_key = storage_info.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
 
     if doc_id is None:
         raise ValueError(
