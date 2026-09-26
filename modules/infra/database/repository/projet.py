@@ -51,9 +51,8 @@ class DbProjetRepository(ProjetRepository):
             query=f"""
                 SELECT p.projet, p.id_projet
                 FROM {CONF_SCHEMA}.projet p
-                JOIN versioning.snapshot s ON p.id_projet = s.id_projet
                 WHERE p.projet = %s
-                ORDER BY s.import_timestamp DESC
+                ORDER BY p.import_timestamp DESC
                 LIMIT 1;
             """,
             parameters=(nom_projet,),
@@ -72,7 +71,7 @@ class DbProjetRepository(ProjetRepository):
             query=f"""
                 SELECT cppc.projet, cppc.contact_mail, cppc.is_mail_generic
                 FROM {CONF_SCHEMA}.projet_contact_vw cppc
-                WHERE cppc.projet = %s AND rang = 1;
+                WHERE cppc.projet = %s AND cppc.rang = 1;
             """,
             parameters=(nom_projet,),
         )
@@ -86,7 +85,7 @@ class DbProjetRepository(ProjetRepository):
             query=f"""
                 SELECT cppd.projet, cppd.type_documentation, cppd.lien
                 FROM {CONF_SCHEMA}.projet_documentation_vw cppd
-                WHERE cppd.projet = %s AND rang = 1;
+                WHERE cppd.projet = %s AND cppd.rang = 1;
             """,
             parameters=(nom_projet,),
         )
@@ -102,7 +101,7 @@ class DbProjetRepository(ProjetRepository):
                     cpps3.key,
                     cpps3.key_tmp
                 FROM {CONF_SCHEMA}.projet_s3_vw cpps3
-                WHERE cpps3.projet = %s AND rang = 1;
+                WHERE cpps3.projet = %s AND cpps3.rang = 1;
             """,
             parameters=(nom_projet,),
         )
@@ -122,7 +121,7 @@ class DbProjetRepository(ProjetRepository):
             JOIN conf_projets.projet p
                 ON p.id_projet = s.id_projet
             WHERE p.projet = %(nom_projet)s
-              AND s.is_dag_completed = %(is_dag_completed)s
+              AND s.is_dag_completed IS %(is_dag_completed)s
             ORDER BY s.import_timestamp DESC
             LIMIT 1;
         """

@@ -54,9 +54,8 @@ class DbDatasetContextRepository(DatasetContextRepository):
             query=f"""
                 SELECT p.projet, p.id_projet, p.dataset_name, p.s3_conn_id, p.bucket, p.s3_key, p.filename, p.local_dir, p.db_conn_id, p.tbl_name, p.type_source, p.id_source
                 FROM {CONF_SCHEMA}.projet p
-                WHERE p.projet = %s AND p.rank = 1
-                ORDER BY p.import_timestamp DESC
-                LIMIT 1;
+                WHERE p.projet = %s AND p.rang = 1
+                ORDER BY p.import_timestamp DESC;
             """,
             parameters=(nom_projet,),
         )
