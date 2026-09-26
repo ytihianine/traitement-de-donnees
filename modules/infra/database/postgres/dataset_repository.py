@@ -10,9 +10,11 @@ from tenacity import (
     wait_exponential,
 )
 
+from modules.constants import DEFAULT_PG_DATA_CONN_ID
 from modules.domain.dataset.model import Dataset
 from modules.domain.dataset.repository import DatasetRepository
 from modules.infra.database.base import DBInterface
+from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 from modules.infra.database.postgres.projet_repository import CONF_SCHEMA
 
 logger = logging.getLogger(name=__name__)
@@ -29,7 +31,18 @@ db_retry = retry(
 # Dataclasses
 # =================
 class PostgresDatasetRepository(DatasetRepository):
-    db_client: DBInterface
+    """ProjetRepository backed by the ``conf_projets`` Postgres schema."""
+
+    db_type: DatabaseType = DatabaseType.POSTGRES
+    db_connection_id: str = DEFAULT_PG_DATA_CONN_ID
+
+    @property
+    def db_client(self) -> DBInterface:
+        client = create_db_handler(
+            db_type=self.db_type,
+            db_config=DbConfig(connection_id=self.db_connection_id),
+        )
+        return client
 
     def get(self, nom_projet: str, name: str) -> Dataset:
         dataset = self.db_client.fetch_one(

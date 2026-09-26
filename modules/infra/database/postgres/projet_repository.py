@@ -11,9 +11,11 @@ from tenacity import (
     wait_exponential,
 )
 
+from modules.constants import DEFAULT_PG_DATA_CONN_ID
 from modules.domain.projet.model import Contact, Documentation, Projet, ProjetMetadata, ProjetS3
 from modules.domain.projet.repository import ProjetRepository
 from modules.infra.database.base import DBInterface
+from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 
 logger = logging.getLogger(name=__name__)
 
@@ -32,27 +34,20 @@ db_retry = retry(
 class PostgresProjetRepository(ProjetRepository):
     """ProjetRepository backed by the ``conf_projets`` Postgres schema."""
 
-    db_client: DBInterface | None = None
-
-    def __post_init__(self) -> None:
-        if self.db_client is None:
-            from modules.constants import DEFAULT_PG_DATA_CONN_ID
-            from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
-
-            self.db_client = create_db_handler(
-                db_type=DatabaseType.POSTGRES,
-                db_config=DbConfig(connection_id=DEFAULT_PG_DATA_CONN_ID),
-            )
+    db_type: DatabaseType = DatabaseType.POSTGRES
+    db_connection_id: str = DEFAULT_PG_DATA_CONN_ID
 
     @property
-    def _db(self) -> DBInterface:
-        if self.db_client is None:
-            raise ValueError("Database client is not initialized.")
-        return self.db_client
+    def db_client(self) -> DBInterface:
+        client = create_db_handler(
+            db_type=self.db_type,
+            db_config=DbConfig(connection_id=self.db_connection_id),
+        )
+        return client
 
     @db_retry
     def get(self, nom_projet: str) -> Projet:
-        df = self._db.fetch_df(
+        df = self.db_client.fetch_df(
             query=f"""
                 SELECT p.projet, p.id_projet
                 FROM {CONF_SCHEMA}.projet p
@@ -73,7 +68,7 @@ class PostgresProjetRepository(ProjetRepository):
     @db_retry
     def get_list_contact(self, nom_projet: str) -> list[Contact]:
 
-        df = self._db.fetch_df(
+        df = self.db_client.fetch_df(
             query=f"""
                 SELECT cppc.projet, cppc.contact_mail, cppc.is_mail_generic
                 FROM {CONF_SCHEMA}.projet_contact_vw cppc
@@ -87,7 +82,7 @@ class PostgresProjetRepository(ProjetRepository):
     @db_retry
     def get_list_documentation(self, nom_projet: str) -> list[Documentation]:
 
-        df = self._db.fetch_df(
+        df = self.db_client.fetch_df(
             query=f"""
                 SELECT cppd.projet, cppd.type_documentation, cppd.lien
                 FROM {CONF_SCHEMA}.projet_documentation_vw cppd
@@ -101,7 +96,7 @@ class PostgresProjetRepository(ProjetRepository):
     @db_retry
     def get_projet_s3_info(self, nom_projet: str) -> ProjetS3:
 
-        df = self._db.fetch_df(
+        df = self.db_client.fetch_df(
             query=f"""
                 SELECT cpps3.projet, cpps3.bucket,
                     cpps3.key,
@@ -132,7 +127,7 @@ class PostgresProjetRepository(ProjetRepository):
             LIMIT 1;
         """
 
-        db_result = self._db.fetch_one(
+        db_result = self.db_client.fetch_one(
             query,
             parameters={"nom_projet": nom_projet, "is_dag_completed": dag_completed},
         )
