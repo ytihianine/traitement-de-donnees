@@ -52,11 +52,10 @@ class DbDatasetContextRepository(DatasetContextRepository):
     def get_list(self, nom_projet: str) -> list[DatasetContext]:
         df = self.db_client.fetch_df(
             query=f"""
-                SELECT p.projet, p.id_projet, s.dataset_name
+                SELECT p.projet, p.id_projet, p.dataset_name, p.s3_conn_id, p.bucket, p.s3_key, p.filename, p.local_dir, p.db_conn_id, p.tbl_name, p.type_source, p.id_source
                 FROM {CONF_SCHEMA}.projet p
-                JOIN versioning.snapshot s ON p.id_projet = s.id_projet
-                WHERE p.projet = %s
-                ORDER BY s.import_timestamp DESC
+                WHERE p.projet = %s AND p.rank = 1
+                ORDER BY p.import_timestamp DESC
                 LIMIT 1;
             """,
             parameters=(nom_projet,),
@@ -90,11 +89,10 @@ class DbDatasetContextRepository(DatasetContextRepository):
     def get(self, nom_projet: str, nom_dataset: str) -> DatasetContext:
         df = self.db_client.fetch_df(
             query=f"""
-                SELECT p.projet, p.id_projet, s.dataset_name
+                SELECT p.projet, p.id_projet, p.dataset_name, p.s3_conn_id, p.bucket, p.s3_key, p.filename, p.local_dir, p.db_conn_id, p.tbl_name, p.type_source, p.id_source
                 FROM {CONF_SCHEMA}.projet p
-                JOIN versioning.snapshot s ON p.id_projet = s.id_projet
-                WHERE p.projet = %s AND s.dataset_name = %s
-                ORDER BY s.import_timestamp DESC
+                WHERE p.projet = %s AND p.dataset_name = %s
+                ORDER BY p.import_timestamp DESC
                 LIMIT 1;
             """,
             parameters=(nom_projet, nom_dataset),
