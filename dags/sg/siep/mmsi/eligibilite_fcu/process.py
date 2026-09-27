@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
+from modules.generic_processing.text import normalize_whitespace_columns
 from modules.infra.http_client.base import HttpInterface
-from modules.utils.process.text import normalize_whitespace_columns
 
 
 def can_perform_api_call(lat: float, lon: float) -> bool:
