@@ -1,11 +1,8 @@
 import logging
 from collections.abc import Callable
-from dataclasses import dataclass
-from datetime import timedelta
 
 import pandas as pd
 from airflow.sdk import XComArg, task
-from airflow.sdk.definitions._internal.abstractoperator import TaskStateChangeCallback
 
 from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO, DEFAULT_PROJET_REPO
 from modules.domain.dag.repository import DagRepository
@@ -15,20 +12,6 @@ from modules.domain.projet.model import ProjetMetadata
 from modules.domain.projet.repository import ProjetRepository
 from modules.infra.file_system.dataset_location_factory import create_dataset_location_provider
 from modules.logs import df_info
-
-
-@dataclass(frozen=True)
-class TaskConfig:
-    task_id: str
-    retries: int = 0
-    retry_delay: timedelta | float = 0
-    retry_exponential_backoff: bool = False
-    max_retry_delay: timedelta | float | None = None
-    on_execute_callback: TaskStateChangeCallback | list[TaskStateChangeCallback] | None = None
-    on_failure_callback: TaskStateChangeCallback | list[TaskStateChangeCallback] | None = None
-    on_success_callback: TaskStateChangeCallback | list[TaskStateChangeCallback] | None = None
-    on_retry_callback: TaskStateChangeCallback | list[TaskStateChangeCallback] | None = None
-    on_skipped_callback: TaskStateChangeCallback | list[TaskStateChangeCallback] | None = None
 
 
 def _add_metadata(df: pd.DataFrame, metadata: ProjetMetadata) -> pd.DataFrame:
@@ -101,7 +84,7 @@ def create_task(
             logging.warning(msg="Pipeline operation returned None. Ending pipeline execution.")
             return
 
-        if execution_options.add_metadata:
+        if pipeline.add_metadata:
             projet_metadata = projet_repo.get_projet_metadata(nom_projet=nom_projet)
             result = _add_metadata(df=result, metadata=projet_metadata)
 

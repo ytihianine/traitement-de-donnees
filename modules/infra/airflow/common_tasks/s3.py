@@ -170,21 +170,12 @@ def del_iceberg_staging_table(
 @task(map_index_template="{{ task_name }}")
 def copy_staging_to_prod(
     dataset_context: DatasetContext,
-    execution_options: Mapping[str, ExecutionOptions],
     catalog_uri: str = DEFAULT_POLARIS_HOST,
     catalog_name: str = DEFAULT_POLARIS_CATALOG,
 ) -> None:
     """Copy Iceberg tables from staging key to prod key"""
     context = get_current_context()
     context["task_name"] = dataset_context.dataset.name  # type: ignore
-
-    dataset_execution_options = execution_options.get(dataset_context.dataset.name)
-    if dataset_execution_options is None:
-        raise ValueError(f"No execution options found for dataset <{dataset_context.dataset.name}>")
-
-    if not dataset_execution_options.write_to_s3_with_iceberg:
-        logging.info(msg=f"Skipping Iceberg write for dataset <{dataset_context.dataset.name}>")
-        return
 
     # Get catalog
     properties = generate_catalog_properties(

@@ -17,6 +17,7 @@ from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import (
     ExecutionOptions,
     LoadStrategy,
+    determine_partition_period,
 )
 from modules.domain.projet.repository import ProjetRepository
 from modules.infra.airflow.dag import (
@@ -90,7 +91,6 @@ def update_projet_snapshot_status(
 def ensure_partition(
     dataset_context: DatasetContext,
     execution_options: Mapping[str, ExecutionOptions],
-    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     **context,
 ) -> None:
     """
@@ -112,25 +112,20 @@ def ensure_partition(
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    dataset_options = execution_options.get(dataset_context.dataset_name)
+    dest_loc = dataset_context.dest_location
+    if dest_loc.type_location != TypeLocation.DB:
+        logging.warning(
+            msg=f"Destination location type is not POSTGRES for dataset {dataset_context.dataset_name} ... skipping partition creation"
+        )
+        return
 
+    dataset_options = execution_options.get(dataset_context.dataset_name)
     if dataset_options is None:
         raise ValueError(f"No execution options found for dataset {dataset_context.dataset_name}")
 
-    dest_loc = dataset_context.dest_location
     tbl_name = dest_loc.validate_location
     is_partitioned = dataset_options.is_partitioned
     partition_period = dataset_options.partition_period
-
-    if dataset_options.write_to_db is False:
-        logging.info(msg=f"write_to_db is set to False for selecteur {dataset_context.dataset_name} ... skipping")
-        return
-
-    if tbl_name is None or tbl_name == "":
-        logging.warning(
-            msg=f"No table name specified for selecteur {dataset_context.dataset_name} ... skipping partition creation"
-        )
-        return
 
     if not is_partitioned:
         logging.info(msg=f"{tbl_name} is not partitioned ... skipping")
@@ -140,14 +135,14 @@ def ensure_partition(
     dag_repo = AirflowDagRepository()
     db = create_db_handler(
         db_type=DatabaseType.POSTGRES,
-        db_config=DbConfig(connection_id=pg_conn_id),
+        db_config=DbConfig(connection_id=dest_loc.validate_conn_id),
     )
     execution_date = dag_repo.get_execution_date(context=context)
     db_info = dag_repo.get_db_info(context=context)
     prod_schema = db_info.prod_schema
 
     # Get partition period range
-    from_date, to_date = dataset_options.determine_partition_period(
+    from_date, to_date = determine_partition_period(
         time_period=partition_period,
         execution_date=execution_date,
     )
