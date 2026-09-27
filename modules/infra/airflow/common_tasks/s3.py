@@ -15,7 +15,6 @@ from modules.domain.dag.model import FeatureFlags
 from modules.domain.dag.repository import DagRepository
 from modules.domain.dataset.model import DatasetContext, TypeLocation
 from modules.domain.dataset.repository import DatasetContextRepository
-from modules.domain.pipeline.model import ExecutionOptions
 from modules.infra.airflow.dag import should_skip_task
 from modules.infra.catalog.iceberg import IcebergCatalog, IcebergTableStatus, generate_catalog_properties
 from modules.infra.file_system.dataset_location import (
@@ -29,7 +28,6 @@ from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_
 
 @task
 def copy_s3_files(
-    execution_options: Mapping[str, ExecutionOptions],
     dag_repo: DagRepository = DEFAULT_DAG_REPO,
     dataset_context_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
     **context: Mapping[str, Any],
@@ -38,7 +36,6 @@ def copy_s3_files(
 
     Args:
         datasets: Mapping of selecteur options
-        execution_options: Mapping of execution options
         connection_id: S3 connection ID (from execution options)
         context: Airflow context
 
