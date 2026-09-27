@@ -49,43 +49,38 @@ def download_grist_doc_to_s3(
 
     nom_projet = dag_repo.get_project_name(context=context)
     dataset_context = datasetcontext_repo.get(nom_projet=nom_projet, nom_dataset=dataset_name)
-    doc_id = dataset_context.storage_info.id_source
-    dest_tmp_key = dataset_context.storage_info.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
 
+    doc_id = dataset_context.src_location.location
     if doc_id is None:
         raise ValueError(
             f"doc_id is None for dataset {dataset_name} in project {nom_projet}. Please check the configuration."
         )
 
-    # Instanciate Grist client
+    # Download the Grist document
     http_config = ClientConfig()
     if use_proxy:
         http_config = ClientConfig(proxy=PROXY, user_agent=AGENT)
 
     request_client = RequestsClient(config=http_config)
-
     grist_client = GristClient(
         http_client=request_client,
         grist_host=grist_host,
         api_token=Variable.get(key=api_token_key),
     )
+    grist_response = grist_client.download_doc(doc_id=doc_id)
 
-    # Hooks
+    # Export sqlite file to S3
+    dest_loc = dataset_context.dest_location
     s3_handler = create_file_handler(
         handler_type=FileHandlerType.S3,
         config=FSConfig(),
     )
-
-    # Get document data from Grist
-    grist_response = grist_client.download_doc(doc_id=doc_id)
-
-    # Export sqlite file to S3
-    print(f"Exporting file to < {dest_tmp_key} >")
+    logging.info(f"Exporting file to < {dest_loc.validate_location} >")
     s3_handler.write(
-        file_path=dest_tmp_key,
+        file_path=dest_loc.validate_location,
         content=grist_response.content,
     )
-    logging.info(msg=f"Export done to {dest_tmp_key}!")
+    logging.info(msg="Exported successfully!")
 
 
 def generic_grist_processing(

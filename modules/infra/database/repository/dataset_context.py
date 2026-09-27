@@ -52,7 +52,7 @@ class DbDatasetContextRepository(DatasetContextRepository):
     def get_list(self, nom_projet: str) -> list[DatasetContext]:
         df = self.db_client.fetch_df(
             query=f"""
-                SELECT p.projet, p.id_projet, p.dataset_name, p.type_location, p.source_location, p.dest_location, p.conn_id
+                SELECT p.projet, p.id_projet, p.dataset_name, p.src_type_location, p.src_location, p.src_conn_id, p.tmp_type_location, p.tmp_location, p.tmp_conn_id, p.dest_type_location, p.dest_location, p.dest_conn_id
                 FROM {CONF_SCHEMA}.projet p
                 WHERE p.projet = %s AND p.rang = 1
                 ORDER BY p.import_timestamp DESC;
@@ -69,11 +69,20 @@ class DbDatasetContextRepository(DatasetContextRepository):
             dataset_context = DatasetContext(
                 projet=Projet(name=record["projet"], id=record["id_projet"]),
                 dataset=Dataset(name=record["dataset_name"]),
-                dataset_location=DatasetLocation(
-                    type_location=record["type_location"],
-                    source_location=record["source_location"],
-                    dest_location=record["dest_location"],
-                    conn_id=record["conn_id"],
+                src_location=DatasetLocation(
+                    type_location=record["src_type_location"],
+                    location=record["src_location"],
+                    conn_id=record["src_conn_id"],
+                ),
+                tmp_location=DatasetLocation(
+                    type_location=record["tmp_type_location"],
+                    location=record["tmp_location"],
+                    conn_id=record["tmp_conn_id"],
+                ),
+                dest_location=DatasetLocation(
+                    type_location=record["dest_type_location"],
+                    location=record["dest_location"],
+                    conn_id=record["dest_conn_id"],
                 ),
             )
             datasets_context.append(dataset_context)
@@ -83,7 +92,7 @@ class DbDatasetContextRepository(DatasetContextRepository):
     def get(self, nom_projet: str, nom_dataset: str) -> DatasetContext:
         df = self.db_client.fetch_df(
             query=f"""
-                SELECT p.projet, p.id_projet, p.dataset_name, p.type_location, p.source_location, p.dest_location, p.conn_id
+                SELECT p.projet, p.id_projet, p.dataset_name, p.src_type_location, p.src_location, p.src_conn_id, p.tmp_type_location, p.tmp_location, p.tmp_conn_id, p.dest_type_location, p.dest_location, p.dest_conn_id
                 FROM {CONF_SCHEMA}.projet p
                 WHERE p.projet = %s AND p.dataset_name = %s
                 ORDER BY p.import_timestamp DESC
@@ -99,11 +108,20 @@ class DbDatasetContextRepository(DatasetContextRepository):
         dataset_context = DatasetContext(
             projet=Projet(name=record["projet"], id=record["id_projet"]),
             dataset=Dataset(name=nom_dataset),
-            dataset_location=DatasetLocation(
-                type_location=record["type_location"],
-                source_location=record["source_location"],
-                dest_location=record["dest_location"],
-                conn_id=record["conn_id"],
+            src_location=DatasetLocation(
+                type_location=record["src_type_location"],
+                location=record["src_location"],
+                conn_id=record["src_conn_id"],
+            ),
+            tmp_location=DatasetLocation(
+                type_location=record["tmp_type_location"],
+                location=record["tmp_location"],
+                conn_id=record["tmp_conn_id"],
+            ),
+            dest_location=DatasetLocation(
+                type_location=record["dest_type_location"],
+                location=record["dest_location"],
+                conn_id=record["dest_conn_id"],
             ),
         )
         return dataset_context

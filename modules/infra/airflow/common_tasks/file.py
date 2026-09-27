@@ -76,14 +76,13 @@ def create_parquet_converter_task(
 
         logging.info(msg=f"Getting configuration for project {nom_projet} and dataset {dataset_name}")
         dataset_context = datasetcontext_repo.get(nom_projet=nom_projet, nom_dataset=dataset_name)
-        source_key = dataset_context.storage_info.get_full_s3_key(use_id_source=True)
-        dest_tmp_key = dataset_context.storage_info.get_full_s3_key(with_tmp_segment=True, use_id_source=False)
+        src_loc = dataset_context.src_location
 
         # Read input file based on extension
-        logging.info(msg=f"Reading file from {source_key}")
+        logging.info(msg=f"Reading file from {src_loc.validate_location}")
         df = read_dataframe(
             file_handler=s3_handler,
-            file_path=source_key,
+            file_path=src_loc.validate_location,
             read_options=read_options,
         )
 
@@ -110,8 +109,9 @@ def create_parquet_converter_task(
 
         # Convert to parquet and save
         parquet_data = df.to_parquet(path=None, index=False)
-        logging.info(msg=f"Saving to {dest_tmp_key}")
-        s3_handler.write(file_path=dest_tmp_key, content=parquet_data)
-        logging.info(msg=f"Successfully saved parquet file to {dest_tmp_key}")
+        tmp_loc = dataset_context.tmp_location
+        logging.info(msg=f"Saving to {tmp_loc.validate_location}")
+        s3_handler.write(file_path=tmp_loc.validate_location, content=parquet_data)
+        logging.info(msg=f"Successfully saved parquet file to {tmp_loc.validate_location}")
 
     return convert_to_parquet

@@ -13,9 +13,7 @@ from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import ExecutionOptions, PipelineDescriptor
 from modules.domain.projet.model import ProjetMetadata
 from modules.domain.projet.repository import ProjetRepository
-from modules.infra.file_system.data_writers import FileDatasetWriter
-from modules.infra.file_system.dataset_reader_factory import create_dataset_reader
-from modules.infra.file_system.factory import FileHandlerType, FSConfig
+from modules.infra.file_system.dataset_location_factory import create_dataset_location_provider
 from modules.logs import df_info
 
 
@@ -83,16 +81,25 @@ def create_task(
         for dataset in pipeline.input_datasets:
             logging.info(msg=f"▶ Reading dataset: {dataset.name}")
             dataset_context = dataset_context_repo.get(nom_projet=nom_projet, nom_dataset=dataset.name)
-            reader = create_dataset_reader(storage_info=dataset_context.storage_info)
-            df = reader.read(storage_info=dataset_context.storage_info)
+            if pipeline.use_input_results_as_operation_args:
+                dataset_location = dataset_context.tmp_location
+            else:
+                dataset_location = dataset_context.src_location
+
+            reader = create_dataset_location_provider(dataset_location=dataset_location)
+            df = reader.read(location=dataset_location.validate_location)
             input_data[f"df_{dataset.name}"] = df
 
         if len(input_data) == 1:
             input_data = {"df": next(iter(input_data.values()))}
 
-        # Apply transformations
-        logging.info(msg=f"Running pipeline transformation: {pipeline.transformation.__name__}")
-        result = pipeline.transformation(**input_data)
+        # Apply operations
+        logging.info(msg=f"Running pipeline operation: {pipeline.operation.__name__}")
+        result = pipeline.operation(**input_data)
+
+        if result is None:
+            logging.warning(msg="Pipeline operation returned None. Ending pipeline execution.")
+            return
 
         if execution_options.add_metadata:
             projet_metadata = projet_repo.get_projet_metadata(nom_projet=nom_projet)
@@ -102,19 +109,11 @@ def create_task(
         df_info(df=result, df_name=f"{pipeline.output_dataset.name} - df to export")
 
         # Export final result - always a DataFrame and the last step output
-        if not execution_options.export_result:
-            return
-
         output_dataset_context = dataset_context_repo.get(
             nom_projet=nom_projet, nom_dataset=pipeline.output_dataset.name
         )
-        writer = FileDatasetWriter(
-            fs_config=FSConfig(
-                bucket=output_dataset_context.storage_info.bucket,
-                connection_id=output_dataset_context.storage_info.s3_conn_id,
-            ),
-            fs_type=FileHandlerType.S3,
-        )
-        writer.write(df=result, storage_info=output_dataset_context.storage_info)
+        output_location = output_dataset_context.dest_location
+        writer = create_dataset_location_provider(dataset_location=output_location)
+        writer.write(df=result, location=output_location.validate_location)
 
     return _task

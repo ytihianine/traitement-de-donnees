@@ -31,7 +31,6 @@ def convert_grist_date_to_date(df: pd.DataFrame, columns: list[str]) -> pd.DataF
             converted.loc[valid_numeric_mask] = pd.to_datetime(
                 numeric_series[valid_numeric_mask],
                 unit=inferred_unit,
-                errors="coerce",
             )
 
         if (~valid_numeric_mask).any():

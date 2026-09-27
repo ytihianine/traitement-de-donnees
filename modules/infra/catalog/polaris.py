@@ -59,7 +59,7 @@ class PolarisCatalog:
                 "name": catalog_name,
                 "type": "INTERNAL",
                 "properties": {
-                    "default-base-location": "s3://dsci/data_store",
+                    "default-base-DatasetLocation": "s3://dsci/data_store",
                 },
                 "storageConfigInfo": {
                     "storageType": "S3",

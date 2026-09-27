@@ -1,39 +1,31 @@
 """SQL task utilities using infrastructure handlers."""
 
 import logging
-import textwrap
 from collections.abc import Mapping
 
 from airflow.sdk import get_current_context, task
 
 from modules.constants import (
     DEFAULT_PG_DATA_CONN_ID,
-    DEFAULT_S3_CONN_ID,
     DEFAULT_TMP_SCHEMA,
 )
 from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO, DEFAULT_PROJET_REPO
 from modules.domain.dag.model import FeatureFlags
 from modules.domain.dag.repository import DagRepository
-from modules.domain.dataset.model import DatasetContext
+from modules.domain.dataset.model import DatasetContext, TypeLocation
 from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import (
     ExecutionOptions,
     LoadStrategy,
 )
 from modules.domain.projet.repository import ProjetRepository
-from modules.generic_processing.structures import are_lists_egal
 from modules.infra.airflow.dag import (
     AirflowDagRepository,
     should_skip_task,
 )
 from modules.infra.database.base import DBInterface
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
-from modules.infra.file_system.dataframe import read_dataframe
-from modules.infra.file_system.factory import (
-    FileHandlerType,
-    FSConfig,
-    create_file_handler,
-)
+from modules.infra.file_system.dataset_location import parse_db_table
 
 
 # ------------------------------------------------------------------------------
@@ -125,7 +117,8 @@ def ensure_partition(
     if dataset_options is None:
         raise ValueError(f"No execution options found for dataset {dataset_context.dataset_name}")
 
-    tbl_name = dataset_context.storage_info.tbl_name
+    dest_loc = dataset_context.dest_location
+    tbl_name = dest_loc.validate_location
     is_partitioned = dataset_options.is_partitioned
     partition_period = dataset_options.partition_period
 
@@ -215,23 +208,19 @@ def create_tmp_tables(
     alter_queries = []
 
     for dataset_context in datasets_context:
-        dataset_options = execution_options.get(dataset_context.dataset_name)
-
-        if dataset_options is None:
-            raise ValueError(f"No execution options found for dataset {dataset_context.dataset_name}")
-
-        if not dataset_options.write_to_db:
+        tmp_loc = dataset_context.tmp_location
+        if tmp_loc.type_location != TypeLocation.DB:
             logging.info(msg=f"Skipping DB tmp table creation for selecteur <{dataset_context.dataset_name}>")
             continue
 
-        tbl_name = dataset_context.storage_info.tbl_name
+        tbl_name = parse_db_table(location=tmp_loc.validate_location)
 
         drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
         create_queries.append(f"""CREATE TABLE
                 IF NOT EXISTS {tmp_schema}.tmp_{tbl_name}
                 ( LIKE {prod_schema}.{tbl_name} INCLUDING ALL);
             """)
-        alter_queries.append(f"ALTER SEQUENCE {prod_schema}.{tbl_name}_id_seq RESTART WITH 1;")
+        alter_queries.append(f"ALTER SEQUENCE {tmp_schema}.tmp_{tbl_name}_id_seq RESTART WITH 1;")
 
     for drop_query in drop_queries:
         db.execute(query=drop_query)
@@ -245,7 +234,6 @@ def create_tmp_tables(
 
 @task(task_id="delete_tmp_tables")
 def delete_tmp_tables(
-    execution_options: Mapping[str, ExecutionOptions],
     nom_projet: str | None = None,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     dag_repo: AirflowDagRepository = DEFAULT_DAG_REPO,
@@ -267,16 +255,15 @@ def delete_tmp_tables(
     datasets_context = dataset_context_repo.get_list(nom_projet=nom_projet)
 
     for dataset_context in datasets_context:
-        dataset_options = execution_options.get(dataset_context.dataset_name)
-
-        if dataset_options is None:
-            raise ValueError(f"No execution options found for dataset {dataset_context.dataset_name}")
-
-        if not dataset_options.write_to_db:
-            logging.info(msg=f"Skipping DB tmp table deletion for selecteur <{dataset_context.dataset_name}>")
+        tmp_loc = dataset_context.tmp_location
+        if tmp_loc.type_location != TypeLocation.DB:
+            logging.warning(
+                msg=f"Temporary location for dataset {dataset_context.dataset_name} is not a DB table ... skipping"
+            )
             continue
 
-        db.execute(query=f"DROP TABLE IF EXISTS {db_info.tmp_schema}.tmp_{dataset_context.storage_info.tbl_name};")
+        tbl_name = parse_db_table(location=tmp_loc.validate_location)
+        db.execute(query=f"DROP TABLE IF EXISTS {db_info.tmp_schema}.tmp_{tbl_name};")
 
 
 def _create_append_copy_query(prod_table: str, tmp_table: str, col_list: list[str]) -> str:
@@ -320,8 +307,8 @@ def _create_incremental_copy_query(
 
 
 def _generate_copy_query(
-    dataset_context: DatasetContext,
-    execution_options: ExecutionOptions,
+    tbl_name: str,
+    load_strategy: LoadStrategy,
     db_handler: DBInterface,
     prod_schema: str = DEFAULT_TMP_SCHEMA,
     tmp_schema: str = DEFAULT_TMP_SCHEMA,
@@ -331,15 +318,13 @@ def _generate_copy_query(
     Generate SQL query to copy data from temporary table to production table based on the specified strategy.
 
     Args:
-        dataset_context: DatasetContext object.
+        tbl_name: Name of the table to copy.
         db_handler: Database handler object.
         prod_schema: Production schema name.
         tmp_schema: Temporary schema name.
         merge_delete: Whether to perform merge delete operation.
+        load_strategy: Load strategy to use for copying data.
     """
-    load_strategy = execution_options.load_strategy
-    tbl_name = dataset_context.storage_info.tbl_name
-    assert tbl_name is not None  # guaranteed by should_write_to_db()
     prod_table = f"{prod_schema}.{tbl_name}"
     tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
 
@@ -415,18 +400,28 @@ def copy_tmp_table_to_real_table(
 
     queries = []
     for dataset_context in datasets_context:
-        dataset_options = execution_options.get(dataset_context.dataset_name)
-
-        if dataset_options is None:
-            raise ValueError(f"No execution options found for dataset {dataset_context.dataset_name}")
-
-        if not dataset_options.write_to_db:
+        tmp_loc = dataset_context.tmp_location
+        if tmp_loc.type_location != TypeLocation.DB:
+            logging.warning(
+                msg=f"Temporary location for dataset {dataset_context.dataset_name} is not a DB table ... skipping"
+            )
             continue
+
+        dest_loc = dataset_context.dest_location
+        if dest_loc.type_location != TypeLocation.DB:
+            logging.warning(
+                msg=f"Destination location for dataset {dataset_context.dataset_name} is not a DB table ... skipping"
+            )
+            continue
+
+        dataset_exec_options = execution_options.get(dataset_context.dataset_name)
+        if dataset_exec_options is None:
+            raise ValueError(f"No execution options found for dataset {dataset_context.dataset_name}")
 
         queries.append(
             _generate_copy_query(
-                dataset_context=dataset_context,
-                execution_options=dataset_options,
+                tbl_name=parse_db_table(location=dest_loc.validate_location),
+                load_strategy=dataset_exec_options.load_strategy,
                 db_handler=db_handler,
                 prod_schema=prod_schema,
                 tmp_schema=tmp_schema,
@@ -478,98 +473,6 @@ def bulk_load_local_tsv_file_to_db(
         filepath=local_filepath,
     )
     logging.info(msg=f"Successfully loaded {local_filepath} into {schema}.tmp_{tbl_name}")
-
-
-@task(map_index_template="{{ import_task_name }}")
-def import_file_to_db(
-    dataset_context: DatasetContext,
-    execution_options: Mapping[str, ExecutionOptions],
-    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
-    s3_conn_id: str = DEFAULT_S3_CONN_ID,
-    **context,
-) -> None:
-    context = get_current_context()
-    context["import_task_name"] = dataset_context.dataset_name  # type: ignore
-
-    if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
-        return
-
-    dag_repo = AirflowDagRepository()
-    dataset_options = execution_options.get(dataset_context.dataset_name)
-
-    if dataset_options is None:
-        raise ValueError(f"No execution options found for dataset {dataset_context.dataset_name}")
-
-    if dataset_options.write_to_db is False:
-        logging.info(
-            msg=f"write_to_db option is set to False for dataset <{dataset_context.dataset_name}>. Skipping import to db ..."
-        )
-        return
-
-    db_info = dag_repo.get_db_info(context=context)
-    schema = db_info.prod_schema if dataset_options.use_prod_schema else db_info.tmp_schema
-
-    # Define hooks
-    db_handler = create_db_handler(
-        db_type=DatabaseType.POSTGRES,
-        db_config=DbConfig(connection_id=pg_conn_id),
-    )
-    s3_handler = create_file_handler(
-        handler_type=FileHandlerType.S3,
-        config=FSConfig(connection_id=s3_conn_id),
-    )
-    local_handler = create_file_handler(
-        handler_type=FileHandlerType.LOCAL,
-        config=FSConfig(base_path="/tmp/"),
-    )
-
-    # Variables
-    tbl_name = dataset_context.storage_info.tbl_name
-
-    if tbl_name is None or tbl_name == "":
-        logging.info(msg=f"tbl_name is None for selecteur <{dataset_context.dataset_name}>. Nothing to import to db")
-    else:
-        # Variables
-        local_filepath = dataset_context.storage_info.get_local_path()
-        s3_filepath = dataset_context.storage_info.get_full_s3_key(with_tmp_segment=True)
-
-        # Check if old file exists
-        local_handler.delete(file_path=local_filepath)
-
-        # Read data from s3, sort its columns and save it locally
-        logging.info(msg=f"Reading file from remote < {s3_filepath} >")
-        df = read_dataframe(file_handler=s3_handler, file_path=s3_filepath)
-
-        sorted_df_cols = sorted(df.columns)
-        df = df.reindex(labels=sorted_df_cols, axis=1).convert_dtypes()
-        logging.info(msg=f"DF : {sorted_df_cols}")
-        logging.info(msg=f"Saving file to local < {local_filepath} >")
-        local_handler.write(
-            file_path=local_filepath,
-            content=df.to_csv(index=False, sep="\t", na_rep="NULL"),
-        )
-
-        # Check if columns are the same between df and db table
-        sorted_db_colnames = db_handler.fetch_table_columns(
-            schema=schema,
-            table=tbl_name,
-        )
-        if not are_lists_egal(list_A=sorted_df_cols, list_B=sorted_db_colnames):
-            raise ValueError(textwrap.dedent(text="""
-                Il y a des différences entre les colonnes du DataFrame et de la Table.
-                Impossible d'importer les données.
-            """))
-
-        # Bulk load file to db
-        bulk_load_local_tsv_file_to_db(
-            local_filepath=local_filepath,
-            tbl_name=tbl_name,
-            column_names=sorted_db_colnames,
-            db_handler=db_handler,
-        )
-
-        # Clean up local file
-        local_handler.delete(file_path=local_filepath)
 
 
 @task
