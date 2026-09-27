@@ -157,9 +157,9 @@ TBL_ORDERED = [
             cols_mapping={
                 "projet": "id_projet",
                 "selecteur": "id_selecteur",
-                "type": "type_source",
+                "type": "type_location",
             },
-            txt_columns=["type_source", "id_source"],
+            txt_columns=["type_location", "id_source"],
             ref_columns=["id_projet", "id_selecteur"],
             custom_fn=process.process_selecteur_source,
         ),
@@ -356,7 +356,7 @@ if __name__ == "__main__":
 
     # Traiter chaque table
     for tbl_desc in TBL_ORDERED:
-        """Traite une table : lecture, transformation et insertion."""
+        """Traite une table : lecture, operation et insertion."""
         print("\n", "=" * 50)
         print(f"Début du traitement de la table <{tbl_desc['tbl_name']}>")
 
