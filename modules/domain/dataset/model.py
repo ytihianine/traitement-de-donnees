@@ -28,23 +28,33 @@ class Dataset:
 @dataclass(frozen=True)
 class DatasetLocation:
     type_location: TypeLocation
-    source_location: str | None = None
-    dest_location: str | None = None
+    location: str | None = None
     conn_id: str | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.type_location, TypeLocation) and self.type_location is not None:
             object.__setattr__(self, "type_location", TypeLocation(value=self.type_location))
 
-    def location(self, use_destination: bool = False) -> str | None:
-        return self.dest_location if use_destination else self.source_location
+    @property
+    def validate_location(self) -> str:
+        if self.location is None:
+            raise ValueError("Location is not set")
+        return self.location
+
+    @property
+    def validate_conn_id(self) -> str:
+        if self.conn_id is None:
+            raise ValueError("Connection ID is not set")
+        return self.conn_id
 
 
 @dataclass(frozen=True)
 class DatasetContext:
     projet: Projet
     dataset: Dataset
-    dataset_location: DatasetLocation
+    src_location: DatasetLocation
+    tmp_location: DatasetLocation
+    dest_location: DatasetLocation
 
     @property
     def projet_name(self) -> str:

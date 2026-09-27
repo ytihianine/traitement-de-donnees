@@ -82,5 +82,6 @@ class PipelineDescriptor:
     input_datasets: tuple[Dataset]
     output_dataset: Dataset
     operation: Callable[..., pd.DataFrame | None]
+    use_input_results_as_operation_args: bool = False
     add_metadata: bool = True
     datasets_context_task_id: str = "get_projet_datasets_context"
