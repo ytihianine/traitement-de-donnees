@@ -1,16 +1,15 @@
-from modules.enums.database import LoadStrategy
-from modules.types.projet import SelecteurStorageOptions
+from modules.domain.pipeline.model import ExecutionOptions, LoadStrategy
 
 nom_projet_operat = "API Opera"
 dag_id_operat = "api_operat_ademe"
 
-storage_options = {
-    "activite": SelecteurStorageOptions(load_strategy=LoadStrategy.APPEND, tbl_order=1),
-    "consommations": SelecteurStorageOptions(write_to_db=False),
-    "declaration_ademe": SelecteurStorageOptions(load_strategy=LoadStrategy.APPEND, tbl_order=0),
-    "declarations": SelecteurStorageOptions(write_to_db=False),
-    "detail": SelecteurStorageOptions(load_strategy=LoadStrategy.APPEND, tbl_order=1),
-    "indicateur": SelecteurStorageOptions(load_strategy=LoadStrategy.APPEND, tbl_order=1),
+execution_options = {
+    "activite": ExecutionOptions(load_strategy=LoadStrategy.APPEND, tbl_order=1),
+    "consommations": ExecutionOptions(),
+    "declaration_ademe": ExecutionOptions(load_strategy=LoadStrategy.APPEND, tbl_order=0),
+    "declarations": ExecutionOptions(),
+    "detail": ExecutionOptions(load_strategy=LoadStrategy.APPEND, tbl_order=1),
+    "indicateur": ExecutionOptions(load_strategy=LoadStrategy.APPEND, tbl_order=1),
 }
 
 
