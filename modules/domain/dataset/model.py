@@ -28,14 +28,14 @@ class Dataset:
 
 @dataclass(frozen=True)
 class DatasetLocation:
-    type_source: TypeLocation
+    type_location: TypeLocation
     source_location: str | None = None
     dest_location: str | None = None
     conn_id: str | None = None
 
     def __post_init__(self) -> None:
-        if not isinstance(self.type_source, TypeLocation) and self.type_source is not None:
-            object.__setattr__(self, "type_source", TypeLocation(value=self.type_source))
+        if not isinstance(self.type_location, TypeLocation) and self.type_location is not None:
+            object.__setattr__(self, "type_location", TypeLocation(value=self.type_location))
 
     # Database properties
     @property
