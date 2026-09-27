@@ -9,6 +9,55 @@ from modules.infra.file_system.dataframe import read_dataframe
 from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 
 
+# Parsing functions for different dataset locations
+def parse_s3_bucket(location: str) -> str:
+    return location.split("/")[0]
+
+
+def parse_s3_prefix(location: str) -> str:
+    return "/".join(location.split("/")[1:-1])
+
+
+def parse_s3_key(location: str) -> str:
+    return "/".join(location.split("/")[1:])
+
+
+def parse_s3_filename(location: str) -> str:
+    return location.split("/")[-1]
+
+
+def parse_local_path(location: str) -> str:
+    return location
+
+
+def parse_local_dir(location: str) -> str:
+    return "/".join(location.split("/")[:-1])
+
+
+def parse_db_schema(location: str) -> str:
+    return location.split(".")[0]
+
+
+def parse_db_table(location: str) -> str:
+    return location.split(".")[1]
+
+
+def parse_doc_id(location: str) -> str:
+    return location.split(".")[0]
+
+
+def parse_table_id(location: str) -> str:
+    return location.split(".")[1]
+
+
+def parse_iceberg_namespace(location: str) -> str:
+    return location.split(".")[0]
+
+
+def parse_iceberg_table(location: str) -> str:
+    return location.split(".")[1]
+
+
 @dataclass(frozen=True)
 class S3DatasetLocationProvider(DatasetLocationProvider):
     conn_id: str
@@ -16,18 +65,9 @@ class S3DatasetLocationProvider(DatasetLocationProvider):
 
     def fs_config(self, location: str, conn_id: str) -> FSConfig:
         return FSConfig(
-            bucket=self.parse_s3_bucket(location=location),
+            bucket=parse_s3_bucket(location=location),
             connection_id=conn_id,
         )
-
-    def parse_s3_bucket(self, location: str) -> str:
-        return location.split("/")[0]
-
-    def parse_s3_prefix(self, location: str) -> str:
-        return "/".join(location.split("/")[1:-1])
-
-    def parse_s3_key(self, location: str) -> str:
-        return "/".join(location.split("/")[1:])
 
     def read(
         self,
@@ -39,7 +79,7 @@ class S3DatasetLocationProvider(DatasetLocationProvider):
         )
         df = read_dataframe(
             file_handler=fs_handler,
-            file_path=self.parse_s3_key(location),
+            file_path=parse_s3_key(location),
             read_options=self.read_options,
         )
         return df
@@ -55,7 +95,7 @@ class S3DatasetLocationProvider(DatasetLocationProvider):
             config=self.fs_config(location=location, conn_id=self.conn_id),
         )
         s3_handler.write(
-            file_path=self.parse_s3_key(location=location),
+            file_path=parse_s3_key(location=location),
             content=df.to_parquet(path=None, index=False),
         )
 
@@ -64,15 +104,9 @@ class S3DatasetLocationProvider(DatasetLocationProvider):
 class LocalFileDatasetLocationProvider(DatasetLocationProvider):
     read_options: dict = field(default_factory=dict)
 
-    def parse_local_path(self, location: str) -> str:
-        return location
-
-    def parse_local_dir(self, location: str) -> str:
-        return "/".join(location.split("/")[:-1])
-
     def fs_config(self, location: str) -> FSConfig:
         return FSConfig(
-            base_path=self.parse_local_dir(location=location),
+            base_path=parse_local_dir(location=location),
         )
 
     def read(
@@ -85,7 +119,7 @@ class LocalFileDatasetLocationProvider(DatasetLocationProvider):
         )
         df = read_dataframe(
             file_handler=fs_handler,
-            file_path=self.parse_local_path(location=location),
+            file_path=parse_local_path(location=location),
             read_options=self.read_options,
         )
         return df
@@ -100,7 +134,7 @@ class LocalFileDatasetLocationProvider(DatasetLocationProvider):
             config=self.fs_config(location=location),
         )
         local_handler.write(
-            file_path=self.parse_local_path(location=location),
+            file_path=parse_local_path(location=location),
             content=df.to_parquet(path=None, index=False),
         )
 
@@ -109,12 +143,6 @@ class LocalFileDatasetLocationProvider(DatasetLocationProvider):
 class DbDatasetLocationProvider(DatasetLocationProvider):
     conn_id: str
     read_options: dict = field(default_factory=dict)
-
-    def parse_schema(self, location: str) -> str:
-        return location.split(".")[0]
-
-    def parse_table(self, location: str) -> str:
-        return location.split(".")[1]
 
     def read(
         self,
@@ -125,8 +153,8 @@ class DbDatasetLocationProvider(DatasetLocationProvider):
             db_type=DatabaseType.POSTGRES,
             db_config=db_config,
         )
-        schema = self.parse_schema(location=location)
-        table = self.parse_table(location=location)
+        schema = parse_db_schema(location=location)
+        table = parse_db_table(location=location)
         df = db_handler.fetch_df(
             query=f"SELECT * FROM {schema}.{table}",
         )
@@ -142,18 +170,12 @@ class DbDatasetLocationProvider(DatasetLocationProvider):
 
 @dataclass(frozen=True)
 class GristDatasetLocationProvider(DatasetLocationProvider):
-    def parse_doc_id(self, location: str) -> str:
-        return location.split(".")[0]
-
-    def parse_table_id(self, location: str) -> str:
-        return location.split(".")[1]
-
     def read(
         self,
         location: str,
     ) -> pd.DataFrame:
-        doc_id = self.parse_doc_id(location=location)
-        table_id = self.parse_table_id(location=location)
+        doc_id = parse_doc_id(location=location)
+        table_id = parse_table_id(location=location)
         doc_local_path = Path("/tmp") / f"{doc_id}.sqlite"
 
         sqlite_handler = create_db_handler(
