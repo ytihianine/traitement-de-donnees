@@ -14,7 +14,7 @@ from tenacity import (
 )
 
 from modules.constants import DEFAULT_PG_DATA_CONN_ID
-from modules.domain.dataset.model import Dataset, DatasetContext, StorageInfo
+from modules.domain.dataset.model import Dataset, DatasetContext, DatasetLocation
 from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.projet.model import Projet
 from modules.infra.database.base import DBInterface
@@ -52,7 +52,7 @@ class DbDatasetContextRepository(DatasetContextRepository):
     def get_list(self, nom_projet: str) -> list[DatasetContext]:
         df = self.db_client.fetch_df(
             query=f"""
-                SELECT p.projet, p.id_projet, p.dataset_name, p.s3_conn_id, p.bucket, p.s3_key, p.filename, p.local_dir, p.db_conn_id, p.tbl_name, p.type_source, p.id_source
+                SELECT p.projet, p.id_projet, p.dataset_name, p.type_location, p.source_location, p.dest_location, p.conn_id
                 FROM {CONF_SCHEMA}.projet p
                 WHERE p.projet = %s AND p.rang = 1
                 ORDER BY p.import_timestamp DESC;
@@ -69,16 +69,11 @@ class DbDatasetContextRepository(DatasetContextRepository):
             dataset_context = DatasetContext(
                 projet=Projet(name=record["projet"], id=record["id_projet"]),
                 dataset=Dataset(name=record["dataset_name"]),
-                storage_info=StorageInfo(
-                    s3_conn_id=record["s3_conn_id"],
-                    bucket=record["bucket"],
-                    s3_key=record["s3_key"],
-                    filename=record["filename"],
-                    local_dir=record["local_dir"],
-                    db_conn_id=record["db_conn_id"],
-                    tbl_name=record["tbl_name"],
-                    type_source=record["type_source"],
-                    id_source=record["id_source"],
+                dataset_location=DatasetLocation(
+                    type_location=record["type_location"],
+                    source_location=record["source_location"],
+                    dest_location=record["dest_location"],
+                    conn_id=record["conn_id"],
                 ),
             )
             datasets_context.append(dataset_context)
@@ -88,7 +83,7 @@ class DbDatasetContextRepository(DatasetContextRepository):
     def get(self, nom_projet: str, nom_dataset: str) -> DatasetContext:
         df = self.db_client.fetch_df(
             query=f"""
-                SELECT p.projet, p.id_projet, p.dataset_name, p.s3_conn_id, p.bucket, p.s3_key, p.filename, p.local_dir, p.db_conn_id, p.tbl_name, p.type_source, p.id_source
+                SELECT p.projet, p.id_projet, p.dataset_name, p.type_location, p.source_location, p.dest_location, p.conn_id
                 FROM {CONF_SCHEMA}.projet p
                 WHERE p.projet = %s AND p.dataset_name = %s
                 ORDER BY p.import_timestamp DESC
@@ -104,16 +99,11 @@ class DbDatasetContextRepository(DatasetContextRepository):
         dataset_context = DatasetContext(
             projet=Projet(name=record["projet"], id=record["id_projet"]),
             dataset=Dataset(name=nom_dataset),
-            storage_info=StorageInfo(
-                s3_conn_id=record["s3_conn_id"],
-                bucket=record["bucket"],
-                s3_key=record["s3_key"],
-                filename=record["filename"],
-                local_dir=record["local_dir"],
-                db_conn_id=record["db_conn_id"],
-                tbl_name=record["tbl_name"],
-                type_source=record["type_source"],
-                id_source=record["id_source"],
+            dataset_location=DatasetLocation(
+                type_location=record["type_location"],
+                source_location=record["source_location"],
+                dest_location=record["dest_location"],
+                conn_id=record["conn_id"],
             ),
         )
         return dataset_context

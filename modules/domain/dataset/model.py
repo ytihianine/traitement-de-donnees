@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path
 
 from modules.domain.projet.model import Projet
 
@@ -37,76 +36,8 @@ class DatasetLocation:
         if not isinstance(self.type_location, TypeLocation) and self.type_location is not None:
             object.__setattr__(self, "type_location", TypeLocation(value=self.type_location))
 
-    # Database properties
-    @property
-    def db_schema(self) -> str:
-        if self.source_location is not None:
-            return self.source_location.split(sep=".")[0]
-        raise ValueError("source_location is None. Can't extract db schema")
-
-    @property
-    def db_table(self) -> str:
-        if self.source_location is not None:
-            return self.source_location.split(sep=".")[1]
-        raise ValueError("source_location is None. Can't extract db table")
-
-    # S3 properties
-    @property
-    def s3_bucket(self) -> str:
-        if self.source_location is not None:
-            return self.source_location.split(sep="/")[0]
-        raise ValueError("source_location is None. Can't extract s3 bucket")
-
-    @property
-    def s3_prefix(self) -> str:
-        if self.source_location is not None:
-            return "/".join(self.source_location.split(sep="/")[:-1])
-        raise ValueError("source_location is None. Can't extract s3 prefix")
-
-    @property
-    def s3_key(self) -> str:
-        if self.source_location is not None:
-            return "/".join(self.source_location.split(sep="/")[1:])
-        raise ValueError("source_location is None. Can't extract s3 key")
-
-    # Local file properties
-    @property
-    def local_dir(self) -> str:
-        if self.source_location is not None:
-            return str(Path(self.source_location).parent)
-        raise ValueError("source_location is None. Can't extract local directory")
-
-    @property
-    def local_file(self) -> str:
-        if self.source_location is not None:
-            return str(Path(self.source_location).name)
-        raise ValueError("source_location is None. Can't extract local file")
-
-    # Grist properties
-    @property
-    def grist_doc_id(self) -> str:
-        if self.source_location is not None:
-            return self.source_location.split(sep=".")[0]
-        raise ValueError("source_location is None. Can't extract grist doc id")
-
-    @property
-    def grist_table_id(self) -> str:
-        if self.source_location is not None:
-            return self.source_location.split(sep=".")[1]
-        raise ValueError("source_location is None. Can't extract grist table id")
-
-    # Iceberg
-    @property
-    def iceberg_namespace(self) -> str:
-        if self.source_location is not None:
-            return self.source_location.split(sep=".")[0]
-        raise ValueError("source_location is None. Can't extract iceberg namespace")
-
-    @property
-    def iceberg_table(self) -> str:
-        if self.source_location is not None:
-            return self.source_location.split(sep=".")[1]
-        raise ValueError("source_location is None. Can't extract iceberg table")
+    def location(self, use_destination: bool = False) -> str | None:
+        return self.dest_location if use_destination else self.source_location
 
 
 @dataclass(frozen=True)
