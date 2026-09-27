@@ -8,11 +8,14 @@ from modules.domain.projet.model import Projet
 # =================
 # Enums
 # =================
-class TypeSource(Enum):
+class TypeLocation(Enum):
     """Type de source de données"""
 
     GRIST = "Grist"
-    FILE = "Fichier"
+    S3_FILE = "S3"
+    LOCAL_FILE = "Local"
+    ICEBERG = "Iceberg"
+    DB = "Database"
 
 
 # =================
@@ -24,59 +27,93 @@ class Dataset:
 
 
 @dataclass(frozen=True)
-class StorageInfo:
-    # s3 info
-    s3_conn_id: str
-    bucket: str
-    s3_key: str
-    filename: str
-    local_dir: str
-    # db info
-    db_conn_id: str
-    tbl_name: str | None
-    # Source info
-    type_source: TypeSource
-    id_source: str | None
+class DatasetLocation:
+    type_source: TypeLocation
+    source_location: str | None = None
+    dest_location: str | None = None
+    conn_id: str | None = None
 
     def __post_init__(self) -> None:
-        if not isinstance(self.type_source, TypeSource) and self.type_source is not None:
-            object.__setattr__(self, "type_source", TypeSource(value=self.type_source))
+        if not isinstance(self.type_source, TypeLocation) and self.type_source is not None:
+            object.__setattr__(self, "type_source", TypeLocation(value=self.type_source))
 
-    def get_full_s3_key(
-        self,
-        with_bucket: bool = False,
-        with_tmp_segment: bool = False,
-        use_id_source: bool = False,
-    ) -> str:
-        segments = [self.s3_key]
-        if with_bucket:
-            segments.insert(0, self.bucket)
-        if with_tmp_segment:
-            segments.append("tmp")
+    # Database properties
+    @property
+    def db_schema(self) -> str:
+        if self.source_location is not None:
+            return self.source_location.split(sep=".")[0]
+        raise ValueError("source_location is None. Can't extract db schema")
 
-        if use_id_source and self.id_source is not None:
-            segments.append(self.id_source)
-        else:
-            segments.append(self.filename)
+    @property
+    def db_table(self) -> str:
+        if self.source_location is not None:
+            return self.source_location.split(sep=".")[1]
+        raise ValueError("source_location is None. Can't extract db table")
 
-        return "/".join(segments)
+    # S3 properties
+    @property
+    def s3_bucket(self) -> str:
+        if self.source_location is not None:
+            return self.source_location.split(sep="/")[0]
+        raise ValueError("source_location is None. Can't extract s3 bucket")
 
-    def get_local_path(self) -> str:
-        if self.filename is None:
-            return str(Path(self.local_dir) / "filename_undefined")
-        return str(Path(self.local_dir) / self.filename)
+    @property
+    def s3_prefix(self) -> str:
+        if self.source_location is not None:
+            return "/".join(self.source_location.split(sep="/")[:-1])
+        raise ValueError("source_location is None. Can't extract s3 prefix")
 
-    def get_iceberg_namespace(self, with_bucket: bool = False) -> str:
-        s3_key = self.get_full_s3_key(with_bucket=with_bucket)
-        namespace_split = s3_key.split(sep=".")[0].split(sep="/")[:-1]
-        return ".".join(namespace_split)
+    @property
+    def s3_key(self) -> str:
+        if self.source_location is not None:
+            return "/".join(self.source_location.split(sep="/")[1:])
+        raise ValueError("source_location is None. Can't extract s3 key")
+
+    # Local file properties
+    @property
+    def local_dir(self) -> str:
+        if self.source_location is not None:
+            return str(Path(self.source_location).parent)
+        raise ValueError("source_location is None. Can't extract local directory")
+
+    @property
+    def local_file(self) -> str:
+        if self.source_location is not None:
+            return str(Path(self.source_location).name)
+        raise ValueError("source_location is None. Can't extract local file")
+
+    # Grist properties
+    @property
+    def grist_doc_id(self) -> str:
+        if self.source_location is not None:
+            return self.source_location.split(sep=".")[0]
+        raise ValueError("source_location is None. Can't extract grist doc id")
+
+    @property
+    def grist_table_id(self) -> str:
+        if self.source_location is not None:
+            return self.source_location.split(sep=".")[1]
+        raise ValueError("source_location is None. Can't extract grist table id")
+
+    # Iceberg
+    @property
+    def iceberg_namespace(self) -> str:
+        if self.source_location is not None:
+            return self.source_location.split(sep=".")[0]
+        raise ValueError("source_location is None. Can't extract iceberg namespace")
+
+    @property
+    def iceberg_table(self) -> str:
+        if self.source_location is not None:
+            return self.source_location.split(sep=".")[1]
+        raise ValueError("source_location is None. Can't extract iceberg table")
 
 
 @dataclass(frozen=True)
 class DatasetContext:
     projet: Projet
     dataset: Dataset
-    storage_info: StorageInfo
+    dataset_location: DatasetLocation
 
     @property
     def projet_name(self) -> str:

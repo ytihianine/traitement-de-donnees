@@ -2,19 +2,17 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from modules.domain.dataset.model import StorageInfo
+from modules.domain.dataset.model import DatasetLocation
 
 
-class DatasetReader(ABC):
+class DatasetStore(ABC):
 
     @abstractmethod
     def read(
         self,
-        storage_info: StorageInfo,
+        dataset_location: DatasetLocation,
+        use_destination: bool = False,
     ) -> pd.DataFrame: ...
 
-
-class DatasetWriter(ABC):
-
     @abstractmethod
-    def write(self, df: pd.DataFrame, storage_info: StorageInfo) -> None: ...
+    def write(self, df: pd.DataFrame, dataset_location: DatasetLocation) -> None: ...
