@@ -7,9 +7,8 @@ from typing import Any
 
 import pandas as pd
 from dags.sg.srh.mentorat_merci import process
+from modules.containers import DEFAULT_DAG_REPO, DEFAULT_PROJET_REPO
 from modules.infra.mails.default_smtp import MailMessage, render_template, send_mail
-from modules.utils.config.dag_params import get_execution_date, get_project_name
-from modules.utils.config.tasks import get_list_contact
 
 
 def trouver_meilleurs_binomes(df: pd.DataFrame) -> Mapping[str, pd.DataFrame]:
@@ -126,9 +125,9 @@ def generer_rapport(dfs: Mapping[str, pd.DataFrame]) -> str:
 
 
 def send_result(dfs: Mapping[str, pd.DataFrame], context: Mapping[str, Any]) -> None:
-    execution_date = get_execution_date(context=context, use_tz=True)
-    nom_projet = get_project_name(context=context)
-    projet_contact = get_list_contact(nom_projet=nom_projet)
+    execution_date = DEFAULT_DAG_REPO.get_execution_date(context=context, use_tz=True)
+    nom_projet = DEFAULT_DAG_REPO.get_project_name(context=context)
+    projet_contact = DEFAULT_PROJET_REPO.get_list_contact(nom_projet=nom_projet)
     mail_to = [contact.contact_mail for contact in projet_contact if contact.is_mail_generic]
     mail_cc = [contact.contact_mail for contact in projet_contact if not contact.is_mail_generic]
     tmp_path = Path(f"/tmp/binomes_v{execution_date.strftime(format="%Y%m%d_%Hh%M")}.xlsx")

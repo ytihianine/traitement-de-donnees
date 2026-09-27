@@ -1,18 +1,11 @@
-from modules.enums.database import PartitionTimePeriod
-from modules.types.projet import SelecteurStorageOptions
+from modules.domain.pipeline.model import ExecutionOptions, PartitionTimePeriod
 
-storage_options = {
-    "service": SelecteurStorageOptions(
-        write_to_s3=True,
-        write_to_s3_with_iceberg=True,
-        write_to_db=True,
+execution_options = {
+    "service": ExecutionOptions(
         tbl_order=0,
         is_partitioned=False,
     ),
-    "direction": SelecteurStorageOptions(
-        write_to_s3=True,
-        write_to_s3_with_iceberg=True,
-        write_to_db=False,
+    "direction": ExecutionOptions(
         tbl_order=0,
         is_partitioned=True,
         partition_period=PartitionTimePeriod.MONTH,
