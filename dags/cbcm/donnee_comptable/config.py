@@ -1,47 +1,37 @@
-from modules.enums.database import LoadStrategy
-from modules.types.projet import SelecteurStorageOptions
+from modules.domain.pipeline.model import ExecutionOptions
 
 # Default NULL values
 DEFAULT_NULL_CC_CF = "Ind"
 
-storage_options = {
-    "delai_global_paiement": SelecteurStorageOptions(
+execution_options = {
+    "delai_global_paiement": ExecutionOptions(
         is_partitioned=False,
-        load_strategy=LoadStrategy.APPEND,
         read_options={"skiprows": 3},
     ),
-    "demande_achat": SelecteurStorageOptions(
+    "demande_achat": ExecutionOptions(
         is_partitioned=False,
-        load_strategy=LoadStrategy.APPEND,
         read_options={"skiprows": 3},
     ),
-    "demande_paiement": SelecteurStorageOptions(
+    "demande_paiement": ExecutionOptions(
         is_partitioned=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "demande_paiement_carte_achat": SelecteurStorageOptions(
+    "demande_paiement_carte_achat": ExecutionOptions(
         is_partitioned=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "demande_paiement_complet": SelecteurStorageOptions(
+    "demande_paiement_complet": ExecutionOptions(
         is_partitioned=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "demande_paiement_flux": SelecteurStorageOptions(
+    "demande_paiement_flux": ExecutionOptions(
         is_partitioned=False,
-        load_strategy=LoadStrategy.APPEND,
         read_options={"skiprows": 3},
     ),
-    "demande_paiement_journal_pieces": SelecteurStorageOptions(
+    "demande_paiement_journal_pieces": ExecutionOptions(
         is_partitioned=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "demande_paiement_sfp": SelecteurStorageOptions(
+    "demande_paiement_sfp": ExecutionOptions(
         is_partitioned=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "engagement_juridique": SelecteurStorageOptions(
+    "engagement_juridique": ExecutionOptions(
         is_partitioned=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
 }
