@@ -85,7 +85,7 @@ def chorus_donnees_comptables() -> None:
         datasets_additionnels(),
         ensure_partition.expand(dataset_context=datasets_context, execution_options=execution_options),
         copy_tmp_table_to_real_table(execution_options=execution_options),
-        copy_s3_files(execution_options=execution_options),
+        copy_s3_files(),
         del_s3_files(),
         delete_tmp_tables(),
     )
