@@ -8,6 +8,7 @@ from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO, D
 from modules.domain.dag.repository import DagRepository
 from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import ExecutionOptions, PipelineDescriptor
+from modules.domain.pipeline.output import DEFAULT_OUTPUT_ADAPTER_REGISTRY, OutputAdapterRegistry
 from modules.domain.projet.model import ProjetMetadata
 from modules.domain.projet.repository import ProjetRepository
 from modules.infra.file_system.dataset_location_factory import create_dataset_location_provider
@@ -29,6 +30,7 @@ def create_task(
     dag_repo: DagRepository = DEFAULT_DAG_REPO,
     projet_repo: ProjetRepository = DEFAULT_PROJET_REPO,
     dataset_context_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
+    output_adapter_registry: OutputAdapterRegistry = DEFAULT_OUTPUT_ADAPTER_REGISTRY,
 ) -> Callable[..., XComArg]:
     """
     Create a generic Airflow task based on the provided TaskConfig.
@@ -40,6 +42,7 @@ def create_task(
         dag_repo: Repository for interacting with Airflow DAGs, defaults to DEFAULT_DAG_REPO
         projet_repo: Repository for interacting with project storage, defaults to DEFAULT_PROJET_REPO
         dataset_context_repo: Repository for interacting with project storage, defaults to DEFAULT_DATASET_CONTEXT_REPO
+        output_adapter_registry: Registry used to serialize pipeline operation results before storage
 
     Returns:
         An Airflow task that performs the defined ETL steps
@@ -85,18 +88,30 @@ def create_task(
             return
 
         if pipeline.add_metadata:
+            if not isinstance(result, pd.DataFrame):
+                raise TypeError("add_metadata is only supported for DataFrame results")
             projet_metadata = projet_repo.get_projet_metadata(nom_projet=nom_projet)
             result = _add_metadata(df=result, metadata=projet_metadata)
 
-        # Log the final DataFrame information
-        df_info(df=result, df_name=f"{pipeline.output_dataset.name} - df to export")
+        if isinstance(result, pd.DataFrame):
+            df_info(df=result, df_name=f"{pipeline.output_dataset.name} - df to export")
 
-        # Export final result - always a DataFrame and the last step output
         output_dataset_context = dataset_context_repo.get(
             nom_projet=nom_projet, nom_dataset=pipeline.output_dataset.name
         )
         output_location = output_dataset_context.dest_location
-        writer = create_dataset_location_provider(dataset_location=output_location)
-        writer.write(df=result, location=output_location.validate_location)
+        provider = create_dataset_location_provider(dataset_location=output_location)
+        adapter = output_adapter_registry.get_adapter(result)
+        logging.info(
+            msg=(
+                f"Exporting pipeline result of type {type(result).__name__} "
+                f"using {type(adapter).__name__} to {output_location.validate_location}"
+            )
+        )
+        adapter.write(
+            output=result,
+            provider=provider,
+            location=output_location.validate_location,
+        )
 
     return _task

@@ -86,17 +86,16 @@ class S3DatasetLocationProvider(DatasetLocationProvider):
 
     def write(
         self,
-        df: pd.DataFrame,
+        content: bytes,
         location: str,
     ) -> None:
-
         s3_handler = create_file_handler(
             handler_type=FileHandlerType.S3,
             config=self.fs_config(location=location, conn_id=self.conn_id),
         )
         s3_handler.write(
             file_path=parse_s3_key(location=location),
-            content=df.to_parquet(path=None, index=False),
+            content=content,
         )
 
 
@@ -126,7 +125,7 @@ class LocalFileDatasetLocationProvider(DatasetLocationProvider):
 
     def write(
         self,
-        df: pd.DataFrame,
+        content: bytes,
         location: str,
     ) -> None:
         local_handler = create_file_handler(
@@ -135,7 +134,7 @@ class LocalFileDatasetLocationProvider(DatasetLocationProvider):
         )
         local_handler.write(
             file_path=parse_local_path(location=location),
-            content=df.to_parquet(path=None, index=False),
+            content=content,
         )
 
 
@@ -162,10 +161,23 @@ class DbDatasetLocationProvider(DatasetLocationProvider):
 
     def write(
         self,
-        df: pd.DataFrame,
+        content: bytes,
         location: str,
     ) -> None:
-        raise NotImplementedError("DbDatasetWriter is not wired yet")
+        """Write content to local filesystem first before bulk import it to Database"""
+        local_path = parse_local_path(location=location)
+        local_handler = create_file_handler(
+            handler_type=FileHandlerType.LOCAL,
+            config=FSConfig(
+                base_path=parse_local_dir(location=location),
+            ),
+        )
+        local_handler.write(
+            file_path=local_path,
+            content=content,
+        )
+
+        raise NotImplementedError("Database bulk import is not implemented yet")
 
 
 @dataclass(frozen=True)
@@ -192,7 +204,7 @@ class GristDatasetLocationProvider(DatasetLocationProvider):
 
     def write(
         self,
-        df: pd.DataFrame,
+        content: bytes,
         location: str,
     ) -> None:
         raise NotImplementedError("GristDatasetWriter is not wired yet")
