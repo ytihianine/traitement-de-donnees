@@ -1,10 +1,8 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
 from dags.cgefi.barometre import process
-from modules.types.dags import TaskConfig
+from modules.infra.airflow.task import create_task
 from modules.types.readers import FileReaderStrategy
-from modules.types.tasks import ETLTask, SingleInputStep
-from modules.types.writers import FileWriterStrategy
 
 SELECTEUR_BAROMETRE = "barometre"
 SELECTEUR_ORGA_MERGE = "organisme_merge"
@@ -12,7 +10,7 @@ SELECTEUR_ORGA_MERGE = "organisme_merge"
 
 @task_group()
 def source_files() -> None:
-    cartographie = ETLTask(
+    cartographie = create_task(
         task_config=TaskConfig(task_id="cartographie"),
         target="cartographie",
         reader=FileReaderStrategy(),
@@ -23,10 +21,10 @@ def source_files() -> None:
                 output_key="cartographie",
             )
         ],
-        writers=[FileWriterStrategy()],
+        writers=[FileDatasetWriter()],
         add_metadata=True,
     )
-    efc = ETLTask(
+    efc = create_task(
         task_config=TaskConfig(task_id="efc"),
         target="efc",
         reader=FileReaderStrategy(),
@@ -37,10 +35,10 @@ def source_files() -> None:
                 output_key="efc",
             )
         ],
-        writers=[FileWriterStrategy()],
+        writers=[FileDatasetWriter()],
         add_metadata=True,
     )
-    recommandation = ETLTask(
+    recommandation = create_task(
         task_config=TaskConfig(task_id="recommandation"),
         target="recommandation",
         reader=FileReaderStrategy(),
@@ -51,10 +49,10 @@ def source_files() -> None:
                 output_key="recommandation",
             )
         ],
-        writers=[FileWriterStrategy()],
+        writers=[FileDatasetWriter()],
         add_metadata=True,
     )
-    fiche_signaletique = ETLTask(
+    fiche_signaletique = create_task(
         task_config=TaskConfig(task_id="fiche_signaletique"),
         target="fiche_signaletique",
         reader=FileReaderStrategy(),
@@ -65,10 +63,10 @@ def source_files() -> None:
                 output_key="fiche_signaletique",
             )
         ],
-        writers=[FileWriterStrategy()],
+        writers=[FileDatasetWriter()],
         add_metadata=True,
     )
-    rapport_annuel = ETLTask(
+    rapport_annuel = create_task(
         task_config=TaskConfig(task_id="rapport_annuel"),
         target="rapport_annuel",
         reader=FileReaderStrategy(),
@@ -79,10 +77,10 @@ def source_files() -> None:
                 output_key="rapport_annuel",
             )
         ],
-        writers=[FileWriterStrategy()],
+        writers=[FileDatasetWriter()],
         add_metadata=True,
     )
-    organisme = ETLTask(
+    organisme = create_task(
         task_config=TaskConfig(task_id="organisme"),
         target="organisme",
         reader=FileReaderStrategy(),
@@ -93,10 +91,10 @@ def source_files() -> None:
                 output_key="organisme",
             )
         ],
-        writers=[FileWriterStrategy()],
+        writers=[FileDatasetWriter()],
         add_metadata=True,
     )
-    organisme_hc = ETLTask(
+    organisme_hc = create_task(
         task_config=TaskConfig(task_id="organisme_hors_corpus"),
         target="organisme_hors_corpus",
         reader=FileReaderStrategy(),
@@ -107,19 +105,19 @@ def source_files() -> None:
                 output_key="organisme_hors_corpus",
             )
         ],
-        writers=[FileWriterStrategy()],
+        writers=[FileDatasetWriter()],
         add_metadata=True,
     )
 
     # ordre des tâches
     chain(
         [
-            cartographie.create_task(),
-            efc.create_task(),
-            recommandation.create_task(),
-            fiche_signaletique.create_task(),
-            rapport_annuel.create_task(),
-            organisme.create_task(),
-            organisme_hc.create_task(),
+            cartographie(),
+            efc(),
+            recommandation(),
+            fiche_signaletique(),
+            rapport_annuel(),
+            organisme(),
+            organisme_hc(),
         ]
     )
