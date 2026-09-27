@@ -1,30 +1,36 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
-from dags.dge.carto_rem.fichiers import process
-from modules.common_tasks.etl import create_task
-from modules.types.dags import ETLStep, TaskConfig
+from dags.dge.carto_rem.fichiers import config, process
+from modules.domain.dataset.model import Dataset
+from modules.domain.pipeline.model import PipelineDescriptor
+from modules.infra.airflow.task import create_task
 
 
-@task_group
+@task_group(group_id="source_files")
 def source_files() -> None:
-    agent_info_carriere = create_task(
-        task_config=TaskConfig(task_id="agent_info_carriere"),
-        output_selecteur="agent_info_carriere",
-        input_selecteurs=["agent_info_carriere"],
-        steps=[ETLStep(fn=process.process_agent_info_carriere, read_data=True)],
+    agent_carriere = create_task(
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("agent_carriere"),),
+            output_dataset=Dataset("agent_carriere"),
+            operation=process.process_agent_info_carriere,
+        ),
+        execution_options=config.execution_options["agent_carriere"],
     )
-    agent_contrat = create_task(
-        task_config=TaskConfig(task_id="agent_contrat"),
-        output_selecteur="agent_contrat",
-        input_selecteurs=["agent_contrat"],
-        steps=[ETLStep(fn=process.process_agent_contrat, read_data=True)],
+    agent = create_task(
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("agent"),),
+            output_dataset=Dataset("agent"),
+            operation=process.process_agent_contrat,
+        ),
+        execution_options=config.execution_options["agent"],
     )
-    agent_r4 = create_task(
-        task_config=TaskConfig(task_id="agent_r4"),
-        output_selecteur="agent_r4",
-        input_selecteurs=["agent_r4"],
-        steps=[ETLStep(fn=process.process_agent_r4, read_data=True)],
+    agent_elem_rem = create_task(
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("agent_elem_rem"),),
+            output_dataset=Dataset("agent_elem_rem"),
+            operation=process.process_agent_r4,
+        ),
+        execution_options=config.execution_options["agent_elem_rem"],
     )
 
-    # ordre des tâches
-    chain([agent_info_carriere(), agent_contrat(), agent_r4()])
+    chain([agent_carriere(), agent(), agent_elem_rem()])

@@ -1,16 +1,7 @@
-from modules.types.projet import SelecteurStorageOptions
+from modules.domain.pipeline.model import ExecutionOptions
 
-storage_options = {
-    "agent_carriere": SelecteurStorageOptions(
-        write_to_s3=False,
-        write_to_s3_with_iceberg=False,
-    ),
-    "agent": SelecteurStorageOptions(
-        write_to_s3=False,
-        write_to_s3_with_iceberg=False,
-    ),
-    "agent_elem_rem": SelecteurStorageOptions(
-        write_to_s3=False,
-        write_to_s3_with_iceberg=False,
-    ),
+execution_options = {
+    "agent_carriere": ExecutionOptions(),
+    "agent": ExecutionOptions(),
+    "agent_elem_rem": ExecutionOptions(),
 }
