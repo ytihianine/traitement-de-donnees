@@ -82,7 +82,7 @@ def experimentation_ia_dag() -> None:
             execution_options=execution_options,
         ),
         copy_tmp_table_to_real_table(execution_options=execution_options),
-        copy_s3_files(execution_options=execution_options),
+        copy_s3_files(),
         del_s3_files(),
         delete_tmp_tables(),
         update_projet_snapshot_status(),

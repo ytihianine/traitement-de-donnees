@@ -54,7 +54,7 @@ def bien_georisques() -> None:
         georisques_group(),
         ensure_partition.expand(dataset_context=datasets_context),
         copy_tmp_table_to_real_table(execution_options=execution_options),
-        copy_s3_files(execution_options=execution_options),
+        copy_s3_files(),
         del_s3_files(execution_options=execution_options),
         update_projet_snapshot_status(),
     )

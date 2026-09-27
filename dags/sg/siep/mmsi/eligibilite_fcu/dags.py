@@ -58,7 +58,7 @@ def eligibilite_fcu_dag() -> None:
         process_fcu_result(),
         ensure_partition.expand(dataset_context=datasets_context),
         copy_tmp_table_to_real_table(execution_options=execution_options),
-        copy_s3_files(execution_options=execution_options),
+        copy_s3_files(),
         del_s3_files(execution_options=execution_options),
         update_projet_snapshot_status(),
         delete_tmp_tables(execution_options=execution_options),

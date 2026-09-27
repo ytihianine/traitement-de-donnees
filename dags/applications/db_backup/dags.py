@@ -41,7 +41,7 @@ def sauvegarde_database() -> None:
     chain(
         validate_dag_parameters(),
         export_databases(),
-        copy_s3_files(execution_options=execution_options),
+        copy_s3_files(),
         del_s3_files(execution_options=execution_options),
     )
 
