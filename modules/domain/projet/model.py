@@ -1,23 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any
 from uuid import UUID
-
-
-def custom_asdict_factory(data) -> dict[str, Any]:
-    """
-    Custom factory function for dataclasses asdict function
-    to convert Enum values to their actual values instead of Enum instances.
-    """
-    from enum import Enum
-
-    def convert_value(obj) -> Any:
-        if isinstance(obj, Enum):
-            return obj.value
-        return obj
-
-    return dict((k, convert_value(obj=v)) for k, v in data)
 
 
 # =================
