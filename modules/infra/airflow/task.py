@@ -19,7 +19,7 @@ from modules.domain.projet.repository import ProjetRepository
 
 def create_task(
     pipeline: PipelineDescriptor,
-    execution_options: ExecutionOptions,
+    execution_options: dict[str, ExecutionOptions],
     dag_repo: DagRepository = DEFAULT_DAG_REPO,
     projet_repo: ProjetRepository = DEFAULT_PROJET_REPO,
     dataset_context_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
@@ -30,7 +30,6 @@ def create_task(
     Create a generic Airflow task based on the provided TaskConfig.
 
     Args:
-        config: Configuration for the task
         pipeline: Pipeline descriptor
         execution_options: Execution options for the task
         dag_repo: Repository for interacting with Airflow DAGs, defaults to DEFAULT_DAG_REPO

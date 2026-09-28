@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
 import pandas as pd
 
@@ -10,6 +11,7 @@ class DatasetLocationProvider(ABC):
     def read(
         self,
         location: str,
+        read_options: dict[str, Any],
     ) -> pd.DataFrame: ...
 
     @abstractmethod

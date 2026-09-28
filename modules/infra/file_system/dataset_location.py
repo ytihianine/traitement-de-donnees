@@ -1,5 +1,6 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
@@ -61,7 +62,6 @@ def parse_iceberg_table(location: str) -> str:
 @dataclass(frozen=True)
 class S3DatasetLocationProvider(DatasetLocationProvider):
     conn_id: str
-    read_options: dict = field(default_factory=dict)
 
     def fs_config(self, location: str, conn_id: str) -> FSConfig:
         return FSConfig(
@@ -72,6 +72,7 @@ class S3DatasetLocationProvider(DatasetLocationProvider):
     def read(
         self,
         location: str,
+        read_options: dict[str, Any],
     ) -> pd.DataFrame:
         fs_handler = create_file_handler(
             handler_type=FileHandlerType.S3,
@@ -80,7 +81,7 @@ class S3DatasetLocationProvider(DatasetLocationProvider):
         df = read_dataframe(
             file_handler=fs_handler,
             file_path=parse_s3_key(location),
-            read_options=self.read_options,
+            read_options=read_options,
         )
         return df
 
@@ -101,7 +102,6 @@ class S3DatasetLocationProvider(DatasetLocationProvider):
 
 @dataclass(frozen=True)
 class LocalFileDatasetLocationProvider(DatasetLocationProvider):
-    read_options: dict = field(default_factory=dict)
 
     def fs_config(self, location: str) -> FSConfig:
         return FSConfig(
@@ -111,6 +111,7 @@ class LocalFileDatasetLocationProvider(DatasetLocationProvider):
     def read(
         self,
         location: str,
+        read_options: dict[str, Any],
     ) -> pd.DataFrame:
         fs_handler = create_file_handler(
             handler_type=FileHandlerType.LOCAL,
@@ -119,7 +120,7 @@ class LocalFileDatasetLocationProvider(DatasetLocationProvider):
         df = read_dataframe(
             file_handler=fs_handler,
             file_path=parse_local_path(location=location),
-            read_options=self.read_options,
+            read_options=read_options,
         )
         return df
 
@@ -141,11 +142,11 @@ class LocalFileDatasetLocationProvider(DatasetLocationProvider):
 @dataclass(frozen=True)
 class DbDatasetLocationProvider(DatasetLocationProvider):
     conn_id: str
-    read_options: dict = field(default_factory=dict)
 
     def read(
         self,
         location: str,
+        read_options: dict[str, Any],
     ) -> pd.DataFrame:
         db_config = DbConfig(connection_id=self.conn_id)
         db_handler = create_db_handler(
@@ -185,6 +186,7 @@ class GristDatasetLocationProvider(DatasetLocationProvider):
     def read(
         self,
         location: str,
+        read_options: dict[str, Any],
     ) -> pd.DataFrame:
         doc_id = parse_doc_id(location=location)
         table_id = parse_table_id(location=location)

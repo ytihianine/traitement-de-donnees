@@ -66,7 +66,7 @@ class ExecutionOptions:
 
 @dataclass(frozen=True)
 class PipelineDescriptor:
-    input_datasets: tuple[Dataset, ...]
+    input_datasets: tuple[Dataset, ...] | None
     output_dataset: Dataset
     operation: Callable[..., object | None]
     use_input_results_as_operation_args: bool = False
