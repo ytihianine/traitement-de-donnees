@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 
+from modules.domain.dataset.model import Dataset
 from modules.domain.dataset.ports import DatasetLocationProviderFactory
 from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import ExecutionOptions, PipelineDescriptor
@@ -28,31 +29,72 @@ class PipelineRunner:
     output_adapter_registry: OutputAdapterRegistry
     location_provider_factory: DatasetLocationProviderFactory
 
-    def run(
+    def _read_data(
         self,
         nom_projet: str,
-        pipeline: PipelineDescriptor,
-        execution_options: ExecutionOptions,
-    ):
-
-        # ===============================
-        # Read data
-        # ===============================
+        datasets: tuple[Dataset, ...],
+        execution_options: dict[str, ExecutionOptions],
+        use_input_results_as_operation_args: bool,
+    ) -> dict[str, pd.DataFrame]:
         input_data = {}
-        for dataset in pipeline.input_datasets:
+        for dataset in datasets:
             logging.info(msg=f"▶ Reading dataset: {dataset.name}")
+            exec_option = execution_options.get(dataset.name)
+            if exec_option is None:
+                raise ValueError(
+                    f"No execution options found for dataset: {dataset.name}. Please check the configuration"
+                )
+
             dataset_context = self.dataset_context_repo.get(nom_projet=nom_projet, nom_dataset=dataset.name)
-            if pipeline.use_input_results_as_operation_args:
+            if use_input_results_as_operation_args:
                 dataset_location = dataset_context.tmp_location
             else:
                 dataset_location = dataset_context.src_location
 
             reader = self.location_provider_factory.create(dataset_location=dataset_location)
-            df = reader.read(location=dataset_location.validate_location)
+            df = reader.read(location=dataset_location.validate_location, read_options=exec_option.read_options)
             input_data[f"df_{dataset.name}"] = df
 
         if len(input_data) == 1:
             input_data = {"df": next(iter(input_data.values()))}
+
+        return input_data
+
+    def _export_result(self, nom_projet: str, dataset: Dataset, result: object) -> None:
+        output_dataset_context = self.dataset_context_repo.get(nom_projet=nom_projet, nom_dataset=dataset.name)
+        output_location = output_dataset_context.dest_location
+        provider = self.location_provider_factory.create(dataset_location=output_location)
+        adapter = self.output_adapter_registry.get_adapter(result)
+        logging.info(
+            msg=(
+                f"Exporting pipeline result of type {type(result).__name__} "
+                f"using {type(adapter).__name__} to {output_location.validate_location}"
+            )
+        )
+        adapter.write(
+            output=result,
+            provider=provider,
+            location=output_location.validate_location,
+        )
+
+    def run(
+        self,
+        nom_projet: str,
+        pipeline: PipelineDescriptor,
+        execution_options: dict[str, ExecutionOptions],
+    ):
+        # ===============================
+        # Read data
+        # ===============================
+        if pipeline.input_datasets is None:
+            input_data = {}
+        else:
+            input_data = self._read_data(
+                nom_projet=nom_projet,
+                datasets=pipeline.input_datasets,
+                execution_options=execution_options,
+                use_input_results_as_operation_args=pipeline.use_input_results_as_operation_args,
+            )
 
         # ===============================
         # Execution operation data
@@ -76,20 +118,4 @@ class PipelineRunner:
         # ===============================
         # Export data
         # ===============================
-        output_dataset_context = self.dataset_context_repo.get(
-            nom_projet=nom_projet, nom_dataset=pipeline.output_dataset.name
-        )
-        output_location = output_dataset_context.dest_location
-        provider = self.location_provider_factory.create(dataset_location=output_location)
-        adapter = self.output_adapter_registry.get_adapter(result)
-        logging.info(
-            msg=(
-                f"Exporting pipeline result of type {type(result).__name__} "
-                f"using {type(adapter).__name__} to {output_location.validate_location}"
-            )
-        )
-        adapter.write(
-            output=result,
-            provider=provider,
-            location=output_location.validate_location,
-        )
+        self._export_result(nom_projet=nom_projet, dataset=pipeline.output_dataset, result=result)
