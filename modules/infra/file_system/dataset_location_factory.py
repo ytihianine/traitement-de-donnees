@@ -1,7 +1,7 @@
 """Factory for creating dataset readers from a DatasetLocation."""
 
 from modules.domain.dataset.model import DatasetLocation, TypeLocation
-from modules.domain.dataset.ports import DatasetLocationProvider
+from modules.domain.dataset.ports import DatasetLocationProvider, DatasetLocationProviderFactory
 from modules.infra.file_system.dataset_location import (
     DbDatasetLocationProvider,
     GristDatasetLocationProvider,
@@ -32,26 +32,27 @@ def _create_grist(location: DatasetLocation) -> DatasetLocationProvider:
     return GristDatasetLocationProvider()
 
 
-def create_dataset_location_provider(dataset_location: DatasetLocation) -> DatasetLocationProvider:
-    """Create the appropriate dataset location provider for the given storage info.
+class DatasetLocationFactory(DatasetLocationProviderFactory):
+    def create(self, dataset_location: DatasetLocation) -> DatasetLocationProvider:
+        """Create the appropriate dataset location provider for the given storage info.
 
-    Args:
-        dataset_location: Storage info describing the dataset source
+        Args:
+            dataset_location: Storage info describing the dataset source
 
-    Returns:
-        A DatasetLocationProvider instance matching the source type
+        Returns:
+            A DatasetLocationProvider instance matching the source type
 
-    Raises:
-        ValueError: If the source type is not supported
-    """
-    factories = {
-        TypeLocation.S3_FILE: _create_s3,
-        TypeLocation.DB: _create_database,
-        TypeLocation.LOCAL_FILE: _create_local,
-        TypeLocation.GRIST: _create_grist,
-    }
+        Raises:
+            ValueError: If the source type is not supported
+        """
+        factories = {
+            TypeLocation.S3_FILE: _create_s3,
+            TypeLocation.DB: _create_database,
+            TypeLocation.LOCAL_FILE: _create_local,
+            TypeLocation.GRIST: _create_grist,
+        }
 
-    provider_factory = factories.get(dataset_location.type_location)
-    if provider_factory is None:
-        raise ValueError(f"Unsupported source type: {dataset_location.type_location}")
-    return provider_factory(dataset_location)
+        provider_factory = factories.get(dataset_location.type_location)
+        if provider_factory is None:
+            raise ValueError(f"Unsupported source type: {dataset_location.type_location}")
+        return provider_factory(dataset_location)
