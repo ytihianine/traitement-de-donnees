@@ -4,11 +4,13 @@ from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
+from dags.cgefi.barometre.config import execution_options
 from dags.cgefi.barometre.tasks import (
     source_files,
 )
+from modules.containers import DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
-from modules.infra.airflow.common_tasks.projet import get_list_source_fichier, get_projet_datasets_context
+from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -16,8 +18,6 @@ from modules.infra.airflow.common_tasks.s3 import (
 from modules.infra.airflow.common_tasks.sql import (
     copy_tmp_table_to_real_table,
     create_tmp_tables,
-    import_file_to_db,
-    # set_dataset_last_update_date,
 )
 from modules.infra.airflow.common_tasks.validation import validate_dag_parameters
 from modules.infra.airflow.dag import create_dag_params, create_default_args
@@ -53,7 +53,7 @@ def barometre() -> None:
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
         bucket_name="dsci",
-        bucket_key=get_list_source_fichier(nom_projet=nom_projet),
+        bucket_key=DEFAULT_DATASET_CONTEXT_REPO.get_list_source_fichier(nom_projet=nom_projet),
         mode="reschedule",
         poke_interval=timedelta(seconds=30),
         timeout=timedelta(minutes=13),
@@ -72,10 +72,9 @@ def barometre() -> None:
         validate_dag_parameters(),
         datasets_context,
         looking_for_files,
+        create_tmp_tables(execution_options=execution_options),
         source_files(),
-        create_tmp_tables(),
-        import_file_to_db.expand(dataset_context=datasets_context),
-        copy_tmp_table_to_real_table(),
+        copy_tmp_table_to_real_table(execution_options=execution_options),
         copy_s3_files(),
         del_s3_files(),
         end_task,

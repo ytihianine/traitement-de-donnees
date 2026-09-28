@@ -1,8 +1,9 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
-from dags.cgefi.barometre import process
+from dags.cgefi.barometre import config, process
+from modules.domain.dataset.model import Dataset
+from modules.domain.pipeline.model import PipelineDescriptor
 from modules.infra.airflow.task import create_task
-from modules.types.readers import FileReaderStrategy
 
 SELECTEUR_BAROMETRE = "barometre"
 SELECTEUR_ORGA_MERGE = "organisme_merge"
@@ -11,102 +12,74 @@ SELECTEUR_ORGA_MERGE = "organisme_merge"
 @task_group()
 def source_files() -> None:
     cartographie = create_task(
-        task_config=TaskConfig(task_id="cartographie"),
-        target="cartographie",
-        reader=FileReaderStrategy(),
-        steps=[
-            SingleInputStep(
-                fn=process.process_cartographie,
-                input_key="cartographie",
-                output_key="cartographie",
-            )
-        ],
-        writers=[FileDatasetWriter()],
-        add_metadata=True,
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("cartographie"),),
+            output_dataset=Dataset("cartographie"),
+            operation=process.process_cartographie,
+            use_input_results_as_operation_args=False,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options["cartographie"],
     )
     efc = create_task(
-        task_config=TaskConfig(task_id="efc"),
-        target="efc",
-        reader=FileReaderStrategy(),
-        steps=[
-            SingleInputStep(
-                fn=process.process_efc,
-                input_key="efc",
-                output_key="efc",
-            )
-        ],
-        writers=[FileDatasetWriter()],
-        add_metadata=True,
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("efc"),),
+            output_dataset=Dataset("efc"),
+            operation=process.process_efc,
+            use_input_results_as_operation_args=False,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options["efc"],
     )
     recommandation = create_task(
-        task_config=TaskConfig(task_id="recommandation"),
-        target="recommandation",
-        reader=FileReaderStrategy(),
-        steps=[
-            SingleInputStep(
-                fn=process.process_recommandation,
-                input_key="recommandation",
-                output_key="recommandation",
-            )
-        ],
-        writers=[FileDatasetWriter()],
-        add_metadata=True,
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("recommandation"),),
+            output_dataset=Dataset("recommandation"),
+            operation=process.process_recommandation,
+            use_input_results_as_operation_args=False,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options["recommandation"],
     )
     fiche_signaletique = create_task(
-        task_config=TaskConfig(task_id="fiche_signaletique"),
-        target="fiche_signaletique",
-        reader=FileReaderStrategy(),
-        steps=[
-            SingleInputStep(
-                fn=process.process_fiche_signaletique,
-                input_key="fiche_signaletique",
-                output_key="fiche_signaletique",
-            )
-        ],
-        writers=[FileDatasetWriter()],
-        add_metadata=True,
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("fiche_signaletique"),),
+            output_dataset=Dataset("fiche_signaletique"),
+            operation=process.process_fiche_signaletique,
+            use_input_results_as_operation_args=False,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options["fiche_signaletique"],
     )
     rapport_annuel = create_task(
-        task_config=TaskConfig(task_id="rapport_annuel"),
-        target="rapport_annuel",
-        reader=FileReaderStrategy(),
-        steps=[
-            SingleInputStep(
-                fn=process.process_rapport_annuel,
-                input_key="rapport_annuel",
-                output_key="rapport_annuel",
-            )
-        ],
-        writers=[FileDatasetWriter()],
-        add_metadata=True,
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("rapport_annuel"),),
+            output_dataset=Dataset("rapport_annuel"),
+            operation=process.process_rapport_annuel,
+            use_input_results_as_operation_args=False,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options["rapport_annuel"],
     )
     organisme = create_task(
-        task_config=TaskConfig(task_id="organisme"),
-        target="organisme",
-        reader=FileReaderStrategy(),
-        steps=[
-            SingleInputStep(
-                fn=process.process_organisme,
-                input_key="organisme",
-                output_key="organisme",
-            )
-        ],
-        writers=[FileDatasetWriter()],
-        add_metadata=True,
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("organisme"),),
+            output_dataset=Dataset("organisme"),
+            operation=process.process_organisme,
+            use_input_results_as_operation_args=False,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options["organisme"],
     )
     organisme_hc = create_task(
-        task_config=TaskConfig(task_id="organisme_hors_corpus"),
-        target="organisme_hors_corpus",
-        reader=FileReaderStrategy(),
-        steps=[
-            SingleInputStep(
-                fn=process.process_organisme_hors_corpus,
-                input_key="organisme_hors_corpus",
-                output_key="organisme_hors_corpus",
-            )
-        ],
-        writers=[FileDatasetWriter()],
-        add_metadata=True,
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("organisme_hors_corpus"),),
+            output_dataset=Dataset("organisme_hors_corpus"),
+            operation=process.process_organisme_hors_corpus,
+            use_input_results_as_operation_args=False,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options["organisme_hors_corpus"],
     )
 
     # ordre des tâches
