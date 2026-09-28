@@ -19,15 +19,15 @@ def _source_file_pipeline(dataset_name: str, custom_fn) -> PipelineDescriptor:
 def source_files() -> None:
     agent = create_task(
         pipeline=_source_file_pipeline("agent", process.process_agent),
-        execution_options=config.execution_options["agent"],
+        execution_options=config.execution_options,
     )
     certificat = create_task(
         pipeline=_source_file_pipeline("certificat", process.process_certificat),
-        execution_options=config.execution_options["certificat"],
+        execution_options=config.execution_options,
     )
     mandataire = create_task(
         pipeline=_source_file_pipeline("mandataire", process.process_mandataire),
-        execution_options=config.execution_options["mandataire"],
+        execution_options=config.execution_options,
     )
 
     # ordre des tâches

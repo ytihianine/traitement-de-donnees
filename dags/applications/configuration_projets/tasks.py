@@ -26,7 +26,7 @@ def process_data() -> None:
                 custom_fn=process.process_direction,
             ),
         ),
-        execution_options=config.execution_options["ref_direction"],
+        execution_options=config.execution_options,
     )
     ref_service = create_task(
         pipeline=PipelineDescriptor(
@@ -45,7 +45,7 @@ def process_data() -> None:
                 custom_fn=process.process_service,
             ),
         ),
-        execution_options=config.execution_options["ref_service"],
+        execution_options=config.execution_options,
     )
     # Projet
     projets = create_task(
@@ -70,7 +70,7 @@ def process_data() -> None:
                 custom_fn=process.process_projets,
             ),
         ),
-        execution_options=config.execution_options["projets"],
+        execution_options=config.execution_options,
     )
     projet_contact = create_task(
         pipeline=PipelineDescriptor(
@@ -94,7 +94,7 @@ def process_data() -> None:
                 custom_fn=process.process_projet_contact,
             ),
         ),
-        execution_options=config.execution_options["projet_contact"],
+        execution_options=config.execution_options,
     )
     projet_documentation = create_task(
         pipeline=PipelineDescriptor(
@@ -115,7 +115,7 @@ def process_data() -> None:
                 custom_fn=process.process_projet_documentation,
             ),
         ),
-        execution_options=config.execution_options["projet_documentation"],
+        execution_options=config.execution_options,
     )
     projet_s3 = create_task(
         pipeline=PipelineDescriptor(
@@ -137,7 +137,7 @@ def process_data() -> None:
                 custom_fn=process.process_projet_s3,
             ),
         ),
-        execution_options=config.execution_options["projet_s3"],
+        execution_options=config.execution_options,
     )
     projet_selecteur = create_task(
         pipeline=PipelineDescriptor(
@@ -161,7 +161,7 @@ def process_data() -> None:
                 custom_fn=process.process_projet_selecteur,
             ),
         ),
-        execution_options=config.execution_options["projet_selecteur"],
+        execution_options=config.execution_options,
     )
     # Selecteur
     selecteur_source = create_task(
@@ -186,7 +186,7 @@ def process_data() -> None:
                 custom_fn=process.process_selecteur_source,
             ),
         ),
-        execution_options=config.execution_options["selecteur_source"],
+        execution_options=config.execution_options,
     )
     selecteur_s3 = create_task(
         pipeline=PipelineDescriptor(
@@ -209,7 +209,7 @@ def process_data() -> None:
                 custom_fn=process.process_selecteur_s3,
             ),
         ),
-        execution_options=config.execution_options["selecteur_s3"],
+        execution_options=config.execution_options,
     )
 
     selecteur_database = create_task(
@@ -232,7 +232,7 @@ def process_data() -> None:
                 custom_fn=process.process_selecteur_database,
             ),
         ),
-        execution_options=config.execution_options["selecteur_database"],
+        execution_options=config.execution_options,
     )
 
     selecteur_column_mapping = create_task(
@@ -262,7 +262,7 @@ def process_data() -> None:
                 custom_fn=process.process_selecteur_column_mapping,
             ),
         ),
-        execution_options=config.execution_options["selecteur_column_mapping"],
+        execution_options=config.execution_options,
     )
 
     chain(

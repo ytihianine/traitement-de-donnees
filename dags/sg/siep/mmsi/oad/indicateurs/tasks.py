@@ -14,7 +14,7 @@ oad_indic_to_parquet = create_task(
         use_input_results_as_operation_args=False,
         add_metadata=True,
     ),
-    execution_options=config.execution_options["oad_indic"],
+    execution_options=config.execution_options,
 )
 
 
@@ -31,7 +31,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["oad_indic"],
+        execution_options=config.execution_options,
     )
     accessibilite = create_task(
         pipeline=PipelineDescriptor(
@@ -41,7 +41,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["accessibilite"],
+        execution_options=config.execution_options,
     )
     accessibilite_detail = create_task(
         pipeline=PipelineDescriptor(
@@ -51,7 +51,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["accessibilite_detail"],
+        execution_options=config.execution_options,
     )
     bacs = create_task(
         pipeline=PipelineDescriptor(
@@ -61,7 +61,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["bacs"],
+        execution_options=config.execution_options,
     )
     bails = create_task(
         pipeline=PipelineDescriptor(
@@ -71,7 +71,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["bails"],
+        execution_options=config.execution_options,
     )
     couts = create_task(
         pipeline=PipelineDescriptor(
@@ -81,7 +81,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["couts"],
+        execution_options=config.execution_options,
     )
     deet_energie_ges = create_task(
         pipeline=PipelineDescriptor(
@@ -91,7 +91,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["deet_energie_ges"],
+        execution_options=config.execution_options,
     )
     etat_de_sante = create_task(
         pipeline=PipelineDescriptor(
@@ -101,7 +101,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["etat_de_sante"],
+        execution_options=config.execution_options,
     )
     exploitation = create_task(
         pipeline=PipelineDescriptor(
@@ -111,7 +111,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["exploitation"],
+        execution_options=config.execution_options,
     )
     note = create_task(
         pipeline=PipelineDescriptor(
@@ -121,7 +121,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["note"],
+        execution_options=config.execution_options,
     )
     effectif = create_task(
         pipeline=PipelineDescriptor(
@@ -131,7 +131,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["effectif"],
+        execution_options=config.execution_options,
     )
     proprietaire = create_task(
         pipeline=PipelineDescriptor(
@@ -141,7 +141,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["proprietaire"],
+        execution_options=config.execution_options,
     )
     reglementation = create_task(
         pipeline=PipelineDescriptor(
@@ -151,7 +151,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["reglementation"],
+        execution_options=config.execution_options,
     )
     surface = create_task(
         pipeline=PipelineDescriptor(
@@ -161,7 +161,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["surface"],
+        execution_options=config.execution_options,
     )
     typologie = create_task(
         pipeline=PipelineDescriptor(
@@ -171,7 +171,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["typologie"],
+        execution_options=config.execution_options,
     )
     valeur = create_task(
         pipeline=PipelineDescriptor(
@@ -181,7 +181,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["valeur"],
+        execution_options=config.execution_options,
     )
     localisation = create_task(
         pipeline=PipelineDescriptor(
@@ -195,7 +195,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["localisation"],
+        execution_options=config.execution_options,
     )
     strategie = create_task(
         pipeline=PipelineDescriptor(
@@ -209,7 +209,7 @@ def tasks_oad_indicateurs():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["strategie"],
+        execution_options=config.execution_options,
     )
 
     chain(

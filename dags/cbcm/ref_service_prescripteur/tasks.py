@@ -22,7 +22,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["ref_prog"],
+        execution_options=config.execution_options,
     )
     ref_bop = create_task(
         pipeline=PipelineDescriptor(
@@ -36,7 +36,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["ref_bop"],
+        execution_options=config.execution_options,
     )
     ref_uo = create_task(
         pipeline=PipelineDescriptor(
@@ -50,7 +50,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["ref_uo"],
+        execution_options=config.execution_options,
     )
 
     ref_cc = create_task(
@@ -65,7 +65,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["ref_cc"],
+        execution_options=config.execution_options,
     )
     ref_sp_pilotage = create_task(
         pipeline=PipelineDescriptor(
@@ -78,7 +78,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["ref_sp_pilotage"],
+        execution_options=config.execution_options,
     )
     ref_sp_choisi = create_task(
         pipeline=PipelineDescriptor(
@@ -91,7 +91,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["ref_sp_choisi"],
+        execution_options=config.execution_options,
     )
     ref_sdep = create_task(
         pipeline=PipelineDescriptor(
@@ -104,7 +104,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["ref_sdep"],
+        execution_options=config.execution_options,
     )
     sp = create_task(
         pipeline=PipelineDescriptor(
@@ -133,7 +133,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["sp"],
+        execution_options=config.execution_options,
     )
     # Services prescripteurs renseignés manuellement
     delai_global_paiement_sp_manuel = create_task(
@@ -148,7 +148,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["delai_global_paiement_sp_manuel"],
+        execution_options=config.execution_options,
     )
     demande_achat_sp_manuel = create_task(
         pipeline=PipelineDescriptor(
@@ -162,7 +162,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["demande_achat_sp_manuel"],
+        execution_options=config.execution_options,
     )
     demande_paiement_sp_manuel = create_task(
         pipeline=PipelineDescriptor(
@@ -176,7 +176,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["demande_paiement_sp_manuel"],
+        execution_options=config.execution_options,
     )
     engagement_juridique_sp_manuel = create_task(
         pipeline=PipelineDescriptor(
@@ -190,7 +190,7 @@ def grist_source() -> None:
             ),
             add_metadata=False,
         ),
-        execution_options=config.execution_options["engagement_juridique_sp_manuel"],
+        execution_options=config.execution_options,
     )
 
     chain(
@@ -220,7 +220,7 @@ def fetch_from_db() -> None:
             operation=actions.get_all_cf_cc,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["get_all_cf_cc"],
+        execution_options=config.execution_options,
     )
     get_demande_achat = create_task(
         pipeline=PipelineDescriptor(
@@ -229,7 +229,7 @@ def fetch_from_db() -> None:
             operation=actions.get_demande_achat,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["get_demande_achat"],
+        execution_options=config.execution_options,
     )
     get_demande_paiement_complet = create_task(
         pipeline=PipelineDescriptor(
@@ -238,7 +238,7 @@ def fetch_from_db() -> None:
             operation=actions.get_demande_paiement_complet,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["get_demande_paiement_complet"],
+        execution_options=config.execution_options,
     )
     get_delai_global_paiement = create_task(
         pipeline=PipelineDescriptor(
@@ -247,7 +247,7 @@ def fetch_from_db() -> None:
             operation=actions.get_delai_global_paiement,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["get_delai_global_paiement"],
+        execution_options=config.execution_options,
     )
     get_engagement_juridique = create_task(
         pipeline=PipelineDescriptor(
@@ -256,7 +256,7 @@ def fetch_from_db() -> None:
             operation=actions.get_engagement_juridique,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["get_engagement_juridique"],
+        execution_options=config.execution_options,
     )
 
     chain(
@@ -280,7 +280,7 @@ def load_to_grist() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["load_new_cf_cc"],
+        execution_options=config.execution_options,
     )
     load_demande_achat = create_task(
         pipeline=PipelineDescriptor(
@@ -290,7 +290,7 @@ def load_to_grist() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["load_demande_achat"],
+        execution_options=config.execution_options,
     )
     load_demande_paiement_complet = create_task(
         pipeline=PipelineDescriptor(
@@ -300,7 +300,7 @@ def load_to_grist() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["load_demande_paiement_complet"],
+        execution_options=config.execution_options,
     )
     load_delai_global_paiement = create_task(
         pipeline=PipelineDescriptor(
@@ -310,7 +310,7 @@ def load_to_grist() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["load_delai_global_paiement"],
+        execution_options=config.execution_options,
     )
     load_engagement_juridique = create_task(
         pipeline=PipelineDescriptor(
@@ -319,7 +319,7 @@ def load_to_grist() -> None:
             operation=actions.load_engagement_juridique,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["load_engagement_juridique"],
+        execution_options=config.execution_options,
     )
 
     chain(

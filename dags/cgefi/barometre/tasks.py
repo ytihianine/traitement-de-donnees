@@ -19,7 +19,7 @@ def source_files() -> None:
             use_input_results_as_operation_args=False,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["cartographie"],
+        execution_options=config.execution_options,
     )
     efc = create_task(
         pipeline=PipelineDescriptor(
@@ -29,7 +29,7 @@ def source_files() -> None:
             use_input_results_as_operation_args=False,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["efc"],
+        execution_options=config.execution_options,
     )
     recommandation = create_task(
         pipeline=PipelineDescriptor(
@@ -39,7 +39,7 @@ def source_files() -> None:
             use_input_results_as_operation_args=False,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["recommandation"],
+        execution_options=config.execution_options,
     )
     fiche_signaletique = create_task(
         pipeline=PipelineDescriptor(
@@ -49,7 +49,7 @@ def source_files() -> None:
             use_input_results_as_operation_args=False,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["fiche_signaletique"],
+        execution_options=config.execution_options,
     )
     rapport_annuel = create_task(
         pipeline=PipelineDescriptor(
@@ -59,7 +59,7 @@ def source_files() -> None:
             use_input_results_as_operation_args=False,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["rapport_annuel"],
+        execution_options=config.execution_options,
     )
     organisme = create_task(
         pipeline=PipelineDescriptor(
@@ -69,7 +69,7 @@ def source_files() -> None:
             use_input_results_as_operation_args=False,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["organisme"],
+        execution_options=config.execution_options,
     )
     organisme_hc = create_task(
         pipeline=PipelineDescriptor(
@@ -79,7 +79,7 @@ def source_files() -> None:
             use_input_results_as_operation_args=False,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["organisme_hors_corpus"],
+        execution_options=config.execution_options,
     )
 
     # ordre des tâches

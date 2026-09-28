@@ -12,7 +12,7 @@ bien_localisation = create_task(
         operation=actions.eligibilite_fcu,
         add_metadata=True,
     ),
-    execution_options=config.execution_options["bien_localisation"],
+    execution_options=config.execution_options,
 )
 
 
@@ -23,5 +23,5 @@ process_fcu_result = create_task(
         operation=process.process_result,
         add_metadata=True,
     ),
-    execution_options=config.execution_options["fcu_result"],
+    execution_options=config.execution_options,
 )

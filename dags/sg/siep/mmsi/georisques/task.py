@@ -19,7 +19,7 @@ def georisques_group() -> None:
             operation=actions.get_bien_from_db,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["bien_db"],
+        execution_options=config.execution_options,
     )
 
     georisques = create_task(
@@ -30,7 +30,7 @@ def georisques_group() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["georisques"],
+        execution_options=config.execution_options,
     )
 
     chain(

@@ -15,7 +15,7 @@ def source() -> None:
             operation=actions.liste_declaration,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["declarations_raw"],
+        execution_options=config.execution_options,
     )
 
     consommations_raw = create_task(
@@ -26,7 +26,7 @@ def source() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=False,
         ),
-        execution_options=config.execution_options["consommations_raw"],
+        execution_options=config.execution_options,
     )
 
     chain(
@@ -45,7 +45,7 @@ def output() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["declaration_ademe"],
+        execution_options=config.execution_options,
     )
     activite = create_task(
         pipeline=PipelineDescriptor(
@@ -55,7 +55,7 @@ def output() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["activite"],
+        execution_options=config.execution_options,
     )
     indicateur = create_task(
         pipeline=PipelineDescriptor(
@@ -65,7 +65,7 @@ def output() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["indicateur"],
+        execution_options=config.execution_options,
     )
     detail = create_task(
         pipeline=PipelineDescriptor(
@@ -75,7 +75,7 @@ def output() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["detail"],
+        execution_options=config.execution_options,
     )
     chain(
         declaration_ademe(),

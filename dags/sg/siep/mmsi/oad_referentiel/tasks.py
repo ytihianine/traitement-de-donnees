@@ -11,5 +11,5 @@ ref_typologie = create_task(
         operation=process.process_ref_typologie,
         add_metadata=True,
     ),
-    execution_options=config.execution_options["ref_typologie"],
+    execution_options=config.execution_options,
 )

@@ -25,19 +25,19 @@ def _grist_pipeline(dataset_name: str, custom_fn, **grist_kwargs) -> PipelineDes
 def referentiels() -> None:
     ref_bureau = create_task(
         pipeline=_grist_pipeline("ref_bureau", process.process_ref_bureau),
-        execution_options=config.execution_options["ref_bureau"],
+        execution_options=config.execution_options,
     )
     ref_certification = create_task(
         pipeline=_grist_pipeline("ref_certification", process.process_ref_certification),
-        execution_options=config.execution_options["ref_certification"],
+        execution_options=config.execution_options,
     )
     ref_competence_particuliere = create_task(
         pipeline=_grist_pipeline("ref_competence_particuliere", process.process_ref_competence_particuliere),
-        execution_options=config.execution_options["ref_competence_particuliere"],
+        execution_options=config.execution_options,
     )
     ref_direction = create_task(
         pipeline=_grist_pipeline("ref_direction", process.process_ref_direction),
-        execution_options=config.execution_options["ref_direction"],
+        execution_options=config.execution_options,
     )
     ref_profil_correspondant = create_task(
         pipeline=_grist_pipeline(
@@ -57,15 +57,15 @@ def referentiels() -> None:
                 "updated_by",
             ],
         ),
-        execution_options=config.execution_options["ref_profil_correspondant"],
+        execution_options=config.execution_options,
     )
     ref_qualite_service = create_task(
         pipeline=_grist_pipeline("ref_qualite_service", process.process_ref_qualite_service),
-        execution_options=config.execution_options["ref_qualite_service"],
+        execution_options=config.execution_options,
     )
     ref_region = create_task(
         pipeline=_grist_pipeline("ref_region", process.process_ref_region),
-        execution_options=config.execution_options["ref_region"],
+        execution_options=config.execution_options,
     )
     ref_semainier = create_task(
         pipeline=_grist_pipeline(
@@ -73,7 +73,7 @@ def referentiels() -> None:
             process.process_ref_semainier,
             date_columns=["date_semaine"],
         ),
-        execution_options=config.execution_options["ref_semainier"],
+        execution_options=config.execution_options,
     )
     ref_typologie_accompagnement = create_task(
         pipeline=_grist_pipeline(
@@ -81,7 +81,7 @@ def referentiels() -> None:
             process.process_ref_typologie_accompagnement,
             txt_columns=["typologie_accompagnement"],
         ),
-        execution_options=config.execution_options["ref_typologie_accompagnement"],
+        execution_options=config.execution_options,
     )
     ref_pole = create_task(
         pipeline=_grist_pipeline(
@@ -89,7 +89,7 @@ def referentiels() -> None:
             process.process_ref_pole,
             cols_mapping={"bureau": "id_bureau"},
         ),
-        execution_options=config.execution_options["ref_pole"],
+        execution_options=config.execution_options,
     )
     ref_type_accompagnement = create_task(
         pipeline=_grist_pipeline(
@@ -98,7 +98,7 @@ def referentiels() -> None:
             cols_mapping={"pole": "id_pole"},
             ref_columns=["id_pole"],
         ),
-        execution_options=config.execution_options["ref_type_accompagnement"],
+        execution_options=config.execution_options,
     )
 
     # Ordre des tâches
@@ -129,7 +129,7 @@ def bilaterales() -> None:
             ref_columns=["id_direction"],
             date_columns=["date_de_rencontre"],
         ),
-        execution_options=config.execution_options["bilaterale"],
+        execution_options=config.execution_options,
     )
     bilaterale_remontee = create_task(
         pipeline=_grist_pipeline(
@@ -142,7 +142,7 @@ def bilaterales() -> None:
             txt_columns=["information_a_remonter"],
             ref_columns=["id_bilaterale", "id_bureau"],
         ),
-        execution_options=config.execution_options["bilaterale_remontee"],
+        execution_options=config.execution_options,
     )
     # Ordre des tâches
     chain([bilaterale(), bilaterale_remontee()])
@@ -186,7 +186,7 @@ def correspondant() -> None:
             ],
             ref_columns=["id_region", "id_direction", "id_promotion_fac"],
         ),
-        execution_options=config.execution_options["correspondant"],
+        execution_options=config.execution_options,
     )
     correspondant_profil = create_task(
         pipeline=_grist_pipeline(
@@ -199,7 +199,7 @@ def correspondant() -> None:
             cols_to_keep=["id", "type_de_correspondant"],
             ref_columns=["id_correspondant"],
         ),
-        execution_options=config.execution_options["correspondant_profil"],
+        execution_options=config.execution_options,
     )
     correspondant_competence_particuliere = create_task(
         pipeline=_grist_pipeline(
@@ -212,7 +212,7 @@ def correspondant() -> None:
             cols_to_keep=["id", "competence_particuliere"],
             ref_columns=["id_correspondant"],
         ),
-        execution_options=config.execution_options["correspondant_competence_particuliere"],
+        execution_options=config.execution_options,
     )
     correspondant_connaissance_communaute = create_task(
         pipeline=_grist_pipeline(
@@ -222,7 +222,7 @@ def correspondant() -> None:
             cols_to_keep=["id", "connaissance_communaute"],
             ref_columns=["id_correspondant"],
         ),
-        execution_options=config.execution_options["correspondant_connaissance_communaute"],
+        execution_options=config.execution_options,
     )
 
     # Ordre des tâches
@@ -279,7 +279,7 @@ def dsci() -> None:
             ],
             ref_columns=["id_direction"],
         ),
-        execution_options=config.execution_options["accompagnement_dsci"],
+        execution_options=config.execution_options,
     )
     effectif_dsci = create_task(
         pipeline=_grist_pipeline(
@@ -299,7 +299,7 @@ def dsci() -> None:
             date_columns=["absent_depuis"],
             ref_columns=["id_bureau", "id_pole"],
         ),
-        execution_options=config.execution_options["effectif_dsci"],
+        execution_options=config.execution_options,
     )
     accompagnement_dsci_equipe = create_task(
         pipeline=_grist_pipeline(
@@ -312,7 +312,7 @@ def dsci() -> None:
             cols_to_keep=["id", "equipe_s_dsci"],
             ref_columns=["id_accompagnement"],
         ),
-        execution_options=config.execution_options["accompagnement_dsci_equipe"],
+        execution_options=config.execution_options,
     )
     accompagnement_dsci_porteur = create_task(
         pipeline=_grist_pipeline(
@@ -325,7 +325,7 @@ def dsci() -> None:
             cols_to_keep=["id", "porteur_dsci"],
             ref_columns=["id_accompagnement"],
         ),
-        execution_options=config.execution_options["accompagnement_dsci_porteur"],
+        execution_options=config.execution_options,
     )
     accompagnement_dsci_typologie = create_task(
         pipeline=_grist_pipeline(
@@ -338,7 +338,7 @@ def dsci() -> None:
             cols_to_keep=["id", "typologie"],
             ref_columns=["id_accompagnement"],
         ),
-        execution_options=config.execution_options["accompagnement_dsci_typologie"],
+        execution_options=config.execution_options,
     )
     # Ordre des tâches
     chain(
@@ -382,7 +382,7 @@ def mission_innovation() -> None:
             date_columns=["date_de_realisation"],
             ref_columns=["id_direction", "id_pole", "id_type_d_accompagnement"],
         ),
-        execution_options=config.execution_options["accompagnement_mi"],
+        execution_options=config.execution_options,
     )
     accompagnement_mi_satisfaction = create_task(
         pipeline=_grist_pipeline(
@@ -410,7 +410,7 @@ def mission_innovation() -> None:
             ],
             ref_columns=["id_accompagnement", "id_type_d_accompagnement"],
         ),
-        execution_options=config.execution_options["accompagnement_mi_satisfaction"],
+        execution_options=config.execution_options,
     )
     animateur_interne = create_task(
         pipeline=_grist_pipeline(
@@ -422,7 +422,7 @@ def mission_innovation() -> None:
             },
             ref_columns=["id_accompagnement", "id_animateur"],
         ),
-        execution_options=config.execution_options["animateur_interne"],
+        execution_options=config.execution_options,
     )
     animateur_externe = create_task(
         pipeline=_grist_pipeline(
@@ -431,7 +431,7 @@ def mission_innovation() -> None:
             cols_mapping={"accompagnement": "id_accompagnement"},
             ref_columns=["id_accompagnement"],
         ),
-        execution_options=config.execution_options["animateur_externe"],
+        execution_options=config.execution_options,
     )
     animateur_fac = create_task(
         pipeline=_grist_pipeline(
@@ -448,7 +448,7 @@ def mission_innovation() -> None:
             ],
             ref_columns=["id_accompagnement", "id_animateur"],
         ),
-        execution_options=config.execution_options["animateur_fac"],
+        execution_options=config.execution_options,
     )
     animateur_fac_certification = create_task(
         pipeline=_grist_pipeline(
@@ -461,7 +461,7 @@ def mission_innovation() -> None:
             cols_to_keep=["id", "certifications_souhaitees"],
             ref_columns=["id_animateur_fac"],
         ),
-        execution_options=config.execution_options["animateur_fac_certification"],
+        execution_options=config.execution_options,
     )
     animateur_fac_certification_valide = create_task(
         pipeline=_grist_pipeline(
@@ -474,7 +474,7 @@ def mission_innovation() -> None:
             cols_to_keep=["id", "certifications_validees"],
             ref_columns=["id_animateur_fac"],
         ),
-        execution_options=config.execution_options["animateur_fac_certification_valide"],
+        execution_options=config.execution_options,
     )
     laboratoires_territoriaux = create_task(
         pipeline=_grist_pipeline(
@@ -483,7 +483,7 @@ def mission_innovation() -> None:
             cols_mapping={"direction": "id_direction", "region": "id_region"},
             ref_columns=["id_direction", "id_region"],
         ),
-        execution_options=config.execution_options["laboratoires_territoriaux"],
+        execution_options=config.execution_options,
     )
     pleniere_quest_inscription = create_task(
         pipeline=_grist_pipeline(
@@ -496,7 +496,7 @@ def mission_innovation() -> None:
             },
             ref_columns=["id_direction", "id_id_accompagnement", "id_pleniere"],
         ),
-        execution_options=config.execution_options["pleniere_quest_inscription"],
+        execution_options=config.execution_options,
     )
     pleniere_quest_satisfaction = create_task(
         pipeline=_grist_pipeline(
@@ -508,7 +508,7 @@ def mission_innovation() -> None:
                 "ce_qui_peut_etre_ameliore",
             ],
         ),
-        execution_options=config.execution_options["pleniere_quest_satisfaction"],
+        execution_options=config.execution_options,
     )
     passinnov_quest_inscription = create_task(
         pipeline=_grist_pipeline(
@@ -523,7 +523,7 @@ def mission_innovation() -> None:
             cols_to_keep=["id", "mail", "direction", "region", "role", "passinnov", "id_accompagnement"],
             ref_columns=["id_direction", "id_region", "id_passinnov", "id_id_accompagnement"],
         ),
-        execution_options=config.execution_options["passinnov_quest_inscription"],
+        execution_options=config.execution_options,
     )
     passinnov_quest_satisfaction = create_task(
         pipeline=_grist_pipeline(
@@ -535,7 +535,7 @@ def mission_innovation() -> None:
             },
             ref_columns=["id_quest_passinnov", "id_id_passinnov"],
         ),
-        execution_options=config.execution_options["passinnov_quest_satisfaction"],
+        execution_options=config.execution_options,
     )
     formation_codev_quest_inscription = create_task(
         pipeline=_grist_pipeline(
@@ -571,7 +571,7 @@ def mission_innovation() -> None:
                 "id_session_formation_codev",
             ],
         ),
-        execution_options=config.execution_options["formation_codev_quest_inscription"],
+        execution_options=config.execution_options,
     )
     formation_fac_quest_satisfaction = create_task(
         pipeline=_grist_pipeline(
@@ -611,7 +611,7 @@ def mission_innovation() -> None:
                 "id_id_formation",
             ],
         ),
-        execution_options=config.execution_options["formation_fac_quest_satisfaction"],
+        execution_options=config.execution_options,
     )
     formation_fac_envie_suite_quest_satisfaction = create_task(
         pipeline=_grist_pipeline(
@@ -621,7 +621,7 @@ def mission_innovation() -> None:
             cols_to_keep=["id", "envies_pour_la_suite"],
             ref_columns=["id_formation_fac"],
         ),
-        execution_options=config.execution_options["formation_fac_envie_suite_quest_satisfaction"],
+        execution_options=config.execution_options,
     )
     fac_hors_bercylab_quest_accompagnement = create_task(
         pipeline=_grist_pipeline(
@@ -660,7 +660,7 @@ def mission_innovation() -> None:
                 "id_facilitateur_3",
             ],
         ),
-        execution_options=config.execution_options["fac_hors_bercylab_quest_accompagnement"],
+        execution_options=config.execution_options,
     )
     fac_hors_bercylab_quest_type_accompagnement = create_task(
         pipeline=_grist_pipeline(
@@ -670,7 +670,7 @@ def mission_innovation() -> None:
             cols_to_keep=["id", "type_d_accompagnement"],
             ref_columns=["id_formation_fac_hors_bercylab"],
         ),
-        execution_options=config.execution_options["fac_hors_bercylab_quest_type_accompagnement"],
+        execution_options=config.execution_options,
     )
     fac_hors_bercylab_quest_accompagnement_participants = create_task(
         pipeline=_grist_pipeline(
@@ -680,7 +680,7 @@ def mission_innovation() -> None:
             cols_to_keep=["id", "participants"],
             ref_columns=["id_formation_fac_hors_bercylab"],
         ),
-        execution_options=config.execution_options["fac_hors_bercylab_quest_accompagnement_participants"],
+        execution_options=config.execution_options,
     )
     fac_hors_bercylab_quest_accompagnement_facilitateurs = create_task(
         pipeline=_grist_pipeline(
@@ -693,7 +693,7 @@ def mission_innovation() -> None:
             cols_to_keep=["id", "facilitateurs"],
             ref_columns=["id_formation_fac_hors_bercylab"],
         ),
-        execution_options=config.execution_options["fac_hors_bercylab_quest_accompagnement_facilitateurs"],
+        execution_options=config.execution_options,
     )
 
     # Ordre des tâches
@@ -736,7 +736,7 @@ def conseil_interne() -> None:
             ],
             ref_columns=["id_accompagnement"],
         ),
-        execution_options=config.execution_options["accompagnement_cci_opportunite"],
+        execution_options=config.execution_options,
     )
     charge_agent_cci = create_task(
         pipeline=_grist_pipeline(
@@ -750,7 +750,7 @@ def conseil_interne() -> None:
             num_columns=["temps_passe", "taux_de_charge"],
             ref_columns=["id_agent_e_", "id_semaine", "id_missions"],
         ),
-        execution_options=config.execution_options["charge_agent_cci"],
+        execution_options=config.execution_options,
     )
     accompagnement_cci_quest_satisfaction = create_task(
         pipeline=_grist_pipeline(
@@ -783,7 +783,7 @@ def conseil_interne() -> None:
                 "id_accompagnement",
             ],
         ),
-        execution_options=config.execution_options["accompagnement_cci_quest_satisfaction"],
+        execution_options=config.execution_options,
     )
 
     # Ordre des tâches

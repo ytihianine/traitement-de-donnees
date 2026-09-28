@@ -13,7 +13,7 @@ oad_carac_to_parquet = create_task(
         operation=process.process_oad_file,
         add_metadata=False,
     ),
-    execution_options=config.execution_options["oad_carac"],
+    execution_options=config.execution_options,
 )
 
 
@@ -27,7 +27,7 @@ def tasks_oad_caracteristiques():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["sites"],
+        execution_options=config.execution_options,
     )
     biens = create_task(
         pipeline=PipelineDescriptor(
@@ -37,7 +37,7 @@ def tasks_oad_caracteristiques():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["biens"],
+        execution_options=config.execution_options,
     )
     gestionnaires = create_task(
         pipeline=PipelineDescriptor(
@@ -47,7 +47,7 @@ def tasks_oad_caracteristiques():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["gestionnaires"],
+        execution_options=config.execution_options,
     )
     biens_gestionnaires = create_task(
         pipeline=PipelineDescriptor(
@@ -57,7 +57,7 @@ def tasks_oad_caracteristiques():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["biens_gest"],
+        execution_options=config.execution_options,
     )
     biens_occupants = create_task(
         pipeline=PipelineDescriptor(
@@ -67,7 +67,7 @@ def tasks_oad_caracteristiques():
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["biens_occupants"],
+        execution_options=config.execution_options,
     )
 
     chain(

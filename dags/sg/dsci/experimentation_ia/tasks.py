@@ -29,7 +29,7 @@ def referentiels() -> None:
             process.process_ref_q1_direction,
             txt_columns=["direction"],
         ),
-        execution_options=config.execution_options["ref_q1_direction"],
+        execution_options=config.execution_options,
     )
     ref_q5_domaine = create_task(
         pipeline=_grist_pipeline(
@@ -37,7 +37,7 @@ def referentiels() -> None:
             process.process_ref_q5_domaine,
             txt_columns=["domaine"],
         ),
-        execution_options=config.execution_options["ref_q5_domaine"],
+        execution_options=config.execution_options,
     )
     ref_q6_niveau_utilisation = create_task(
         pipeline=_grist_pipeline(
@@ -46,7 +46,7 @@ def referentiels() -> None:
             cols_to_keep=["id", "niveau_d_appropriation"],
             txt_columns=["niveau_d_appropriation"],
         ),
-        execution_options=config.execution_options["ref_q6_niveau_utilisation"],
+        execution_options=config.execution_options,
     )
     ref_q9_cas_usage = create_task(
         pipeline=_grist_pipeline(
@@ -54,7 +54,7 @@ def referentiels() -> None:
             process.process_ref_q9_cas_usage,
             txt_columns=["cas_d_usage"],
         ),
-        execution_options=config.execution_options["ref_q9_cas_usage"],
+        execution_options=config.execution_options,
     )
     # ==============================
     # referentiels du questionnaire2
@@ -65,7 +65,7 @@ def referentiels() -> None:
             process.process_ref_q28_raisons_perte,
             txt_columns=["raisons"],
         ),
-        execution_options=config.execution_options["ref_q28_raisons_perte"],
+        execution_options=config.execution_options,
     )
     ref_q25_impact_observe = create_task(
         pipeline=_grist_pipeline(
@@ -73,7 +73,7 @@ def referentiels() -> None:
             process.process_ref_q25_impact_observe,
             txt_columns=["observation"],
         ),
-        execution_options=config.execution_options["ref_q25_impact_observe"],
+        execution_options=config.execution_options,
     )
     ref_q24_impact_identifie = create_task(
         pipeline=_grist_pipeline(
@@ -81,7 +81,7 @@ def referentiels() -> None:
             process.process_ref_q24_impact_identifie,
             txt_columns=["impacts"],
         ),
-        execution_options=config.execution_options["ref_q24_impact_identifie"],
+        execution_options=config.execution_options,
     )
     ref_q23_taux_correction = create_task(
         pipeline=_grist_pipeline(
@@ -90,7 +90,7 @@ def referentiels() -> None:
             cols_to_keep=["id", "taux_de_correction"],
             txt_columns=["taux_de_correction"],
         ),
-        execution_options=config.execution_options["ref_q23_taux_correction"],
+        execution_options=config.execution_options,
     )
     ref_q22_typologie_erreurs = create_task(
         pipeline=_grist_pipeline(
@@ -98,7 +98,7 @@ def referentiels() -> None:
             process.process_ref_q22_typologie_erreurs,
             txt_columns=["erreurs"],
         ),
-        execution_options=config.execution_options["ref_q22_typologie_erreurs"],
+        execution_options=config.execution_options,
     )
     ref_q20_autres_ia = create_task(
         pipeline=_grist_pipeline(
@@ -106,7 +106,7 @@ def referentiels() -> None:
             process.process_ref_q20_autres_ia,
             txt_columns=["comparaisons"],
         ),
-        execution_options=config.execution_options["ref_q20_autres_ia"],
+        execution_options=config.execution_options,
     )
     ref_q16_taches = create_task(
         pipeline=_grist_pipeline(
@@ -114,7 +114,7 @@ def referentiels() -> None:
             process.process_ref_q16_taches,
             txt_columns=["taches"],
         ),
-        execution_options=config.execution_options["ref_q16_taches"],
+        execution_options=config.execution_options,
     )
     ref_q14_evolution_craintes = create_task(
         pipeline=_grist_pipeline(
@@ -122,7 +122,7 @@ def referentiels() -> None:
             process.process_ref_q14_evolution_craintes,
             txt_columns=["evolutions"],
         ),
-        execution_options=config.execution_options["ref_q14_evolution_craintes"],
+        execution_options=config.execution_options,
     )
     ref_q13_facteurs_progression = create_task(
         pipeline=_grist_pipeline(
@@ -130,7 +130,7 @@ def referentiels() -> None:
             process.process_ref_q13_facteurs_progression,
             txt_columns=["facteurs"],
         ),
-        execution_options=config.execution_options["ref_q13_facteurs_progression"],
+        execution_options=config.execution_options,
     )
     ref_q10_principaux_freins = create_task(
         pipeline=_grist_pipeline(
@@ -138,7 +138,7 @@ def referentiels() -> None:
             process.process_ref_q10_principaux_freins,
             txt_columns=["freins"],
         ),
-        execution_options=config.execution_options["ref_q10_principaux_freins"],
+        execution_options=config.execution_options,
     )
     ref_q6_participation_programme = create_task(
         pipeline=_grist_pipeline(
@@ -146,7 +146,7 @@ def referentiels() -> None:
             process.process_ref_q6_participation_programme,
             txt_columns=["participation"],
         ),
-        execution_options=config.execution_options["ref_q6_participation_programme"],
+        execution_options=config.execution_options,
     )
     ref_q5_formation_suivie = create_task(
         pipeline=_grist_pipeline(
@@ -154,7 +154,7 @@ def referentiels() -> None:
             process.process_ref_q5_formation_suivie,
             txt_columns=["formation_suivie"],
         ),
-        execution_options=config.execution_options["ref_q5_formation_suivie"],
+        execution_options=config.execution_options,
     )
     ref_q3_niveau_2 = create_task(
         pipeline=_grist_pipeline(
@@ -162,7 +162,7 @@ def referentiels() -> None:
             process.process_ref_q3_niveau,
             txt_columns=["niveau"],
         ),
-        execution_options=config.execution_options["ref_q3_niveau_2"],
+        execution_options=config.execution_options,
     )
     ref_q7_accords = create_task(
         pipeline=_grist_pipeline(
@@ -170,7 +170,7 @@ def referentiels() -> None:
             process.process_ref_q7_accords,
             txt_columns=["reponses"],
         ),
-        execution_options=config.execution_options["ref_q7_accords"],
+        execution_options=config.execution_options,
     )
     # ==============================
     # referentiels du questionnaire2_bis
@@ -181,7 +181,7 @@ def referentiels() -> None:
             process.process_ref_raisons_non_utilisation,
             txt_columns=["raisons"],
         ),
-        execution_options=config.execution_options["ref_raisons_non_utilisation"],
+        execution_options=config.execution_options,
     )
     # ==============================
     # Référentiels du questionnaire_3
@@ -192,7 +192,7 @@ def referentiels() -> None:
             process.process_ref_q6_formation_suivie,
             txt_columns=["formation"],
         ),
-        execution_options=config.execution_options["ref_q6_formation_suivie"],
+        execution_options=config.execution_options,
     )
     ref_q7_particip_programme = create_task(
         pipeline=_grist_pipeline(
@@ -200,7 +200,7 @@ def referentiels() -> None:
             process.process_ref_q7_particip_programme,
             txt_columns=["participation"],
         ),
-        execution_options=config.execution_options["ref_q7_particip_programme"],
+        execution_options=config.execution_options,
     )
     ref_q8_raisons_non_participation = create_task(
         pipeline=_grist_pipeline(
@@ -208,7 +208,7 @@ def referentiels() -> None:
             process.process_ref_q8_raisons_non_participation,
             txt_columns=["raisons"],
         ),
-        execution_options=config.execution_options["ref_q8_raisons_non_participation"],
+        execution_options=config.execution_options,
     )
     ref_q11_leviers_progressions = create_task(
         pipeline=_grist_pipeline(
@@ -216,7 +216,7 @@ def referentiels() -> None:
             process.process_ref_q11_leviers_progressions,
             txt_columns=["leviers"],
         ),
-        execution_options=config.execution_options["ref_q11_leviers_progressions"],
+        execution_options=config.execution_options,
     )
     ref_q12_impacts_taches_pro = create_task(
         pipeline=_grist_pipeline(
@@ -224,7 +224,7 @@ def referentiels() -> None:
             process.process_ref_q12_impacts_taches_pro,
             txt_columns=["impacts"],
         ),
-        execution_options=config.execution_options["ref_q12_impacts_taches_pro"],
+        execution_options=config.execution_options,
     )
     ref_q14_taches_rebarbativ = create_task(
         pipeline=_grist_pipeline(
@@ -232,7 +232,7 @@ def referentiels() -> None:
             process.process_ref_q14_taches_rebarbativ,
             txt_columns=["taches_rebarbatives"],
         ),
-        execution_options=config.execution_options["ref_q14_taches_rebarbativ"],
+        execution_options=config.execution_options,
     )
     ref_q17_autres_outils = create_task(
         pipeline=_grist_pipeline(
@@ -241,7 +241,7 @@ def referentiels() -> None:
             cols_to_keep=["id", "autres_outils"],
             txt_columns=["autres_outils"],
         ),
-        execution_options=config.execution_options["ref_q17_autres_outils"],
+        execution_options=config.execution_options,
     )
     ref_q17_satisfaction_autre_outil = create_task(
         pipeline=_grist_pipeline(
@@ -250,7 +250,7 @@ def referentiels() -> None:
             cols_to_keep=["id", "satisfaction_autres_outils"],
             txt_columns=["satisfaction_autres_outils"],
         ),
-        execution_options=config.execution_options["ref_q17_satisfaction_autre_outil"],
+        execution_options=config.execution_options,
     )
     ref_q18_comparaisons = create_task(
         pipeline=_grist_pipeline(
@@ -258,7 +258,7 @@ def referentiels() -> None:
             process.process_ref_q18_comparaisons,
             txt_columns=["comparaisons"],
         ),
-        execution_options=config.execution_options["ref_q18_comparaisons"],
+        execution_options=config.execution_options,
     )
     ref_q19_fonctionnalites = create_task(
         pipeline=_grist_pipeline(
@@ -266,7 +266,7 @@ def referentiels() -> None:
             process.process_ref_q19_fonctionnalites,
             txt_columns=["fonctionnalites"],
         ),
-        execution_options=config.execution_options["ref_q19_fonctionnalites"],
+        execution_options=config.execution_options,
     )
     ref_q21_risques_identifies = create_task(
         pipeline=_grist_pipeline(
@@ -274,7 +274,7 @@ def referentiels() -> None:
             process.process_ref_q21_risques_identifies,
             txt_columns=["risques"],
         ),
-        execution_options=config.execution_options["ref_q21_risques_identifies"],
+        execution_options=config.execution_options,
     )
     ref_q25_besoins = create_task(
         pipeline=_grist_pipeline(
@@ -282,7 +282,7 @@ def referentiels() -> None:
             process.process_ref_q25_besoins,
             txt_columns=["besoins"],
         ),
-        execution_options=config.execution_options["ref_q25_besoins"],
+        execution_options=config.execution_options,
     )
 
     # Ordre des tâches
@@ -357,7 +357,7 @@ def repartition() -> None:
                 "nbre_connexion_effective",
             ],
         ),
-        execution_options=config.execution_options["quota_par_entite"],
+        execution_options=config.execution_options,
     )
     # Ordre des tâches
     chain([quota_par_entite()])
@@ -387,7 +387,7 @@ def suivi_experimentateurs() -> None:
                 "courriel_corrige",
             ],
         ),
-        execution_options=config.execution_options["experimentateurs"],
+        execution_options=config.execution_options,
     )
     # Ordre des tâches
     chain([experimentateurs()])
@@ -443,7 +443,7 @@ def suivi_questionnaire_1() -> None:
                 "id_niveau_d_utilisation_ia",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_1"],
+        execution_options=config.execution_options,
     )
     questionnaire_1_cas_usage = create_task(
         pipeline=_grist_pipeline(
@@ -457,7 +457,7 @@ def suivi_questionnaire_1() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_1_cas_usage"],
+        execution_options=config.execution_options,
     )
     questionnaire_1_besoins_accompagnement = create_task(
         pipeline=_grist_pipeline(
@@ -468,7 +468,7 @@ def suivi_questionnaire_1() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_1_besoins_accompagnement"],
+        execution_options=config.execution_options,
     )
 
     # Ordre de tâches
@@ -592,7 +592,7 @@ def suivi_questionnaire_2() -> None:
                 "id_ia_favorise_relations_humaines_",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_2"],
+        execution_options=config.execution_options,
     )
     questionnaire_2_typologie_interaction = create_task(
         pipeline=_grist_pipeline(
@@ -603,7 +603,7 @@ def suivi_questionnaire_2() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_2_typologie_interaction"],
+        execution_options=config.execution_options,
     )
     questionnaire_2_formation_suivie = create_task(
         pipeline=_grist_pipeline(
@@ -617,7 +617,7 @@ def suivi_questionnaire_2() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_2_formation_suivie"],
+        execution_options=config.execution_options,
     )
     questionnaire_2_participation = create_task(
         pipeline=_grist_pipeline(
@@ -631,7 +631,7 @@ def suivi_questionnaire_2() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_2_participation"],
+        execution_options=config.execution_options,
     )
     questionnaire_2_freins = create_task(
         pipeline=_grist_pipeline(
@@ -642,7 +642,7 @@ def suivi_questionnaire_2() -> None:
                 "freins_a_l_utilisation": "id_freins_a_l_utilisation",
             },
         ),
-        execution_options=config.execution_options["questionnaire_2_freins"],
+        execution_options=config.execution_options,
     )
     questionnaire_2_facteurs_progression = create_task(
         pipeline=_grist_pipeline(
@@ -656,7 +656,7 @@ def suivi_questionnaire_2() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_2_facteurs_progression"],
+        execution_options=config.execution_options,
     )
     questionnaire_2_taches = create_task(
         pipeline=_grist_pipeline(
@@ -670,7 +670,7 @@ def suivi_questionnaire_2() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_2_taches"],
+        execution_options=config.execution_options,
     )
     questionnaire_2_typologie_erreurs = create_task(
         pipeline=_grist_pipeline(
@@ -684,7 +684,7 @@ def suivi_questionnaire_2() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_2_typologie_erreurs"],
+        execution_options=config.execution_options,
     )
     questionnaire_2_impact_observe = create_task(
         pipeline=_grist_pipeline(
@@ -698,7 +698,7 @@ def suivi_questionnaire_2() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_2_impact_observe"],
+        execution_options=config.execution_options,
     )
     questionnaire_2_impact_identifie = create_task(
         pipeline=_grist_pipeline(
@@ -712,7 +712,7 @@ def suivi_questionnaire_2() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_2_impact_identifie"],
+        execution_options=config.execution_options,
     )
 
     # Ordre des tâches
@@ -746,7 +746,7 @@ def suivi_questionnaire_2_bis() -> None:
             ],
             txt_columns=["courriel", "autres_raisons", "ajouter_quelque_chose"],
         ),
-        execution_options=config.execution_options["questionnaire_2_bis"],
+        execution_options=config.execution_options,
     )
     questionnaire_2_bis_raisons_non_utilisation = create_task(
         pipeline=_grist_pipeline(
@@ -758,7 +758,7 @@ def suivi_questionnaire_2_bis() -> None:
             },
             txt_columns=["courriel"],
         ),
-        execution_options=config.execution_options["questionnaire_2_bis_raisons_non_utilisation"],
+        execution_options=config.execution_options,
     )
     # Ordre des tâches
     chain(
@@ -847,7 +847,7 @@ def suivi_questionnaire_3() -> None:
                 "id_comparaison_autres_ia",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_3"],
+        execution_options=config.execution_options,
     )
     questionnaire_3_formation_suivie = create_task(
         pipeline=_grist_pipeline(
@@ -859,7 +859,7 @@ def suivi_questionnaire_3() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_3_formation_suivie"],
+        execution_options=config.execution_options,
     )
     questionnaire_3_programme_rdv = create_task(
         pipeline=_grist_pipeline(
@@ -871,7 +871,7 @@ def suivi_questionnaire_3() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_3_programme_rdv"],
+        execution_options=config.execution_options,
     )
     questionnaire_3_leviers_progression = create_task(
         pipeline=_grist_pipeline(
@@ -885,7 +885,7 @@ def suivi_questionnaire_3() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_3_leviers_progression"],
+        execution_options=config.execution_options,
     )
     questionnaire_3_fonctionnalites = create_task(
         pipeline=_grist_pipeline(
@@ -897,7 +897,7 @@ def suivi_questionnaire_3() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_3_fonctionnalites"],
+        execution_options=config.execution_options,
     )
     questionnaire_3_risques_identifies = create_task(
         pipeline=_grist_pipeline(
@@ -911,7 +911,7 @@ def suivi_questionnaire_3() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_3_risques_identifies"],
+        execution_options=config.execution_options,
     )
     questionnaire_3_besoins_prioritaires = create_task(
         pipeline=_grist_pipeline(
@@ -925,7 +925,7 @@ def suivi_questionnaire_3() -> None:
                 "no_id",
             ],
         ),
-        execution_options=config.execution_options["questionnaire_3_besoins_prioritaires"],
+        execution_options=config.execution_options,
     )
     questionnaire_3_besoins_moindres = create_task(
         pipeline=_grist_pipeline(
@@ -934,7 +934,7 @@ def suivi_questionnaire_3() -> None:
             cols_to_keep=["no_id", "besoins_moindres"],
             cols_mapping={"besoins_moindres": "id_besoins_moindres"},
         ),
-        execution_options=config.execution_options["questionnaire_3_besoins_moindres"],
+        execution_options=config.execution_options,
     )
     # Ordre des tâches
     chain(

@@ -14,7 +14,7 @@ def source_files() -> None:
             output_dataset=Dataset("agent_carriere"),
             operation=process.process_agent_info_carriere,
         ),
-        execution_options=config.execution_options["agent_carriere"],
+        execution_options=config.execution_options,
     )
     agent = create_task(
         pipeline=PipelineDescriptor(
@@ -22,7 +22,7 @@ def source_files() -> None:
             output_dataset=Dataset("agent"),
             operation=process.process_agent_contrat,
         ),
-        execution_options=config.execution_options["agent"],
+        execution_options=config.execution_options,
     )
     agent_elem_rem = create_task(
         pipeline=PipelineDescriptor(
@@ -30,7 +30,7 @@ def source_files() -> None:
             output_dataset=Dataset("agent_elem_rem"),
             operation=process.process_agent_r4,
         ),
-        execution_options=config.execution_options["agent_elem_rem"],
+        execution_options=config.execution_options,
     )
 
     chain([agent_carriere(), agent(), agent_elem_rem()])

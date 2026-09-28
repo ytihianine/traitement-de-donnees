@@ -15,7 +15,7 @@ def source_files() -> None:
             operation=process.process_demande_achat,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["demande_achat"],
+        execution_options=config.execution_options,
     )
     engagement_juridique = create_task(
         pipeline=PipelineDescriptor(
@@ -24,7 +24,7 @@ def source_files() -> None:
             operation=process.process_engagement_juridique,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["engagement_juridique"],
+        execution_options=config.execution_options,
     )
     demande_paiement = create_task(
         pipeline=PipelineDescriptor(
@@ -33,7 +33,7 @@ def source_files() -> None:
             operation=process.process_demande_paiement,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["demande_paiement"],
+        execution_options=config.execution_options,
     )
     demande_paiement_flux = create_task(
         pipeline=PipelineDescriptor(
@@ -42,7 +42,7 @@ def source_files() -> None:
             operation=process.process_demande_paiement_flux,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["demande_paiement_flux"],
+        execution_options=config.execution_options,
     )
     demande_paiement_sfp = create_task(
         pipeline=PipelineDescriptor(
@@ -51,7 +51,7 @@ def source_files() -> None:
             operation=process.process_demande_paiement_sfp,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["demande_paiement_sfp"],
+        execution_options=config.execution_options,
     )
     demande_paiement_carte_achat = create_task(
         pipeline=PipelineDescriptor(
@@ -60,7 +60,7 @@ def source_files() -> None:
             operation=process.process_demande_paiement_carte_achat,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["demande_paiement_carte_achat"],
+        execution_options=config.execution_options,
     )
     demande_paiement_journal_pieces = create_task(
         pipeline=PipelineDescriptor(
@@ -69,7 +69,7 @@ def source_files() -> None:
             operation=process.process_demande_paiement_journal_pieces,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["demande_paiement_journal_pieces"],
+        execution_options=config.execution_options,
     )
     delai_global_paiement = create_task(
         pipeline=PipelineDescriptor(
@@ -78,7 +78,7 @@ def source_files() -> None:
             operation=process.process_delai_global_paiement,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["delai_global_paiement"],
+        execution_options=config.execution_options,
     )
     chain(
         [
@@ -109,7 +109,7 @@ def datasets_additionnels() -> None:
             use_input_results_as_operation_args=True,
             operation=process.process_demande_paiement_complet,
         ),
-        execution_options=config.execution_options["demande_paiement_complet"],
+        execution_options=config.execution_options,
     )
 
     chain(demande_paiement_complet())

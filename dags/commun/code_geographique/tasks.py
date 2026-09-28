@@ -18,15 +18,15 @@ def _geo_pipeline(dataset_name: str, fn) -> PipelineDescriptor:
 def code_geographique() -> None:
     communes = create_task(
         pipeline=_geo_pipeline("communes", actions.communes),
-        execution_options=config.execution_options["communes"],
+        execution_options=config.execution_options,
     )
     departements = create_task(
         pipeline=_geo_pipeline("departements", actions.departements),
-        execution_options=config.execution_options["departements"],
+        execution_options=config.execution_options,
     )
     regions = create_task(
         pipeline=_geo_pipeline("regions", actions.regions),
-        execution_options=config.execution_options["regions"],
+        execution_options=config.execution_options,
     )
     chain(communes(), departements(), regions())
 
@@ -35,11 +35,11 @@ def code_geographique() -> None:
 def geojson() -> None:
     departements_geojson = create_task(
         pipeline=_geo_pipeline("departements_geojson", actions.departement_geojson),
-        execution_options=config.execution_options["departements_geojson"],
+        execution_options=config.execution_options,
     )
     regions_geojson = create_task(
         pipeline=_geo_pipeline("regions_geojson", actions.region_geojson),
-        execution_options=config.execution_options["regions_geojson"],
+        execution_options=config.execution_options,
     )
     chain([departements_geojson(), regions_geojson()])
 
@@ -48,10 +48,10 @@ def geojson() -> None:
 def code_iso() -> None:
     code_iso_departement = create_task(
         pipeline=_geo_pipeline("code_iso_departement", actions.code_iso_departement),
-        execution_options=config.execution_options["code_iso_departement"],
+        execution_options=config.execution_options,
     )
     code_iso_region = create_task(
         pipeline=_geo_pipeline("code_iso_region", actions.code_iso_region),
-        execution_options=config.execution_options["code_iso_region"],
+        execution_options=config.execution_options,
     )
     chain([code_iso_departement(), code_iso_region()])

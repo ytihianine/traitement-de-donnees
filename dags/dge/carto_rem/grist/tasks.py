@@ -24,35 +24,35 @@ def referentiels() -> None:
             "ref_base_remuneration",
             txt_columns=["base_remuneration"],
         ),
-        execution_options=config.execution_options["ref_base_remuneration"],
+        execution_options=config.execution_options,
     )
     ref_base_revalorisation = create_task(
         pipeline=_grist_pipeline(
             "ref_base_revalorisation",
             txt_columns=["base_revalorisation"],
         ),
-        execution_options=config.execution_options["ref_base_revalorisation"],
+        execution_options=config.execution_options,
     )
     ref_niveau_diplome = create_task(
         pipeline=_grist_pipeline(
             "ref_niveau_diplome",
             txt_columns=["niveau_diplome"],
         ),
-        execution_options=config.execution_options["ref_niveau_diplome"],
+        execution_options=config.execution_options,
     )
     ref_valeur_point_indice = create_task(
         pipeline=_grist_pipeline(
             "ref_valeur_point_indice",
             date_columns=["date_d_application"],
         ),
-        execution_options=config.execution_options["ref_valeur_point_indice"],
+        execution_options=config.execution_options,
     )
     ref_categorie_ecole = create_task(
         pipeline=_grist_pipeline(
             "ref_categorie_ecole",
             txt_columns=["categorie_d_ecole"],
         ),
-        execution_options=config.execution_options["ref_categorie_ecole"],
+        execution_options=config.execution_options,
     )
     ref_libelle_diplome = create_task(
         pipeline=_grist_pipeline(
@@ -64,7 +64,7 @@ def referentiels() -> None:
             txt_columns=["libelle_diplome"],
             ref_columns=["id_categorie_ecole", "id_niveau_diplome_associe"],
         ),
-        execution_options=config.execution_options["ref_libelle_diplome"],
+        execution_options=config.execution_options,
     )
     ref_position = create_task(
         pipeline=_grist_pipeline(
@@ -72,14 +72,14 @@ def referentiels() -> None:
             cols_mapping={"niveau_diplome": "id_niveau_diplome"},
             ref_columns=["id_niveau_diplome"],
         ),
-        execution_options=config.execution_options["ref_position"],
+        execution_options=config.execution_options,
     )
     ref_fonction_dge = create_task(
         pipeline=_grist_pipeline(
             "ref_fonction_dge",
             txt_columns=["fonction_dge", "fonction_dge_libelle_long"],
         ),
-        execution_options=config.execution_options["ref_fonction_dge"],
+        execution_options=config.execution_options,
     )
 
     # ordre des tâches
@@ -101,7 +101,7 @@ def referentiels() -> None:
 def source_grist() -> None:
     agent = create_task(
         pipeline=_grist_pipeline("agent"),
-        execution_options=config.execution_options["agent"],
+        execution_options=config.execution_options,
     )
     agent_diplome = create_task(
         pipeline=_grist_pipeline(
@@ -117,7 +117,7 @@ def source_grist() -> None:
                 "id_categorie_d_ecole",
             ],
         ),
-        execution_options=config.execution_options["agent_diplome"],
+        execution_options=config.execution_options,
     )
     agent_revalorisation = create_task(
         pipeline=_grist_pipeline(
@@ -128,7 +128,7 @@ def source_grist() -> None:
             ref_columns=["id_base_revalorisation"],
             custom_fn=process.process_agent_revalorisation,
         ),
-        execution_options=config.execution_options["agent_revalorisation"],
+        execution_options=config.execution_options,
     )
     agent_revalorisation_proposition = create_task(
         pipeline=_grist_pipeline(
@@ -136,7 +136,7 @@ def source_grist() -> None:
             cols_mapping={"base_revalorisation": "id_base_revalorisation"},
             ref_columns=["id_base_revalorisation"],
         ),
-        execution_options=config.execution_options["agent_revalorisation_proposition"],
+        execution_options=config.execution_options,
     )
     agent_contrat_complement = create_task(
         pipeline=_grist_pipeline(
@@ -155,7 +155,7 @@ def source_grist() -> None:
             ref_columns=["id_fonction_dge"],
             custom_fn=process.process_agent_contrat_complement,
         ),
-        execution_options=config.execution_options["agent_contrat_complement"],
+        execution_options=config.execution_options,
     )
     agent_remuneration_complement = create_task(
         pipeline=_grist_pipeline(
@@ -168,7 +168,7 @@ def source_grist() -> None:
             ref_columns=["id_base_remuneration"],
             custom_fn=process.process_agent_remuneration_complement,
         ),
-        execution_options=config.execution_options["agent_remuneration_complement"],
+        execution_options=config.execution_options,
     )
     agent_experience_pro = create_task(
         pipeline=_grist_pipeline(
@@ -177,7 +177,7 @@ def source_grist() -> None:
             ref_columns=["id_position_grille"],
             custom_fn=process.process_agent_experience_pro,
         ),
-        execution_options=config.execution_options["agent_experience_pro"],
+        execution_options=config.execution_options,
     )
 
     # ordre des tâches

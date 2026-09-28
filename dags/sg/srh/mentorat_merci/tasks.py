@@ -9,7 +9,7 @@ agent_inscrit = create_task(
         output_dataset=Dataset("agent_inscrit"),
         operation=process.clean_data,
     ),
-    execution_options=config.execution_options["agent_inscrit"],
+    execution_options=config.execution_options,
 )
 
 generer_binomes = create_task(
@@ -18,5 +18,5 @@ generer_binomes = create_task(
         output_dataset=Dataset("generer_binomes"),
         operation=actions.action_generer_binomes_mentorat,
     ),
-    execution_options=config.execution_options["generer_binomes"],
+    execution_options=config.execution_options,
 )

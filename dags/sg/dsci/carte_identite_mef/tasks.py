@@ -25,15 +25,15 @@ def _grist_pipeline(dataset_name: str, custom_fn, **grist_kwargs) -> PipelineDes
 def effectif():
     teletravail = create_task(
         pipeline=_grist_pipeline("teletravail", process.process_teletravail),
-        execution_options=config.execution_options["teletravail"],
+        execution_options=config.execution_options,
     )
     teletravail_frequence = create_task(
         pipeline=_grist_pipeline("teletravail_frequence", process.process_teletravail_frequence),
-        execution_options=config.execution_options["teletravail_frequence"],
+        execution_options=config.execution_options,
     )
     teletravail_opinion = create_task(
         pipeline=_grist_pipeline("teletravail_opinion", process.process_teletravail_opinion),
-        execution_options=config.execution_options["teletravail_opinion"],
+        execution_options=config.execution_options,
     )
     effectif_direction = create_task(
         pipeline=_grist_pipeline(
@@ -41,11 +41,11 @@ def effectif():
             process.process_effectif_direction,
             cols_mapping={"nombre_d_agent": "nombre_agents"},
         ),
-        execution_options=config.execution_options["effectif_direction"],
+        execution_options=config.execution_options,
     )
     effectif_perimetre = create_task(
         pipeline=_grist_pipeline("effectif_perimetre", process.process_effectif_perimetre),
-        execution_options=config.execution_options["effectif_perimetre"],
+        execution_options=config.execution_options,
     )
     effectif_departements = create_task(
         pipeline=_grist_pipeline(
@@ -53,7 +53,7 @@ def effectif():
             process.process_effectif_departements,
             cols_mapping={"nombre_d_agent": "nombre_agents"},
         ),
-        execution_options=config.execution_options["effectif_departements"],
+        execution_options=config.execution_options,
     )
     masse_salariale = create_task(
         pipeline=_grist_pipeline(
@@ -61,7 +61,7 @@ def effectif():
             process.process_masse_salariale,
             cols_mapping={"designation_du_ministere_ou_du_budget": "designation_ministere_ou_compte"},
         ),
-        execution_options=config.execution_options["masse_salariale"],
+        execution_options=config.execution_options,
     )
 
     """ Task order """
@@ -94,11 +94,11 @@ def budget():
                 "type_budget": "type_budget",
             },
         ),
-        execution_options=config.execution_options["budget_total"],
+        execution_options=config.execution_options,
     )
     budget_pilotable = create_task(
         pipeline=_grist_pipeline("budget_pilotable", process.process_budget_pilotable),
-        execution_options=config.execution_options["budget_pilotable"],
+        execution_options=config.execution_options,
     )
     budget_general = create_task(
         pipeline=_grist_pipeline(
@@ -114,11 +114,11 @@ def budget():
                 "type_budget": "type_budget",
             },
         ),
-        execution_options=config.execution_options["budget_general"],
+        execution_options=config.execution_options,
     )
     evolution_budget_mef = create_task(
         pipeline=_grist_pipeline("evolution_budget_mef", process.process_evolution_budget_mef),
-        execution_options=config.execution_options["evolution_budget_mef"],
+        execution_options=config.execution_options,
     )
     montant_intervention_invest = create_task(
         pipeline=_grist_pipeline(
@@ -128,7 +128,7 @@ def budget():
                 "source": "source_montant",
             },
         ),
-        execution_options=config.execution_options["montant_intervention_invest"],
+        execution_options=config.execution_options,
     )
     budget_ministere = create_task(
         pipeline=_grist_pipeline(
@@ -141,7 +141,7 @@ def budget():
                 "total": "budget_total",
             },
         ),
-        execution_options=config.execution_options["budget_ministere"],
+        execution_options=config.execution_options,
     )
 
     """ Task order """
@@ -161,15 +161,15 @@ def budget():
 def taux_agent():
     engagement_agent = create_task(
         pipeline=_grist_pipeline("engagement_agent", process.process_engagement_agent),
-        execution_options=config.execution_options["engagement_agent"],
+        execution_options=config.execution_options,
     )
     election_resultat = create_task(
         pipeline=_grist_pipeline("election_resultat", process.process_election_resultat),
-        execution_options=config.execution_options["election_resultat"],
+        execution_options=config.execution_options,
     )
     taux_participation = create_task(
         pipeline=_grist_pipeline("taux_participation", process.process_taux_participation),
-        execution_options=config.execution_options["taux_participation"],
+        execution_options=config.execution_options,
     )
 
     """ Task order """
@@ -194,7 +194,7 @@ def plafond():
                 "Part_du_total": "part_du_total",
             },
         ),
-        execution_options=config.execution_options["plafond_etpt"],
+        execution_options=config.execution_options,
     )
     db_plafond_etpt = create_task(
         pipeline=_grist_pipeline(
@@ -212,7 +212,7 @@ def plafond():
                 "Unite": "unite",
             },
         ),
-        execution_options=config.execution_options["db_plafond_etpt"],
+        execution_options=config.execution_options,
     )
     """ Task order """
     chain([plafond_etpt(), db_plafond_etpt()])

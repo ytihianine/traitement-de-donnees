@@ -16,7 +16,7 @@ def convert_file_to_parquet() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["conso_mens_source"],
+        execution_options=config.execution_options,
     )
 
     informations_batiments_parquet = create_task(
@@ -27,7 +27,7 @@ def convert_file_to_parquet() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["bien_info_complementaire"],
+        execution_options=config.execution_options,
     )
 
     chain(
@@ -48,7 +48,7 @@ def source_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["bien_info_complementaire"],
+        execution_options=config.execution_options,
     )
     conso_mensuelles = create_task(
         pipeline=PipelineDescriptor(
@@ -58,7 +58,7 @@ def source_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["conso_mens"],
+        execution_options=config.execution_options,
     )
     chain([informations_batiments(), conso_mensuelles()])
 
@@ -73,7 +73,7 @@ def additionnal_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["conso_mens_corr_unpivot"],
+        execution_options=config.execution_options,
     )
     unpivot_conso_mens_brute = create_task(
         pipeline=PipelineDescriptor(
@@ -83,7 +83,7 @@ def additionnal_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["conso_mens_brute_unpivot"],
+        execution_options=config.execution_options,
     )
     conso_annuelle = create_task(
         pipeline=PipelineDescriptor(
@@ -93,7 +93,7 @@ def additionnal_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["conso_annuelle"],
+        execution_options=config.execution_options,
     )
     conso_annuelle_unpivot = create_task(
         pipeline=PipelineDescriptor(
@@ -103,7 +103,7 @@ def additionnal_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["conso_annuelle_unpivot"],
+        execution_options=config.execution_options,
     )
     conso_annuelle_unpivot_comparaison = create_task(
         pipeline=PipelineDescriptor(
@@ -113,7 +113,7 @@ def additionnal_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["conso_annuelle_unpivot_comparaison"],
+        execution_options=config.execution_options,
     )
     facture_annuelle_unpivot = create_task(
         pipeline=PipelineDescriptor(
@@ -123,7 +123,7 @@ def additionnal_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["facture_annuelle_unpivot"],
+        execution_options=config.execution_options,
     )
     facture_annuelle_unpivot_comparaison = create_task(
         pipeline=PipelineDescriptor(
@@ -133,7 +133,7 @@ def additionnal_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["facture_annuelle_unpivot_comparaison"],
+        execution_options=config.execution_options,
     )
     facture_annuelle_unpivot = create_task(
         pipeline=PipelineDescriptor(
@@ -143,7 +143,7 @@ def additionnal_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["facture_annuelle_unpivot"],
+        execution_options=config.execution_options,
     )
     facture_annuelle_unpivot_comparaison = create_task(
         pipeline=PipelineDescriptor(
@@ -153,7 +153,7 @@ def additionnal_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["facture_annuelle_unpivot_comparaison"],
+        execution_options=config.execution_options,
     )
     conso_statut_par_fluide = create_task(
         pipeline=PipelineDescriptor(
@@ -163,7 +163,7 @@ def additionnal_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["conso_statut_par_fluide"],
+        execution_options=config.execution_options,
     )
     conso_statut_batiment = create_task(
         pipeline=PipelineDescriptor(
@@ -173,7 +173,7 @@ def additionnal_files() -> None:
             use_input_results_as_operation_args=True,
             add_metadata=True,
         ),
-        execution_options=config.execution_options["conso_statut_batiment"],
+        execution_options=config.execution_options,
     )
 
     chain(
