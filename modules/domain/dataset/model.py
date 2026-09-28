@@ -10,11 +10,11 @@ from modules.domain.projet.model import Projet
 class TypeLocation(Enum):
     """Type de source de données"""
 
-    GRIST = "Grist"
-    S3_FILE = "S3"
-    LOCAL_FILE = "Local"
-    ICEBERG = "Iceberg"
-    DB = "Database"
+    GRIST = "grist"
+    S3_FILE = "s3"
+    LOCAL_FILE = "local"
+    ICEBERG = "iceberg"
+    DB = "database"
 
 
 # =================
@@ -62,6 +62,8 @@ class DatasetContext:
 
     @property
     def projet_id(self) -> int:
+        if self.projet.id is None:
+            raise ValueError("Project ID is not set")
         return self.projet.id
 
     @property

@@ -36,7 +36,7 @@ class TypeDocumentation(Enum):
 @dataclass(frozen=True)
 class Documentation:
     id_projet: int
-    type_documentation: str
+    type_documentation: TypeDocumentation
     lien: str
 
 
@@ -67,4 +67,4 @@ class ProjetMetadata:
 @dataclass
 class Projet:
     name: str
-    id: int
+    id: int | None = None
