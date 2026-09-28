@@ -5,11 +5,10 @@ from dags.applications.clean_system.task import (
     delete_keys_with_date,
     delete_tmp_keys,
 )
-from modules.common_tasks.validation import validate_dag_parameters
-from modules.enums.dags import DagStatus
+from modules.domain.dag.model import DagStatus, FeatureFlagsEnable
+from modules.infra.airflow.common_tasks.validation import validate_dag_parameters
+from modules.infra.airflow.dag import create_dag_params, create_default_args
 from modules.infra.mails.default_smtp import MailStatus, create_send_mail_callback
-from modules.types.dags import FeatureFlagsEnable
-from modules.utils.config.dag_params import create_dag_params, create_default_args
 
 nom_projet = "Nettoyer les systèmes"
 

@@ -10,9 +10,9 @@ import numpy as np
 import pandas as pd
 import psycopg2
 from dags.applications.configuration_projets import process
-from modules.common_tasks.grist import generic_grist_processing
-from modules.utils.logs import df_info
-from modules.utils.process.structures import normalize_grist_dataframe
+from modules.generic_processing.structures import normalize_grist_dataframe
+from modules.infra.airflow.common_tasks.grist import generic_grist_processing
+from modules.logs import df_info
 from psycopg2.extensions import AsIs, register_adapter
 from psycopg2.extras import execute_values
 
@@ -157,9 +157,9 @@ TBL_ORDERED = [
             cols_mapping={
                 "projet": "id_projet",
                 "selecteur": "id_selecteur",
-                "type": "type_source",
+                "type": "type_location",
             },
-            txt_columns=["type_source", "id_source"],
+            txt_columns=["type_location", "id_source"],
             ref_columns=["id_projet", "id_selecteur"],
             custom_fn=process.process_selecteur_source,
         ),
@@ -356,7 +356,7 @@ if __name__ == "__main__":
 
     # Traiter chaque table
     for tbl_desc in TBL_ORDERED:
-        """Traite une table : lecture, transformation et insertion."""
+        """Traite une table : lecture, operation et insertion."""
         print("\n", "=" * 50)
         print(f"Début du traitement de la table <{tbl_desc['tbl_name']}>")
 

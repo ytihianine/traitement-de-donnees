@@ -1,103 +1,84 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
-from dags.sg.siep.mmsi.api_operat import actions, process
-from dags.sg.siep.mmsi.api_operat.types import ApiOperat
-from modules.common_tasks.etl import create_task
-from modules.types.dags import ETLStep, TaskConfig
+from dags.sg.siep.mmsi.api_operat import actions, config, process
+from modules.domain.dataset.model import Dataset
+from modules.domain.pipeline.model import PipelineDescriptor
+from modules.infra.airflow.task import create_task
 
 
 @task_group
 def source() -> None:
-    declarations = create_task(
-        task_config=TaskConfig(task_id="declarations"),
-        output_selecteur="declarations",
-        steps=[
-            ETLStep(
-                fn=actions.liste_declaration,
-                kwargs={"api_operat": ApiOperat()},
-                use_context=False,
-            ),
-        ],
-        export_output=True,
+    declarations_raw = create_task(
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("declarations_raw"),),
+            output_dataset=Dataset("declarations_raw"),
+            operation=actions.liste_declaration,
+            add_metadata=False,
+        ),
+        execution_options=config.execution_options,
     )
-    consommations = create_task(
-        task_config=TaskConfig(task_id="consommation_by_id"),
-        output_selecteur="consommations",
-        input_selecteurs=["declarations"],
-        steps=[
-            ETLStep(
-                fn=actions.consommation_by_id,
-                kwargs={"api_operat": ApiOperat()},
-                use_context=False,
-                read_data=True,
-            ),
-        ],
-        export_output=True,
+
+    consommations_raw = create_task(
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("declarations_raw"),),
+            output_dataset=Dataset("consommations_raw"),
+            operation=actions.consommation_by_id,
+            use_input_results_as_operation_args=True,
+            add_metadata=False,
+        ),
+        execution_options=config.execution_options,
     )
 
     chain(
-        declarations(),
-        consommations(),
+        declarations_raw(),
+        consommations_raw(),
     )
 
 
 @task_group
 def output() -> None:
-    declarations = create_task(
-        task_config=TaskConfig(task_id="declaration_ademe"),
-        input_selecteurs=["declarations"],
-        output_selecteur="declaration_ademe",
-        steps=[
-            ETLStep(
-                fn=process.process_declarations,
-                use_context=False,
-                read_data=True,
-            ),
-        ],
-        export_output=True,
+    declaration_ademe = create_task(
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("declarations_raw"),),
+            output_dataset=Dataset("declaration_ademe"),
+            operation=process.process_declarations,
+            use_input_results_as_operation_args=True,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options,
     )
     activite = create_task(
-        task_config=TaskConfig(task_id="activite"),
-        input_selecteurs=["consommations"],
-        output_selecteur="activite",
-        steps=[
-            ETLStep(
-                fn=process.process_detail_conso_activite,
-                use_context=False,
-                read_data=True,
-            ),
-        ],
-        export_output=True,
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("consommations_raw"),),
+            output_dataset=Dataset("activite"),
+            operation=process.process_detail_conso_activite,
+            use_input_results_as_operation_args=True,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options,
     )
     indicateur = create_task(
-        task_config=TaskConfig(task_id="indicateur"),
-        input_selecteurs=["consommations"],
-        output_selecteur="indicateur",
-        steps=[
-            ETLStep(
-                fn=process.process_detail_conso_indicateur,
-                use_context=False,
-                read_data=True,
-            ),
-        ],
-        export_output=True,
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("consommations_raw"),),
+            output_dataset=Dataset("indicateur"),
+            operation=process.process_detail_conso_indicateur,
+            use_input_results_as_operation_args=True,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options,
     )
     detail = create_task(
-        task_config=TaskConfig(task_id="detail"),
-        input_selecteurs=["consommations"],
-        output_selecteur="detail",
-        steps=[
-            ETLStep(
-                fn=process.process_detail_conso,
-                use_context=False,
-                read_data=True,
-            ),
-        ],
-        export_output=True,
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("consommations_raw"),),
+            output_dataset=Dataset("detail"),
+            operation=process.process_detail_conso,
+            use_input_results_as_operation_args=True,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options,
     )
-
     chain(
-        declarations(),
+        declaration_ademe(),
         activite(),
         indicateur(),
         detail(),

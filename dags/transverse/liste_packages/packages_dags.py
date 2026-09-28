@@ -1,9 +1,8 @@
 from typing import Literal
 
 from airflow.sdk import dag, task
-from modules.enums.dags import DagStatus
-from modules.types.dags import FeatureFlagsEnable
-from modules.utils.config.dag_params import create_dag_params, create_default_args
+from modules.domain.dag.model import DagStatus, FeatureFlagsEnable
+from modules.infra.airflow.dag import create_dag_params, create_default_args
 
 nom_projet = "Liste des packages installés"
 

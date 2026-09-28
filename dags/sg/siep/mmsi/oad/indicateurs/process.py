@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from modules.utils.process.text import normalize_whitespace_columns
+from modules.generic_processing.text import normalize_whitespace_columns
 
 
 def filter_bien(df: pd.DataFrame, df_bien: pd.DataFrame) -> pd.DataFrame:

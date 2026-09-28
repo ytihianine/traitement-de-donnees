@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pandas as pd
-from modules.utils.process.text import (
+from modules.generic_processing.text import (
     convert_str_cols_to_date,
     normalize_whitespace_columns,
 )
@@ -297,7 +297,7 @@ def find_certificat_dir_in_mail(mail: str) -> str | None:
         "IGF": "IGF",
         "SYNDICATS": "SYNDICATS",
         "INDUSTRIE.GOUV": "CABINETS",
-        "TRANSFORMATION.GOUV": "CABINETS",
+        "operation.GOUV": "CABINETS",
         "NUMERIQUE.GOUV": "CABINETS",
         "INSEE": "INSEE",
     }

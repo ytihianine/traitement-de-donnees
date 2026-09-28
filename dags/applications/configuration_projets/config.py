@@ -1,52 +1,38 @@
-from modules.enums.database import LoadStrategy
-from modules.types.projet import SelecteurStorageOptions
+from modules.domain.pipeline.model import ExecutionOptions
 
-storage_options = {
-    "service": SelecteurStorageOptions(
+execution_options = {
+    "ref_service": ExecutionOptions(
         keep_file_id_col=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "direction": SelecteurStorageOptions(
+    "ref_direction": ExecutionOptions(
         keep_file_id_col=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "grist_doc": SelecteurStorageOptions(
-        write_to_db=False,
-    ),
-    "projet_contact": SelecteurStorageOptions(
+    "grist_doc": ExecutionOptions(),
+    "projet_contact": ExecutionOptions(
         keep_file_id_col=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "projet_documentation": SelecteurStorageOptions(
+    "projet_documentation": ExecutionOptions(
         keep_file_id_col=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "projet_s3": SelecteurStorageOptions(
+    "projet_s3": ExecutionOptions(
         keep_file_id_col=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "projet_selecteur": SelecteurStorageOptions(
+    "projet_selecteur": ExecutionOptions(
         keep_file_id_col=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "projets": SelecteurStorageOptions(
+    "projets": ExecutionOptions(
         keep_file_id_col=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "selecteur_column_mapping": SelecteurStorageOptions(
+    "selecteur_column_mapping": ExecutionOptions(
         keep_file_id_col=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "selecteur_database": SelecteurStorageOptions(
+    "selecteur_database": ExecutionOptions(
         keep_file_id_col=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "selecteur_s3": SelecteurStorageOptions(
+    "selecteur_s3": ExecutionOptions(
         keep_file_id_col=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
-    "selecteur_source": SelecteurStorageOptions(
+    "selecteur_source": ExecutionOptions(
         keep_file_id_col=False,
-        load_strategy=LoadStrategy.APPEND,
     ),
 }

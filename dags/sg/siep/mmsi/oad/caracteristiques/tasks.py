@@ -1,48 +1,73 @@
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
+from dags.sg.siep.mmsi.oad import config
 from dags.sg.siep.mmsi.oad.caracteristiques import process
-from modules.common_tasks.etl import create_task
-from modules.common_tasks.file import create_parquet_converter_task
-from modules.types.dags import ETLStep, TaskConfig
+from modules.domain.dataset.model import Dataset
+from modules.domain.pipeline.model import PipelineDescriptor
+from modules.infra.airflow.task import create_task
 
-oad_carac_to_parquet = create_parquet_converter_task(
-    selecteur="oad_carac",
-    task_params={"task_id": "convert_oad_caracteristique_to_parquet"},
-    process_func=process.process_oad_file,
+oad_carac_to_parquet = create_task(
+    pipeline=PipelineDescriptor(
+        input_datasets=(Dataset("oad_carac"),),
+        output_dataset=Dataset("oad_carac"),
+        operation=process.process_oad_file,
+        add_metadata=False,
+    ),
+    execution_options=config.execution_options,
 )
 
 
 @task_group
 def tasks_oad_caracteristiques():
     sites = create_task(
-        task_config=TaskConfig(task_id="sites"),
-        output_selecteur="sites",
-        input_selecteurs=["oad_carac"],
-        steps=[ETLStep(fn=process.process_sites, read_data=True)],
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("oad_carac"),),
+            output_dataset=Dataset("sites"),
+            operation=process.process_sites,
+            use_input_results_as_operation_args=True,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options,
     )
     biens = create_task(
-        task_config=TaskConfig(task_id="biens"),
-        output_selecteur="biens",
-        input_selecteurs=["oad_carac"],
-        steps=[ETLStep(fn=process.process_biens, read_data=True)],
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("oad_carac"),),
+            output_dataset=Dataset("biens"),
+            operation=process.process_biens,
+            use_input_results_as_operation_args=True,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options,
     )
     gestionnaires = create_task(
-        task_config=TaskConfig(task_id="gestionnaires"),
-        output_selecteur="gestionnaires",
-        input_selecteurs=["oad_carac"],
-        steps=[ETLStep(fn=process.process_gestionnaires, read_data=True)],
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("oad_carac"),),
+            output_dataset=Dataset("gestionnaires"),
+            operation=process.process_gestionnaires,
+            use_input_results_as_operation_args=True,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options,
     )
     biens_gestionnaires = create_task(
-        task_config=TaskConfig(task_id="biens_gestionnaires"),
-        output_selecteur="biens_gest",
-        input_selecteurs=["oad_carac"],
-        steps=[ETLStep(fn=process.process_biens_gestionnaires, read_data=True)],
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("oad_carac"),),
+            output_dataset=Dataset("biens_gest"),
+            operation=process.process_biens_gestionnaires,
+            use_input_results_as_operation_args=True,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options,
     )
     biens_occupants = create_task(
-        task_config=TaskConfig(task_id="biens_occupants"),
-        output_selecteur="biens_occupants",
-        input_selecteurs=["oad_carac"],
-        steps=[ETLStep(fn=process.process_biens_occupants, read_data=True)],
+        pipeline=PipelineDescriptor(
+            input_datasets=(Dataset("oad_carac"),),
+            output_dataset=Dataset("biens_occupants"),
+            operation=process.process_biens_occupants,
+            use_input_results_as_operation_args=True,
+            add_metadata=True,
+        ),
+        execution_options=config.execution_options,
     )
 
     chain(

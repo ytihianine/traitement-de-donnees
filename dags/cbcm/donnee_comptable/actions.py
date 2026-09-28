@@ -7,8 +7,7 @@ from modules.constants import (
     DEFAULT_GRIST_HOST,
     PROXY,
 )
-from modules.enums.database import DatabaseType
-from modules.infra.database.factory import DbConfig, create_db_handler
+from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 from modules.infra.grist.client import GristClient
 from modules.infra.http_client.adapters import RequestsClient
 from modules.infra.http_client.config import ClientConfig

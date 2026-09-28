@@ -1,14 +1,22 @@
 """Factory for creating database handlers."""
 
 from dataclasses import dataclass
+from enum import Enum, auto
 from pathlib import Path
 
 from modules.constants import DEFAULT_PG_DATA_CONN_ID
-from modules.enums.database import DatabaseType
 from modules.infra.database.base import DBInterface
 from modules.infra.database.postgres import PgAdapter
 from modules.infra.database.sqlite import SQLiteAdapter
 from modules.infra.database.trino import TrinoAdapter
+
+
+class DatabaseType(Enum):
+    """Database types enumeration."""
+
+    POSTGRES = auto()
+    SQLITE = auto()
+    TRINO = auto()
 
 
 @dataclass(frozen=True)

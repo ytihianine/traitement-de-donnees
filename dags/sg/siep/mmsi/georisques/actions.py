@@ -6,14 +6,12 @@ from dags.sg.siep.mmsi.georisques.process import (
     format_risque_results,
 )
 from modules.constants import AGENT, PROXY
-from modules.enums.database import DatabaseType
-from modules.enums.http import HttpHandlerType
-from modules.infra.database.factory import DbConfig, create_db_handler
+from modules.containers import DEFAULT_DAG_REPO
+from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 from modules.infra.http_client.base import HttpInterface
 from modules.infra.http_client.config import ClientConfig
-from modules.infra.http_client.factory import create_http_client
+from modules.infra.http_client.factory import HttpHandlerType, create_http_client
 from modules.infra.http_client.types import HTTPResponse
-from modules.utils.config.dag_params import get_db_info
 from tenacity import (
     before_sleep_log,
     retry,
@@ -22,8 +20,6 @@ from tenacity import (
     wait_exponential,
 )
 
-logger = logging.getLogger(name=__name__)
-
 
 def get_bien_from_db(context: dict) -> pd.DataFrame:
     # Hook & config
@@ -31,7 +27,7 @@ def get_bien_from_db(context: dict) -> pd.DataFrame:
         db_type=DatabaseType.POSTGRES,
         db_config=DbConfig(),
     )
-    schema = get_db_info(context=context).prod_schema
+    schema = DEFAULT_DAG_REPO.get_db_info(context=context).prod_schema
     snapshot_id = context["ti"].xcom_pull(key="return_value", task_ids="get_projet_snapshot")
     logging.info(msg=f"Snapshot ID récupéré : {snapshot_id}")
 
@@ -72,7 +68,7 @@ def _should_retry_response(response: HTTPResponse | None) -> bool:
     stop=stop_after_attempt(max_attempt_number=30),
     wait=wait_exponential(multiplier=1, min=1, max=30),
     retry=retry_if_result(predicate=_should_retry_response),
-    before_sleep=before_sleep_log(logger, log_level=logging.WARNING),
+    before_sleep=before_sleep_log(logging, log_level=logging.WARNING),
     reraise=False,
 )
 def get_risque(http_client: HttpInterface, url: str, query_param: str) -> HTTPResponse | None:

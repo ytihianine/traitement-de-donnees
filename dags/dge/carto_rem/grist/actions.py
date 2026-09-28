@@ -8,17 +8,15 @@ from modules.constants import (
     DEFAULT_GRIST_HOST,
     PROXY,
 )
-from modules.enums.database import DatabaseType
-from modules.infra.database.factory import DbConfig, create_db_handler
+from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO
+from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 from modules.infra.grist.client import GristClient
 from modules.infra.http_client.adapters import RequestsClient
 from modules.infra.http_client.config import ClientConfig
-from modules.utils.config.dag_params import get_db_info, get_project_name
-from modules.utils.config.tasks import get_selecteur_storage_info
 
 
 def get_agent_db(context: Mapping[str, Any]) -> pd.DataFrame:
-    schema = get_db_info(context=context).prod_schema
+    schema = DEFAULT_DAG_REPO.get_db_info(context=context).prod_schema
 
     # Hook
     db_handler = create_db_handler(
@@ -53,8 +51,8 @@ def load_agent(
     context: Mapping[str, Any],
 ) -> None:
     # Get Grist doc_id
-    nom_projet = get_project_name(context=context)
-    grist_doc_info = get_selecteur_storage_info(nom_projet=nom_projet, selecteur=grist_doc_selecteur)
+    nom_projet = DEFAULT_DAG_REPO.get_project_name(context=context)
+    dataset_context = DEFAULT_DATASET_CONTEXT_REPO.get(nom_projet=nom_projet, nom_dataset=grist_doc_selecteur)
 
     # Merge pour comparer
     df = pd.merge(
@@ -78,10 +76,10 @@ def load_agent(
         grist_host=DEFAULT_GRIST_HOST,
         api_token=Variable.get(key="grist_secret_key"),
     )
-    doc_id = grist_doc_info.id_source
+    doc_id = dataset_context.src_location.location
     if doc_id is None:
         raise ValueError(
-            f"doc_id is None for selecteur {grist_doc_selecteur} in project {nom_projet}. Please check the configuration."
+            f"doc_id is None for dataset {grist_doc_selecteur} in project {nom_projet}. Please check the configuration."
         )
     grist_client.send_dataframe_to_grist(
         df=df,

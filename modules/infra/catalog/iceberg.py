@@ -2,6 +2,7 @@ import logging
 import ssl
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from enum import Enum, auto
 from typing import Any
 
 import pandas as pd
@@ -17,7 +18,12 @@ from modules.constants import (
     DEFAULT_POLARIS_CLIENT_ID,
     DEFAULT_POLARIS_CLIENT_SECRET,
 )
-from modules.enums.filesystem import IcebergTableStatus
+
+
+class IcebergTableStatus(Enum):
+
+    STAGING = auto()
+    PROD = auto()
 
 
 def generate_catalog_properties(
@@ -119,13 +125,13 @@ class IcebergCatalog:
             logging.info(msg=f"Creating namespace: {parent_namespace}")
             self.catalog.create_namespace_if_not_exists(namespace=parent_namespace)
 
-    def create_table(self, table_name: str, df: pd.DataFrame, location: str | None = None) -> Table:
+    def create_table(self, table_name: str, df: pd.DataFrame, DatasetLocation: str | None = None) -> Table:
         # Générer le schéma à partir de la structure du DataFrame
         logging.info(msg=f"Creating table with name: {table_name}")
         table = self.catalog.create_table_if_not_exists(
             identifier=table_name,
             schema=self._get_schema_from_dataframe(df=df),
-            # location=location
+            # DatasetLocation=DatasetLocation
         )
         return table
 

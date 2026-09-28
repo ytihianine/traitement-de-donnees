@@ -10,8 +10,7 @@ import pandas as pd
 import psycopg2
 from sqlalchemy import create_engine
 
-from .base import DBInterface
-from .exceptions import DatabaseError
+from modules.infra.database.base import DBInterface
 
 if TYPE_CHECKING:
     from airflow.providers.common.sql.hooks.sql import DbApiHook
@@ -110,74 +109,93 @@ class PgAdapter(DBInterface):
 
     def execute(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> None:
         """Execute a query without returning results."""
-        try:
-            start_time = time.time()
-            if self._use_airflow:
-                self.hook.run(query, parameters=parameters)
-            else:
-                with self.get_conn() as conn:
-                    with conn.cursor() as cur:
-                        cur.execute(query, parameters)
-                    conn.commit()
-            logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
-        except Exception as e:
-            raise DatabaseError(f"Error executing query: {e!s}") from e
+        start_time = time.time()
+        if self._use_airflow:
+            self.hook.run(query, parameters=parameters)
+        else:
+            with self.get_conn() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(query, parameters)
+                conn.commit()
+        logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
 
     def fetch_one(
         self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None
     ) -> dict[str, Any] | None:
         """Fetch a single row as a dictionary."""
-        try:
-            start_time = time.time()
-            with self.get_conn() as conn, conn.cursor() as cur:
-                cur.execute(query, parameters)
-                if cur.description is None:
-                    raise DatabaseError("Query did not return a result set")
-                columns = [str(desc[0]) for desc in cur.description]
-                result = cur.fetchone()
+        start_time = time.time()
+        with self.get_conn() as conn, conn.cursor() as cur:
+            cur.execute(query, parameters)
+            if cur.description is None:
+                raise ValueError("Query did not return a result set")
+            columns = [str(desc[0]) for desc in cur.description]
+            result = cur.fetchone()
 
-            logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
-            if result is None:
-                return None
-            return dict(zip(columns, result, strict=False))
-        except DatabaseError:
-            raise
-        except Exception as e:
-            raise DatabaseError(f"Error fetching row: {e!s}") from e
+        logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
+        if result is None:
+            return None
+        return dict(zip(columns, result, strict=False))
 
     def fetch_all(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Fetch all rows as a list of dictionaries."""
-        try:
-            start_time = time.time()
-            with self.get_conn() as conn, conn.cursor() as cur:
-                cur.execute(query, parameters)
-                if cur.description is None:
-                    raise DatabaseError("Query did not return a result set")
+        start_time = time.time()
+        with self.get_conn() as conn, conn.cursor() as cur:
+            cur.execute(query, parameters)
+            if cur.description is None:
+                raise ValueError("Query did not return a result set")
 
-                columns = [str(desc[0]) for desc in cur.description]
-                results = cur.fetchall()
+            columns = [str(desc[0]) for desc in cur.description]
+            results = cur.fetchall()
 
-            logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
-            return [dict(zip(columns, row, strict=False)) for row in results]
-
-        except DatabaseError:
-            raise
-        except Exception as e:
-            raise DatabaseError(f"Error fetching rows: {e!s}") from e
+        logging.debug(f"Query executed in {time.time() - start_time:.2f}s")
+        return [dict(zip(columns, row, strict=False)) for row in results]
 
     def fetch_df(self, query: str, parameters: tuple[Any, ...] | dict[str, Any] | None = None) -> pd.DataFrame:
         """Fetch results as a pandas DataFrame."""
-        try:
-            start_time = time.time()
-            logging.info(msg=f"Running statement:\n {query}")
-            if self._use_airflow:
-                df = self.hook.get_pandas_df(sql=query, parameters=parameters)
-            else:
-                df = pd.read_sql(sql=query, con=self.engine, params=parameters)
-            logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
-            return df
-        except Exception as e:
-            raise DatabaseError(f"Error fetching DataFrame: {e!s}") from e
+        start_time = time.time()
+        logging.info(msg=f"Running statement:\n {query}")
+        if self._use_airflow:
+            df = self.hook.get_pandas_df(sql=query, parameters=parameters)
+        else:
+            df = pd.read_sql(sql=query, con=self.engine, params=parameters)
+        logging.debug(msg=f"Query executed in {time.time() - start_time:.2f}s")
+        return df
+
+    def fetch_table_columns(self, schema: str, table: str, sorted: bool = True) -> list[str]:
+        """Fetch the column names of a table."""
+        df = self.fetch_df(
+            query="""
+                SELECT isc.table_catalog, isc.table_schema, isc.table_name, isc.column_name
+                FROM information_schema.columns isc
+                WHERE
+                    isc.table_schema = %s
+                    AND isc.table_name = %s
+                    AND isc.column_default IS NULL
+                    AND isc.is_identity = 'NO'
+                ORDER BY table_schema ASC, table_name ASC, column_name ASC;
+            """,
+            parameters=(schema, table),
+        )
+        cols = df.loc[:, "column_name"].tolist()
+        if sorted:
+            cols.sort()
+        return cols
+
+    def fetch_table_pk(self, schema: str, table: str) -> list[str]:
+        """Fetch the primary key column of a table."""
+        query = """
+            SELECT kcu.column_name
+            FROM information_schema.table_constraints tc
+            JOIN information_schema.key_column_usage kcu
+                ON tc.constraint_name = kcu.constraint_name
+                    AND tc.constraint_schema = kcu.constraint_schema
+            WHERE tc.table_schema = %s
+                AND tc.table_name = %s
+                AND tc.constraint_type = 'PRIMARY KEY'
+            ORDER BY kcu.ordinal_position;
+        """
+        df = self.fetch_df(query, parameters=(schema, table))
+        return df.loc[:, "column_name"].tolist()
 
     def insert(self, table: str, data: dict[str, Any]) -> None:
         """Insert a single row into a table."""
@@ -256,15 +274,12 @@ class PgAdapter(DBInterface):
             sql: COPY command to execute
             filepath: Path to the file to bulk load
         """
-        try:
-            start_time = time.time()
-            if self._use_airflow:
-                self.hook.copy_expert(sql, filepath)
-            else:
-                with self.get_conn() as conn:
-                    with conn.cursor() as cur, open(filepath) as f:
-                        cur.copy_expert(sql, f)
-                    conn.commit()
-            logging.debug(f"COPY operation executed in {time.time() - start_time:.2f}s")
-        except Exception as e:
-            raise DatabaseError(f"Error during COPY operation: {e!s}") from e
+        start_time = time.time()
+        if self._use_airflow:
+            self.hook.copy_expert(sql, filepath)
+        else:
+            with self.get_conn() as conn:
+                with conn.cursor() as cur, open(filepath) as f:
+                    cur.copy_expert(sql, f)
+                conn.commit()
+        logging.debug(f"COPY operation executed in {time.time() - start_time:.2f}s")

@@ -3,12 +3,10 @@
 import logging
 import os
 import sys
-from functools import lru_cache
 
 import pytz
 
 
-@lru_cache(maxsize=1)
 def get_root_folder() -> str:
     """Get root folder based on environment."""
     base_folder = os.getenv("AIRFLOW_HOME")
@@ -34,7 +32,9 @@ AGENT = ENV_VAR.get("AIRFLOW_USER_AGENT", None)
 # Timezone configuration
 PARIS_TZ = pytz.timezone(zone="Europe/Paris")
 
+
 # DEFAULT VARIABLES
+DEFAULT_TASK_OWNER = "airflow"
 DEFAULT_SMTP_CONN_ID = "smtp_nubonyxia"
 DEFAULT_MAIL_CC = ["labo-data@finances.gouv.fr", "yanis.tihianine@finances.gouv.fr"]
 DEFAULT_TMP_SCHEMA = "temporaire"

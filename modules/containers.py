@@ -1,0 +1,10 @@
+from modules.infra.airflow.dag import AirflowDagRepository
+from modules.infra.database.repository.dataset_context import DbDatasetContextRepository
+from modules.infra.database.repository.projet import DbProjetRepository
+from modules.infra.file_system.dataset_location_factory import DatasetLocationFactory
+
+# DEFAULT REPOSITORIES
+DEFAULT_DAG_REPO = AirflowDagRepository()
+DEFAULT_PROJET_REPO = DbProjetRepository()
+DEFAULT_DATASET_CONTEXT_REPO = DbDatasetContextRepository()
+DEFAULT_LOCATION_PROVIDER_FACTORY = DatasetLocationFactory()

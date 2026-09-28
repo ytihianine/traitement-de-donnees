@@ -104,7 +104,7 @@ CREATE TABLE conf_projets."selecteur_source" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "id_selecteur" int,
-  "type_source" text,
+  "type_location" text,
   "id_source" text,
   "import_timestamp" TIMESTAMP NOT NULL,
   "snapshot_id" UUID NOT NULL,
@@ -242,7 +242,7 @@ SELECT
     cpp.projet,
     cpps.type_selecteur,
     cpps.selecteur,
-    cpss.type_source,
+    cpss.type_location,
     cpss.id_source,
     cpss3.filename,
     COALESCE(cpss3.key, cpps3.key) as s3_key,
@@ -336,7 +336,7 @@ join conf_projets.selecteur_source cppsource
 	cpp.id_projet = cppsource.id_projet
 	and cpps.id_selecteur = cppsource.id_selecteur
 	and cpp.snapshot_id = cppsource.snapshot_id
-	and cppsource.type_source = 'Fichier'
+	and cppsource.type_location = 'Fichier'
 join conf_projets.ref_direction cp_ref_dir
   on
 	cpp.id_direction = cp_ref_dir.id_direction

@@ -4,8 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
-from modules.enums.filesystem import IcebergTableStatus
-from modules.infra.catalog.iceberg import IcebergCatalog, generate_catalog_properties
+from modules.infra.catalog.iceberg import IcebergCatalog, IcebergTableStatus, generate_catalog_properties
 from scripts.settings import get_settings
 
 

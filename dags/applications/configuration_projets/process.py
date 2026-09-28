@@ -2,8 +2,8 @@ import logging
 
 import pandas as pd
 from modules.constants import NO_PROCESS_MSG
-from modules.enums.dags import TypeDocumentation
-from modules.utils.process.structures import (
+from modules.domain.projet.model import TypeDocumentation
+from modules.generic_processing.structures import (
     validate_enum_column,
 )
 

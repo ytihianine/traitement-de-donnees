@@ -2,7 +2,7 @@ import logging
 
 import pandas as pd
 from modules.constants import NO_PROCESS_MSG
-from modules.utils.process.structures import (
+from modules.generic_processing.structures import (
     convert_str_of_list_to_list,
 )
 
