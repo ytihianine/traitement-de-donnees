@@ -22,7 +22,7 @@ from modules.infra.database.factory import DatabaseType, DbConfig, create_db_han
 
 logger = logging.getLogger(name=__name__)
 
-CONF_SCHEMA = "conf_projets"
+CONF_SCHEMA = "conf_projet"
 
 db_retry = retry(
     retry=retry_if_exception_type(exception_types=(ConnectionError, TimeoutError, OSError)),
@@ -35,7 +35,7 @@ db_retry = retry(
 
 @dataclass(frozen=True)
 class DbDatasetContextRepository(DatasetContextRepository):
-    """DatasetContextRepository backed by the ``conf_projets`` Postgres schema."""
+    """DatasetContextRepository backed by the ``conf_projet`` Postgres schema."""
 
     db_type: DatabaseType = DatabaseType.POSTGRES
     db_connection_id: str = DEFAULT_PG_DATA_CONN_ID
@@ -68,7 +68,7 @@ class DbDatasetContextRepository(DatasetContextRepository):
                     AND cpdd.projet = %s
                     AND cpdd."import_timestamp" = (
                     SELECT MAX("import_timestamp")
-                    FROM conf_projets."dim_dataset_location"
+                    FROM conf_projet."dim_dataset_location"
                     WHERE "projet" = %s
                 );
             """,
@@ -120,7 +120,7 @@ class DbDatasetContextRepository(DatasetContextRepository):
                     AND cpdd.dataset = %s
                     AND cpdd."import_timestamp" = (
                     SELECT MAX("import_timestamp")
-                    FROM conf_projets."dim_dataset_location"
+                    FROM conf_projet."dim_dataset_location"
                     WHERE "projet" = %s
                       AND "dataset" = %s
                 );

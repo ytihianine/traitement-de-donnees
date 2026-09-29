@@ -14,7 +14,7 @@ from modules.domain.projet.model import Projet
 
 @dataclass(frozen=True)
 class YamlDatasetContextRepository(DatasetContextRepository):
-    """DatasetContextRepository backed by a declarative YAML file instead of the ``conf_projets`` schema."""
+    """DatasetContextRepository backed by a declarative YAML file instead of the ``conf_projet`` schema."""
 
     yaml_path: str | Path
 

@@ -21,7 +21,7 @@ from modules.infra.database.factory import DatabaseType, DbConfig, create_db_han
 
 logger = logging.getLogger(name=__name__)
 
-CONF_SCHEMA = "conf_projets"
+CONF_SCHEMA = "conf_projet"
 
 db_retry = retry(
     retry=retry_if_exception_type(exception_types=(ConnectionError, TimeoutError, OSError)),
@@ -34,7 +34,7 @@ db_retry = retry(
 
 @dataclass(frozen=True)
 class DbProjetRepository(ProjetRepository):
-    """ProjetRepository backed by the ``conf_projets`` Postgres schema."""
+    """ProjetRepository backed by the ``conf_projet`` Postgres schema."""
 
     db_type: DatabaseType = DatabaseType.POSTGRES
     db_connection_id: str = DEFAULT_PG_DATA_CONN_ID
@@ -137,7 +137,7 @@ class DbProjetRepository(ProjetRepository):
         query = """
             SELECT s.id_projet, s.snapshot_id, s.snapshot_id_parent, s.import_timestamp, s.is_dag_completed
             FROM versioning.snapshot s
-            JOIN conf_projets.projet p
+            JOIN conf_projet.projet p
                 ON p.id_projet = s.id_projet
             WHERE p.projet = %(nom_projet)s
             AND s.is_dag_completed = %(is_dag_completed)s
@@ -185,7 +185,7 @@ class DbProjetRepository(ProjetRepository):
 
         # Get project id
         id_projet_result = self.db_client.fetch_one(
-            query="SELECT id_projet FROM conf_projets.projet WHERE projet = %(nom_projet)s;",
+            query="SELECT id_projet FROM conf_projet.projet WHERE projet = %(nom_projet)s;",
             parameters={"nom_projet": nom_projet},
         )
         if id_projet_result is None:
