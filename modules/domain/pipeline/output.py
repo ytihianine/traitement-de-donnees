@@ -59,7 +59,7 @@ class DataFrameOutputAdapter(OutputAdapter):
 
     def supports(self, output: object) -> bool:
         """Return whether the output is a pandas DataFrame."""
-        return isinstance(output, DataframeOutput)
+        return isinstance(output, (pd.DataFrame, DataframeOutput))
 
     def write(
         self,
@@ -68,10 +68,14 @@ class DataFrameOutputAdapter(OutputAdapter):
         location: str,
     ) -> None:
         """Serialize a DataFrame to Parquet bytes and store them."""
-        if not isinstance(output, DataframeOutput):
-            raise TypeError("DataFrameOutputAdapter only supports DataframeOutput outputs")
+        if isinstance(output, DataframeOutput):
+            dataframe = output.value
+        elif isinstance(output, pd.DataFrame):
+            dataframe = output
+        else:
+            raise TypeError("DataFrameOutputAdapter only supports pandas DataFrame or DataframeOutput outputs")
 
-        content = output.value.to_parquet(path=None, index=False)
+        content = dataframe.to_parquet(path=None, index=False)
         if not isinstance(content, bytes):
             raise TypeError("DataFrame serialization must produce bytes")
 
