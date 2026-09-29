@@ -88,7 +88,7 @@ def process_dim_projet(
     df_ref_service: pd.DataFrame,
     df_projet_location: pd.DataFrame,
 ) -> pd.DataFrame:
-    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    metadata_cols = ["id_row", "snapshot_id_parent", "snapshot_id", "import_timestamp"]
     df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
     df_projet_location_clean = df_projet_location.drop(columns=metadata_cols, errors="ignore")
     df_ref_direction_clean = df_ref_direction.drop(columns=metadata_cols, errors="ignore")
@@ -119,7 +119,7 @@ def process_dim_projet(
 
 
 def process_dim_projet_contact(df_projet: pd.DataFrame, df_projet_contact: pd.DataFrame) -> pd.DataFrame:
-    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    metadata_cols = ["id_row", "snapshot_id_parent", "snapshot_id", "import_timestamp"]
     df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
     df_projet_contact_clean = df_projet_contact.drop(columns=metadata_cols, errors="ignore")
 
@@ -137,7 +137,7 @@ def process_dim_projet_contact(df_projet: pd.DataFrame, df_projet_contact: pd.Da
 
 
 def process_dim_projet_documentation(df_projet: pd.DataFrame, df_projet_documentation: pd.DataFrame) -> pd.DataFrame:
-    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    metadata_cols = ["id_row", "snapshot_id_parent", "snapshot_id", "import_timestamp"]
     df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
     df_projet_documentation_clean = df_projet_documentation.drop(columns=metadata_cols, errors="ignore")
 
@@ -157,7 +157,7 @@ def process_dim_projet_documentation(df_projet: pd.DataFrame, df_projet_document
 def process_dim_dataset(
     df_projet: pd.DataFrame, df_dataset: pd.DataFrame, df_ref_direction: pd.DataFrame, df_ref_service: pd.DataFrame
 ) -> pd.DataFrame:
-    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    metadata_cols = ["id_row", "snapshot_id_parent", "snapshot_id", "import_timestamp"]
     df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
     df_dataset_clean = df_dataset.drop(columns=metadata_cols, errors="ignore")
     df_ref_direction_clean = df_ref_direction.drop(columns=metadata_cols, errors="ignore")
@@ -194,7 +194,7 @@ def process_dim_dataset_location(
     df_ref_type_location: pd.DataFrame,
     df_ref_connexion: pd.DataFrame,
 ) -> pd.DataFrame:
-    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    metadata_cols = ["id_row", "snapshot_id_parent", "snapshot_id", "import_timestamp"]
     df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
     df_dataset_clean = df_dataset.drop(columns=metadata_cols, errors="ignore")
     df_dataset_location_clean = df_dataset_location.drop(columns=metadata_cols, errors="ignore")
@@ -236,7 +236,7 @@ def process_dim_dataset_location(
 def process_dim_dataset_column_mapping(
     df_projet: pd.DataFrame, df_dataset: pd.DataFrame, df_dataset_column_mapping: pd.DataFrame
 ) -> pd.DataFrame:
-    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    metadata_cols = ["id_row", "snapshot_id_parent", "snapshot_id", "import_timestamp"]
     df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
     df_dataset_clean = df_dataset.drop(columns=metadata_cols, errors="ignore")
     df_dataset_column_mapping_clean = df_dataset_column_mapping.drop(columns=metadata_cols, errors="ignore")
