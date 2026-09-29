@@ -1,7 +1,8 @@
 import logging
 from pathlib import Path
+from pprint import pprint
 
-from airflow.sdk import Variable, chain, task, task_group
+from airflow.sdk import Variable, chain, get_current_context, task, task_group
 from dags.dag_verification.config import execution_options
 from modules.constants import (
     AGENT,
@@ -19,8 +20,9 @@ from modules.containers import (
     DEFAULT_PROJET_REPO,
 )
 from modules.domain.dag.model import DagConfig
-from modules.domain.dataset.model import Dataset
+from modules.domain.dataset.model import Dataset, DatasetContext
 from modules.domain.pipeline.model import PipelineDescriptor
+from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.dag import AirflowDagRepository
 from modules.infra.catalog.iceberg import (
     IcebergCatalog,
@@ -38,7 +40,7 @@ from modules.infra.mails.default_smtp import MailMessage, MailStatus, _callback,
 # Domain verification
 # =====================
 @task_group
-def check_dag() -> None:
+def check_dag(**context) -> None:
     @task
     def create_dag_config(**context) -> DagConfig:
         dag_repository = AirflowDagRepository()
@@ -55,16 +57,23 @@ def check_dag() -> None:
     def retrieve_dag_info_from_context(**context) -> DagConfig:
         return DagConfig.from_dag_context(context_params=context["params"])
 
+    @task
+    def print_context(**context) -> None:
+        pprint(object=context)
+        pprint(object=context["dag"].__dict__)
+        pprint(object=context["ti"].__dict__)
+
     chain(
         [
-            create_dag_config(),
-            retrieve_dag_info_from_context(),
+            create_dag_config(**context),
+            retrieve_dag_info_from_context(**context),
+            print_context(**context),
         ]
     )
 
 
 @task_group
-def check_projet() -> None:
+def check_projet(**context) -> None:
     @task
     def create_projet(nom_projet: str | None = None, **context) -> None:
         projet_repository = DEFAULT_PROJET_REPO
@@ -86,13 +95,23 @@ def check_projet() -> None:
         s3_info = projet_repository.get_projet_s3_info(nom_projet=nom_projet)
         logging.info(msg=f"S3 info: {s3_info}")
 
+    @task
+    def get_projet_metadata(nom_projet: str | None = None, **context) -> None:
+        projet_repository = DEFAULT_PROJET_REPO
+        if nom_projet is None:
+            nom_projet = DEFAULT_DAG_REPO.get_project_name(context=context)
+
+        metadata = projet_repository.get_projet_metadata(nom_projet=nom_projet)
+        logging.info(msg=f"ProjetMetadata retrieved: {metadata}")
+
     chain(
-        create_projet(),
+        create_projet(**context),
+        get_projet_metadata(**context),
     )
 
 
 @task_group
-def check_dataset() -> None:
+def check_dataset(nom_projet: str, **context) -> None:
     @task
     def create_dataset(nom_projet: str | None = None, **context) -> None:
         if nom_projet is None:
@@ -104,16 +123,34 @@ def check_dataset() -> None:
             logging.info(
                 msg=(
                     f"Dataset: {dataset_context.dataset_name}, "
-                    f"src: {dataset_context.src_location}, "
-                    f"tmp: {dataset_context.tmp_location}, "
-                    f"dest: {dataset_context.dest_location}"
+                    f"src: {dataset_context.src_loc}, "
+                    f"tmp: {dataset_context.tmp_loc}, "
+                    f"dest: {dataset_context.dest_loc}"
                 )
             )
-            provider = DEFAULT_LOCATION_PROVIDER_FACTORY.create(dataset_location=dataset_context.src_location)
+            provider = DEFAULT_LOCATION_PROVIDER_FACTORY.create(dataset_location=dataset_context.src_loc)
             logging.info(msg=f"Location provider created: {type(provider).__name__}")
 
+    @task(map_index_template="{{ dataset_name }}")
+    def print_dataset_context(
+        dataset_context: DatasetContext,
+        **context,
+    ) -> None:
+        context = get_current_context()
+        context["dataset_name"] = dataset_context.dataset_name  # type: ignore
+        print(f"Dataset: {dataset_context.dataset_name}")
+        print(f"Source location: {dataset_context.src_loc}")
+        print(f"Temporary location: {dataset_context.tmp_loc}")
+        print(f"Destination location: {dataset_context.dest_loc}")
+
+    datasets_context = get_projet_datasets_context(nom_projet=nom_projet)
+
     chain(
-        create_dataset(),
+        datasets_context,
+        [
+            create_dataset(nom_projet=nom_projet, **context),
+            print_dataset_context.expand(dataset_context=datasets_context),
+        ],
     )
 
 

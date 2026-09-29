@@ -1,7 +1,6 @@
-from pprint import pprint
-
-from airflow.sdk import dag, get_current_context, task
+from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
+from dags.dag_verification.config import nom_projet, nom_projet_test
 from dags.dag_verification.tasks import (
     check_dag,
     check_dataset,
@@ -15,17 +14,11 @@ from dags.dag_verification.tasks import (
     check_smtp,
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
-from modules.domain.dataset.model import DatasetContext
-from modules.infra.airflow.common_tasks.projet import (
-    get_projet_datasets_context,
-)
 from modules.infra.airflow.common_tasks.validation import validate_dag_parameters
 from modules.infra.airflow.dag import (
     create_dag_params,
     create_default_args,
 )
-
-nom_projet = "Configuration des projets"
 
 
 # Définition du DAG
@@ -52,35 +45,14 @@ nom_projet = "Configuration des projets"
     ),
 )
 def dag_verification() -> None:
-    @task
-    def print_context(**context) -> None:
-        pprint(object=context)
-        pprint(object=context["dag"].__dict__)
-        pprint(object=context["ti"].__dict__)
-
-    datasets_context = get_projet_datasets_context(nom_projet=nom_projet)
-
-    @task(map_index_template="{{ dataset_name }}")
-    def print_dataset_context(
-        dataset_context: DatasetContext,
-        **context,
-    ) -> None:
-        context = get_current_context()
-        context["dataset_name"] = dataset_context.dataset_name  # type: ignore
-        print(f"Dataset: {dataset_context.dataset_name}")
-        print(f"Source location: {dataset_context.src_location}")
-        print(f"Temporary location: {dataset_context.tmp_location}")
-        print(f"Destination location: {dataset_context.dest_location}")
 
     # Ordre des tâches
     chain(
         validate_dag_parameters(),
-        datasets_context,
         [
-            print_context(),
             check_dag(),
             check_projet(),
-            check_dataset(),
+            check_dataset(nom_projet=nom_projet_test),
             check_pipeline(),
             check_db_interface(),
             check_fs_interface(),
@@ -88,7 +60,6 @@ def dag_verification() -> None:
             check_grist(),
             check_http_interface(),
             check_smtp(),
-            print_dataset_context.expand(dataset_context=datasets_context),
         ],
     )
 
