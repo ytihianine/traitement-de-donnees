@@ -165,6 +165,7 @@ def source_grist() -> None:
                 },
                 txt_columns=["contact_mail"],
                 ref_columns=["id_projet"],
+                int_columns=["id_contact"],
                 bool_columns=["is_mail_generic"],
                 custom_fn=process.process_projet_contact,
             ),
