@@ -3,7 +3,7 @@
 import logging
 from collections.abc import Mapping
 
-from airflow.sdk import get_current_context, task
+from airflow.sdk import task
 
 from modules.constants import (
     DEFAULT_PG_DATA_CONN_ID,
@@ -12,7 +12,7 @@ from modules.constants import (
 from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO, DEFAULT_PROJET_REPO
 from modules.domain.dag.model import FeatureFlags
 from modules.domain.dag.repository import DagRepository
-from modules.domain.dataset.model import DatasetContext, TypeLocation
+from modules.domain.dataset.model import TypeLocation
 from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import (
     ExecutionOptions,
@@ -26,7 +26,7 @@ from modules.infra.airflow.dag import (
 )
 from modules.infra.database.base import DBInterface
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
-from modules.infra.file_system.dataset_location import parse_db_table
+from modules.infra.file_system.dataset_location import parse_db_schema, parse_db_table
 
 
 # ------------------------------------------------------------------------------
@@ -87,10 +87,13 @@ def update_projet_snapshot_status(
     logging.info(msg=f"Updated latest snapshot_id. Set is_dag_completed to {status}")
 
 
-@task(map_index_template="{{ import_task_name }}")
+@task
 def ensure_partition(
-    dataset_context: DatasetContext,
     execution_options: Mapping[str, ExecutionOptions],
+    nom_projet: str | None = None,
+    pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
+    dag_repo: AirflowDagRepository = DEFAULT_DAG_REPO,
+    dataset_context_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
     **context,
 ) -> None:
     """
@@ -106,64 +109,71 @@ def ensure_partition(
     Returns:
         Le nom de la partition (créée ou existante)
     """
-    context = get_current_context()
-    context["import_task_name"] = dataset_context.dataset_name  # type: ignore
-
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    dest_loc = dataset_context.dest_loc
-    if dest_loc.type_location != TypeLocation.DB:
-        logging.warning(
-            msg=f"Destination location type is not POSTGRES for dataset {dataset_context.dataset_name} ... skipping partition creation"
-        )
-        return
+    if nom_projet is None:
+        nom_projet = dag_repo.get_project_name(context=context)
 
-    dataset_options = execution_options.get(dataset_context.dataset_name)
-    if dataset_options is None:
-        raise ValueError(f"No execution options found for dataset {dataset_context.dataset_name}")
-
-    tbl_name = dest_loc.validate_location
-    is_partitioned = dataset_options.is_partitioned
-    partition_period = dataset_options.partition_period
-
-    if not is_partitioned:
-        logging.info(msg=f"{tbl_name} is not partitioned ... skipping")
-        return
+    execution_date = dag_repo.get_execution_date(context=context)
 
     # Init vars
-    dag_repo = AirflowDagRepository()
     db = create_db_handler(
         db_type=DatabaseType.POSTGRES,
-        db_config=DbConfig(connection_id=dest_loc.validate_conn_id),
-    )
-    execution_date = dag_repo.get_execution_date(context=context)
-    db_info = dag_repo.get_db_info(context=context)
-    prod_schema = db_info.prod_schema
-
-    # Get partition period range
-    from_date, to_date = determine_partition_period(
-        time_period=partition_period,
-        execution_date=execution_date,
+        db_config=DbConfig(connection_id=pg_conn_id),
     )
 
-    # Nom de la partition : parenttable_YYYY_MM
-    partition_name = f"{tbl_name}_{from_date.strftime(format='%Y%m%d')}_{to_date.strftime(format='%Y%m%d')}"
+    datasets_context = dataset_context_repo.get_list(nom_projet=nom_projet)
 
-    try:
-        logging.info(msg=f"Creating partition {partition_name} for {tbl_name}.")
-        # Créer la partition
-        create_sql = f"""
-            CREATE TABLE IF NOT EXISTS {prod_schema}.{partition_name}
-            PARTITION OF {prod_schema}.{tbl_name}
-            FOR VALUES FROM
-                ('{from_date.strftime(format="%Y-%m-%d")}') TO ('{to_date.strftime(format="%Y-%m-%d")}');
-        """
-        db.execute(query=create_sql)
-        logging.info(msg=f"Partition {partition_name} created successfully.")
-    except Exception as e:
-        logging.error(msg=f"Error creating partition {partition_name}: {e!s}")
-        raise
+    for index, dataset_context in enumerate(datasets_context):
+        logging.info(msg=f"{index + 1}/{len(datasets_context)} Processing dataset {dataset_context.dataset_name}")
+
+        dataset_options = execution_options.get(dataset_context.dataset_name)
+        if dataset_options is None:
+            raise ValueError("No execution options found for dataset.")
+
+        if not dataset_options.is_partitioned:
+            logging.info(msg=f"{dataset_context.dataset_name} is not partitioned ... skipping")
+            continue
+
+        dest_loc = dataset_context.dest_loc
+        if dest_loc.type_location != TypeLocation.DB:
+            logging.warning(msg="Destination location type not database ... skipping partition creation")
+            continue
+
+        if dest_loc.validate_conn_id != pg_conn_id:
+            db = create_db_handler(
+                db_type=DatabaseType.POSTGRES,
+                db_config=DbConfig(connection_id=dest_loc.validate_conn_id),
+            )
+
+        schema = parse_db_schema(dest_loc.validate_location)
+        tbl_name = parse_db_table(dest_loc.validate_location)
+        partition_period = dataset_options.partition_period
+
+        # Get partition period range
+        from_date, to_date = determine_partition_period(
+            time_period=partition_period,
+            execution_date=execution_date,
+        )
+
+        # Nom de la partition : parenttable_YYYY_MM
+        partition_name = f"{tbl_name}_{from_date.strftime(format='%Y%m%d')}_{to_date.strftime(format='%Y%m%d')}"
+
+        try:
+            logging.info(msg=f"Creating partition {partition_name} for {tbl_name}.")
+            # Créer la partition
+            create_sql = f"""
+                CREATE TABLE IF NOT EXISTS {schema}.{partition_name}
+                PARTITION OF {schema}.{tbl_name}
+                FOR VALUES FROM
+                    ('{from_date.strftime(format="%Y-%m-%d")}') TO ('{to_date.strftime(format="%Y-%m-%d")}');
+            """
+            db.execute(query=create_sql)
+            logging.info(msg=f"Partition {partition_name} created successfully.")
+        except Exception as e:
+            logging.error(msg=f"Error creating partition {partition_name}: {e!s}")
+            raise
 
 
 @task(task_id="create_tmp_tables")

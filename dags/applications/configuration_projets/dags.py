@@ -10,7 +10,6 @@ from dags.applications.configuration_projets.tasks import (
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.grist import download_grist_doc_to_s3
-from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -52,11 +51,8 @@ nom_projet = "Configuration des projets"
 def configuration_projets() -> None:
     """Tasks order"""
 
-    datasets_context = get_projet_datasets_context(execution_options=execution_options)
-
     chain(
         validate_dag_parameters(),
-        datasets_context,
         download_grist_doc_to_s3(
             dataset_name="grist_doc",
             workspace_id="dsci",
@@ -70,7 +66,7 @@ def configuration_projets() -> None:
         source_grist(),
         projet_dimension_tables(),
         dataset_dimension_tables(),
-        ensure_partition.expand(dataset_context=datasets_context),
+        ensure_partition(execution_options=execution_options),
         copy_tmp_table_to_real_table(execution_options=execution_options),
         copy_s3_files(
             execution_options=execution_options,

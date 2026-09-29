@@ -12,7 +12,6 @@ from dags.cbcm.donnee_comptable.tasks import (
 )
 from modules.containers import DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
-from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -72,22 +71,20 @@ def chorus_donnees_comptables() -> None:
         on_skipped_callback=create_send_mail_callback(mail_status=MailStatus.SKIP),
         on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
-    datasets_context = get_projet_datasets_context(execution_options=execution_options)
 
     # Ordre des tâches
     chain(
         validate_dag_parameters(),
-        datasets_context,
         looking_for_files,
         create_projet_snapshot(nom_projet=nom_projet),
         create_tmp_tables(execution_options=execution_options, reset_id_seq=False),
         source_files(),
         datasets_additionnels(),
-        ensure_partition.expand(dataset_context=datasets_context, execution_options=execution_options),
+        ensure_partition(execution_options=execution_options),
         copy_tmp_table_to_real_table(execution_options=execution_options),
-        copy_s3_files(),
-        del_s3_files(),
-        delete_tmp_tables(),
+        copy_s3_files(execution_options=execution_options),
+        del_s3_files(execution_options=execution_options),
+        delete_tmp_tables(execution_options=execution_options),
     )
 
 

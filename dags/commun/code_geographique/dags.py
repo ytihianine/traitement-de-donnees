@@ -5,7 +5,6 @@ from dags.commun.code_geographique.config import (
 )
 from dags.commun.code_geographique.tasks import code_geographique, code_iso, geojson
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
-from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.sql import (
     copy_tmp_table_to_real_table,
     create_projet_snapshot,
@@ -44,11 +43,8 @@ nom_projet = "Code géographique"
 def informations_geographiques() -> None:
     """Récupération de toutes les données géographiques"""
 
-    datasets_context = get_projet_datasets_context(execution_options=execution_options)
-
     chain(
         validate_dag_parameters(),
-        datasets_context,
         create_projet_snapshot(),
         create_tmp_tables(execution_options=execution_options, reset_id_seq=False),
         code_geographique(),

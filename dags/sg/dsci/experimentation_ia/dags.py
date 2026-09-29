@@ -14,7 +14,6 @@ from dags.sg.dsci.experimentation_ia.tasks import (
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.grist import download_grist_doc_to_s3
-from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -53,12 +52,10 @@ nom_projet = "Experimentation IA"
     ),
 )
 def experimentation_ia_dag() -> None:
-    datasets_context = get_projet_datasets_context(execution_options=execution_options)
 
     # Ordre des tâches
     chain(
         validate_dag_parameters(),
-        datasets_context,
         download_grist_doc_to_s3(
             dataset_name="grist_doc",
             workspace_id="dsci",
@@ -77,15 +74,14 @@ def experimentation_ia_dag() -> None:
             suivi_questionnaire_2_bis(),
             suivi_questionnaire_3(),
         ],
-        ensure_partition.expand(
-            dataset_context=datasets_context,
+        ensure_partition(
             execution_options=execution_options,
         ),
         copy_tmp_table_to_real_table(execution_options=execution_options),
-        copy_s3_files(),
-        del_s3_files(),
-        delete_tmp_tables(),
-        update_projet_snapshot_status(),
+        copy_s3_files(execution_options=execution_options),
+        del_s3_files(execution_options=execution_options),
+        delete_tmp_tables(execution_options=execution_options),
+        update_projet_snapshot_status(execution_options=execution_options),
     )
 
 

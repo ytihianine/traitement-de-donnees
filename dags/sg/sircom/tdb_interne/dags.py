@@ -12,7 +12,6 @@ from dags.sg.sircom.tdb_interne.tasks import (
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.grist import download_grist_doc_to_s3
-from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -55,11 +54,9 @@ nom_projet = "TdB interne - SIRCOM"
 )
 def tdb_sircom() -> None:
     """Task order"""
-    datasets_context = get_projet_datasets_context(execution_options=execution_options)
 
     chain(
         validate_dag_parameters(),
-        datasets_context,
         download_grist_doc_to_s3(
             dataset_name="grist_doc",
             workspace_id="dsci",

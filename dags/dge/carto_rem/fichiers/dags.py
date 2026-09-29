@@ -67,7 +67,6 @@ def cartographie_remuneration() -> None:
     """ Task order """
     chain(
         validate_dag_parameters(),
-        datasets_context,
         looking_for_files,
         create_projet_snapshot(nom_projet=nom_projet),
         del_iceberg_staging_table(),

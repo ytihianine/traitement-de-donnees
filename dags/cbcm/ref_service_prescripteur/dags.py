@@ -8,7 +8,6 @@ from dags.cbcm.ref_service_prescripteur.tasks import (
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.grist import download_grist_doc_to_s3
-from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -49,12 +48,10 @@ nom_projet = "Données comptable - référentiel"
 )
 def chorus_service_prescripteur() -> None:
     """Task definition"""
-    datasets_context = get_projet_datasets_context(execution_options=execution_options)
 
     # Ordre des tâches
     chain(
         validate_dag_parameters(),
-        datasets_context,
         create_projet_snapshot(nom_projet_parent="Données comptable"),
         download_grist_doc_to_s3(dataset_name="grist_doc", workspace_id="dsci", doc_id_key="grist_doc_id_cbcm"),
         create_tmp_tables(execution_options=execution_options, reset_id_seq=False),

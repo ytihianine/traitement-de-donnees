@@ -141,7 +141,6 @@ def check_dataset(nom_projet: str, **context) -> None:
     datasets_context = get_projet_datasets_context(nom_projet=nom_projet)
 
     chain(
-        datasets_context,
         [
             get_dataset(nom_projet=nom_projet, **context),
             print_dataset_context.expand(dataset_context=datasets_context),

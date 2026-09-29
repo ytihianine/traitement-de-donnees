@@ -4,7 +4,6 @@ from dags.sg.siep.mmsi.georisques.config import dag_id_georisque, execution_opti
 from dags.sg.siep.mmsi.georisques.task import georisques_group
 from dags.sg.siep.mmsi.oad.config import nom_projet_oad
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
-from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -45,14 +44,12 @@ from modules.infra.mails.default_smtp import MailStatus, create_send_mail_callba
 def bien_georisques() -> None:
     """Task order"""
 
-    datasets_context = get_projet_datasets_context(execution_options=execution_options)
-
     chain(
         validate_dag_parameters(),
         create_projet_snapshot(nom_projet_parent=nom_projet_oad),
         create_tmp_tables(execution_options=execution_options, reset_id_seq=False),
         georisques_group(),
-        ensure_partition.expand(dataset_context=datasets_context),
+        ensure_partition(execution_options=execution_options),
         copy_tmp_table_to_real_table(execution_options=execution_options),
         copy_s3_files(),
         del_s3_files(execution_options=execution_options),

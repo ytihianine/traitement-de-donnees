@@ -10,7 +10,6 @@ from dags.cgefi.barometre.tasks import (
 )
 from modules.containers import DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
-from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -47,8 +46,6 @@ nom_projet = "Baromètre"
 def barometre() -> None:
     """Tasks definition"""
 
-    datasets_context = get_projet_datasets_context(execution_options={})
-
     looking_for_files = S3KeySensor(
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
@@ -70,7 +67,6 @@ def barometre() -> None:
     """ Task order """
     chain(
         validate_dag_parameters(),
-        datasets_context,
         looking_for_files,
         create_tmp_tables(execution_options=execution_options),
         source_files(),

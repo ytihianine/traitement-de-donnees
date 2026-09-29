@@ -12,7 +12,6 @@ from dags.sg.siep.mmsi.consommation_batiment.tasks import (
 from dags.sg.siep.mmsi.oad.config import nom_projet_oad
 from modules.containers import DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
-from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -66,8 +65,6 @@ def consommation_des_batiments() -> None:
         on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
     )
 
-    datasets_context = get_projet_datasets_context(execution_options=execution_options)
-
     # Ordre des tâches
     chain(
         validate_dag_parameters(),
@@ -77,7 +74,7 @@ def consommation_des_batiments() -> None:
         convert_file_to_parquet(),
         source_files(),
         additionnal_files(),
-        ensure_partition.expand(dataset_context=datasets_context),
+        ensure_partition(execution_options=execution_options),
         copy_tmp_table_to_real_table(execution_options=execution_options),
         refresh_views(),
         copy_s3_files(),

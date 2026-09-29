@@ -19,7 +19,6 @@ from dags.sg.siep.mmsi.oad.indicateurs.tasks import (
 )
 from modules.containers import DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
-from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -74,8 +73,6 @@ def oad() -> None:
         ),
     )
 
-    datasets_context = get_projet_datasets_context(execution_options=execution_options)
-
     @task_group
     def trigger_linked_dags() -> None:
         trigger_fcu_dag = TriggerDagRunOperator(
@@ -116,7 +113,7 @@ def oad() -> None:
         convert_file_to_parquet(),
         tasks_oad_caracteristiques(),
         tasks_oad_indicateurs(),
-        ensure_partition.expand(dataset_context=datasets_context),
+        ensure_partition(execution_options=execution_options),
         copy_tmp_table_to_real_table(execution_options=execution_options),
         refresh_views(),
         copy_s3_files(),

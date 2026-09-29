@@ -7,7 +7,6 @@ from dags.sg.siep.mmsi.oad_referentiel.config import dag_id_oad_ref, execution_o
 from dags.sg.siep.mmsi.oad_referentiel.tasks import ref_typologie
 from modules.containers import DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
-from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -62,12 +61,9 @@ def oad_referentiel() -> None:
         ),
     )
 
-    datasets_context = get_projet_datasets_context(execution_options={})
-
     """ Task order """
     chain(
         validate_dag_parameters(),
-        datasets_context,
         looking_for_files,
         create_projet_snapshot(nom_projet_parent="Outil aide diagnostic"),
         create_tmp_tables(execution_options=execution_options),
