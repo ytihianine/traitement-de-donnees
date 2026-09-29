@@ -77,13 +77,13 @@ class DatasetContext:
         return self.dataset.name
 
     @property
-    def src(self) -> DatasetLocation:
+    def src_loc(self) -> DatasetLocation:
         return self.location[StageLocation.SOURCE]
 
     @property
-    def tmp(self) -> DatasetLocation:
+    def tmp_loc(self) -> DatasetLocation:
         return self.location[StageLocation.TEMPORAIRE]
 
     @property
-    def dest(self) -> DatasetLocation:
+    def dest_loc(self) -> DatasetLocation:
         return self.location[StageLocation.DESTINATION]
