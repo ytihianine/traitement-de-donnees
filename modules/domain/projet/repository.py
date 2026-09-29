@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from modules.domain.projet.model import Contact, Documentation, Projet, ProjetMetadata, ProjetS3
+from modules.domain.projet.model import Contact, Documentation, Projet, ProjetLocation, ProjetMetadata
 
 
 class ProjetRepository(ABC):
@@ -26,7 +26,7 @@ class ProjetRepository(ABC):
         """Get the documentation entries declared for a project."""
 
     @abstractmethod
-    def get_projet_s3_info(self, nom_projet: str) -> ProjetS3:
+    def get_projet_s3_info(self, nom_projet: str) -> ProjetLocation:
         """Get the S3 storage configuration for a project.
 
         Raises:

@@ -152,7 +152,11 @@ class DbDatasetContextRepository(DatasetContextRepository):
     @db_retry
     def get_list_source_fichier(self, nom_projet: str) -> list[str]:
         source_fichiers = self.db_client.fetch_all(
-            query="SELECT * FROM source_fichiers WHERE nom_projet = %s",
+            query=f"""
+                SELECT nom_source AS source_fichier
+                FROM {CONF_SCHEMA}.vue_source
+                WHERE nom_projet = %s
+            """,
             parameters=(nom_projet,),
         )
         return [sf["source_fichier"] for sf in source_fichiers]
@@ -160,7 +164,30 @@ class DbDatasetContextRepository(DatasetContextRepository):
     @db_retry
     def get_list_column_mapping(self, nom_projet: str, dataset_name: str) -> Sequence[Mapping[str, Any]]:
         column_mappings = self.db_client.fetch_all(
-            query="SELECT * FROM column_mappings WHERE nom_projet = %s AND dataset_name = %s",
-            parameters=(nom_projet, dataset_name),
+            query=f"""
+                SELECT
+                    id_projet,
+                    projet AS nom_projet,
+                    id_dataset,
+                    dataset AS dataset_name,
+                    id_col_mapping,
+                    colname_source,
+                    colname_dest,
+                    to_keep,
+                    date_archivage,
+                    snapshot_id,
+                    snapshot_id_parent,
+                    import_timestamp
+                FROM {CONF_SCHEMA}.dim_dataset_column_mapping
+                WHERE projet = %s
+                  AND dataset = %s
+                  AND import_timestamp = (
+                      SELECT MAX(import_timestamp)
+                      FROM {CONF_SCHEMA}.dim_dataset_column_mapping
+                      WHERE projet = %s
+                        AND dataset = %s
+                  )
+            """,
+            parameters=(nom_projet, dataset_name, nom_projet, dataset_name),
         )
         return column_mappings

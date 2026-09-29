@@ -32,11 +32,13 @@ class Contact:
 
 
 @dataclass(frozen=True)
-class ProjetS3:
+class ProjetLocation:
+    id_projet: int
     projet: str
     bucket: str
-    key: str
-    key_tmp: str
+    fs_folder: str
+    fs_folder_tmp: str
+    db_schema: str
 
 
 @dataclass(frozen=True)

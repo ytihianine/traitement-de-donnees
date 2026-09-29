@@ -14,7 +14,7 @@ from tenacity import (
 )
 
 from modules.constants import DEFAULT_PG_DATA_CONN_ID
-from modules.domain.projet.model import Contact, Documentation, Projet, ProjetMetadata, ProjetS3
+from modules.domain.projet.model import Contact, Documentation, Projet, ProjetLocation, ProjetMetadata
 from modules.domain.projet.repository import ProjetRepository
 from modules.infra.database.base import DBInterface
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
@@ -52,7 +52,7 @@ class DbProjetRepository(ProjetRepository):
         df = self.db_client.fetch_df(
             query=f"""
                 SELECT p.projet, p.id_projet
-                FROM {CONF_SCHEMA}.projet p
+                FROM {CONF_SCHEMA}.dim_projet p
                 WHERE p.projet = %s
                 ORDER BY p.import_timestamp DESC
                 LIMIT 1;
@@ -71,11 +71,16 @@ class DbProjetRepository(ProjetRepository):
 
         df = self.db_client.fetch_df(
             query=f"""
-                SELECT cppc.projet, cppc.contact_mail, cppc.is_mail_generic
-                FROM {CONF_SCHEMA}.projet_contact_vw cppc
-                WHERE cppc.projet = %s AND cppc.rang = 1;
+                SELECT cppc.id_projet, cppc.contact_mail, cppc.is_mail_generic
+                FROM {CONF_SCHEMA}.dim_projet_contact cppc
+                WHERE cppc.projet = %s
+                  AND cppc.import_timestamp = (
+                      SELECT MAX(import_timestamp)
+                      FROM {CONF_SCHEMA}.dim_projet_contact
+                      WHERE projet = %s
+                  );
             """,
-            parameters=(nom_projet,),
+            parameters=(nom_projet, nom_projet),
         )
         records = df.to_dict("records", into=dict)
         return [Contact(**record) for record in records]
@@ -85,34 +90,47 @@ class DbProjetRepository(ProjetRepository):
 
         df = self.db_client.fetch_df(
             query=f"""
-                SELECT cppd.projet, cppd.type_documentation, cppd.lien
-                FROM {CONF_SCHEMA}.projet_documentation_vw cppd
-                WHERE cppd.projet = %s AND cppd.rang = 1;
+                SELECT cppd.id_projet, cppd.type_documentation, cppd.lien
+                FROM {CONF_SCHEMA}.dim_projet_documentation cppd
+                WHERE cppd.projet = %s
+                  AND cppd.import_timestamp = (
+                      SELECT MAX(import_timestamp)
+                      FROM {CONF_SCHEMA}.dim_projet_documentation
+                      WHERE projet = %s
+                  );
             """,
-            parameters=(nom_projet,),
+            parameters=(nom_projet, nom_projet),
         )
         records = df.to_dict("records", into=dict)
         return [Documentation(**record) for record in records]
 
     @db_retry
-    def get_projet_s3_info(self, nom_projet: str) -> ProjetS3:
-
+    def get_projet_location(self, nom_projet: str) -> ProjetLocation:
         df = self.db_client.fetch_df(
             query=f"""
-                SELECT cpps3.projet, cpps3.bucket,
-                    cpps3.key,
-                    cpps3.key_tmp
-                FROM {CONF_SCHEMA}.projet_s3_vw cpps3
-                WHERE cpps3.projet = %s AND cpps3.rang = 1;
+                SELECT
+                    cpp.id_projet,
+                    cpp.projet,
+                    cpp.bucket,
+                    cpp.fs_folder,
+                    cpp.fs_folder_tmp,
+                    cpp.db_schema
+                FROM {CONF_SCHEMA}.dim_projet cpp
+                WHERE cpp.projet = %s
+                  AND cpp.import_timestamp = (
+                    SELECT MAX(import_timestamp)
+                    FROM {CONF_SCHEMA}.dim_projet
+                    WHERE projet = %s
+                  );
             """,
-            parameters=(nom_projet,),
+            parameters=(nom_projet, nom_projet),
         )
 
         if df.empty:
             raise ValueError(f"No S3 configuration found for project {nom_projet}")
 
         record = df.iloc[0].to_dict(into=dict)
-        return ProjetS3(**record)  # type: ignore[arg-type]
+        return ProjetLocation(**record)  # type: ignore[arg-type]
 
     @db_retry
     def get_projet_metadata(self, nom_projet: str, dag_completed: bool = False) -> ProjetMetadata:
