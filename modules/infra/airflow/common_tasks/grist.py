@@ -70,14 +70,14 @@ def download_grist_doc_to_s3(
     grist_response = grist_client.download_doc(doc_id=doc_id)
 
     # Export sqlite file to S3
-    dest_loc = dataset_context.dest_loc
+    tmp_loc = dataset_context.tmp_loc
     s3_handler = create_file_handler(
         handler_type=FileHandlerType.S3,
         config=FSConfig(),
     )
-    logging.info(f"Exporting file to < {dest_loc.validate_location} >")
+    logging.info(f"Exporting file to < {tmp_loc.validate_location} >")
     s3_handler.write(
-        file_path=dest_loc.validate_location,
+        file_path=tmp_loc.validate_location,
         content=grist_response.content,
     )
     logging.info(msg="Exported successfully!")
