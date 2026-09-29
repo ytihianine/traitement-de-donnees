@@ -1,6 +1,6 @@
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
-from enum import StrEnum
+from enum import Enum, StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -30,7 +30,7 @@ class MailStatus(StrEnum):
     INFO = "Information"
 
 
-class MailPriority(StrEnum):
+class MailPriority(Enum):
     """Mail priority levels."""
 
     NORMAL = 0
