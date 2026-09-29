@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from pprint import pprint
 
-from airflow.sdk import Variable, chain, get_current_context, task, task_group
+from airflow.sdk import Variable, chain, task, task_group
 from dags.dag_verification.config import execution_options
 from modules.constants import (
     AGENT,
@@ -19,7 +19,7 @@ from modules.containers import (
     DEFAULT_PROJET_REPO,
 )
 from modules.domain.dag.model import DagConfig
-from modules.domain.dataset.model import Dataset, DatasetContext
+from modules.domain.dataset.model import Dataset
 from modules.domain.pipeline.model import PipelineDescriptor
 from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
 from modules.infra.airflow.dag import AirflowDagRepository
@@ -123,28 +123,10 @@ def check_dataset(nom_projet: str, **context) -> None:
         for dataset_context in datasets_context:
             logging.info(msg=(f"Dataset: {dataset_context}, "))
 
-    @task(map_index_template="{{ dataset_name }}")
-    def print_dataset_context(
-        dataset_context: DatasetContext,
-        **context,
-    ) -> None:
-        print(f"Dataset context: {dataset_context}")
-        if isinstance(dataset_context, dict):
-            dataset_name = dataset_context["dataset_name"]
-        else:
-            dataset_name = dataset_context.dataset_name
-
-        context = get_current_context()
-        context["dataset_name"] = dataset_name  # type: ignore
-        print(f"Dataset context: {dataset_name}")
-
     datasets_context = get_projet_datasets_context(nom_projet=nom_projet)
 
     chain(
-        [
-            get_dataset(nom_projet=nom_projet, **context),
-            print_dataset_context.expand(dataset_context=datasets_context),
-        ],
+        [get_dataset(nom_projet=nom_projet, **context), datasets_context],
     )
 
 
