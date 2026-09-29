@@ -7,12 +7,10 @@ from dags.sg.siep.mmsi.eligibilite_fcu.process import (
 )
 from dags.sg.siep.mmsi.oad.config import nom_projet_oad
 from modules.constants import AGENT, PROXY
-from modules.enums.database import DatabaseType
-from modules.enums.http import HttpHandlerType
-from modules.infra.database.factory import DbConfig, create_db_handler
+from modules.containers import DEFAULT_PROJET_REPO
+from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 from modules.infra.http_client.adapters import ClientConfig
-from modules.infra.http_client.factory import create_http_client
-from modules.utils.config.tasks import get_projet_metadata
+from modules.infra.http_client.factory import HttpHandlerType, create_http_client
 
 
 def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
@@ -26,7 +24,7 @@ def eligibilite_fcu(context: dict[str, Any]) -> pd.DataFrame:
         db_config=DbConfig(),
     )
 
-    metadata = get_projet_metadata(nom_projet=nom_projet_oad, dag_completed=True)
+    metadata = DEFAULT_PROJET_REPO.get_projet_metadata(nom_projet=nom_projet_oad, dag_completed=True)
     logging.info(msg=f"Snapshot ID récupéré : {metadata}")
 
     # Storage paths

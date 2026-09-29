@@ -1,5 +1,5 @@
 import pandas as pd
-from modules.utils.process.text import (
+from modules.generic_processing.text import (
     convert_str_cols_to_date,
     normalize_whitespace_columns,
 )

@@ -2,17 +2,16 @@ from datetime import timedelta
 
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-from dags.applications.db_backup.config import storage_options
-from dags.applications.db_backup.tasks import export_database
-from modules.common_tasks.s3 import (
+from dags.applications.db_backup.config import execution_options
+from dags.applications.db_backup.tasks import export_databases
+from modules.domain.dag.model import DagStatus, FeatureFlagsEnable
+from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from modules.common_tasks.validation import validate_dag_parameters
-from modules.enums.dags import DagStatus
+from modules.infra.airflow.common_tasks.validation import validate_dag_parameters
+from modules.infra.airflow.dag import create_dag_params, create_default_args
 from modules.infra.mails.default_smtp import MailStatus, create_send_mail_callback
-from modules.types.dags import FeatureFlagsEnable
-from modules.utils.config.dag_params import create_dag_params, create_default_args
 
 nom_projet = "Sauvegarde databases"
 
@@ -41,10 +40,9 @@ def sauvegarde_database() -> None:
     """Task order"""
     chain(
         validate_dag_parameters(),
-        export_database(db_conn_id="db_config"),
-        export_database(db_conn_id="db_data_store"),
-        copy_s3_files(storage_options=storage_options),
-        del_s3_files(storage_options=storage_options),
+        export_databases(),
+        copy_s3_files(),
+        del_s3_files(execution_options=execution_options),
     )
 
 

@@ -5,8 +5,7 @@ from airflow.sdk import task
 from modules.constants import (
     DEFAULT_S3_CONN_ID,
 )
-from modules.enums.filesystem import FileHandlerType
-from modules.infra.file_system.factory import FSConfig, create_file_handler
+from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 
 
 @task()

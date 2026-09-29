@@ -1,23 +1,27 @@
-from dags.sg.siep.mmsi.eligibilite_fcu import actions, process
-from modules.common_tasks.etl import (
+from dags.sg.siep.mmsi.eligibilite_fcu import actions, config, process
+from modules.domain.dataset.model import Dataset
+from modules.domain.pipeline.model import PipelineDescriptor
+from modules.infra.airflow.task import (
     create_task,
 )
-from modules.types.dags import ETLStep, TaskConfig
 
-get_eligibilite_fcu = create_task(
-    task_config=TaskConfig(task_id="eligibilite_fcu_to_file"),
-    output_selecteur="fcu",
-    steps=[
-        ETLStep(
-            fn=actions.eligibilite_fcu,
-            use_context=True,
-        )
-    ],
+bien_localisation = create_task(
+    pipeline=PipelineDescriptor(
+        input_datasets=(Dataset("bien_localisation"),),
+        output_dataset=Dataset("bien_localisation"),
+        operation=actions.eligibilite_fcu,
+        add_metadata=True,
+    ),
+    execution_options=config.execution_options,
 )
 
+
 process_fcu_result = create_task(
-    task_config=TaskConfig(task_id="fcu_result"),
-    input_selecteurs=["fcu"],
-    output_selecteur="fcu_result",
-    steps=[ETLStep(fn=process.process_result, read_data=True)],
+    pipeline=PipelineDescriptor(
+        input_datasets=(Dataset("bien_localisation"),),
+        output_dataset=Dataset("fcu_result"),
+        operation=process.process_result,
+        add_metadata=True,
+    ),
+    execution_options=config.execution_options,
 )

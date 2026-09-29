@@ -1,20 +1,15 @@
+from dags.applications.configuration_projets import config
 from dags.sg.siep.mmsi.oad_referentiel import process
-from modules.types.dags import TaskConfig
-from modules.types.readers import GristReaderStrategy
-from modules.types.tasks import ETLTask, SingleInputStep
-from modules.types.writers import FileWriterStrategy
+from modules.domain.dataset.model import Dataset
+from modules.domain.pipeline.model import PipelineDescriptor
+from modules.infra.airflow.task import create_task
 
-ref_typologie = ETLTask(
-    task_config=TaskConfig(task_id="ref_typologie"),
-    target="ref_typologie",
-    reader=GristReaderStrategy(),
-    steps=[
-        SingleInputStep(
-            fn=process.process_ref_typologie,
-            input_key="ref_typologie",
-            output_key="ref_typologie",
-        )
-    ],
-    writers=[FileWriterStrategy()],
-    add_metadata=True,
-).create_task()
+ref_typologie = create_task(
+    pipeline=PipelineDescriptor(
+        input_datasets=(Dataset("ref_typologie"),),
+        output_dataset=Dataset("ref_typologie"),
+        operation=process.process_ref_typologie,
+        add_metadata=True,
+    ),
+    execution_options=config.execution_options,
+)

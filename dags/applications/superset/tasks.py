@@ -1,8 +1,7 @@
 import logging
 
 from airflow.sdk import task
-from modules.enums.database import DatabaseType
-from modules.infra.database.factory import DbConfig, create_db_handler
+from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 
 
 @task

@@ -44,6 +44,25 @@ class DBInterface(ABC):
         pass
 
     @abstractmethod
+    def fetch_table_columns(self, schema: str, table: str, sorted: bool = True) -> list[str]:
+        """Fetch the column names of a table.
+
+        Args:
+            schema: Schema name.
+            table: Table name.
+            sorted: Whether to return the column names sorted.
+
+        Returns:
+            List of column names.
+        """
+        pass
+
+    @abstractmethod
+    def fetch_table_pk(self, schema: str, table: str) -> list[str]:
+        """Fetch the primary key column of a table."""
+        pass
+
+    @abstractmethod
     def insert(self, table: str, data: dict[str, Any]) -> None:
         """Insert a single row into a table."""
         pass

@@ -1,12 +1,9 @@
-from modules.enums.database import LoadStrategy
-from modules.types.projet import SelecteurStorageOptions
+from modules.domain.pipeline.model import ExecutionOptions, LoadStrategy
 
 nom_projet_georisque = "Géorisques"
 dag_id_georisque = "georisques_batiments"
 
-storage_options = {
-    "bien_db": SelecteurStorageOptions(
-        write_to_db=False,
-    ),
-    "georisques": SelecteurStorageOptions(load_strategy=LoadStrategy.APPEND),
+execution_options = {
+    "bien_db": ExecutionOptions(),
+    "georisques": ExecutionOptions(load_strategy=LoadStrategy.APPEND),
 }

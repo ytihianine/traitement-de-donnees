@@ -1,32 +1,22 @@
-from dags.sg.srh.mentorat_merci import actions, process
-from modules.common_tasks.etl import create_task
-from modules.types.dags import ETLStep, TaskConfig
-from modules.types.readers import GristReaderStrategy
-from modules.types.tasks import ETLTask, SingleInputStep
-from modules.types.writers import FileWriterStrategy
+from dags.sg.srh.mentorat_merci import actions, config, process
+from modules.domain.dataset.model import Dataset
+from modules.domain.pipeline.model import PipelineDescriptor
+from modules.infra.airflow.task import create_task
 
-agent_inscrit = ETLTask(
-    task_config=TaskConfig(task_id="agent_inscrit"),
-    target="agent_inscrit",
-    reader=GristReaderStrategy(),
-    steps=[
-        SingleInputStep(
-            fn=process.clean_data,
-            input_key="agent_inscrit",
-            output_key="agent_inscrit",
-        )
-    ],
-    writers=[FileWriterStrategy()],
-    add_metadata=True,
+agent_inscrit = create_task(
+    pipeline=PipelineDescriptor(
+        input_datasets=(Dataset("agent_inscrit"),),
+        output_dataset=Dataset("agent_inscrit"),
+        operation=process.clean_data,
+    ),
+    execution_options=config.execution_options,
 )
 
-
 generer_binomes = create_task(
-    task_config=TaskConfig(task_id="generer_binomes"),
-    output_selecteur="generer_binome",
-    input_selecteurs=["agent_inscrit"],
-    steps=[
-        ETLStep(fn=actions.action_generer_binomes_mentorat, read_data=True),
-    ],
-    export_output=False,
+    pipeline=PipelineDescriptor(
+        input_datasets=(Dataset("agent_inscrit"),),
+        output_dataset=Dataset("generer_binomes"),
+        operation=actions.action_generer_binomes_mentorat,
+    ),
+    execution_options=config.execution_options,
 )

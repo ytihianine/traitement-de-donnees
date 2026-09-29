@@ -1,18 +1,22 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
+from dags.commun.code_geographique.config import (
+    execution_options,
+)
 from dags.commun.code_geographique.tasks import code_geographique, code_iso, geojson
-from modules.common_tasks.sql import (
+from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
+from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
+from modules.infra.airflow.common_tasks.sql import (
     copy_tmp_table_to_real_table,
     create_projet_snapshot,
     create_tmp_tables,
+    delete_tmp_tables,
     refresh_views,
-    # set_dataset_last_update_date,
+    update_projet_snapshot_status,
 )
-from modules.common_tasks.validation import validate_dag_parameters
-from modules.enums.dags import DagStatus
+from modules.infra.airflow.common_tasks.validation import validate_dag_parameters
+from modules.infra.airflow.dag import create_dag_params, create_default_args
 from modules.infra.mails.default_smtp import MailStatus, create_send_mail_callback
-from modules.types.dags import DBParams, FeatureFlagsEnable
-from modules.utils.config.dag_params import create_dag_params, create_default_args
 
 nom_projet = "Code géographique"
 
@@ -40,17 +44,19 @@ nom_projet = "Code géographique"
 def informations_geographiques() -> None:
     """Récupération de toutes les données géographiques"""
 
-    """ Hooks """
+    datasets_context = get_projet_datasets_context(execution_options=execution_options)
 
-    # Ordre des tâches
     chain(
         validate_dag_parameters(),
+        datasets_context,
         create_projet_snapshot(),
+        create_tmp_tables(execution_options=execution_options, reset_id_seq=False),
         code_geographique(),
         geojson(),
         code_iso(),
-        create_tmp_tables(),
-        copy_tmp_table_to_real_table(),
+        copy_tmp_table_to_real_table(execution_options=execution_options),
+        delete_tmp_tables(execution_options=execution_options),
+        update_projet_snapshot_status(),
         refresh_views(),
     )
 

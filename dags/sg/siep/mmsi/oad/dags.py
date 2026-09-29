@@ -12,32 +12,30 @@ from dags.sg.siep.mmsi.oad.caracteristiques.tasks import (
     oad_carac_to_parquet,
     tasks_oad_caracteristiques,
 )
-from dags.sg.siep.mmsi.oad.config import dag_id_oad, nom_projet_oad, storage_options
+from dags.sg.siep.mmsi.oad.config import dag_id_oad, execution_options, nom_projet_oad
 from dags.sg.siep.mmsi.oad.indicateurs.tasks import (
     oad_indic_to_parquet,
     tasks_oad_indicateurs,
 )
-from modules.common_tasks.projet import get_selecteur_config
-from modules.common_tasks.s3 import (
+from modules.containers import DEFAULT_DATASET_CONTEXT_REPO
+from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
+from modules.infra.airflow.common_tasks.projet import get_projet_datasets_context
+from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
 )
-from modules.common_tasks.sql import (
+from modules.infra.airflow.common_tasks.sql import (
     copy_tmp_table_to_real_table,
     create_projet_snapshot,
     create_tmp_tables,
     delete_tmp_tables,
     ensure_partition,
-    import_file_to_db,
     refresh_views,
     update_projet_snapshot_status,
 )
-from modules.common_tasks.validation import validate_dag_parameters
-from modules.enums.dags import DagStatus
+from modules.infra.airflow.common_tasks.validation import validate_dag_parameters
+from modules.infra.airflow.dag import create_dag_params, create_default_args
 from modules.infra.mails.default_smtp import MailStatus, create_send_mail_callback
-from modules.types.dags import DBParams, FeatureFlagsEnable
-from modules.utils.config.dag_params import create_dag_params, create_default_args
-from modules.utils.config.tasks import get_list_source_fichier
 
 
 # Définition du DAG
@@ -65,7 +63,7 @@ def oad() -> None:
         task_id="looking_for_files",
         aws_conn_id="minio_bucket_dsci",
         bucket_name="dsci",
-        bucket_key=get_list_source_fichier(nom_projet=nom_projet_oad),
+        bucket_key=DEFAULT_DATASET_CONTEXT_REPO.get_list_source_fichier(nom_projet=nom_projet_oad),
         mode="reschedule",
         poke_interval=timedelta(seconds=30),
         timeout=timedelta(minutes=13),
@@ -76,7 +74,7 @@ def oad() -> None:
         ),
     )
 
-    selecteur_configs = get_selecteur_config(storage_options=storage_options)
+    datasets_context = get_projet_datasets_context(execution_options=execution_options)
 
     @task_group
     def trigger_linked_dags() -> None:
@@ -114,17 +112,16 @@ def oad() -> None:
         validate_dag_parameters(),
         looking_for_files,
         create_projet_snapshot(),
+        create_tmp_tables(execution_options=execution_options),
         convert_file_to_parquet(),
         tasks_oad_caracteristiques(),
         tasks_oad_indicateurs(),
-        create_tmp_tables(storage_options=storage_options),
-        import_file_to_db.expand(selecteur_config=selecteur_configs),
-        ensure_partition.expand(selecteur_config=selecteur_configs),
-        copy_tmp_table_to_real_table(storage_options=storage_options),
+        ensure_partition.expand(dataset_context=datasets_context),
+        copy_tmp_table_to_real_table(execution_options=execution_options),
         refresh_views(),
-        copy_s3_files(storage_options=storage_options),
-        del_s3_files(storage_options=storage_options),
-        delete_tmp_tables(storage_options=storage_options),
+        copy_s3_files(),
+        del_s3_files(execution_options=execution_options),
+        delete_tmp_tables(execution_options=execution_options),
         update_projet_snapshot_status(),
         end_task,
         trigger_linked_dags(),

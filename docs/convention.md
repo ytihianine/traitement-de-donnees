@@ -20,7 +20,7 @@ Tous les dags doivent êtres organisés de la façon suivante:
 │   │   ├── grist
 │   │   │   ├── sql   # Contient les scripts sql
 │   │   │   │   └── projet_X.sql
-│   │   │   ├── config.py   # Configuration propre au dag (storage_options, constantes ...)
+│   │   │   ├── config.py   # Configuration propre au dag (execution_options, constantes ...)
 │   │   │   ├── dags.py   # Définition du dag
 │   │   │   ├── process.py  # Contient toutes les fonctions de processing
 │   │   │   ├── actions.py   # (Optionnel) Contient les actions à réaliser dans le dag

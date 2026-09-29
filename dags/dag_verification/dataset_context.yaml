@@ -1,0 +1,37 @@
+projet:
+  - name: "Demo"
+    contact:
+      - contact_mail: "labo-data@finances.gouv.fr"
+        is_mail_generic: true
+    documentation:
+      - type_documentation: "pipeline"
+        lien: "undefined.org"
+      - type_documentation: "data"
+        lien: "undefined.org"
+    datasets:
+      - name: "grist_doc"
+        src_location:
+          type_location: "grist"
+          location: "doc_ic"
+          conn_id: null
+        tmp_location:
+          type_location: "s3"
+          location: null
+          conn_id: null
+        dest_location:
+          type_location: "s3"
+          location: null
+          conn_id: null
+      - name: "ref_direction"
+        src_location:
+          type_location: "grist"
+          location: "ref_direction"
+          conn_id: null
+        tmp_location:
+          type_location: "database"
+          location: null
+          conn_id: null
+        dest_location:
+          type_location: "database"
+          location: null
+          conn_id: null

@@ -6,10 +6,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, BinaryIO
 
-from .exceptions import (
-    FileNotFoundError,
-)
-
 
 @dataclass(frozen=True)
 class FileMetadata:
