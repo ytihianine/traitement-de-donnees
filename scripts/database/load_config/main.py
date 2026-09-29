@@ -257,6 +257,7 @@ DIMENSION_TABLES = [
             df_dataset=tables["dataset"],
             df_dataset_location=tables["dataset_location"],
             df_ref_type_location=tables["ref_type_location"],
+            df_ref_connexion=tables["ref_connexion"],
         ),
     },
     {
