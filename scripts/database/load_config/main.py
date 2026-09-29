@@ -256,6 +256,7 @@ DIMENSION_TABLES = [
             df_projet=tables["projet"],
             df_dataset=tables["dataset"],
             df_dataset_location=tables["dataset_location"],
+            df_ref_type_location=tables["ref_type_location"],
         ),
     },
     {
