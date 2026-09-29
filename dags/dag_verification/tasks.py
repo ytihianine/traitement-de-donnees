@@ -128,9 +128,15 @@ def check_dataset(nom_projet: str, **context) -> None:
         dataset_context: DatasetContext,
         **context,
     ) -> None:
+        print(f"Dataset context: {dataset_context}")
+        if isinstance(dataset_context, dict):
+            dataset_name = dataset_context["dataset_name"]
+        else:
+            dataset_name = dataset_context.dataset_name
+
         context = get_current_context()
-        context["dataset_name"] = dataset_context.dataset_name  # type: ignore
-        print(f"Dataset context: {dataset_context.dataset_name}")
+        context["dataset_name"] = dataset_name  # type: ignore
+        print(f"Dataset context: {dataset_name}")
 
     datasets_context = get_projet_datasets_context(nom_projet=nom_projet)
 
