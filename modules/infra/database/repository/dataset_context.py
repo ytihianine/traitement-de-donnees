@@ -14,7 +14,7 @@ from tenacity import (
 )
 
 from modules.constants import DEFAULT_PG_DATA_CONN_ID
-from modules.domain.dataset.model import Dataset, DatasetContext, DatasetLocation
+from modules.domain.dataset.model import Dataset, DatasetContext, DatasetLocation, StageLocation
 from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.projet.model import Projet
 from modules.infra.database.base import DBInterface
@@ -52,77 +52,100 @@ class DbDatasetContextRepository(DatasetContextRepository):
     def get_list(self, nom_projet: str) -> list[DatasetContext]:
         df = self.db_client.fetch_df(
             query=f"""
-                SELECT p.projet, p.id_projet, p.dataset_name, p.src_type_location, p.src_location, p.src_conn_id, p.tmp_type_location, p.tmp_location, p.tmp_conn_id, p.dest_type_location, p.dest_location, p.dest_conn_id
-                FROM {CONF_SCHEMA}.projet p
-                WHERE p.projet = %s AND p.rang = 1
-                ORDER BY p.import_timestamp DESC;
+                SELECT
+                    "id_projet",
+                    "projet",
+                    "id_dataset",
+                    "dataset",
+                    "stage",
+                    "id_type_location",
+                    "type_location",
+                    "location",
+                    "id_conn_id",
+                    "conn_id",
+                FROM {CONF_SCHEMA}.dim_dataset_location cpdd
+                WHERE 1=1
+                    AND cpdd.projet = %s
+                    AND cpdd."import_timestamp" = (
+                    SELECT MAX("import_timestamp")
+                    FROM conf_projets."dim_dataset_location"
+                    WHERE "projet" = %s
+                );
             """,
-            parameters=(nom_projet,),
+            parameters=(nom_projet, nom_projet),
         )
 
         if df.empty:
             raise ValueError(f"No project found with name {nom_projet}")
 
-        datasets_context = []
-        for _, row in df.iterrows():
-            record = row.to_dict(into=dict)
-            dataset_context = DatasetContext(
-                projet=Projet(name=record["projet"], id=record["id_projet"]),
-                dataset=Dataset(name=record["dataset_name"]),
-                src_location=DatasetLocation(
-                    type_location=record["src_type_location"],
-                    location=record["src_location"],
-                    conn_id=record["src_conn_id"],
-                ),
-                tmp_location=DatasetLocation(
-                    type_location=record["tmp_type_location"],
-                    location=record["tmp_location"],
-                    conn_id=record["tmp_conn_id"],
-                ),
-                dest_location=DatasetLocation(
-                    type_location=record["dest_type_location"],
-                    location=record["dest_location"],
-                    conn_id=record["dest_conn_id"],
-                ),
+        projet = Projet(name=df.iloc[0]["projet"], id=df.iloc[0]["id_projet"])
+        dataset_contexts: list[DatasetContext] = []
+        for _, dataset_rows in df.groupby("id_dataset", sort=False):
+            dataset = Dataset(name=dataset_rows.iloc[0]["dataset"])
+            locations: dict[StageLocation, DatasetLocation] = {}
+            for _, row in dataset_rows.iterrows():
+                record = row.to_dict(into=dict)
+                locations[StageLocation(record["stage"])] = DatasetLocation(
+                    type_location=record["type_location"],
+                    location=record["location"],
+                    conn_id=record["conn_id"],
+                )
+            dataset_contexts.append(
+                DatasetContext(
+                    projet=projet,
+                    dataset=dataset,
+                    location=locations,
+                )
             )
-            datasets_context.append(dataset_context)
-        return datasets_context
+        return dataset_contexts
 
     @db_retry
     def get(self, nom_projet: str, nom_dataset: str) -> DatasetContext:
         df = self.db_client.fetch_df(
             query=f"""
-                SELECT p.projet, p.id_projet, p.dataset_name, p.src_type_location, p.src_location, p.src_conn_id, p.tmp_type_location, p.tmp_location, p.tmp_conn_id, p.dest_type_location, p.dest_location, p.dest_conn_id
-                FROM {CONF_SCHEMA}.projet p
-                WHERE p.projet = %s AND p.dataset_name = %s
-                ORDER BY p.import_timestamp DESC
-                LIMIT 1;
+                SELECT
+                    "id_projet",
+                    "projet",
+                    "id_dataset",
+                    "dataset",
+                    "stage",
+                    "id_type_location",
+                    "type_location",
+                    "location",
+                    "id_conn_id",
+                    "conn_id",
+                FROM {CONF_SCHEMA}.dim_dataset_location cpdd
+                WHERE 1=1
+                    AND cpdd.projet = %s
+                    AND cpdd.dataset = %s
+                    AND cpdd."import_timestamp" = (
+                    SELECT MAX("import_timestamp")
+                    FROM conf_projets."dim_dataset_location"
+                    WHERE "projet" = %s
+                      AND "dataset" = %s
+                );
             """,
-            parameters=(nom_projet, nom_dataset),
+            parameters=(nom_projet, nom_dataset, nom_projet, nom_dataset),
         )
 
         if df.empty:
-            raise ValueError(f"No project found with name {nom_projet} and dataset {nom_dataset}")
+            raise ValueError(f"No dataset found with name {nom_dataset} in project {nom_projet}")
 
-        record = df.iloc[0].to_dict(into=dict)
+        projet = Projet(name=df.iloc[0]["projet"], id=df.iloc[0]["id_projet"])
+        dataset = Dataset(name=df.iloc[0]["dataset"])
+        locations = {}
+        for _, row in df.iterrows():
+            record = row.to_dict(into=dict)
+            loc = DatasetLocation(
+                type_location=record["type_location"],
+                location=record["location"],
+                conn_id=record["conn_id"],
+            )
+            locations[StageLocation(record["stage"])] = loc
         dataset_context = DatasetContext(
-            projet=Projet(name=record["projet"], id=record["id_projet"]),
-            dataset=Dataset(name=nom_dataset),
-            src_location=DatasetLocation(
-                type_location=record["src_type_location"],
-                location=record["src_location"],
-                conn_id=record["src_conn_id"],
-            ),
-            tmp_location=DatasetLocation(
-                type_location=record["tmp_type_location"],
-                location=record["tmp_location"],
-                conn_id=record["tmp_conn_id"],
-            ),
-            dest_location=DatasetLocation(
-                type_location=record["dest_type_location"],
-                location=record["dest_location"],
-                conn_id=record["dest_conn_id"],
-            ),
+            projet=projet,
+            dataset=dataset,
+            location=locations,
         )
         return dataset_context
 

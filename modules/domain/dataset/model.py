@@ -7,6 +7,14 @@ from modules.domain.projet.model import Projet
 # =================
 # Enums
 # =================
+class StageLocation(Enum):
+    """Étape du traitement des données"""
+
+    SOURCE = "Source"
+    TEMPORAIRE = "Temporaire"
+    DESTINATION = "Destination"
+
+
 class TypeLocation(Enum):
     """Type de source de données"""
 
@@ -52,9 +60,7 @@ class DatasetLocation:
 class DatasetContext:
     projet: Projet
     dataset: Dataset
-    src_location: DatasetLocation
-    tmp_location: DatasetLocation
-    dest_location: DatasetLocation
+    location: dict[StageLocation, DatasetLocation]
 
     @property
     def projet_name(self) -> str:
@@ -69,3 +75,15 @@ class DatasetContext:
     @property
     def dataset_name(self) -> str:
         return self.dataset.name
+
+    @property
+    def src(self) -> DatasetLocation:
+        return self.location[StageLocation.SOURCE]
+
+    @property
+    def tmp(self) -> DatasetLocation:
+        return self.location[StageLocation.TEMPORAIRE]
+
+    @property
+    def dest(self) -> DatasetLocation:
+        return self.location[StageLocation.DESTINATION]
