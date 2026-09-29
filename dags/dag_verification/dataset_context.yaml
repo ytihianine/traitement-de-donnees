@@ -10,28 +10,30 @@ projet:
         lien: "undefined.org"
     datasets:
       - name: "grist_doc"
-        src_location:
-          type_location: "grist"
-          location: "doc_ic"
-          conn_id: null
-        tmp_location:
-          type_location: "s3"
-          location: null
-          conn_id: null
-        dest_location:
-          type_location: "s3"
-          location: null
-          conn_id: null
+        locations:
+          - stage: "Source"
+            type_location: "grist"
+            location: "doc_ic"
+            conn_id: null
+          - stage: "Temporaire"
+            type_location: "s3"
+            location: null
+            conn_id: null
+          - stage: "Destination"
+            type_location: "s3"
+            location: null
+            conn_id: null
       - name: "ref_direction"
-        src_location:
-          type_location: "grist"
-          location: "ref_direction"
-          conn_id: null
-        tmp_location:
-          type_location: "database"
-          location: null
-          conn_id: null
-        dest_location:
-          type_location: "database"
-          location: null
-          conn_id: null
+        locations:
+          - stage: "Source"
+            type_location: "grist"
+            location: "Ref_direction"
+            conn_id: null
+          - stage: "Temporaire"
+            type_location: "database"
+            location: null
+            conn_id: null
+          - stage: "Destination"
+            type_location: "database"
+            location: null
+            conn_id: null

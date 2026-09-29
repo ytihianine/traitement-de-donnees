@@ -7,7 +7,7 @@ from typing import Any
 
 import yaml
 
-from modules.domain.dataset.model import Dataset, DatasetContext, DatasetLocation
+from modules.domain.dataset.model import Dataset, DatasetContext, DatasetLocation, StageLocation
 from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.projet.model import Projet
 
@@ -49,12 +49,14 @@ class YamlDatasetContextRepository(DatasetContextRepository):
 
     @staticmethod
     def _build_context(projet: Mapping[str, Any], dataset: Mapping[str, Any]) -> DatasetContext:
+        locations = {}
+        for location in dataset.get("locations", []):
+            locations[StageLocation(location["stage"])] = DatasetLocation(**location)
+
         return DatasetContext(
             projet=Projet(name=projet["name"]),
             dataset=Dataset(name=dataset["name"]),
-            src_location=DatasetLocation(**dataset["src_location"]),
-            tmp_location=DatasetLocation(**dataset["tmp_location"]),
-            dest_location=DatasetLocation(**dataset["dest_location"]),
+            location=locations,
         )
 
     def get_list(self, nom_projet: str) -> list[DatasetContext]:
