@@ -53,8 +53,12 @@ class PipelineRunner:
             else:
                 dataset_location = dataset_context.src_loc
 
+            logging.info(msg=f"Instantiating reader of type {dataset_location.type_location}")
             reader = self.location_provider_factory.create(dataset_location=dataset_location)
+            logging.info(msg="Reader instantiated")
+            logging.info(msg=f"Reading data from location: {dataset_location.validate_location}")
             df = reader.read(location=dataset_location.validate_location, read_options=exec_option.read_options)
+            logging.info(msg=f"Data read successfully. DataFrame shape: {df.shape}")
             input_data[f"df_{dataset.name}"] = df
 
         if len(input_data) == 1:
