@@ -13,6 +13,12 @@ class DagStatus(Enum):
     RUN = auto()
     DEV = auto()
 
+    def serialize(self) -> int:
+        return self.value
+
+    def deserialize(self) -> "DagStatus":
+        return DagStatus(self.value)
+
 
 class FeatureFlags(Enum):
     """Feature flags for conditional task execution"""
@@ -22,6 +28,12 @@ class FeatureFlags(Enum):
     S3 = "s3"
     CONVERT_FILES = "convert_files"
     DOWNLOAD_GRIST_DOC = "download_grist_doc"
+
+    def serialize(self) -> str:
+        return self.name.lower()
+
+    def deserialize(self) -> "FeatureFlags":
+        return FeatureFlags[self.name]
 
 
 # =================

@@ -14,6 +14,12 @@ class StageLocation(Enum):
     TEMPORAIRE = "Temporaire"
     DESTINATION = "Destination"
 
+    def serialize(self) -> str:
+        return self.value
+
+    def deserialize(self) -> "StageLocation":
+        return StageLocation(self.value)
+
 
 class TypeLocation(Enum):
     """Type de source de données"""
@@ -23,6 +29,12 @@ class TypeLocation(Enum):
     LOCAL_FILE = "local"
     ICEBERG = "iceberg"
     DB = "database"
+
+    def serialize(self) -> str:
+        return self.value
+
+    def deserialize(self) -> "TypeLocation":
+        return TypeLocation(self.value)
 
 
 # =================

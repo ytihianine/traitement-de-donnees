@@ -17,6 +17,12 @@ class PartitionTimePeriod(Enum):
     MONTH = auto()
     YEAR = auto()
 
+    def serialize(self) -> str:
+        return self.value
+
+    def deserialize(self) -> "PartitionTimePeriod":
+        return PartitionTimePeriod(self.value)
+
 
 def determine_partition_period(time_period: PartitionTimePeriod, execution_date: datetime) -> tuple[datetime, datetime]:
     """Determine the start and end dates for a partition based on the time period."""

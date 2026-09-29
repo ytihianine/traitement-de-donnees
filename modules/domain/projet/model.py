@@ -13,6 +13,12 @@ class TypeDocumentation(Enum):
     PIPELINE = "pipeline"
     DATA = "data"
 
+    def serialize(self) -> str:
+        return self.value
+
+    def deserialize(self) -> "TypeDocumentation":
+        return TypeDocumentation(self.value)
+
 
 # =================
 # Dataclasses
