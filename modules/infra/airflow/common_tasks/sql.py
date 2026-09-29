@@ -337,7 +337,7 @@ def _generate_copy_query(
         load_strategy: Load strategy to use for copying data.
     """
     prod_table = f"{prod_schema}.{tbl_name}"
-    tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
+    tmp_table = f"{tmp_schema}.{tbl_name}"
 
     col_list = db_handler.fetch_table_columns(
         schema=prod_schema,
