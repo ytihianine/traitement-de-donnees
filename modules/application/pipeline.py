@@ -117,19 +117,19 @@ class PipelineRunner:
 
     def _export_result(self, nom_projet: str, dataset: Dataset, result: object) -> None:
         output_dataset_context = self.dataset_context_repo.get(nom_projet=nom_projet, nom_dataset=dataset.name)
-        output_location = output_dataset_context.dest_loc
-        provider = self.location_provider_factory.create(dataset_location=output_location)
-        adapter = self.output_adapter_registry.get_adapter(result)
+        tmp_loc = output_dataset_context.tmp_loc
+        provider = self.location_provider_factory.create(dataset_location=tmp_loc)
+        adapter = self.output_adapter_registry.get_adapter(output=result)
         logging.info(
             msg=(
                 f"Exporting pipeline result of type {type(result).__name__} "
-                f"using {type(adapter).__name__} to {output_location.validate_location}"
+                f"using {type(adapter).__name__} to {tmp_loc.validate_location}"
             )
         )
         adapter.write(
             output=result,
             provider=provider,
-            location=output_location.validate_location,
+            location=tmp_loc.validate_location,
         )
 
     def run(
@@ -175,4 +175,5 @@ class PipelineRunner:
         # ===============================
         # Export data
         # ===============================
+        logging.info(msg="Executing export data step")
         self._export_result(nom_projet=nom_projet, dataset=pipeline.output_dataset, result=result)
