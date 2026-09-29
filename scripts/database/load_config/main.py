@@ -31,7 +31,7 @@ TBL_ORDERED = [
             ],
             cols_mapping={"id": "id_direction"},
             txt_columns=["direction"],
-            custom_fn=process.process_direction,
+            custom_fn=process.process_ref_direction,
         ),
     },
     {
@@ -46,7 +46,31 @@ TBL_ORDERED = [
             cols_mapping={"direction": "id_direction", "id": "id_service"},
             txt_columns=["service"],
             ref_columns=["id_direction"],
-            custom_fn=process.process_service,
+            custom_fn=process.process_ref_service,
+        ),
+    },
+    {
+        "tbl_name": "ref_type_location",
+        "process_func": partial(
+            generic_grist_processing,
+            cols_to_keep=[
+                "id",
+                "type_location",
+            ],
+            cols_mapping={"id": "id_type_location"},
+            txt_columns=["type_location"],
+            custom_fn=process.process_ref_type_location,
+        ),
+    },
+    {
+        "tbl_name": "ref_connexion",
+        "process_func": partial(
+            generic_grist_processing,
+            cols_to_keep=["id", "type_location", "conn_id"],
+            cols_mapping={"id": "id_connexion", "type_location": "id_type_location"},
+            txt_columns=["conn_id"],
+            ref_columns=["id_type_location"],
+            custom_fn=process.process_ref_connexion,
         ),
     },
     {
@@ -66,7 +90,26 @@ TBL_ORDERED = [
             },
             txt_columns=["projet"],
             ref_columns=["id_direction", "id_service"],
-            custom_fn=process.process_projets,
+            custom_fn=process.process_projet,
+        ),
+    },
+    {
+        "tbl_name": "projet_location",
+        "process_func": partial(
+            generic_grist_processing,
+            cols_to_keep=[
+                "projet",
+                "bucket",
+                "fs_folder",
+                "fs_folder_tmp",
+                "db_schema",
+            ],
+            cols_mapping={
+                "projet": "id_projet",
+            },
+            txt_columns=["bucket", "fs_folder", "fs_folder_tmp", "db_schema"],
+            ref_columns=["id_projet"],
+            custom_fn=process.process_projet_location,
         ),
     },
     {
@@ -107,108 +150,54 @@ TBL_ORDERED = [
         ),
     },
     {
-        "tbl_name": "projet_s3",
-        "process_func": partial(
-            generic_grist_processing,
-            cols_to_keep=[
-                "projet",
-                "bucket",
-                "key",
-                "key_tmp",
-            ],
-            cols_mapping={
-                "projet": "id_projet",
-            },
-            txt_columns=["bucket", "key", "key_tmp"],
-            ref_columns=["id_projet"],
-            custom_fn=process.process_projet_s3,
-        ),
-    },
-    {
-        "tbl_name": "projet_selecteur",
+        "tbl_name": "dataset",
         "process_func": partial(
             generic_grist_processing,
             cols_to_keep=[
                 "id",
                 "projet",
-                "type_de_selecteur",
-                "selecteur",
+                "dataset",
             ],
             cols_mapping={
-                "id": "id_selecteur",
+                "id": "id_dataset",
                 "projet": "id_projet",
-                "type_de_selecteur": "type_selecteur",
             },
-            txt_columns=["selecteur", "type_selecteur"],
+            txt_columns=["dataset"],
             ref_columns=["id_projet"],
-            custom_fn=process.process_projet_selecteur,
+            custom_fn=process.process_dataset,
         ),
     },
     {
-        "tbl_name": "selecteur_source",
+        "tbl_name": "dataset_location",
         "process_func": partial(
             generic_grist_processing,
             cols_to_keep=[
                 "projet",
-                "type",
-                "selecteur",
-                "id_source",
+                "dataset",
+                "stage",
+                "type_location",
+                "location",
+                "conn_id",
             ],
             cols_mapping={
                 "projet": "id_projet",
-                "selecteur": "id_selecteur",
-                "type": "type_location",
+                "dataset": "id_dataset",
+                "type_location": "id_type_location",
+                "conn_id": "id_conn_id",
             },
-            txt_columns=["type_location", "id_source"],
-            ref_columns=["id_projet", "id_selecteur"],
-            custom_fn=process.process_selecteur_source,
+            txt_columns=["stage", "location"],
+            ref_columns=["id_projet", "id_dataset", "id_type_location", "id_conn_id"],
+            custom_fn=process.process_dataset_location,
         ),
     },
     {
-        "tbl_name": "selecteur_s3",
-        "process_func": partial(
-            generic_grist_processing,
-            cols_to_keep=[
-                "projet",
-                "selecteur",
-                "filename",
-                "key",
-            ],
-            cols_mapping={
-                "projet": "id_projet",
-                "selecteur": "id_selecteur",
-            },
-            txt_columns=["filename", "key"],
-            ref_columns=["id_projet", "id_selecteur"],
-            custom_fn=process.process_selecteur_s3,
-        ),
-    },
-    {
-        "tbl_name": "selecteur_database",
-        "process_func": partial(
-            generic_grist_processing,
-            cols_to_keep=[
-                "projet",
-                "selecteur",
-                "tbl_name",
-            ],
-            cols_mapping={
-                "projet": "id_projet",
-                "selecteur": "id_selecteur",
-            },
-            txt_columns=["tbl_name"],
-            ref_columns=["id_projet", "id_selecteur"],
-            custom_fn=process.process_selecteur_database,
-        ),
-    },
-    {
-        "tbl_name": "selecteur_column_mapping",
+        "tbl_name": "dataset_column_mapping",
         "process_func": partial(
             generic_grist_processing,
             cols_to_keep=[
                 "id",
                 "projet",
-                "selecteur",
+                "dataset",
                 "colname_source",
                 "colname_dest",
                 "to_keep",
@@ -217,13 +206,64 @@ TBL_ORDERED = [
             cols_mapping={
                 "id": "id_col_mapping",
                 "projet": "id_projet",
-                "selecteur": "id_selecteur",
+                "dataset": "id_dataset",
             },
             txt_columns=["colname_source", "colname_dest"],
-            ref_columns=["id_projet", "id_selecteur"],
+            ref_columns=["id_projet", "id_dataset"],
             bool_columns=["to_keep"],
             date_columns=["date_archivage"],
-            custom_fn=process.process_selecteur_column_mapping,
+            custom_fn=process.process_dataset_column_mapping,
+        ),
+    },
+]
+
+DIMENSION_TABLES = [
+    {
+        "tbl_name": "dim_projet",
+        "build_func": lambda tables: process.process_dim_projet(
+            df_projet=tables["projet"],
+            df_ref_direction=tables["ref_direction"],
+            df_ref_service=tables["ref_service"],
+            df_projet_location=tables["projet_location"],
+        ),
+    },
+    {
+        "tbl_name": "dim_projet_contact",
+        "build_func": lambda tables: process.process_dim_projet_contact(
+            df_projet=tables["projet"],
+            df_projet_contact=tables["projet_contact"],
+        ),
+    },
+    {
+        "tbl_name": "dim_projet_documentation",
+        "build_func": lambda tables: process.process_dim_projet_documentation(
+            df_projet=tables["projet"],
+            df_projet_documentation=tables["projet_documentation"],
+        ),
+    },
+    {
+        "tbl_name": "dim_dataset",
+        "build_func": lambda tables: process.process_dim_dataset(
+            df_projet=tables["projet"],
+            df_dataset=tables["dataset"],
+            df_ref_direction=tables["ref_direction"],
+            df_ref_service=tables["ref_service"],
+        ),
+    },
+    {
+        "tbl_name": "dim_dataset_location",
+        "build_func": lambda tables: process.process_dim_dataset_location(
+            df_projet=tables["projet"],
+            df_dataset=tables["dataset"],
+            df_dataset_location=tables["dataset_location"],
+        ),
+    },
+    {
+        "tbl_name": "dim_dataset_column_mapping",
+        "build_func": lambda tables: process.process_dim_dataset_column_mapping(
+            df_projet=tables["projet"],
+            df_dataset=tables["dataset"],
+            df_dataset_column_mapping=tables["dataset_column_mapping"],
         ),
     },
 ]
@@ -351,14 +391,16 @@ if __name__ == "__main__":
     pg_cur = pg_conn.cursor()
 
     # Nettoyer les tables si dry_run est désactivé
-    tbl_names = [tbl["tbl_name"] for tbl in TBL_ORDERED]
+    tbl_names = [tbl["tbl_name"] for tbl in TBL_ORDERED] + [tbl["tbl_name"] for tbl in DIMENSION_TABLES]
     clear_tables(pg_cur=pg_cur, schema=schema, tbl_names=tbl_names, dry_run=dry_run)
 
-    # Traiter chaque table
-    for tbl_desc in TBL_ORDERED:
+    processed_tables = {}
+
+    # Traiter chaque table source
+    for i, tbl_desc in enumerate(TBL_ORDERED):
         """Traite une table : lecture, operation et insertion."""
         print("\n", "=" * 50)
-        print(f"Début du traitement de la table <{tbl_desc['tbl_name']}>")
+        print(f"({i}/{len(TBL_ORDERED)}) Début du traitement de la table <{tbl_desc['tbl_name']}>")
 
         df = process_table(
             sqlite_conn=sqlite_conn,
@@ -367,6 +409,7 @@ if __name__ == "__main__":
             snapshot_id=snapshot_id,
             import_timestamp=now,
         )
+        processed_tables[tbl_desc["tbl_name"]] = df
         create_partition(
             pg_cur=pg_cur,
             schema=schema,
@@ -375,6 +418,33 @@ if __name__ == "__main__":
             import_timestamp=now,
         )
         insert_into_postgres(df=df, tbl_desc=tbl_desc, schema=schema, pg_cur=pg_cur, dry_run=dry_run)
+
+    # Traiter chaque table de dimension calculée à partir des tables source
+    for i, tbl_desc in enumerate(DIMENSION_TABLES, start=1):
+        print("\n", "=" * 50)
+        print(f"({i}/{len(DIMENSION_TABLES)}) Début du traitement de la table <{tbl_desc['tbl_name']}>")
+
+        df = tbl_desc["build_func"](processed_tables)
+        df = df.fillna(np.nan).replace([np.nan], [None])
+        if add_metadata:
+            df["snapshot_id"] = str(snapshot_id)
+            df["import_timestamp"] = now
+
+        print(df.columns)
+        print(df.dtypes)
+        print(df.isnull().sum())
+        df_info(df=df, df_name=tbl_desc["tbl_name"])
+
+        create_partition(
+            pg_cur=pg_cur,
+            schema=schema,
+            tbl_name=tbl_desc["tbl_name"],
+            dry_run=dry_run,
+            import_timestamp=now,
+        )
+        insert_into_postgres(
+            df=df, tbl_desc={"tbl_name": tbl_desc["tbl_name"]}, schema=schema, pg_cur=pg_cur, dry_run=dry_run
+        )
 
     # Valider et fermer les connexions
     if not dry_run:

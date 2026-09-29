@@ -3,10 +3,10 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
-# Load env vars from centralised .env
-set -a
-source "$PROJECT_ROOT/.env"
-set +a
+# # Load env vars from centralised .env
+# set -a
+# source "$PROJECT_ROOT/.env"
+# set +a
 
 # Make repo packages importable
 export PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}"
