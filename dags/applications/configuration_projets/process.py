@@ -41,7 +41,6 @@ def process_projet(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_projet_location(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.dropna(subset=["projet"])
     return df
 
 
@@ -70,8 +69,8 @@ def process_dataset(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_dataset_location(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop_duplicates(subset=["id_projet", "dataset", "stage"])
-    df = df.dropna(subset=["id_projet", "dataset", "stage", "id_type_location", "location"])
+    df = df.drop_duplicates(subset=["id_projet", "id_dataset", "stage"])
+    df = df.dropna(subset=["id_projet", "id_dataset", "stage", "id_type_location", "location"])
     return df
 
 
@@ -89,21 +88,27 @@ def process_dim_projet(
     df_ref_service: pd.DataFrame,
     df_projet_location: pd.DataFrame,
 ) -> pd.DataFrame:
+    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
+    df_projet_location_clean = df_projet_location.drop(columns=metadata_cols, errors="ignore")
+    df_ref_direction_clean = df_ref_direction.drop(columns=metadata_cols, errors="ignore")
+    df_ref_service_clean = df_ref_service.drop(columns=["id_direction", *metadata_cols], errors="ignore")
+
     df_dim_projet = (
-        df_projet.merge(
-            right=df_projet_location,
+        df_projet_clean.merge(
+            right=df_projet_location_clean,
             how="left",
             left_on="id_projet",
             right_on="id_projet",
         )
         .merge(
-            right=df_ref_direction,
+            right=df_ref_direction_clean,
             how="left",
             left_on="id_direction",
             right_on="id_direction",
         )
         .merge(
-            right=df_ref_service,
+            right=df_ref_service_clean,
             how="left",
             left_on="id_service",
             right_on="id_service",
@@ -114,9 +119,13 @@ def process_dim_projet(
 
 
 def process_dim_projet_contact(df_projet: pd.DataFrame, df_projet_contact: pd.DataFrame) -> pd.DataFrame:
+    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
+    df_projet_contact_clean = df_projet_contact.drop(columns=metadata_cols, errors="ignore")
+
     df_dim_projet_contact = (
-        df_projet.merge(
-            right=df_projet_contact,
+        df_projet_clean.merge(
+            right=df_projet_contact_clean,
             how="left",
             left_on="id_projet",
             right_on="id_projet",
@@ -128,9 +137,13 @@ def process_dim_projet_contact(df_projet: pd.DataFrame, df_projet_contact: pd.Da
 
 
 def process_dim_projet_documentation(df_projet: pd.DataFrame, df_projet_documentation: pd.DataFrame) -> pd.DataFrame:
+    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
+    df_projet_documentation_clean = df_projet_documentation.drop(columns=metadata_cols, errors="ignore")
+
     df_dim_projet_documentation = (
-        df_projet.merge(
-            right=df_projet_documentation,
+        df_projet_clean.merge(
+            right=df_projet_documentation_clean,
             how="left",
             left_on="id_projet",
             right_on="id_projet",
@@ -144,21 +157,27 @@ def process_dim_projet_documentation(df_projet: pd.DataFrame, df_projet_document
 def process_dim_dataset(
     df_projet: pd.DataFrame, df_dataset: pd.DataFrame, df_ref_direction: pd.DataFrame, df_ref_service: pd.DataFrame
 ) -> pd.DataFrame:
+    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
+    df_dataset_clean = df_dataset.drop(columns=metadata_cols, errors="ignore")
+    df_ref_direction_clean = df_ref_direction.drop(columns=metadata_cols, errors="ignore")
+    df_ref_service_clean = df_ref_service.drop(columns=["id_direction", *metadata_cols], errors="ignore")
+
     df_dim_dataset = (
-        df_projet.merge(
-            right=df_dataset,
+        df_projet_clean.merge(
+            right=df_dataset_clean,
             how="left",
             left_on="id_projet",
             right_on="id_projet",
         )
         .merge(
-            right=df_ref_direction,
+            right=df_ref_direction_clean,
             how="left",
             left_on="id_direction",
             right_on="id_direction",
         )
         .merge(
-            right=df_ref_service,
+            right=df_ref_service_clean,
             how="left",
             left_on="id_service",
             right_on="id_service",
@@ -171,18 +190,23 @@ def process_dim_dataset(
 def process_dim_dataset_location(
     df_projet: pd.DataFrame, df_dataset: pd.DataFrame, df_dataset_location: pd.DataFrame
 ) -> pd.DataFrame:
+    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
+    df_dataset_clean = df_dataset.drop(columns=metadata_cols, errors="ignore")
+    df_dataset_location_clean = df_dataset_location.drop(columns=metadata_cols, errors="ignore")
+
     df_dim_dataset_location = (
-        df_projet.merge(
-            right=df_dataset,
+        df_projet_clean.merge(
+            right=df_dataset_clean,
             how="left",
             left_on="id_projet",
             right_on="id_projet",
         )
         .merge(
-            right=df_dataset_location,
+            right=df_dataset_location_clean,
             how="left",
-            left_on="id_projet",
-            right_on="id_projet",
+            left_on=["id_projet", "id_dataset"],
+            right_on=["id_projet", "id_dataset"],
         )
         .drop(columns=["id_direction", "id_service"])
         .drop_duplicates(subset=["id_projet", "dataset", "stage"])
@@ -193,18 +217,23 @@ def process_dim_dataset_location(
 def process_dim_dataset_column_mapping(
     df_projet: pd.DataFrame, df_dataset: pd.DataFrame, df_dataset_column_mapping: pd.DataFrame
 ) -> pd.DataFrame:
+    metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
+    df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
+    df_dataset_clean = df_dataset.drop(columns=metadata_cols, errors="ignore")
+    df_dataset_column_mapping_clean = df_dataset_column_mapping.drop(columns=metadata_cols, errors="ignore")
+
     df_dim_dataset_column_mapping = (
-        df_projet.merge(
-            right=df_dataset,
+        df_projet_clean.merge(
+            right=df_dataset_clean,
             how="left",
             left_on="id_projet",
             right_on="id_projet",
         )
         .merge(
-            right=df_dataset_column_mapping,
+            right=df_dataset_column_mapping_clean,
             how="left",
-            left_on="id_projet",
-            right_on="id_projet",
+            left_on=["id_projet", "id_dataset"],
+            right_on=["id_projet", "id_dataset"],
         )
         .drop(columns=["id_direction", "id_service"])
         .drop_duplicates(subset=["id_projet", "id_dataset", "colname_source"])

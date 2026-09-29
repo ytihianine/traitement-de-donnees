@@ -53,7 +53,7 @@ CREATE TABLE conf_projets."ref_connexion" (
   "snapshot_id" UUID NOT NULL,
   "snapshot_id_parent" UUID NULL,
   PRIMARY KEY ("id_row", "import_timestamp"),
-  UNIQUE ("id_connexion", "import_timestamp")
+  UNIQUE ("id_type_location", "id_connexion", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
 
@@ -144,7 +144,7 @@ CREATE TABLE conf_projets."dataset_location" (
   "snapshot_id" UUID NOT NULL,
   "snapshot_id_parent" UUID NULL,
   PRIMARY KEY ("id_row", "import_timestamp"),
-  UNIQUE ("id_projet", "id_dataset", "import_timestamp")
+  UNIQUE ("id_projet", "id_dataset", "stage", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
 DROP TABLE IF EXISTS conf_projets."dataset_column_mapping" CASCADE;
@@ -179,8 +179,8 @@ CREATE TABLE conf_projets."dim_projet" (
   "id_service" int,
   "service" text,
   "bucket" text,
-  "key" text,
-  "key_tmp" text,
+  "fs_folder" text,
+  "fs_folder_tmp" text,
   "db_schema" text,
   "snapshot_id" UUID NOT NULL,
   "snapshot_id_parent" UUID NULL,
@@ -255,8 +255,8 @@ CREATE TABLE conf_projets."dim_dataset_location" (
 ) PARTITION BY RANGE (import_timestamp);
 
 
-DROP TABLE IF EXISTS conf_projets."dim_dataset_cols_mapping" CASCADE;
-CREATE TABLE conf_projets."dim_dataset_cols_mapping" (
+DROP TABLE IF EXISTS conf_projets."dim_dataset_column_mapping" CASCADE;
+CREATE TABLE conf_projets."dim_dataset_column_mapping" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "projet" text,
