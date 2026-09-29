@@ -130,10 +130,7 @@ def check_dataset(nom_projet: str, **context) -> None:
     ) -> None:
         context = get_current_context()
         context["dataset_name"] = dataset_context.dataset_name  # type: ignore
-        print(f"Dataset: {dataset_context.dataset_name}")
-        print(f"Source location: {dataset_context.src_loc}")
-        print(f"Temporary location: {dataset_context.tmp_loc}")
-        print(f"Destination location: {dataset_context.dest_loc}")
+        print(f"Dataset context: {dataset_context.dataset_name}")
 
     datasets_context = get_projet_datasets_context(nom_projet=nom_projet)
 
