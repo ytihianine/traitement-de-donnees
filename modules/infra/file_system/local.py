@@ -19,6 +19,13 @@ class LocalFS(FSInterface):
 
     base_path: Path
 
+    def get_absolute_path(self, file_path: str | Path) -> Path:
+        """Resolve a path against the configured base directory."""
+        path = Path(file_path)
+        if path.is_absolute():
+            return path
+        return self.base_path / path
+
     def read(self, file_path: str | Path, validate: bool = True) -> BinaryIO:
         """Read file content from local filesystem."""
         abs_path = self.get_absolute_path(file_path)
