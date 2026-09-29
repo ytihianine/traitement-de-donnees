@@ -10,10 +10,6 @@ from dags.applications.configuration_projets.tasks import (
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.grist import download_grist_doc_to_s3
-from modules.infra.airflow.common_tasks.s3 import (
-    copy_s3_files,
-    del_s3_files,
-)
 from modules.infra.airflow.common_tasks.sql import (
     copy_tmp_table_to_real_table,
     create_projet_snapshot,
@@ -58,7 +54,6 @@ def configuration_projets() -> None:
             workspace_id="dsci",
         ),
         create_projet_snapshot(),
-        delete_tmp_tables(execution_options=execution_options),
         create_tmp_tables(
             execution_options=execution_options,
             reset_id_seq=False,
@@ -68,12 +63,6 @@ def configuration_projets() -> None:
         dataset_dimension_tables(),
         ensure_partition(execution_options=execution_options),
         copy_tmp_table_to_real_table(execution_options=execution_options),
-        copy_s3_files(
-            execution_options=execution_options,
-        ),
-        del_s3_files(
-            execution_options=execution_options,
-        ),
         delete_tmp_tables(execution_options=execution_options),
         update_projet_snapshot_status(),
     )
