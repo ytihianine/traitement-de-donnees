@@ -92,7 +92,7 @@ def check_projet(**context) -> None:
         documentation = projet_repository.get_list_documentation(nom_projet=nom_projet)
         logging.info(msg=f"Documentation: {[(d.type_documentation.value, d.lien) for d in documentation]}")
 
-        s3_info = projet_repository.get_projet_s3_info(nom_projet=nom_projet)
+        s3_info = projet_repository.get_projet_location(nom_projet=nom_projet)
         logging.info(msg=f"S3 info: {s3_info}")
 
     @task
