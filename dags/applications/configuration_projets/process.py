@@ -188,7 +188,10 @@ def process_dim_dataset(
 
 
 def process_dim_dataset_location(
-    df_projet: pd.DataFrame, df_dataset: pd.DataFrame, df_dataset_location: pd.DataFrame
+    df_projet: pd.DataFrame,
+    df_dataset: pd.DataFrame,
+    df_dataset_location: pd.DataFrame,
+    df_ref_type_location: pd.DataFrame,
 ) -> pd.DataFrame:
     metadata_cols = [col for col in ["snapshot_id", "import_timestamp"] if col in df_projet.columns]
     df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
@@ -207,6 +210,12 @@ def process_dim_dataset_location(
             how="left",
             left_on=["id_projet", "id_dataset"],
             right_on=["id_projet", "id_dataset"],
+        )
+        .merge(
+            right=df_ref_type_location,
+            how="left",
+            left_on="id_type_location",
+            right_on="id_type_location",
         )
         .drop(columns=["id_direction", "id_service"])
         .drop_duplicates(subset=["id_projet", "dataset", "stage"])

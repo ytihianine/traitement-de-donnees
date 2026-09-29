@@ -329,7 +329,12 @@ def dataset_dimension_tables() -> None:
     )
     dim_dataset_location = create_task(
         pipeline=PipelineDescriptor(
-            input_datasets=(Dataset(name="projet"), Dataset(name="dataset"), Dataset(name="projet_location")),
+            input_datasets=(
+                Dataset(name="projet"),
+                Dataset(name="dataset"),
+                Dataset(name="dataset_location"),
+                Dataset(name="ref_type_location"),
+            ),
             output_dataset=Dataset(name="dim_dataset_location"),
             operation=process.process_dim_dataset_location,
             use_input_results_as_operation_args=True,
