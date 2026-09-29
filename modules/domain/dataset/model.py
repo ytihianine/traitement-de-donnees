@@ -90,12 +90,21 @@ class DatasetContext:
 
     @property
     def src_loc(self) -> DatasetLocation:
-        return self.location[StageLocation.SOURCE]
+        loc = self.location.get(StageLocation.SOURCE)
+        if loc is None:
+            raise ValueError("Source location is not set")
+        return loc
 
     @property
     def tmp_loc(self) -> DatasetLocation:
-        return self.location[StageLocation.TEMPORAIRE]
+        loc = self.location.get(StageLocation.TEMPORAIRE)
+        if loc is None:
+            raise ValueError("Temporary location is not set")
+        return loc
 
     @property
     def dest_loc(self) -> DatasetLocation:
-        return self.location[StageLocation.DESTINATION]
+        loc = self.location.get(StageLocation.DESTINATION)
+        if loc is None:
+            raise ValueError("Destination location is not set")
+        return loc
