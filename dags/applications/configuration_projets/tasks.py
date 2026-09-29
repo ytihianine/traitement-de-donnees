@@ -334,6 +334,7 @@ def dataset_dimension_tables() -> None:
                 Dataset(name="dataset"),
                 Dataset(name="dataset_location"),
                 Dataset(name="ref_type_location"),
+                Dataset(name="ref_connexion"),
             ),
             output_dataset=Dataset(name="dim_dataset_location"),
             operation=process.process_dim_dataset_location,
