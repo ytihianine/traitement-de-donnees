@@ -1,6 +1,6 @@
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -19,7 +19,7 @@ from modules.infra.airflow.dag import AirflowDagRepository
 from modules.infra.database.repository.projet import DbProjetRepository
 
 
-class MailStatus(Enum):
+class MailStatus(StrEnum):
     """Mail notification status types."""
 
     START = "Début"
@@ -30,7 +30,7 @@ class MailStatus(Enum):
     INFO = "Information"
 
 
-class MailPriority(Enum):
+class MailPriority(StrEnum):
     """Mail priority levels."""
 
     NORMAL = 0

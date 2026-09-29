@@ -1,7 +1,7 @@
-from enum import Enum, StrEnum
+from enum import StrEnum
 
 
-class ChoixDirection(Enum):
+class ChoixDirection(StrEnum):
     SANS_PREF = "pas de préférence"
     MEME_DIR = "Même direction"
     AUTRE_DIR = "Une autre direction"

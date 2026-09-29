@@ -1,7 +1,7 @@
 """Factory for creating file handlers."""
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from modules.constants import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
@@ -10,7 +10,7 @@ from modules.infra.file_system.local import LocalFS
 from modules.infra.file_system.s3 import S3FS
 
 
-class FileHandlerType(Enum):
+class FileHandlerType(StrEnum):
     """File handler types enumeration."""
 
     S3 = "S3"
@@ -23,7 +23,7 @@ class FileHandlerType(Enum):
         return FileHandlerType(self.value)
 
 
-class FileFormat(Enum):
+class FileFormat(StrEnum):
     """Supported file formats for ETL operations."""
 
     CSV = "CSV"

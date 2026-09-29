@@ -1,13 +1,13 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from modules.domain.dataset.model import Dataset
 
 
-class LoadStrategy(Enum):
+class LoadStrategy(StrEnum):
     """Load strategies for data ingestion."""
 
     @staticmethod
@@ -25,7 +25,7 @@ class LoadStrategy(Enum):
         return LoadStrategy(self.value)
 
 
-class PartitionTimePeriod(Enum):
+class PartitionTimePeriod(StrEnum):
     @staticmethod
     def _generate_next_value_(name, start, count, last_values) -> str:
         return name.upper()

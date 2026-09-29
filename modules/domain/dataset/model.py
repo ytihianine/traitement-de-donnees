@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 from modules.domain.projet.model import Projet
 
@@ -7,7 +7,7 @@ from modules.domain.projet.model import Projet
 # =================
 # Enums
 # =================
-class StageLocation(Enum):
+class StageLocation(StrEnum):
     """Étape du traitement des données"""
 
     SOURCE = "Source"
@@ -21,7 +21,7 @@ class StageLocation(Enum):
         return StageLocation(self.value)
 
 
-class TypeLocation(Enum):
+class TypeLocation(StrEnum):
     """Type de source de données"""
 
     GRIST = "grist"

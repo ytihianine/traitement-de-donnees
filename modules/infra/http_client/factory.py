@@ -1,13 +1,13 @@
 """Factory for creating HTTP clients."""
 
-from enum import Enum
+from enum import StrEnum
 
 from modules.infra.http_client.adapters import HttpxClient, RequestsClient
 from modules.infra.http_client.base import HttpInterface
 from modules.infra.http_client.config import ClientConfig
 
 
-class HttpHandlerType(Enum):
+class HttpHandlerType(StrEnum):
     """Http handler types enumeration."""
 
     REQUEST = "REQUESTS"

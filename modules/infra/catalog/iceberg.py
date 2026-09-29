@@ -2,7 +2,7 @@ import logging
 import ssl
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from enum import Enum, auto
+from enum import StrEnum, auto
 from typing import Any
 
 import pandas as pd
@@ -20,7 +20,7 @@ from modules.constants import (
 )
 
 
-class IcebergTableStatus(Enum):
+class IcebergTableStatus(StrEnum):
 
     STAGING = auto()
     PROD = auto()

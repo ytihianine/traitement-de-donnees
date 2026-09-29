@@ -1,5 +1,5 @@
 import ast
-from enum import Enum
+from enum import StrEnum
 
 import numpy as np
 import pandas as pd
@@ -68,14 +68,14 @@ def are_lists_egal(list_A: list[str], list_B: list[str]) -> bool:
     return False
 
 
-def validate_enum_column(df: pd.DataFrame, column: str, enum_class: type[Enum], allow_null: bool = True) -> None:
+def validate_enum_column(df: pd.DataFrame, column: str, enum_class: type[StrEnum], allow_null: bool = True) -> None:
     """
-    Valide que toutes les valeurs d'une colonne correspondent aux valeurs d'un Enum.
+    Valide que toutes les valeurs d'une colonne correspondent aux valeurs d'un StrEnum.
 
     Args:
         df: DataFrame à valider
         column: Nom de la colonne à vérifier
-        enum_class: Classe Enum contenant les valeurs valides
+        enum_class: Classe StrEnum contenant les valeurs valides
         allow_null: Si True, ignore les valeurs NaN/None
 
     Raises:

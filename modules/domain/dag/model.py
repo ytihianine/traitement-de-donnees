@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 from modules.constants import DEFAULT_TMP_SCHEMA
 
@@ -7,7 +7,7 @@ from modules.constants import DEFAULT_TMP_SCHEMA
 # =================
 # Enums
 # =================
-class DagStatus(Enum):
+class DagStatus(StrEnum):
     """DAG status"""
 
     RUN = "RUN"
@@ -20,7 +20,7 @@ class DagStatus(Enum):
         return DagStatus(self.value)
 
 
-class FeatureFlags(Enum):
+class FeatureFlags(StrEnum):
     """Feature flags for conditional task execution"""
 
     DB = "db"

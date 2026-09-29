@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from uuid import UUID
 
 
 # =================
 # Enums
 # =================
-class TypeDocumentation(Enum):
+class TypeDocumentation(StrEnum):
     """Type de documentation"""
 
     PIPELINE = "pipeline"
