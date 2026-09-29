@@ -4,7 +4,9 @@ from dags.applications.configuration_projets.config import (
     execution_options,
 )
 from dags.applications.configuration_projets.tasks import (
-    process_data,
+    dataset_dimension_tables,
+    projet_dimension_tables,
+    source_grist,
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.grist import download_grist_doc_to_s3
@@ -65,7 +67,9 @@ def configuration_projets() -> None:
             execution_options=execution_options,
             reset_id_seq=False,
         ),
-        process_data(),
+        source_grist(),
+        projet_dimension_tables(),
+        dataset_dimension_tables(),
         ensure_partition.expand(dataset_context=datasets_context),
         copy_tmp_table_to_real_table(execution_options=execution_options),
         copy_s3_files(

@@ -1,35 +1,47 @@
-import logging
-
 import pandas as pd
-from modules.constants import NO_PROCESS_MSG
 from modules.domain.projet.model import TypeDocumentation
 from modules.generic_processing.structures import (
     validate_enum_column,
 )
 
 
-def replace_values(df: pd.DataFrame, to_replace: dict[str, str], cols: list[str] | None = None) -> pd.DataFrame:
-    if cols:
-        df[cols] = df[cols].replace(to_replace=to_replace)
-    else:
-        df = df.replace(to_replace=to_replace)
-    return df
-
-
-def process_direction(df: pd.DataFrame) -> pd.DataFrame:
+# ====================
+# Référentiels
+# ====================
+def process_ref_direction(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop_duplicates(subset=["direction"])
     df = df.dropna(subset=["direction"])
     return df
 
 
-def process_service(df: pd.DataFrame) -> pd.DataFrame:
+def process_ref_service(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop_duplicates(subset=["id_direction", "service"])
     df = df.dropna(subset=["id_direction", "service"])
     return df
 
 
-def process_projets(df: pd.DataFrame) -> pd.DataFrame:
+def process_ref_type_location(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.drop_duplicates(subset=["type_location"])
+    df = df.dropna(subset=["type_location"])
+    return df
+
+
+def process_ref_connexion(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.drop_duplicates(subset=["id_type_location", "conn_id"])
+    df = df.dropna(subset=["id_type_location", "conn_id"])
+    return df
+
+
+# ====================
+# Tables métiers
+# ====================
+def process_projet(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["projet", "id_direction", "id_service"])
+    return df
+
+
+def process_projet_location(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.dropna(subset=["projet"])
     return df
 
 
@@ -51,32 +63,150 @@ def process_projet_documentation(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_projet_s3(df: pd.DataFrame) -> pd.DataFrame:
-    logging.info(NO_PROCESS_MSG)
+def process_dataset(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.drop_duplicates(subset=["id_projet", "dataset"])
+    df = df.dropna(subset=["id_projet", "dataset"])
     return df
 
 
-def process_projet_selecteur(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.dropna(subset=["id_projet"])
+def process_dataset_location(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.drop_duplicates(subset=["id_projet", "dataset", "stage"])
+    df = df.dropna(subset=["id_projet", "dataset", "stage", "id_type_location", "location"])
     return df
 
 
-def process_selecteur_source(df: pd.DataFrame) -> pd.DataFrame:
-    # Retirer les lignes sans id_source (après normalisation)
-    df = df.loc[df["id_source"].astype(bool)]
+def process_dataset_column_mapping(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.dropna(subset=["id_projet", "id_dataset"])
     return df
 
 
-def process_selecteur_s3(df: pd.DataFrame) -> pd.DataFrame:
-    logging.info(NO_PROCESS_MSG)
-    return df
+# ====================
+# Tables de dimension
+# ====================
+def process_dim_projet(
+    df_projet: pd.DataFrame,
+    df_ref_direction: pd.DataFrame,
+    df_ref_service: pd.DataFrame,
+    df_projet_location: pd.DataFrame,
+) -> pd.DataFrame:
+    df_dim_projet = (
+        df_projet.merge(
+            right=df_projet_location,
+            how="left",
+            left_on="id_projet",
+            right_on="id_projet",
+        )
+        .merge(
+            right=df_ref_direction,
+            how="left",
+            left_on="id_direction",
+            right_on="id_direction",
+        )
+        .merge(
+            right=df_ref_service,
+            how="left",
+            left_on="id_service",
+            right_on="id_service",
+        )
+        .drop_duplicates(subset=["id_projet"])
+    )
+    return df_dim_projet
 
 
-def process_selecteur_database(df: pd.DataFrame) -> pd.DataFrame:
-    logging.info(NO_PROCESS_MSG)
-    return df
+def process_dim_projet_contact(df_projet: pd.DataFrame, df_projet_contact: pd.DataFrame) -> pd.DataFrame:
+    df_dim_projet_contact = (
+        df_projet.merge(
+            right=df_projet_contact,
+            how="left",
+            left_on="id_projet",
+            right_on="id_projet",
+        )
+        .drop(columns=["id_direction", "id_service"])
+        .drop_duplicates(subset=["id_projet", "id_contact"])
+    )
+    return df_dim_projet_contact
 
 
-def process_selecteur_column_mapping(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.dropna(subset=["id_projet", "id_selecteur"])
-    return df
+def process_dim_projet_documentation(df_projet: pd.DataFrame, df_projet_documentation: pd.DataFrame) -> pd.DataFrame:
+    df_dim_projet_documentation = (
+        df_projet.merge(
+            right=df_projet_documentation,
+            how="left",
+            left_on="id_projet",
+            right_on="id_projet",
+        )
+        .drop(columns=["id_direction", "id_service"])
+        .drop_duplicates(subset=["id_projet", "type_documentation"])
+    )
+    return df_dim_projet_documentation
+
+
+def process_dim_dataset(
+    df_projet: pd.DataFrame, df_dataset: pd.DataFrame, df_ref_direction: pd.DataFrame, df_ref_service: pd.DataFrame
+) -> pd.DataFrame:
+    df_dim_dataset = (
+        df_projet.merge(
+            right=df_dataset,
+            how="left",
+            left_on="id_projet",
+            right_on="id_projet",
+        )
+        .merge(
+            right=df_ref_direction,
+            how="left",
+            left_on="id_direction",
+            right_on="id_direction",
+        )
+        .merge(
+            right=df_ref_service,
+            how="left",
+            left_on="id_service",
+            right_on="id_service",
+        )
+        .drop_duplicates(subset=["id_projet", "dataset"])
+    )
+    return df_dim_dataset
+
+
+def process_dim_dataset_location(
+    df_projet: pd.DataFrame, df_dataset: pd.DataFrame, df_dataset_location: pd.DataFrame
+) -> pd.DataFrame:
+    df_dim_dataset_location = (
+        df_projet.merge(
+            right=df_dataset,
+            how="left",
+            left_on="id_projet",
+            right_on="id_projet",
+        )
+        .merge(
+            right=df_dataset_location,
+            how="left",
+            left_on="id_projet",
+            right_on="id_projet",
+        )
+        .drop(columns=["id_direction", "id_service"])
+        .drop_duplicates(subset=["id_projet", "dataset", "stage"])
+    )
+    return df_dim_dataset_location
+
+
+def process_dim_dataset_column_mapping(
+    df_projet: pd.DataFrame, df_dataset: pd.DataFrame, df_dataset_column_mapping: pd.DataFrame
+) -> pd.DataFrame:
+    df_dim_dataset_column_mapping = (
+        df_projet.merge(
+            right=df_dataset,
+            how="left",
+            left_on="id_projet",
+            right_on="id_projet",
+        )
+        .merge(
+            right=df_dataset_column_mapping,
+            how="left",
+            left_on="id_projet",
+            right_on="id_projet",
+        )
+        .drop(columns=["id_direction", "id_service"])
+        .drop_duplicates(subset=["id_projet", "id_dataset", "colname_source"])
+    )
+    return df_dim_dataset_column_mapping

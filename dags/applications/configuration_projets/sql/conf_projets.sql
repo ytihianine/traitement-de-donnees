@@ -1,7 +1,10 @@
 -- Create
+DROP SCHEMA IF EXISTS conf_projets CASCADE;
 CREATE SCHEMA IF NOT EXISTS conf_projets;
 
-
+/*
+  Référentiels
+*/
 DROP TABLE IF EXISTS conf_projets."ref_direction" CASCADE;
 CREATE TABLE conf_projets."ref_direction" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
@@ -10,7 +13,7 @@ CREATE TABLE conf_projets."ref_direction" (
   "import_timestamp" TIMESTAMP NOT NULL,
   "snapshot_id" UUID NOT NULL,
   "snapshot_id_parent" UUID NULL,
-  PRIMARY KEY ("id_row"),
+  PRIMARY KEY ("id_row", "import_timestamp"),
   UNIQUE ("id_direction", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
@@ -23,11 +26,40 @@ CREATE TABLE conf_projets."ref_service" (
   "import_timestamp" TIMESTAMP NOT NULL,
   "snapshot_id" UUID NOT NULL,
   "snapshot_id_parent" UUID NULL,
-  PRIMARY KEY ("id_row"),
+  PRIMARY KEY ("id_row", "import_timestamp"),
   UNIQUE ("id_service", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
+DROP TABLE IF EXISTS conf_projets."ref_type_location" CASCADE;
+CREATE TABLE conf_projets."ref_type_location" (
+  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
+  "id_type_location" int,
+  "type_location" text,
+  "import_timestamp" TIMESTAMP NOT NULL,
+  "snapshot_id" UUID NOT NULL,
+  "snapshot_id_parent" UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp"),
+  UNIQUE ("id_type_location", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
+
+DROP TABLE IF EXISTS conf_projets."ref_connexion" CASCADE;
+CREATE TABLE conf_projets."ref_connexion" (
+  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
+  "id_connexion" int,
+  "id_type_location" int,
+  "conn_id" text,
+  "import_timestamp" TIMESTAMP NOT NULL,
+  "snapshot_id" UUID NOT NULL,
+  "snapshot_id_parent" UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp"),
+  UNIQUE ("id_connexion", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
+
+/*
+  Tables métiers
+*/
 DROP TABLE IF EXISTS conf_projets."projet" CASCADE;
 CREATE TABLE conf_projets."projet" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
@@ -38,117 +70,89 @@ CREATE TABLE conf_projets."projet" (
   "import_timestamp" TIMESTAMP NOT NULL,
   "snapshot_id" UUID NOT NULL,
   "snapshot_id_parent" UUID NULL,
-  PRIMARY KEY ("id_row"),
+  PRIMARY KEY ("id_row", "import_timestamp"),
   UNIQUE ("id_projet", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
+DROP TABLE IF EXISTS conf_projets."projet_location" CASCADE;
+CREATE TABLE conf_projets."projet_location" (
+  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
+  "id_projet" int,
+  "bucket" text,
+  "fs_folder" text,
+  "fs_folder_tmp" text,
+  "db_schema" text,
+  "import_timestamp" TIMESTAMP NOT NULL,
+  "snapshot_id" UUID NOT NULL,
+  "snapshot_id_parent" UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp"),
+  UNIQUE ("id_projet", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 DROP TABLE IF EXISTS conf_projets."projet_documentation" CASCADE;
 CREATE TABLE conf_projets."projet_documentation" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
+  "id_documentation" int,
   "type_documentation" text,
   "lien" text,
   "import_timestamp" TIMESTAMP NOT NULL,
   "snapshot_id" UUID NOT NULL,
   "snapshot_id_parent" UUID NULL,
-  PRIMARY KEY ("id_row"),
+  PRIMARY KEY ("id_row", "import_timestamp"),
+  UNIQUE ("id_projet", "id_documentation", "import_timestamp"),
   UNIQUE ("id_projet", "type_documentation", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
-
-DROP TABLE IF EXISTS conf_projets."projet_s3" CASCADE;
-CREATE TABLE conf_projets."projet_s3" (
-  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
-  "id_projet" int,
-  "bucket" text,
-  "key" text,
-  "key_tmp" text,
-  "import_timestamp" TIMESTAMP NOT NULL,
-  "snapshot_id" UUID NOT NULL,
-  "snapshot_id_parent" UUID NULL,
-  PRIMARY KEY ("id_row"),
-  UNIQUE ("id_projet", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
 
 DROP TABLE IF EXISTS conf_projets."projet_contact" CASCADE;
 CREATE TABLE conf_projets."projet_contact" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
-  "id_contact" int,
   "id_projet" int,
+  "id_contact" int,
   "contact_mail" text,
   "is_mail_generic" bool,
   "import_timestamp" TIMESTAMP NOT NULL,
   "snapshot_id" UUID NOT NULL,
   "snapshot_id_parent" UUID NULL,
-  PRIMARY KEY ("id_row"),
+  PRIMARY KEY ("id_row", "import_timestamp"),
   UNIQUE ("id_projet", "id_contact", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."projet_selecteur" CASCADE;
-CREATE TABLE conf_projets."projet_selecteur" (
+DROP TABLE IF EXISTS conf_projets."dataset" CASCADE;
+CREATE TABLE conf_projets."dataset" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
-  "id_selecteur" int,
+  "id_dataset" int,
   "id_projet" int,
-  "type_selecteur" text,
-  "selecteur" text,
+  "dataset" text,
   "import_timestamp" TIMESTAMP NOT NULL,
   "snapshot_id" UUID NOT NULL,
   "snapshot_id_parent" UUID NULL,
-  PRIMARY KEY ("id_row"),
-  UNIQUE ("id_projet", "id_selecteur", "import_timestamp")
+  PRIMARY KEY ("id_row", "import_timestamp"),
+  UNIQUE ("id_projet", "id_dataset", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."selecteur_source" CASCADE;
-CREATE TABLE conf_projets."selecteur_source" (
+DROP TABLE IF EXISTS conf_projets."dataset_location" CASCADE;
+CREATE TABLE conf_projets."dataset_location" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
-  "id_selecteur" int,
-  "type_location" text,
-  "id_source" text,
+  "id_dataset" int,
+  "stage" text,
+  "id_type_location" int,
+  "location" text,
+  "id_conn_id" int,
   "import_timestamp" TIMESTAMP NOT NULL,
   "snapshot_id" UUID NOT NULL,
   "snapshot_id_parent" UUID NULL,
-  PRIMARY KEY ("id_row"),
-  UNIQUE ("id_projet", "id_selecteur", "import_timestamp")
+  PRIMARY KEY ("id_row", "import_timestamp"),
+  UNIQUE ("id_projet", "id_dataset", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-
-DROP TABLE IF EXISTS conf_projets."selecteur_s3" CASCADE;
-CREATE TABLE conf_projets."selecteur_s3" (
-  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
-  "id_projet" int,
-  "id_selecteur" int,
-  "key" text,
-  "filename" text,
-  "import_timestamp" TIMESTAMP NOT NULL,
-  "snapshot_id" UUID NOT NULL,
-  "snapshot_id_parent" UUID NULL,
-  PRIMARY KEY ("id_row"),
-  UNIQUE ("id_projet", "id_selecteur", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
-
-DROP TABLE IF EXISTS conf_projets."selecteur_database" CASCADE;
-CREATE TABLE conf_projets."selecteur_database" (
-  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
-  "id_projet" int,
-  "id_selecteur" int,
-  "tbl_name" text,
-  "import_timestamp" TIMESTAMP NOT NULL,
-  "snapshot_id" UUID NOT NULL,
-  "snapshot_id_parent" UUID NULL,
-  PRIMARY KEY ("id_row"),
-  UNIQUE ("id_projet", "id_selecteur", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
-
-DROP TABLE IF EXISTS conf_projets."selecteur_column_mapping" CASCADE;
-CREATE TABLE conf_projets."selecteur_column_mapping" (
+DROP TABLE IF EXISTS conf_projets."dataset_column_mapping" CASCADE;
+CREATE TABLE conf_projets."dataset_column_mapping" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_col_mapping" int,
   "id_projet" int,
-  "id_selecteur" int,
+  "id_dataset" int,
   "colname_source" text,
   "colname_dest" text,
   "to_keep" bool,
@@ -156,153 +160,119 @@ CREATE TABLE conf_projets."selecteur_column_mapping" (
   "import_timestamp" TIMESTAMP NOT NULL,
   "snapshot_id" UUID NOT NULL,
   "snapshot_id_parent" UUID NULL,
-  PRIMARY KEY ("id_row"),
-  UNIQUE ("id_projet", "id_selecteur", "id_col_mapping", "import_timestamp")
+  PRIMARY KEY ("id_row", "import_timestamp"),
+  UNIQUE ("id_projet", "id_dataset", "id_col_mapping", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
 
--- Vue pour get_projet_s3_info()
-DROP VIEW IF EXISTS conf_projets.projet_s3_vw;
-CREATE OR REPLACE VIEW conf_projets.projet_s3_vw AS
-SELECT
-    cpp.projet,
-    cpps.bucket,
-    cpps.key,
-    cpps.key_tmp,
-    cpp.import_timestamp,
-    DENSE_RANK() OVER (
-      ORDER BY cpp.import_timestamp desc
-  ) as rang
-FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_s3 cpps ON cpp.id_projet = cpps.id_projet
-  AND cpp.import_timestamp = cpps.import_timestamp;
+/*
+  Tables des faits
+*/
+-- Dimensions pour les projets
+DROP TABLE IF EXISTS conf_projets."dim_projet" CASCADE;
+CREATE TABLE conf_projets."dim_projet" (
+  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
+  "id_projet" int,
+  "projet" text,
+  "id_direction" int,
+  "direction" text,
+  "id_service" int,
+  "service" text,
+  "bucket" text,
+  "key" text,
+  "key_tmp" text,
+  "db_schema" text,
+  "snapshot_id" UUID NOT NULL,
+  "snapshot_id_parent" UUID NULL,
+  "import_timestamp" TIMESTAMP NOT NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
+DROP TABLE IF EXISTS conf_projets."dim_projet_contact" CASCADE;
+CREATE TABLE conf_projets."dim_projet_contact" (
+  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
+  "id_projet" int,
+  "projet" text,
+  "id_contact" int,
+  "contact_mail" text,
+  "is_mail_generic" boolean,
+  "snapshot_id" UUID NOT NULL,
+  "snapshot_id_parent" UUID NULL,
+  "import_timestamp" TIMESTAMP NOT NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
+DROP TABLE IF EXISTS conf_projets."dim_projet_documentation" CASCADE;
+CREATE TABLE conf_projets."dim_projet_documentation" (
+  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
+  "id_projet" int,
+  "projet" text,
+  "id_documentation" int,
+  "type_documentation" text,
+  "lien" text,
+  "snapshot_id" UUID NOT NULL,
+  "snapshot_id_parent" UUID NULL,
+  "import_timestamp" TIMESTAMP NOT NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
+-- Dimensions pour les datasets
+DROP TABLE IF EXISTS conf_projets."dim_dataset" CASCADE;
+CREATE TABLE conf_projets."dim_dataset" (
+  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
+  "id_projet" int,
+  "projet" text,
+  "id_direction" int,
+  "direction" text,
+  "id_service" int,
+  "service" text,
+  "id_dataset" int,
+  "dataset" text,
+  "snapshot_id" UUID NOT NULL,
+  "snapshot_id_parent" UUID NULL,
+  "import_timestamp" TIMESTAMP NOT NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 
--- Vue pour column_mapping_dataframe()
-DROP VIEW IF EXISTS conf_projets.cols_mapping_vw;
-CREATE OR REPLACE VIEW conf_projets.cols_mapping_vw AS
-SELECT
-    cpp.projet,
-    cpps.selecteur,
-    scm.colname_source,
-    scm.colname_dest,
-    cpp.import_timestamp,
-    DENSE_RANK() OVER (
-      ORDER BY cpp.import_timestamp desc
-  ) as rang
-FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_selecteur cpps ON cpp.id_projet = cpps.id_projet
-  AND cpp.import_timestamp = cpps.import_timestamp
-INNER JOIN conf_projets.selecteur_column_mapping scm
-  ON cpps.id_selecteur = scm.id_selecteur
-    AND cpps.id_projet = scm.id_projet
-    AND cpp.import_timestamp = cpps.import_timestamp
-WHERE scm.to_keep = true;
+DROP TABLE IF EXISTS conf_projets."dim_dataset_location" CASCADE;
+CREATE TABLE conf_projets."dim_dataset_location" (
+  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
+  "id_projet" int,
+  "projet" text,
+  "id_dataset" int,
+  "dataset" text,
+  "stage" text,
+  "id_type_location" int,
+  "type_location" text,
+  "location" text,
+  "id_conn_id" int,
+  "conn_id" text,
+  "snapshot_id" UUID NOT NULL,
+  "snapshot_id_parent" UUID NULL,
+  "import_timestamp" TIMESTAMP NOT NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
 
--- Vue pour get_list_documentation()
-DROP VIEW IF EXISTS conf_projets.projet_documentation_vw;
-CREATE OR REPLACE VIEW conf_projets.projet_documentation_vw AS
-SELECT
-    cpp.projet,
-    cppd.type_documentation,
-    cppd.lien,
-  cpp.import_timestamp,
-    DENSE_RANK() OVER (
-      ORDER BY cppd.import_timestamp desc
-  ) as rang
-FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_documentation cppd ON cpp.id_projet = cppd.id_projet
-  AND cpp.import_timestamp = cppd.import_timestamp;
+DROP TABLE IF EXISTS conf_projets."dim_dataset_cols_mapping" CASCADE;
+CREATE TABLE conf_projets."dim_dataset_cols_mapping" (
+  "id_row" bigint GENERATED ALWAYS AS IDENTITY,
+  "id_projet" int,
+  "projet" text,
+  "id_dataset" int,
+  "dataset" text,
+  "id_col_mapping" int,
+  "colname_source" text,
+  "colname_dest" text,
+  "to_keep" boolean,
+  "date_archivage" date,
+  "snapshot_id" UUID NOT NULL,
+  "snapshot_id_parent" UUID NULL,
+  "import_timestamp" TIMESTAMP NOT NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
 
--- Vue pour get_list_contact()
-DROP VIEW IF EXISTS conf_projets.projet_contact_vw;
-create or replace
-view conf_projets.projet_contact_vw as
-select
-	cpp.projet,
-	cppc.contact_mail,
-	cppc.is_mail_generic,
-	cpp.import_timestamp,
-	dense_rank() over (
-order by
-	cpp.import_timestamp desc
-  ) as rang
-from
-	conf_projets.projet cpp
-inner join conf_projets.projet_contact cppc on
-	cpp.id_projet = cppc.id_projet
-	and cpp.import_timestamp = cppc.import_timestamp;
-
-
--- Vue pour _get_selecteur_storage_info()
-DROP VIEW IF EXISTS conf_projets.selecteur_s3_db_vw;
-CREATE OR REPLACE VIEW conf_projets.selecteur_s3_db_vw AS
-SELECT
-    cpp.projet,
-    cpps.type_selecteur,
-    cpps.selecteur,
-    cpss.type_location,
-    cpss.id_source,
-    cpss3.filename,
-    COALESCE(cpss3.key, cpps3.key) as s3_key,
-    cpps3.bucket,
-    cpps3.key as projet_s3_key,
-    cpps3.key_tmp as projet_s3_key_tmp,
-    CONCAT(COALESCE(cpss3.key, cpps3.key), '/', cpss3.filename) as filepath_s3,
-    CONCAT(cpps3.key_tmp, '/', cpss3.filename) as filepath_tmp_s3,
-    cpsd.tbl_name,
-    cpp.import_timestamp,
-    DENSE_RANK() OVER (
-      ORDER BY cpp.import_timestamp DESC
-  ) as rang
-FROM conf_projets.projet cpp
-INNER JOIN conf_projets.projet_selecteur cpps
-  ON cpp.id_projet = cpps.id_projet
-  AND cpp.import_timestamp = cpps.import_timestamp
-LEFT JOIN conf_projets.selecteur_source cpss
-  ON cpps.id_selecteur = cpss.id_selecteur
-    AND cpps.id_projet = cpss.id_projet
-  AND cpp.import_timestamp = cpss.import_timestamp
-INNER JOIN conf_projets.projet_s3 cpps3
-  ON cpp.id_projet = cpps3.id_projet
-  AND cpp.import_timestamp = cpps3.import_timestamp
-LEFT JOIN conf_projets.selecteur_s3 cpss3
-  ON cpps.id_selecteur = cpss3.id_selecteur
-    AND cpps.id_projet = cpss3.id_projet
-  AND cpp.import_timestamp = cpss3.import_timestamp
-LEFT JOIN conf_projets.selecteur_database cpsd
-  ON cpps.id_selecteur = cpsd.id_selecteur
-    AND cpps.id_projet = cpsd.id_projet
-  AND cpp.import_timestamp = cpsd.import_timestamp
-;
-
--- Vue pour _get_snapshot_id()
-DROP VIEW IF EXISTS conf_projets.projet_snapshot_vw;
-CREATE OR REPLACE VIEW conf_projets.projet_snapshot_vw AS
-  WITH latest_projet AS (
-    SELECT id_projet, projet, import_timestamp,
-      DENSE_RANK() OVER (
-        PARTITION BY id_projet
-        ORDER BY import_timestamp ASC
-    ) as rang
-    FROM conf_projets.projet
-  )
-  SELECT
-    cte_projet.id_projet,
-    cte_projet.projet,
-    ver_snap.import_timestamp,
-    ver_snap.snapshot_id,
-    DENSE_RANK() OVER (
-        PARTITION BY cte_projet.id_projet
-        ORDER BY ver_snap.import_timestamp DESC
-    ) as rang,
-    ver_snap.created_at
-  FROM versioning.snapshot ver_snap
-  INNER JOIN latest_projet cte_projet
-    ON cte_projet.id_projet = ver_snap.id_projet
-  WHERE cte_projet.rang = 1
-  ORDER BY id_projet, import_timestamp;
 
 -- [TO REFACTOR] vue_source pour l'interface de dépôt de fichier
 drop view IF EXISTS conf_projets.vue_source;
