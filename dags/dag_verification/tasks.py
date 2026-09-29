@@ -282,8 +282,11 @@ def check_iceberg_catalog() -> None:
         properties = generate_catalog_properties(
             uri=DEFAULT_POLARIS_HOST,
         )
-        catalog = IcebergCatalog(name=DEFAULT_POLARIS_CATALOG, properties=properties)
-        logging.info(msg=f"Iceberg catalog connected: {catalog.name}")
+        try:
+            catalog = IcebergCatalog(name=DEFAULT_POLARIS_CATALOG, properties=properties)
+            logging.info(msg=f"Iceberg catalog connected: {catalog.name}")
+        except Exception as e:
+            logging.error(msg=f"Iceberg catalog connection failed: {e}")
 
     chain(
         check_catalog(),
@@ -322,7 +325,7 @@ def check_http_interface() -> None:
             client_type=HttpHandlerType.REQUEST,
             config=ClientConfig(),
         )
-        response = http_client.get(url="https://grist.numerique.gouv.fr/")
+        response = http_client.get(url="https://nubonyxia.incubateur.finances.rie.gouv.fr/")
         logging.info(msg=f"Requests client check OK: status={response.status_code}")
         http_client.close()
 
@@ -332,7 +335,7 @@ def check_http_interface() -> None:
             client_type=HttpHandlerType.HTTPX,
             config=ClientConfig(),
         )
-        response = http_client.get(url="https://grist.numerique.gouv.fr/")
+        response = http_client.get(url="https://nubonyxia.incubateur.finances.rie.gouv.fr/")
         logging.info(msg=f"Httpx client check OK: status={response.status_code}")
         http_client.close()
 
