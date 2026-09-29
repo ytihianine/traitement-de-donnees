@@ -38,7 +38,7 @@ nom_projet = "Configuration des projets"
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        db_params=DBParams(prod_schema="conf_projets"),
+        db_params=DBParams(prod_schema="conf_projet"),
         feature_flags=FeatureFlagsEnable(db=True, mail=True, s3=True, convert_files=False, download_grist_doc=True),
     ),
     on_success_callback=create_send_mail_callback(

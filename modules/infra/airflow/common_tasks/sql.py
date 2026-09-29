@@ -197,9 +197,7 @@ def create_tmp_tables(
         nom_projet = dag_repo.get_project_name(context=context)
 
     db_info = dag_repo.get_db_info(context=context)
-    prod_schema = db_info.prod_schema
     tmp_schema = db_info.tmp_schema
-    logging.info(msg=f"Prod schema: {prod_schema}, Tmp schema: {tmp_schema}")
 
     # Init vars
     db = create_db_handler(
@@ -221,11 +219,12 @@ def create_tmp_tables(
             continue
 
         tbl_name = parse_db_table(location=tmp_loc.validate_location)
+        schema = parse_db_schema(location=tmp_loc.validate_location)
 
         drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.{tbl_name};")
         create_queries.append(f"""CREATE TABLE
                 IF NOT EXISTS {tmp_schema}.{tbl_name}
-                ( LIKE {prod_schema}.{tbl_name} INCLUDING ALL);
+                ( LIKE {schema}.{tbl_name} INCLUDING ALL);
             """)
         alter_queries.append(f"ALTER SEQUENCE {tmp_schema}.{tbl_name}_id_seq RESTART WITH 1;")
 

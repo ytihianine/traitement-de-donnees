@@ -1,12 +1,12 @@
 -- Create
-DROP SCHEMA IF EXISTS conf_projets CASCADE;
-CREATE SCHEMA IF NOT EXISTS conf_projets;
+DROP SCHEMA IF EXISTS conf_projet CASCADE;
+CREATE SCHEMA IF NOT EXISTS conf_projet;
 
 /*
   Référentiels
 */
-DROP TABLE IF EXISTS conf_projets."ref_direction" CASCADE;
-CREATE TABLE conf_projets."ref_direction" (
+DROP TABLE IF EXISTS conf_projet."ref_direction" CASCADE;
+CREATE TABLE conf_projet."ref_direction" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_direction" int,
   "direction" text,
@@ -17,8 +17,8 @@ CREATE TABLE conf_projets."ref_direction" (
   UNIQUE ("id_direction", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."ref_service" CASCADE;
-CREATE TABLE conf_projets."ref_service" (
+DROP TABLE IF EXISTS conf_projet."ref_service" CASCADE;
+CREATE TABLE conf_projet."ref_service" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_service" int,
   "id_direction" int,
@@ -30,8 +30,8 @@ CREATE TABLE conf_projets."ref_service" (
   UNIQUE ("id_service", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."ref_type_location" CASCADE;
-CREATE TABLE conf_projets."ref_type_location" (
+DROP TABLE IF EXISTS conf_projet."ref_type_location" CASCADE;
+CREATE TABLE conf_projet."ref_type_location" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_type_location" int,
   "type_location" text,
@@ -43,8 +43,8 @@ CREATE TABLE conf_projets."ref_type_location" (
 ) PARTITION BY RANGE (import_timestamp);
 
 
-DROP TABLE IF EXISTS conf_projets."ref_connexion" CASCADE;
-CREATE TABLE conf_projets."ref_connexion" (
+DROP TABLE IF EXISTS conf_projet."ref_connexion" CASCADE;
+CREATE TABLE conf_projet."ref_connexion" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_connexion" int,
   "id_type_location" int,
@@ -60,8 +60,8 @@ CREATE TABLE conf_projets."ref_connexion" (
 /*
   Tables métiers
 */
-DROP TABLE IF EXISTS conf_projets."projet" CASCADE;
-CREATE TABLE conf_projets."projet" (
+DROP TABLE IF EXISTS conf_projet."projet" CASCADE;
+CREATE TABLE conf_projet."projet" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "id_direction" int,
@@ -74,8 +74,8 @@ CREATE TABLE conf_projets."projet" (
   UNIQUE ("id_projet", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."projet_location" CASCADE;
-CREATE TABLE conf_projets."projet_location" (
+DROP TABLE IF EXISTS conf_projet."projet_location" CASCADE;
+CREATE TABLE conf_projet."projet_location" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "bucket" text,
@@ -89,8 +89,8 @@ CREATE TABLE conf_projets."projet_location" (
   UNIQUE ("id_projet", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."projet_documentation" CASCADE;
-CREATE TABLE conf_projets."projet_documentation" (
+DROP TABLE IF EXISTS conf_projet."projet_documentation" CASCADE;
+CREATE TABLE conf_projet."projet_documentation" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "id_documentation" int,
@@ -104,8 +104,8 @@ CREATE TABLE conf_projets."projet_documentation" (
   UNIQUE ("id_projet", "type_documentation", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."projet_contact" CASCADE;
-CREATE TABLE conf_projets."projet_contact" (
+DROP TABLE IF EXISTS conf_projet."projet_contact" CASCADE;
+CREATE TABLE conf_projet."projet_contact" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "id_contact" int,
@@ -118,8 +118,8 @@ CREATE TABLE conf_projets."projet_contact" (
   UNIQUE ("id_projet", "id_contact", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."dataset" CASCADE;
-CREATE TABLE conf_projets."dataset" (
+DROP TABLE IF EXISTS conf_projet."dataset" CASCADE;
+CREATE TABLE conf_projet."dataset" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_dataset" int,
   "id_projet" int,
@@ -131,8 +131,8 @@ CREATE TABLE conf_projets."dataset" (
   UNIQUE ("id_projet", "id_dataset", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."dataset_location" CASCADE;
-CREATE TABLE conf_projets."dataset_location" (
+DROP TABLE IF EXISTS conf_projet."dataset_location" CASCADE;
+CREATE TABLE conf_projet."dataset_location" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "id_dataset" int,
@@ -147,8 +147,8 @@ CREATE TABLE conf_projets."dataset_location" (
   UNIQUE ("id_projet", "id_dataset", "stage", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."dataset_column_mapping" CASCADE;
-CREATE TABLE conf_projets."dataset_column_mapping" (
+DROP TABLE IF EXISTS conf_projet."dataset_column_mapping" CASCADE;
+CREATE TABLE conf_projet."dataset_column_mapping" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_col_mapping" int,
   "id_projet" int,
@@ -169,8 +169,8 @@ CREATE TABLE conf_projets."dataset_column_mapping" (
   Tables des faits
 */
 -- Dimensions pour les projets
-DROP TABLE IF EXISTS conf_projets."dim_projet" CASCADE;
-CREATE TABLE conf_projets."dim_projet" (
+DROP TABLE IF EXISTS conf_projet."dim_projet" CASCADE;
+CREATE TABLE conf_projet."dim_projet" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "projet" text,
@@ -188,8 +188,8 @@ CREATE TABLE conf_projets."dim_projet" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."dim_projet_contact" CASCADE;
-CREATE TABLE conf_projets."dim_projet_contact" (
+DROP TABLE IF EXISTS conf_projet."dim_projet_contact" CASCADE;
+CREATE TABLE conf_projet."dim_projet_contact" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "projet" text,
@@ -202,8 +202,8 @@ CREATE TABLE conf_projets."dim_projet_contact" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-DROP TABLE IF EXISTS conf_projets."dim_projet_documentation" CASCADE;
-CREATE TABLE conf_projets."dim_projet_documentation" (
+DROP TABLE IF EXISTS conf_projet."dim_projet_documentation" CASCADE;
+CREATE TABLE conf_projet."dim_projet_documentation" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "projet" text,
@@ -217,8 +217,8 @@ CREATE TABLE conf_projets."dim_projet_documentation" (
 ) PARTITION BY RANGE (import_timestamp);
 
 -- Dimensions pour les datasets
-DROP TABLE IF EXISTS conf_projets."dim_dataset" CASCADE;
-CREATE TABLE conf_projets."dim_dataset" (
+DROP TABLE IF EXISTS conf_projet."dim_dataset" CASCADE;
+CREATE TABLE conf_projet."dim_dataset" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "projet" text,
@@ -235,8 +235,8 @@ CREATE TABLE conf_projets."dim_dataset" (
 ) PARTITION BY RANGE (import_timestamp);
 
 
-DROP TABLE IF EXISTS conf_projets."dim_dataset_location" CASCADE;
-CREATE TABLE conf_projets."dim_dataset_location" (
+DROP TABLE IF EXISTS conf_projet."dim_dataset_location" CASCADE;
+CREATE TABLE conf_projet."dim_dataset_location" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "projet" text,
@@ -255,8 +255,8 @@ CREATE TABLE conf_projets."dim_dataset_location" (
 ) PARTITION BY RANGE (import_timestamp);
 
 
-DROP TABLE IF EXISTS conf_projets."dim_dataset_column_mapping" CASCADE;
-CREATE TABLE conf_projets."dim_dataset_column_mapping" (
+DROP TABLE IF EXISTS conf_projet."dim_dataset_column_mapping" CASCADE;
+CREATE TABLE conf_projet."dim_dataset_column_mapping" (
   "id_row" bigint GENERATED ALWAYS AS IDENTITY,
   "id_projet" int,
   "projet" text,
@@ -275,9 +275,9 @@ CREATE TABLE conf_projets."dim_dataset_column_mapping" (
 
 
 -- [TO REFACTOR] vue_source pour l'interface de dépôt de fichier
-drop view IF EXISTS conf_projets.vue_source;
+drop view IF EXISTS conf_projet.vue_source;
 create or replace
-view conf_projets.vue_source
+view conf_projet.vue_source
 as
 select
 	cpp.snapshot_id,
@@ -292,26 +292,26 @@ select
 	cpp.id_service,
 	cp_ref_service.service
 from
-	conf_projets.projet cpp
-inner join conf_projets.projet_s3 cpps3
+	conf_projet.projet cpp
+inner join conf_projet.projet_s3 cpps3
   on
 	cpp.id_projet = cpps3.id_projet
 	and cpp.snapshot_id = cpps3.snapshot_id
-inner join conf_projets.projet_selecteur cpps
+inner join conf_projet.projet_selecteur cpps
   on
 	cpp.id_projet = cpps.id_projet
 	and cpp.snapshot_id = cpps.snapshot_id
-join conf_projets.selecteur_source cppsource
+join conf_projet.selecteur_source cppsource
   on
 	cpp.id_projet = cppsource.id_projet
 	and cpps.id_selecteur = cppsource.id_selecteur
 	and cpp.snapshot_id = cppsource.snapshot_id
 	and cppsource.type_location = 'Fichier'
-join conf_projets.ref_direction cp_ref_dir
+join conf_projet.ref_direction cp_ref_dir
   on
 	cpp.id_direction = cp_ref_dir.id_direction
 	and cpp.snapshot_id = cp_ref_dir.snapshot_id
-join conf_projets.ref_service cp_ref_service
+join conf_projet.ref_service cp_ref_service
   on
 	cpp.id_service = cp_ref_service.id_service
 	and cpp.snapshot_id = cp_ref_service.snapshot_id
@@ -321,7 +321,7 @@ where
 	select
 		MAX(import_timestamp)
 	from
-		conf_projets.projet
+		conf_projet.projet
 	limit 1
 )
 order by
