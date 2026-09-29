@@ -156,7 +156,7 @@ class PipelineRunner:
         # ===============================
         # Execution operation data
         # ===============================
-        logging.info(msg=f"Running pipeline operation: {pipeline.operation.__name__}")
+        logging.info(msg="Running pipeline operation function")
         result = pipeline.operation(**input_data)
 
         if result is None:
