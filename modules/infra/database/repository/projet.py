@@ -135,7 +135,7 @@ class DbProjetRepository(ProjetRepository):
     @db_retry
     def get_projet_metadata(self, nom_projet: str, dag_completed: bool = False) -> ProjetMetadata:
         query = """
-            SELECT s.id_projet, s.snapshot_id, s.snapshot_id_parent, s.import_timestamp, s.status
+            SELECT s.id_projet, s.snapshot_id, s.snapshot_id_parent, s.import_timestamp, s.is_dag_completed
             FROM versioning.snapshot s
             JOIN conf_projets.projet p
                 ON p.id_projet = s.id_projet
@@ -160,7 +160,7 @@ class DbProjetRepository(ProjetRepository):
             snapshot_id=db_result["snapshot_id"],
             snapshot_id_parent=db_result["snapshot_id_parent"],
             import_timestamp=db_result["import_timestamp"],
-            status=db_result["status"],
+            is_dag_completed=db_result["is_dag_completed"],
         )
 
     @db_retry

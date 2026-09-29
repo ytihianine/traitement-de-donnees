@@ -116,7 +116,7 @@ def render_template(
         root_folder = get_root_folder()
         template_dir = Path(
             root_folder,
-            "src",
+            "modules",
             "infra",
             "mails",
             "templates",

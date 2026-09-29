@@ -105,8 +105,10 @@ def check_projet(**context) -> None:
         logging.info(msg=f"ProjetMetadata retrieved: {metadata}")
 
     chain(
-        create_projet(**context),
-        get_projet_metadata(**context),
+        [
+            create_projet(**context),
+            get_projet_metadata(**context),
+        ]
     )
 
 

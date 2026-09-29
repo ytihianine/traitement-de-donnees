@@ -113,7 +113,7 @@ class DbDatasetContextRepository(DatasetContextRepository):
                     "type_location",
                     "location",
                     "id_conn_id",
-                    "conn_id",
+                    "conn_id"
                 FROM {CONF_SCHEMA}.dim_dataset_location cpdd
                 WHERE 1=1
                     AND cpdd.projet = %s
