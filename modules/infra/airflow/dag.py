@@ -147,7 +147,7 @@ def create_dag_params(
     # Using DagConfig for type checking
     dag_params = DagConfig(
         nom_projet=nom_projet,
-        dag_status=dag_status.value,
+        dag_status=dag_status,
         db=db_params,
         enable=feature_flags,
     )

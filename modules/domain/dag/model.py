@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
 
 from modules.constants import DEFAULT_TMP_SCHEMA
 
@@ -10,10 +10,10 @@ from modules.constants import DEFAULT_TMP_SCHEMA
 class DagStatus(Enum):
     """DAG status"""
 
-    RUN = auto()
-    DEV = auto()
+    RUN = "RUN"
+    DEV = "DEV"
 
-    def serialize(self) -> int:
+    def serialize(self) -> str:
         return self.value
 
     def deserialize(self) -> "DagStatus":
@@ -30,10 +30,10 @@ class FeatureFlags(Enum):
     DOWNLOAD_GRIST_DOC = "download_grist_doc"
 
     def serialize(self) -> str:
-        return self.name.lower()
+        return self.value
 
     def deserialize(self) -> "FeatureFlags":
-        return FeatureFlags[self.name]
+        return FeatureFlags(self.value)
 
 
 # =================

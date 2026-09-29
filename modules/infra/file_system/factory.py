@@ -1,7 +1,7 @@
 """Factory for creating file handlers."""
 
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
 from pathlib import Path
 
 from modules.constants import DEFAULT_S3_BUCKET, DEFAULT_S3_CONN_ID
@@ -13,21 +13,33 @@ from modules.infra.file_system.s3 import S3FS
 class FileHandlerType(Enum):
     """File handler types enumeration."""
 
-    S3 = auto()
-    LOCAL = auto()
+    S3 = "S3"
+    LOCAL = "LOCAL"
+
+    def serialize(self) -> str:
+        return self.value
+
+    def deserialize(self) -> "FileHandlerType":
+        return FileHandlerType(self.value)
 
 
 class FileFormat(Enum):
     """Supported file formats for ETL operations."""
 
-    CSV = auto()
-    EXCEL = auto()
-    XLSX = auto()
-    XLS = auto()
-    XLSB = auto()
-    PARQUET = auto()
-    JSON = auto()
-    AUTO = auto()
+    CSV = "CSV"
+    EXCEL = "EXCEL"
+    XLSX = "XLSX"
+    XLS = "XLS"
+    XLSB = "XLSB"
+    PARQUET = "PARQUET"
+    JSON = "JSON"
+    AUTO = "AUTO"
+
+    def serialize(self) -> str:
+        return self.value
+
+    def deserialize(self) -> "FileFormat":
+        return FileFormat(self.value)
 
 
 @dataclass(frozen=True)

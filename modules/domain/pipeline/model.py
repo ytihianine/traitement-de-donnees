@@ -1,10 +1,28 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from enum import Enum, auto
+from enum import Enum
 from typing import Any
 
 from modules.domain.dataset.model import Dataset
+
+
+class LoadStrategy(Enum):
+    """Load strategies for data ingestion."""
+
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values) -> str:
+        return name.upper()
+
+    FULL_LOAD = "FULL_LOAD"
+    INCREMENTAL = "INCREMENTAL"
+    APPEND = "APPEND"
+
+    def serialize(self) -> str:
+        return self.value
+
+    def deserialize(self) -> "LoadStrategy":
+        return LoadStrategy(self.value)
 
 
 class PartitionTimePeriod(Enum):
@@ -12,10 +30,10 @@ class PartitionTimePeriod(Enum):
     def _generate_next_value_(name, start, count, last_values) -> str:
         return name.upper()
 
-    DAY = auto()
-    WEEK = auto()
-    MONTH = auto()
-    YEAR = auto()
+    DAY = "DAY"
+    WEEK = "WEEK"
+    MONTH = "MONTH"
+    YEAR = "YEAR"
 
     def serialize(self) -> str:
         return self.value
@@ -45,18 +63,6 @@ def determine_partition_period(time_period: PartitionTimePeriod, execution_date:
     else:
         raise ValueError(f"Unsupported time period: {time_period}")
     return (from_date_period, to_date_period)
-
-
-class LoadStrategy(Enum):
-    """Load strategies for data ingestion."""
-
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values) -> str:
-        return name.upper()
-
-    FULL_LOAD = auto()
-    INCREMENTAL = auto()
-    APPEND = auto()
 
 
 @dataclass(frozen=True)
