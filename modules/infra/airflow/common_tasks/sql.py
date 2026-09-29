@@ -218,8 +218,13 @@ def create_tmp_tables(
             logging.info(msg=f"Skipping DB tmp table creation for selecteur <{dataset_context.dataset_name}>")
             continue
 
-        tbl_name = parse_db_table(location=tmp_loc.validate_location)
-        schema = parse_db_schema(location=tmp_loc.validate_location)
+        dest_loc = dataset_context.dest_loc
+        if dest_loc.type_location != TypeLocation.DB:
+            logging.info(msg=f"Skipping DB tmp table creation for selecteur <{dataset_context.dataset_name}>")
+            continue
+
+        tbl_name = parse_db_table(location=dest_loc.validate_location)
+        schema = parse_db_schema(location=dest_loc.validate_location)
 
         drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.{tbl_name};")
         create_queries.append(f"""CREATE TABLE
