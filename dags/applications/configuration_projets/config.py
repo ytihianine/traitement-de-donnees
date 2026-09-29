@@ -17,6 +17,6 @@ execution_options = {
     "dataset_location": ExecutionOptions(),
     "dataset_column_mapping": ExecutionOptions(),
     "dim_dataset": ExecutionOptions(),
-    "dim_dataset_cols_mapping": ExecutionOptions(),
+    "dim_dataset_column_mapping": ExecutionOptions(),
     "dim_dataset_location": ExecutionOptions(),
 }
