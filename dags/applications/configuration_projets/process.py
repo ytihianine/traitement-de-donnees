@@ -1,6 +1,7 @@
 import pandas as pd
 from modules.domain.projet.model import TypeDocumentation
 from modules.generic_processing.structures import (
+    handle_grist_nullable_int_columns,
     validate_enum_column,
 )
 
@@ -134,9 +135,11 @@ def process_dim_projet_contact(df_projet: pd.DataFrame, df_projet_contact: pd.Da
         .drop_duplicates(subset=["id_projet", "id_contact"])
     )
 
-    if "id_contact" in df_dim_projet_contact.columns:
-        df_dim_projet_contact["id_contact"] = pd.to_numeric(df_dim_projet_contact["id_contact"], errors="coerce")
-        df_dim_projet_contact = df_dim_projet_contact.astype({"id_contact": "Int64"})
+    int_columns = ["id_projet", "id_contact"]
+    df_dim_projet_contact = handle_grist_nullable_int_columns(
+        df=df_dim_projet_contact,
+        columns=int_columns,
+    )
 
     return df_dim_projet_contact
 
@@ -189,6 +192,12 @@ def process_dim_dataset(
         )
         .drop_duplicates(subset=["id_projet", "dataset"])
     )
+
+    int_columns = ["id_projet", "id_dataset", "id_direction", "id_service"]
+    df_dim_dataset = handle_grist_nullable_int_columns(
+        df=df_dim_dataset,
+        columns=int_columns,
+    )
     return df_dim_dataset
 
 
@@ -235,6 +244,13 @@ def process_dim_dataset_location(
         .drop(columns=["id_direction", "id_service"])
         .drop_duplicates(subset=["id_projet", "dataset", "stage"])
     )
+
+    int_columns = ["id_projet", "id_dataset", "id_type_location", "id_conn_id"]
+    df_dim_dataset_location = handle_grist_nullable_int_columns(
+        df=df_dim_dataset_location,
+        columns=int_columns,
+    )
+
     return df_dim_dataset_location
 
 
@@ -262,4 +278,11 @@ def process_dim_dataset_column_mapping(
         .drop(columns=["id_direction", "id_service"])
         .drop_duplicates(subset=["id_projet", "id_dataset", "colname_source"])
     )
+
+    int_columns = ["id_projet", "id_dataset", "id_col_mapping"]
+    df_dim_dataset_column_mapping = handle_grist_nullable_int_columns(
+        df=df_dim_dataset_column_mapping,
+        columns=int_columns,
+    )
+
     return df_dim_dataset_column_mapping
