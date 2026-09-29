@@ -18,6 +18,7 @@ from modules.generic_processing.dates import convert_grist_date_to_date
 from modules.generic_processing.structures import (
     handle_grist_boolean_columns,
     handle_grist_null_references,
+    handle_grist_nullable_int_columns,
     normalize_grist_dataframe,
 )
 from modules.generic_processing.text import normalize_whitespace_columns
@@ -92,6 +93,7 @@ def generic_grist_processing(
     ref_columns: list[str] | None = None,
     date_columns: list[str] | None = None,
     bool_columns: list[str] | None = None,
+    int_columns: list[str] | None = None,
     num_columns: list[str] | None = None,
     custom_fn: Callable[[pd.DataFrame], pd.DataFrame] | None = None,
 ) -> pd.DataFrame:
@@ -145,9 +147,16 @@ def generic_grist_processing(
     else:
         logging.info(msg="No boolean columns provided. Skipping ...")
 
-    # Convert reference columns to string
+    # Convert integer columns to nullable integer
+    if int_columns:
+        logging.info(msg=f"Converting integer columns to nullable integer: {int_columns}")
+        df = handle_grist_nullable_int_columns(df=df, columns=int_columns)
+    else:
+        logging.info(msg="No integer columns provided. Skipping ...")
+
+    # Convert reference columns to nullable integer
     if ref_columns:
-        logging.info(msg=f"Converting reference columns to string: {ref_columns}")
+        logging.info(msg=f"Converting reference columns to nullable integer: {ref_columns}")
         df = handle_grist_null_references(df=df, columns=ref_columns)
     else:
         logging.info(msg="No reference columns provided. Skipping ...")
