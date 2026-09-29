@@ -189,7 +189,7 @@ class GristDatasetLocationProvider(DatasetLocationProvider):
         read_options: dict[str, Any],
     ) -> pd.DataFrame:
         doc_id = parse_doc_id(location=location)
-        table_id = parse_table_id(location=location)
+        table_id = location  # parse_table_id(location=location)
         doc_local_path = Path("/tmp") / f"{doc_id}.sqlite"
 
         sqlite_handler = create_db_handler(
