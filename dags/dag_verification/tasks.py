@@ -121,14 +121,7 @@ def check_dataset(nom_projet: str, **context) -> None:
         dataset_context_repository = DEFAULT_DATASET_CONTEXT_REPO
         datasets_context = dataset_context_repository.get_list(nom_projet=nom_projet)
         for dataset_context in datasets_context:
-            logging.info(
-                msg=(
-                    f"Dataset: {dataset_context.dataset_name}, "
-                    f"src: {dataset_context.src_loc}, "
-                    f"tmp: {dataset_context.tmp_loc}, "
-                    f"dest: {dataset_context.dest_loc}"
-                )
-            )
+            logging.info(msg=(f"Dataset: {dataset_context}, "))
 
     @task(map_index_template="{{ dataset_name }}")
     def print_dataset_context(
@@ -323,7 +316,7 @@ def check_http_interface() -> None:
     def check_requests_client() -> None:
         http_client = create_http_client(
             client_type=HttpHandlerType.REQUEST,
-            config=ClientConfig(),
+            config=ClientConfig(verify_ssl=False),
         )
         response = http_client.get(url="https://nubonyxia.incubateur.finances.rie.gouv.fr/")
         logging.info(msg=f"Requests client check OK: status={response.status_code}")
@@ -333,7 +326,7 @@ def check_http_interface() -> None:
     def check_httpx_client() -> None:
         http_client = create_http_client(
             client_type=HttpHandlerType.HTTPX,
-            config=ClientConfig(),
+            config=ClientConfig(verify_ssl=False),
         )
         response = http_client.get(url="https://nubonyxia.incubateur.finances.rie.gouv.fr/")
         logging.info(msg=f"Httpx client check OK: status={response.status_code}")
