@@ -212,7 +212,9 @@ def create_tmp_tables(
     create_queries = []
     alter_queries = []
 
-    for dataset_context in datasets_context:
+    for index, dataset_context in enumerate(datasets_context):
+        logging.info(msg=f"{index + 1}/{len(datasets_context)} Processing dataset {dataset_context.dataset_name}")
+
         tmp_loc = dataset_context.tmp_loc
         if tmp_loc.type_location != TypeLocation.DB:
             logging.info(msg=f"Skipping DB tmp table creation for selecteur <{dataset_context.dataset_name}>")

@@ -36,9 +36,11 @@ class PipelineRunner:
         execution_options: dict[str, ExecutionOptions],
         use_input_results_as_operation_args: bool,
     ) -> dict[str, pd.DataFrame]:
+        logging.info(msg=f"{len(datasets)} datasets to read as input data")
+
         input_data = {}
-        for dataset in datasets:
-            logging.info(msg=f"▶ Reading dataset: {dataset.name}")
+        for index, dataset in enumerate(datasets):
+            logging.info(msg=f"▶ {index + 1}/{len(datasets)} Reading dataset : {dataset.name}")
             exec_option = execution_options.get(dataset.name)
             if exec_option is None:
                 raise ValueError(
@@ -86,6 +88,7 @@ class PipelineRunner:
         # ===============================
         # Read data
         # ===============================
+        logging.info(msg="Execution reading data step")
         if pipeline.input_datasets is None:
             input_data = {}
         else:
@@ -95,6 +98,7 @@ class PipelineRunner:
                 execution_options=execution_options,
                 use_input_results_as_operation_args=pipeline.use_input_results_as_operation_args,
             )
+        logging.info(msg="Reading data step completed successfully")
 
         # ===============================
         # Execution operation data
