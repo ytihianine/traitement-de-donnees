@@ -112,7 +112,7 @@ def ensure_partition(
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
-    dest_loc = dataset_context.dest_location
+    dest_loc = dataset_context.dest_loc
     if dest_loc.type_location != TypeLocation.DB:
         logging.warning(
             msg=f"Destination location type is not POSTGRES for dataset {dataset_context.dataset_name} ... skipping partition creation"
@@ -203,7 +203,7 @@ def create_tmp_tables(
     alter_queries = []
 
     for dataset_context in datasets_context:
-        tmp_loc = dataset_context.tmp_location
+        tmp_loc = dataset_context.tmp_loc
         if tmp_loc.type_location != TypeLocation.DB:
             logging.info(msg=f"Skipping DB tmp table creation for selecteur <{dataset_context.dataset_name}>")
             continue
@@ -250,7 +250,7 @@ def delete_tmp_tables(
     datasets_context = dataset_context_repo.get_list(nom_projet=nom_projet)
 
     for dataset_context in datasets_context:
-        tmp_loc = dataset_context.tmp_location
+        tmp_loc = dataset_context.tmp_loc
         if tmp_loc.type_location != TypeLocation.DB:
             logging.warning(
                 msg=f"Temporary location for dataset {dataset_context.dataset_name} is not a DB table ... skipping"
@@ -395,14 +395,14 @@ def copy_tmp_table_to_real_table(
 
     queries = []
     for dataset_context in datasets_context:
-        tmp_loc = dataset_context.tmp_location
+        tmp_loc = dataset_context.tmp_loc
         if tmp_loc.type_location != TypeLocation.DB:
             logging.warning(
                 msg=f"Temporary location for dataset {dataset_context.dataset_name} is not a DB table ... skipping"
             )
             continue
 
-        dest_loc = dataset_context.dest_location
+        dest_loc = dataset_context.dest_loc
         if dest_loc.type_location != TypeLocation.DB:
             logging.warning(
                 msg=f"Destination location for dataset {dataset_context.dataset_name} is not a DB table ... skipping"

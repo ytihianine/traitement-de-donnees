@@ -57,12 +57,12 @@ def copy_s3_files(
     for dataset_context in datasets_context:
         logging.info(msg=f"Processing dataset {dataset_context.dataset.name}")
 
-        tmp_loc = dataset_context.tmp_location
+        tmp_loc = dataset_context.tmp_loc
         if tmp_loc.type_location != TypeLocation.S3_FILE:
             logging.info(msg="Temporary location is not an S3 file ... skipping")
             continue
 
-        dest_loc = dataset_context.dest_location
+        dest_loc = dataset_context.dest_loc
         if dest_loc.type_location != TypeLocation.S3_FILE:
             logging.info(msg="Destination location is not an S3 file ... skipping")
             continue
@@ -105,7 +105,7 @@ def del_s3_files(
     datasets_context = dataset_context_repo.get_list(nom_projet=nom_projet)
     for dataset_context in datasets_context:
         # Delete src files
-        src_loc = dataset_context.src_location
+        src_loc = dataset_context.src_loc
         logging.info(msg=f"{dataset_context.dataset.name}")
         if src_loc.type_location != TypeLocation.S3_FILE:
             logging.info(
@@ -122,7 +122,7 @@ def del_s3_files(
         logging.info(msg="Source file deleted successfully")
 
         # Delete tmp files
-        tmp_loc = dataset_context.tmp_location
+        tmp_loc = dataset_context.tmp_loc
         logging.info(msg=f"{dataset_context.dataset.name}")
         if tmp_loc.type_location != TypeLocation.S3_FILE:
             logging.info(
@@ -158,7 +158,7 @@ def del_iceberg_staging_table(
     nom_projet = dag_repo.get_project_name(context=context)
     datasets_context = dataset_context_repo.get_list(nom_projet=nom_projet)
     for dataset_context in datasets_context:
-        tmp_loc = dataset_context.tmp_location
+        tmp_loc = dataset_context.tmp_loc
         logging.info(msg=f"Dropping iceberg staging table {tmp_loc.validate_location} ...")
         catalog.drop_table(table_name=tmp_loc.validate_location, purge=False)
         logging.info(msg="Dropped successfully !")
@@ -181,11 +181,11 @@ def copy_staging_to_prod(
     catalog = IcebergCatalog(name=catalog_name, properties=properties)
 
     # Read staging table
-    tmp_loc = dataset_context.tmp_location
+    tmp_loc = dataset_context.tmp_loc
     df = catalog.read_table_as_df(table_name=tmp_loc.validate_location)
 
     # Write prod table
-    dest_loc = dataset_context.tmp_location
+    dest_loc = dataset_context.dest_loc
     catalog.write_table_and_namespace(
         df=df,
         table_status=IcebergTableStatus.PROD,

@@ -50,7 +50,7 @@ def download_grist_doc_to_s3(
     nom_projet = dag_repo.get_project_name(context=context)
     dataset_context = datasetcontext_repo.get(nom_projet=nom_projet, nom_dataset=dataset_name)
 
-    doc_id = dataset_context.src_location.location
+    doc_id = dataset_context.src_loc.location
     if doc_id is None:
         raise ValueError(
             f"doc_id is None for dataset {dataset_name} in project {nom_projet}. Please check the configuration."
@@ -70,7 +70,7 @@ def download_grist_doc_to_s3(
     grist_response = grist_client.download_doc(doc_id=doc_id)
 
     # Export sqlite file to S3
-    dest_loc = dataset_context.dest_location
+    dest_loc = dataset_context.dest_loc
     s3_handler = create_file_handler(
         handler_type=FileHandlerType.S3,
         config=FSConfig(),

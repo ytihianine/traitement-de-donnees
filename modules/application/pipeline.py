@@ -47,9 +47,9 @@ class PipelineRunner:
 
             dataset_context = self.dataset_context_repo.get(nom_projet=nom_projet, nom_dataset=dataset.name)
             if use_input_results_as_operation_args:
-                dataset_location = dataset_context.tmp_location
+                dataset_location = dataset_context.tmp_loc
             else:
-                dataset_location = dataset_context.src_location
+                dataset_location = dataset_context.src_loc
 
             reader = self.location_provider_factory.create(dataset_location=dataset_location)
             df = reader.read(location=dataset_location.validate_location, read_options=exec_option.read_options)
@@ -62,7 +62,7 @@ class PipelineRunner:
 
     def _export_result(self, nom_projet: str, dataset: Dataset, result: object) -> None:
         output_dataset_context = self.dataset_context_repo.get(nom_projet=nom_projet, nom_dataset=dataset.name)
-        output_location = output_dataset_context.dest_location
+        output_location = output_dataset_context.dest_loc
         provider = self.location_provider_factory.create(dataset_location=output_location)
         adapter = self.output_adapter_registry.get_adapter(result)
         logging.info(
