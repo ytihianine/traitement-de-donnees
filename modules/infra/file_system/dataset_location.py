@@ -9,6 +9,8 @@ from modules.infra.database.factory import DatabaseType, DbConfig, create_db_han
 from modules.infra.file_system.dataframe import read_dataframe
 from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 
+GRIST_SQLITE_PATH_READ_OPTION = "grist_sqlite_path"
+
 
 # Parsing functions for different dataset locations
 def parse_s3_bucket(location: str) -> str:
@@ -188,9 +190,13 @@ class GristDatasetLocationProvider(DatasetLocationProvider):
         location: str,
         read_options: dict[str, Any],
     ) -> pd.DataFrame:
-        doc_id = parse_doc_id(location=location)
+        doc_local_path = Path(
+            read_options.get(
+                GRIST_SQLITE_PATH_READ_OPTION,
+                Path("/tmp") / f"{parse_doc_id(location=location)}.sqlite",
+            )
+        )
         table_id = location  # parse_table_id(location=location)
-        doc_local_path = Path("/tmp") / f"{doc_id}.sqlite"
 
         sqlite_handler = create_db_handler(
             db_type=DatabaseType.SQLITE,

@@ -1,5 +1,7 @@
 """Factory for creating dataset readers from a DatasetLocation."""
 
+import logging
+
 from modules.domain.dataset.model import DatasetLocation, TypeLocation
 from modules.domain.dataset.ports import DatasetLocationProvider, DatasetLocationProviderFactory
 from modules.infra.file_system.dataset_location import (
@@ -52,7 +54,10 @@ class DatasetLocationFactory(DatasetLocationProviderFactory):
             TypeLocation.GRIST: _create_grist,
         }
 
+        logging.info(msg=f"Instantiating DatasetLocation provider of type {dataset_location.type_location}")
         provider_factory = factories.get(dataset_location.type_location)
         if provider_factory is None:
             raise ValueError(f"Unsupported source type: {dataset_location.type_location}")
+        logging.info(msg="DatasetLocation provider instantiated")
+
         return provider_factory(dataset_location)

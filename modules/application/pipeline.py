@@ -1,16 +1,23 @@
 import logging
+import os
 from dataclasses import dataclass
+from pathlib import Path
 
 import pandas as pd
 
-from modules.domain.dataset.model import Dataset
+from modules.domain.dataset.model import Dataset, TypeLocation
 from modules.domain.dataset.ports import DatasetLocationProviderFactory
 from modules.domain.dataset.repository import DatasetContextRepository
 from modules.domain.pipeline.model import ExecutionOptions, PipelineDescriptor
 from modules.domain.pipeline.output import OutputAdapterRegistry
 from modules.domain.projet.model import ProjetMetadata
 from modules.domain.projet.repository import ProjetRepository
+from modules.infra.file_system.dataset_location import GRIST_SQLITE_PATH_READ_OPTION
+from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 from modules.logs import df_info
+
+GRIST_DOCUMENT_DATASET_NAME = "grist_doc"
+GRIST_DOCUMENT_DIRECTORY = Path("/tmp")
 
 
 def _add_metadata(df: pd.DataFrame, metadata: ProjetMetadata) -> pd.DataFrame:
@@ -28,6 +35,42 @@ class PipelineRunner:
     dataset_context_repo: DatasetContextRepository
     output_adapter_registry: OutputAdapterRegistry
     location_provider_factory: DatasetLocationProviderFactory
+
+    def _download_grist_doc_locally(self, nom_projet: str) -> Path:
+        """Download the project's Grist SQLite document to temporary storage."""
+        grist_doc_context = self.dataset_context_repo.get(
+            nom_projet=nom_projet,
+            nom_dataset=GRIST_DOCUMENT_DATASET_NAME,
+        )
+        grist_doc_src_loc = grist_doc_context.src_loc
+        if grist_doc_src_loc.type_location != TypeLocation.GRIST:
+            raise ValueError(f"{GRIST_DOCUMENT_DATASET_NAME} source must be a Grist location")
+        document_id = grist_doc_src_loc.validate_location
+
+        grist_doc_tmp_loc = grist_doc_context.tmp_loc
+        if grist_doc_tmp_loc.type_location != TypeLocation.S3_FILE:
+            raise ValueError(f"{GRIST_DOCUMENT_DATASET_NAME} destination must be an S3 location")
+
+        local_document_path = GRIST_DOCUMENT_DIRECTORY / f"{document_id}.sqlite"
+        if os.path.exists(local_document_path):
+            logging.info(msg=f"Local Grist document already exists at {local_document_path}")
+            return local_document_path
+
+        s3_handler = create_file_handler(
+            handler_type=FileHandlerType.S3,
+            config=FSConfig(),
+        )
+        local_handler = create_file_handler(
+            handler_type=FileHandlerType.LOCAL,
+            config=FSConfig(base_path=GRIST_DOCUMENT_DIRECTORY),
+        )
+        logging.info(
+            msg=f"Downloading Grist from {grist_doc_tmp_loc.type_location}@{grist_doc_tmp_loc.validate_location} to {FileHandlerType.LOCAL}@{local_document_path}"
+        )
+        with s3_handler.read(file_path=grist_doc_tmp_loc.validate_location) as document_file:
+            local_handler.write(file_path=local_document_path, content=document_file)
+
+        return local_document_path
 
     def _read_data(
         self,
@@ -53,11 +96,17 @@ class PipelineRunner:
             else:
                 dataset_location = dataset_context.src_loc
 
-            logging.info(msg=f"Instantiating reader of type {dataset_location.type_location}")
             reader = self.location_provider_factory.create(dataset_location=dataset_location)
-            logging.info(msg="Reader instantiated")
             logging.info(msg=f"Reading data from location: {dataset_location.validate_location}")
-            df = reader.read(location=dataset_location.validate_location, read_options=exec_option.read_options)
+            read_options = exec_option.read_options
+            if dataset_location.type_location == TypeLocation.GRIST:
+                grist_document_path = self._download_grist_doc_locally(nom_projet=nom_projet)
+                read_options = {
+                    **read_options,
+                    GRIST_SQLITE_PATH_READ_OPTION: grist_document_path,
+                }
+
+            df = reader.read(location=dataset_location.validate_location, read_options=read_options)
             logging.info(msg=f"Data read successfully. DataFrame shape: {df.shape}")
             input_data[f"df_{dataset.name}"] = df
 
