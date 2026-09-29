@@ -222,12 +222,12 @@ def create_tmp_tables(
 
         tbl_name = parse_db_table(location=tmp_loc.validate_location)
 
-        drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
+        drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.{tbl_name};")
         create_queries.append(f"""CREATE TABLE
-                IF NOT EXISTS {tmp_schema}.tmp_{tbl_name}
+                IF NOT EXISTS {tmp_schema}.{tbl_name}
                 ( LIKE {prod_schema}.{tbl_name} INCLUDING ALL);
             """)
-        alter_queries.append(f"ALTER SEQUENCE {tmp_schema}.tmp_{tbl_name}_id_seq RESTART WITH 1;")
+        alter_queries.append(f"ALTER SEQUENCE {tmp_schema}.{tbl_name}_id_seq RESTART WITH 1;")
 
     for drop_query in drop_queries:
         db.execute(query=drop_query)
