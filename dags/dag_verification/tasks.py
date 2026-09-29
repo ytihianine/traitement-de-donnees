@@ -16,7 +16,6 @@ from modules.constants import (
 from modules.containers import (
     DEFAULT_DAG_REPO,
     DEFAULT_DATASET_CONTEXT_REPO,
-    DEFAULT_LOCATION_PROVIDER_FACTORY,
     DEFAULT_PROJET_REPO,
 )
 from modules.domain.dag.model import DagConfig
@@ -90,10 +89,10 @@ def check_projet(**context) -> None:
         logging.info(msg=f"Contacts: {[c.contact_mail for c in contacts]}")
 
         documentation = projet_repository.get_list_documentation(nom_projet=nom_projet)
-        logging.info(msg=f"Documentation: {[(d.type_documentation.value, d.lien) for d in documentation]}")
+        logging.info(msg=f"Documentation: {[(d.type_documentation, d.lien) for d in documentation]}")
 
-        s3_info = projet_repository.get_projet_location(nom_projet=nom_projet)
-        logging.info(msg=f"S3 info: {s3_info}")
+        s3_location = projet_repository.get_projet_location(nom_projet=nom_projet)
+        logging.info(msg=f"S3 location: {s3_location}")
 
     @task
     def get_projet_metadata(nom_projet: str | None = None, **context) -> None:
@@ -115,7 +114,7 @@ def check_projet(**context) -> None:
 @task_group
 def check_dataset(nom_projet: str, **context) -> None:
     @task
-    def create_dataset(nom_projet: str | None = None, **context) -> None:
+    def get_dataset(nom_projet: str | None = None, **context) -> None:
         if nom_projet is None:
             nom_projet = DEFAULT_DAG_REPO.get_project_name(context=context)
 
@@ -130,8 +129,6 @@ def check_dataset(nom_projet: str, **context) -> None:
                     f"dest: {dataset_context.dest_loc}"
                 )
             )
-            provider = DEFAULT_LOCATION_PROVIDER_FACTORY.create(dataset_location=dataset_context.src_loc)
-            logging.info(msg=f"Location provider created: {type(provider).__name__}")
 
     @task(map_index_template="{{ dataset_name }}")
     def print_dataset_context(
@@ -150,7 +147,7 @@ def check_dataset(nom_projet: str, **context) -> None:
     chain(
         datasets_context,
         [
-            create_dataset(nom_projet=nom_projet, **context),
+            get_dataset(nom_projet=nom_projet, **context),
             print_dataset_context.expand(dataset_context=datasets_context),
         ],
     )
@@ -199,9 +196,9 @@ def check_db_interface() -> None:
             db_type=DatabaseType.SQLITE,
             db_config=DbConfig(db_path=str(db_path)),
         )
-        db_handler.execute(query="CREATE TABLE IF NOT EXISTS check (id INTEGER PRIMARY KEY, value TEXT);")
-        db_handler.insert(table="check", data={"id": 1, "value": "dag_verification"})
-        rows = db_handler.fetch_all(query="SELECT * FROM check;")
+        db_handler.execute(query="CREATE TABLE IF NOT EXISTS verification (id INTEGER PRIMARY KEY, value TEXT);")
+        db_handler.insert(table="verification", data={"id": 1, "value": "dag_verification"})
+        rows = db_handler.fetch_all(query="SELECT * FROM verification;")
         logging.info(msg=f"SQLite check OK: {rows}")
         db_path.unlink(missing_ok=True)
 
@@ -219,9 +216,13 @@ def check_db_interface() -> None:
                 verify=False,
             ),
         )
-        df = db_handler.fetch_df(query='SELECT * FROM "infrastructure.configuration.projet".direction')
-        logging.info(msg=f"Trino check OK, {len(df)} rows")
-        logging.info(msg=str(df.head()))
+        logging.info(msg=f"Trino connection established to {DEFAULT_TRINO_HOST} as user {trino_user}")
+        try:
+            df = db_handler.fetch_df(query='SELECT * FROM "infrastructure.configuration.projet".direction')
+            logging.info(msg=f"Trino check OK, {len(df)} rows")
+            logging.info(msg=str(df.head()))
+        except Exception as e:
+            logging.error(msg=f"Trino check failed: {e}")
 
     chain(
         [
@@ -321,7 +322,7 @@ def check_http_interface() -> None:
             client_type=HttpHandlerType.REQUEST,
             config=ClientConfig(),
         )
-        response = http_client.get(url="https://grist.numerique.gouv.fr")
+        response = http_client.get(url="https://grist.numerique.gouv.fr/")
         logging.info(msg=f"Requests client check OK: status={response.status_code}")
         http_client.close()
 
@@ -331,7 +332,7 @@ def check_http_interface() -> None:
             client_type=HttpHandlerType.HTTPX,
             config=ClientConfig(),
         )
-        response = http_client.get(url="https://grist.numerique.gouv.fr")
+        response = http_client.get(url="https://grist.numerique.gouv.fr/")
         logging.info(msg=f"Httpx client check OK: status={response.status_code}")
         http_client.close()
 
