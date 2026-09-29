@@ -133,6 +133,11 @@ def process_dim_projet_contact(df_projet: pd.DataFrame, df_projet_contact: pd.Da
         .drop(columns=["id_direction", "id_service"])
         .drop_duplicates(subset=["id_projet", "id_contact"])
     )
+
+    if "id_contact" in df_dim_projet_contact.columns:
+        df_dim_projet_contact["id_contact"] = pd.to_numeric(df_dim_projet_contact["id_contact"], errors="coerce")
+        df_dim_projet_contact = df_dim_projet_contact.astype({"id_contact": "Int64"})
+
     return df_dim_projet_contact
 
 
