@@ -47,7 +47,7 @@ def generate_date(year: int, semester: str) -> datetime.datetime | None:
     return None
 
 
-def process_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
+def process_abonnes_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
     # Processing des données
     df = drop_additionals_columns(df=df)
     df["date"] = pd.to_datetime(df["mois"], unit="s").astype("datetime64[s]")
@@ -94,7 +94,7 @@ def process_reseaux_sociaux(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_abonnes_lettres(df: pd.DataFrame) -> pd.DataFrame:
+def process_abonnes_aux_lettres(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     df["date"] = pd.to_datetime(df["mois"], unit="s").astype("datetime64[s]")
     df = df.drop(columns=["mois"])
@@ -270,7 +270,7 @@ def process_engagement_agents_mef(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_qualite_vie_travail(df: pd.DataFrame) -> pd.DataFrame:
+def process_qualite_de_vie_au_travail(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     # Clean
     df["indicateurs"] = df["indicateurs"].str.strip()
@@ -288,7 +288,7 @@ def process_qualite_vie_travail(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_collab_inter_structure(df: pd.DataFrame) -> pd.DataFrame:
+def process_collab_inter_structures(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     txt_colnames = ["structure", "indicateurs"]
     for colname in txt_colnames:
@@ -297,7 +297,7 @@ def process_collab_inter_structure(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_obs_interne(df: pd.DataFrame) -> pd.DataFrame:
+def process_observatoire_interne(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     df["indicateurs"] = df["indicateurs"].str.strip()
     df["valeur"] = np.where(df["unite"] == "%", df["valeur"].apply(generic_convert_to_float), df["valeur"])
@@ -345,7 +345,7 @@ def process_communique_presse(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_studio_graphique(df: pd.DataFrame) -> pd.DataFrame:
+def process_creation_graphique(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     df["demandeurs"] = df["demandeurs"].str.strip()
     df = df.dropna(subset=["semestre", "creation_graphique"])
@@ -408,7 +408,7 @@ def process_rh_contractuel(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_obs_interne_participation(df: pd.DataFrame) -> pd.DataFrame:
+def process_participation_observatoire_interne(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     # Clean
     df = df.rename(columns={"taux_de_participation": "taux_participation"})
@@ -436,7 +436,7 @@ def process_enquete_360(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_ouverture_lettre_alize(df: pd.DataFrame) -> pd.DataFrame:
+def process_ouverture_lettres_alize(df: pd.DataFrame) -> pd.DataFrame:
     df = drop_additionals_columns(df=df)
     # Clean
     df = df.rename(

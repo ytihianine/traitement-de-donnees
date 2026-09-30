@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS sircom.indicateurs_metiers (
     is_last_value BOOLEAN
 );
 
-CREATE TABLE IF NOT EXISTS sircom.enquete_de_satisfaction (
+CREATE TABLE IF NOT EXISTS sircom.enquete_satisfaction (
     id INT PRIMARY KEY,
     annee INTEGER,
     semestre TEXT,

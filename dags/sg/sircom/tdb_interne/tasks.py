@@ -23,8 +23,8 @@ def _grist_pipeline(dataset_name: str, custom_fn) -> PipelineDescriptor:
 
 @task_group(group_id="abonnes_visites")
 def abonnes_visites() -> None:
-    reseaux_sociaux = create_task(
-        pipeline=_grist_pipeline("reseaux_sociaux", process.process_reseaux_sociaux),
+    abonnes_reseaux_sociaux = create_task(
+        pipeline=_grist_pipeline("abonnes_reseaux_sociaux", process.process_abonnes_reseaux_sociaux),
         execution_options=config.execution_options,
     )
     visites_portail = create_task(
@@ -47,12 +47,12 @@ def abonnes_visites() -> None:
         pipeline=_grist_pipeline("performances_lettres", process.process_performances_lettres),
         execution_options=config.execution_options,
     )
-    abonnes_lettres = create_task(
-        pipeline=_grist_pipeline("abonnes_lettres", process.process_abonnes_lettres),
+    abonnes_aux_lettres = create_task(
+        pipeline=_grist_pipeline("abonnes_aux_lettres", process.process_abonnes_aux_lettres),
         execution_options=config.execution_options,
     )
-    ouverture_lettre_alize = create_task(
-        pipeline=_grist_pipeline("ouverture_lettre_alize", process.process_ouverture_lettre_alize),
+    ouverture_lettres_alize = create_task(
+        pipeline=_grist_pipeline("ouverture_lettres_alize", process.process_ouverture_lettres_alize),
         execution_options=config.execution_options,
     )
     impressions_reseaux_sociaux = create_task(
@@ -66,14 +66,14 @@ def abonnes_visites() -> None:
 
     chain(
         [
-            reseaux_sociaux(),
+            abonnes_reseaux_sociaux(),
             visites_portail(),
             visites_bercyinfo(),
             visites_alize(),
             visites_intranet_sg(),
             performances_lettres(),
-            abonnes_lettres(),
-            ouverture_lettre_alize(),
+            abonnes_aux_lettres(),
+            ouverture_lettres_alize(),
             impressions_reseaux_sociaux(),
             impact_actions_com(),
         ]
@@ -95,24 +95,26 @@ def enquetes() -> None:
         pipeline=_grist_pipeline("engagement_agents_mef", process.process_engagement_agents_mef),
         execution_options=config.execution_options,
     )
-    qualite_vie_travail = create_task(
-        pipeline=_grist_pipeline("qualite_vie_travail", process.process_qualite_vie_travail),
+    qualite_de_vie_au_travail = create_task(
+        pipeline=_grist_pipeline("qualite_de_vie_au_travail", process.process_qualite_de_vie_au_travail),
         execution_options=config.execution_options,
     )
-    collab_inter_structure = create_task(
-        pipeline=_grist_pipeline("collab_inter_structure", process.process_collab_inter_structure),
+    collab_inter_structures = create_task(
+        pipeline=_grist_pipeline("collab_inter_structures", process.process_collab_inter_structures),
         execution_options=config.execution_options,
     )
-    obs_interne = create_task(
-        pipeline=_grist_pipeline("obs_interne", process.process_obs_interne),
+    observatoire_interne = create_task(
+        pipeline=_grist_pipeline("observatoire_interne", process.process_observatoire_interne),
         execution_options=config.execution_options,
     )
     enquete_360 = create_task(
         pipeline=_grist_pipeline("enquete_360", process.process_enquete_360),
         execution_options=config.execution_options,
     )
-    obs_interne_participation = create_task(
-        pipeline=_grist_pipeline("obs_interne_participation", process.process_obs_interne_participation),
+    participation_observatoire_interne = create_task(
+        pipeline=_grist_pipeline(
+            "participation_observatoire_interne", process.process_participation_observatoire_interne
+        ),
         execution_options=config.execution_options,
     )
     engagement_environnement = create_task(
@@ -123,11 +125,11 @@ def enquetes() -> None:
     chain(
         [
             engagement_agents_mef(),
-            qualite_vie_travail(),
-            collab_inter_structure(),
-            obs_interne(),
+            qualite_de_vie_au_travail(),
+            collab_inter_structures(),
+            observatoire_interne(),
             enquete_360(),
-            obs_interne_participation(),
+            participation_observatoire_interne(),
             engagement_environnement(),
         ]
     )
@@ -151,8 +153,8 @@ def metiers() -> None:
         pipeline=_grist_pipeline("communique_presse", process.process_communique_presse),
         execution_options=config.execution_options,
     )
-    studio_graphique = create_task(
-        pipeline=_grist_pipeline("studio_graphique", process.process_studio_graphique),
+    creation_graphique = create_task(
+        pipeline=_grist_pipeline("creation_graphique", process.process_creation_graphique),
         execution_options=config.execution_options,
     )
     notes_veilles = create_task(
@@ -174,7 +176,7 @@ def metiers() -> None:
             enquete_satisfaction(),
             etudes(),
             communique_presse(),
-            studio_graphique(),
+            creation_graphique(),
             notes_veilles(),
             recommandation_strat(),
             projets_graphiques(),
