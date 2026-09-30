@@ -12,14 +12,14 @@ classDiagram
     direction TB
 
     %% ============ DOMAIN ============
-    class DagStatus { +Enum }
-    class FeatureFlags { +Enum }
+    class DagStatus { +StrEnum }
+    class FeatureFlags { +StrEnum }
     class DBParams
     class FeatureFlagsEnable
     class DagConfig
     class DagRepository <<ABC>>
 
-    class TypeLocation { +Enum }
+    class TypeLocation { +StrEnum }
     class Dataset
     class DatasetLocation
     class DatasetContext
@@ -27,8 +27,8 @@ classDiagram
     class DatasetLocationProviderFactory <<ABC>>
     class DatasetContextRepository <<ABC>>
 
-    class PartitionTimePeriod { +Enum }
-    class LoadStrategy { +Enum }
+    class PartitionTimePeriod { +StrEnum }
+    class LoadStrategy { +StrEnum }
     class ExecutionOptions
     class PipelineDescriptor
     class OutputAdapter <<ABC>>
@@ -80,7 +80,7 @@ classDiagram
 
     %% ============ INFRA: database ============
     class DBInterface <<ABC>>
-    class DatabaseType { +Enum }
+    class DatabaseType { +StrEnum }
     class DbConfig
     class PgAdapter
     class SQLiteAdapter
@@ -103,8 +103,8 @@ classDiagram
     class FSInterface <<ABC>>
     class LocalFS
     class S3FS
-    class FileHandlerType { +Enum }
-    class FileFormat { +Enum }
+    class FileHandlerType { +StrEnum }
+    class FileFormat { +StrEnum }
     class DataSerializer <<ABC>>
     class CSVSerializer
     class ParquetSerializer
@@ -149,10 +149,10 @@ classDiagram
     GristClient ..> TablesEndpointBuilder
 
     %% ============ INFRA: catalog / mails ============
-    class IcebergTableStatus { +Enum }
+    class IcebergTableStatus { +StrEnum }
     class IcebergCatalog
-    class MailStatus { +Enum }
-    class MailPriority { +Enum }
+    class MailStatus { +StrEnum }
+    class MailPriority { +StrEnum }
     class MailMessage
     IcebergCatalog ..> IcebergTableStatus
     MailMessage ..> DagStatus
