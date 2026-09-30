@@ -233,7 +233,7 @@ def process_dim_dataset_location(
             right_on=["id_type_location", "id_connexion"],
         )
         .drop(columns=["id_connexion"], errors="ignore")
-        .drop(columns=["id_direction", "id_service"])
+        .drop(columns=["id_direction", "id_service", "direction", "service"])
     )
 
     int_columns = ["id_projet", "id_dataset", "id_type_location", "id_conn_id"]
