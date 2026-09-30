@@ -202,28 +202,20 @@ def process_dim_dataset(
 
 
 def process_dim_dataset_location(
-    df_projet: pd.DataFrame,
-    df_dataset: pd.DataFrame,
     df_dataset_location: pd.DataFrame,
+    df_dim_dataset: pd.DataFrame,
     df_ref_type_location: pd.DataFrame,
     df_ref_connexion: pd.DataFrame,
 ) -> pd.DataFrame:
     metadata_cols = ["id_row", "snapshot_id_parent", "snapshot_id", "import_timestamp"]
-    df_projet_clean = df_projet.drop(columns=metadata_cols, errors="ignore")
-    df_dataset_clean = df_dataset.drop(columns=metadata_cols, errors="ignore")
     df_dataset_location_clean = df_dataset_location.drop(columns=metadata_cols, errors="ignore")
+    df_dim_dataset_clean = df_dim_dataset.drop(columns=metadata_cols, errors="ignore")
     df_ref_type_location_clean = df_ref_type_location.drop(columns=metadata_cols, errors="ignore")
     df_ref_connexion_clean = df_ref_connexion.drop(columns=metadata_cols, errors="ignore")
 
     df_dim_dataset_location = (
-        df_projet_clean.merge(
-            right=df_dataset_clean,
-            how="left",
-            left_on="id_projet",
-            right_on="id_projet",
-        )
-        .merge(
-            right=df_dataset_location_clean,
+        df_dataset_location_clean.merge(
+            right=df_dim_dataset_clean,
             how="left",
             left_on=["id_projet", "id_dataset"],
             right_on=["id_projet", "id_dataset"],
@@ -242,7 +234,6 @@ def process_dim_dataset_location(
         )
         .drop(columns=["id_connexion"], errors="ignore")
         .drop(columns=["id_direction", "id_service"])
-        .drop_duplicates(subset=["id_projet", "dataset", "stage"])
     )
 
     int_columns = ["id_projet", "id_dataset", "id_type_location", "id_conn_id"]
@@ -250,6 +241,8 @@ def process_dim_dataset_location(
         df=df_dim_dataset_location,
         columns=int_columns,
     )
+
+    df_dim_dataset_location = df_dim_dataset_location.drop_duplicates(subset=["id_projet", "id_dataset", "stage"])
 
     return df_dim_dataset_location
 
