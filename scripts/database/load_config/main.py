@@ -9,12 +9,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import psycopg2
-from dags.applications.configuration_projets import process
 from modules.generic_processing.structures import normalize_grist_dataframe
 from modules.infra.airflow.common_tasks.grist import generic_grist_processing
 from modules.logs import df_info
 from psycopg2.extensions import AsIs, register_adapter
 from psycopg2.extras import execute_values
+
+from dags.applications.configuration_projets import process
 
 # Enregistrer l'adaptateur pour les entiers numpy
 register_adapter(typ=np.int64, callable=AsIs)
@@ -253,9 +254,10 @@ DIMENSION_TABLES = [
     {
         "tbl_name": "dim_dataset_location",
         "build_func": lambda tables: process.process_dim_dataset_location(
-            df_projet=tables["projet"],
-            df_dataset=tables["dataset"],
+            # df_projet=tables["projet"],
+            # df_dataset=tables["dataset"],
             df_dataset_location=tables["dataset_location"],
+            df_dim_dataset=tables["dim_dataset"],
             df_ref_type_location=tables["ref_type_location"],
             df_ref_connexion=tables["ref_connexion"],
         ),
@@ -424,13 +426,16 @@ if __name__ == "__main__":
     # Traiter chaque table de dimension calculée à partir des tables source
     for i, tbl_desc in enumerate(DIMENSION_TABLES, start=1):
         print("\n", "=" * 50)
-        print(f"({i}/{len(DIMENSION_TABLES)}) Début du traitement de la table <{tbl_desc['tbl_name']}>")
+        print(f"[{i}/{len(DIMENSION_TABLES)}] [{tbl_desc['tbl_name']}] Début du traitement de la table")
 
         df = tbl_desc["build_func"](processed_tables)
         df = df.fillna(np.nan).replace([np.nan], [None])
         if add_metadata:
             df["snapshot_id"] = str(snapshot_id)
             df["import_timestamp"] = now
+
+        # Keep computed dimensions available for subsequent dependent dimensions.
+        processed_tables[tbl_desc["tbl_name"]] = df
 
         print(df.columns)
         print(df.dtypes)
