@@ -82,11 +82,11 @@ def abonnes_visites() -> None:
 
 @task_group(group_id="budget")
 def budget() -> None:
-    synthese_depenses = create_task(
-        pipeline=_grist_pipeline("synthese_depenses", process.process_synthese_depenses),
+    budget_depense = create_task(
+        pipeline=_grist_pipeline("budget_depense", process.process_budget_depense),
         execution_options=config.execution_options,
     )
-    chain(synthese_depenses())
+    chain(budget_depense())
 
 
 @task_group(group_id="enquetes")
