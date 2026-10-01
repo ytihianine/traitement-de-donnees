@@ -36,7 +36,7 @@ class PipelineRunner:
     output_adapter_registry: OutputAdapterRegistry
     location_provider_factory: DatasetLocationProviderFactory
 
-    def _download_grist_doc_locally(self, nom_projet: str) -> Path:
+    def _download_grist_doc_locally(self, nom_projet: str, dataset_name: str) -> Path:
         """Download the project's Grist SQLite document to temporary storage."""
         grist_doc_context = self.dataset_context_repo.get(
             nom_projet=nom_projet,
@@ -51,10 +51,12 @@ class PipelineRunner:
         if grist_doc_tmp_loc.type_location != TypeLocation.S3_FILE:
             raise ValueError(f"{GRIST_DOCUMENT_DATASET_NAME} destination must be an S3 location")
 
-        local_document_path = GRIST_DOCUMENT_DIRECTORY / f"{document_id}.sqlite"
-        if os.path.exists(local_document_path):
-            logging.info(msg=f"Local Grist document already exists at {local_document_path}")
-            return local_document_path
+        local_document_path = GRIST_DOCUMENT_DIRECTORY / f"{dataset_name}" / f"{document_id}.sqlite"
+        if os.path.exists(path=local_document_path):
+            logging.info(
+                msg=f"Local Grist document already exists at {local_document_path}. Deleting it to ensure a fresh download."
+            )
+            os.remove(path=local_document_path)
 
         s3_handler = create_file_handler(
             handler_type=FileHandlerType.S3,
@@ -100,7 +102,7 @@ class PipelineRunner:
             logging.info(msg=f"Reading data from location: {dataset_location.validate_location}")
             read_options = exec_option.read_options
             if dataset_location.type_location == TypeLocation.GRIST:
-                grist_document_path = self._download_grist_doc_locally(nom_projet=nom_projet)
+                grist_document_path = self._download_grist_doc_locally(nom_projet=nom_projet, dataset_name=dataset.name)
                 read_options = {
                     **read_options,
                     GRIST_SQLITE_PATH_READ_OPTION: grist_document_path,
