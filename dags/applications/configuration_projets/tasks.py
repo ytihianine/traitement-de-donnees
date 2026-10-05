@@ -356,7 +356,7 @@ def dataset_dimension_tables() -> None:
     chain(
         [
             dim_dataset(),
-            dim_dataset_location(),
             dim_dataset_cols_mapping(),
-        ]
+        ],
+        dim_dataset_location(),
     )
