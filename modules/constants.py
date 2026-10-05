@@ -32,6 +32,9 @@ AGENT = ENV_VAR.get("AIRFLOW_USER_AGENT", None)
 # Timezone configuration
 PARIS_TZ = pytz.timezone(zone="Europe/Paris")
 
+# Dataset
+METADATA_COLS = ["id_row", "snapshot_id_parent", "snapshot_id", "import_timestamp"]
+
 
 # DEFAULT VARIABLES
 DEFAULT_TASK_OWNER = "airflow"
