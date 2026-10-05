@@ -190,7 +190,7 @@ def create_tmp_tables(
     Used to create temporary tables in the database.
     """
 
-    if should_skip_task(context=context):
+    if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
     if nom_projet is None:
