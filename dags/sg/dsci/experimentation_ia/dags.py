@@ -4,9 +4,8 @@ from dags.sg.dsci.experimentation_ia.config import (
     execution_options,
 )
 from dags.sg.dsci.experimentation_ia.tasks import (
+    experimentations,
     referentiels,
-    repartition,
-    suivi_experimentateurs,
     suivi_questionnaire_1,
     suivi_questionnaire_2,
     suivi_questionnaire_2_bis,
@@ -36,16 +35,16 @@ nom_projet = "Experimentation IA"
 
 @dag(
     dag_id="experimentation_ia",
-    schedule="0 8-12,14-18 * * 1-5",
+    schedule="0 0 * * 1-5",
     default_args=create_default_args(),
     max_consecutive_failed_dag_runs=1,
     max_active_runs=1,
     catchup=False,
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.RUN,
+        dag_status=DagStatus.DEV,
         db_params=DBParams(prod_schema="assistant_ia"),
-        feature_flags=FeatureFlagsEnable(db=True, mail=False, s3=True, convert_files=False, download_grist_doc=True),
+        feature_flags=FeatureFlagsEnable(db=False, mail=False, s3=True, convert_files=False, download_grist_doc=True),
     ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,
@@ -63,12 +62,10 @@ def experimentation_ia_dag() -> None:
         create_projet_snapshot(),
         create_tmp_tables(
             execution_options=execution_options,
-            reset_id_seq=False,
         ),
         [
             referentiels(),
-            repartition(),
-            suivi_experimentateurs(),
+            experimentations(),
             suivi_questionnaire_1(),
             suivi_questionnaire_2(),
             suivi_questionnaire_2_bis(),

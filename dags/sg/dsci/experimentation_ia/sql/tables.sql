@@ -1,11 +1,56 @@
 DROP SCHEMA IF EXISTS assistant_ia CASCADE;
 CREATE SCHEMA IF NOT EXISTS assistant_ia;
 
+
+/*
+    Référentiels commun
+*/
+CREATE TABLE assistant_ia."ref_niveau_appropriation" (
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" INTEGER,
+  "niveau_d_appropriation" TEXT,
+  "niveau_appropriation_libelle_court" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  snapshot_id UUID NOT NULL,
+  snapshot_id_parent UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
+CREATE TABLE assistant_ia."ref_niveau_accord" (
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" INTEGER,
+  "niveau" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  snapshot_id UUID NOT NULL,
+  snapshot_id_parent UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
+CREATE TABLE assistant_ia."ref_formation_suivie" (
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" INTEGER,
+  "formation_suivie" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  snapshot_id UUID NOT NULL,
+  snapshot_id_parent UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
+CREATE TABLE assistant_ia."ref_participation_programme" (
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" INTEGER,
+  "participation" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  snapshot_id UUID NOT NULL,
+  snapshot_id_parent UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
 /*
     Référentiels questionnaire 1
 */
 
-CREATE TABLE assistant_ia."ref_q1_direction" (
+CREATE TABLE assistant_ia."ref_direction" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "direction" TEXT,
@@ -15,7 +60,7 @@ CREATE TABLE assistant_ia."ref_q1_direction" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q5_domaine" (
+CREATE TABLE assistant_ia."ref_domaine_professionnel" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "domaine" TEXT,
@@ -25,17 +70,7 @@ CREATE TABLE assistant_ia."ref_q5_domaine" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q6_niveau_utilisation" (
-  id_row bigint GENERATED ALWAYS AS IDENTITY,
-  "id" INTEGER,
-  "niveau_d_appropriation" TEXT,
-  import_timestamp TIMESTAMP NOT NULL,
-  snapshot_id UUID NOT NULL,
-  snapshot_id_parent UUID NULL,
-  PRIMARY KEY ("id_row", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
-CREATE TABLE assistant_ia."ref_q9_cas_usage" (
+CREATE TABLE assistant_ia."ref_cas_usage" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "cas_d_usage" TEXT,
@@ -46,10 +81,10 @@ CREATE TABLE assistant_ia."ref_q9_cas_usage" (
 ) PARTITION BY RANGE (import_timestamp);
 
 /*
-   Référentiels questionnaire 2
+   Référentiels questionnaire 2 & 2 bis
 */
 
-CREATE TABLE assistant_ia."ref_q28_raisons_perte" (
+CREATE TABLE assistant_ia."ref_raison_perte_temps" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "raisons" TEXT,
@@ -59,7 +94,7 @@ CREATE TABLE assistant_ia."ref_q28_raisons_perte" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q25_impact_observe" (
+CREATE TABLE assistant_ia."ref_impact_observation" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "observation" TEXT,
@@ -69,7 +104,7 @@ CREATE TABLE assistant_ia."ref_q25_impact_observe" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q24_impact_identifie" (
+CREATE TABLE assistant_ia."ref_impact_identifie" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "impacts" TEXT,
@@ -79,7 +114,7 @@ CREATE TABLE assistant_ia."ref_q24_impact_identifie" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q23_taux_correction" (
+CREATE TABLE assistant_ia."ref_taux_correction" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "taux_de_correction" TEXT,
@@ -89,7 +124,7 @@ CREATE TABLE assistant_ia."ref_q23_taux_correction" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q22_typologie_erreurs" (
+CREATE TABLE assistant_ia."ref_type_erreur_ia" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "erreurs" TEXT,
@@ -99,7 +134,7 @@ CREATE TABLE assistant_ia."ref_q22_typologie_erreurs" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q20_autres_ia" (
+CREATE TABLE assistant_ia."ref_comparaison_autres_ia" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "comparaisons" TEXT,
@@ -109,7 +144,7 @@ CREATE TABLE assistant_ia."ref_q20_autres_ia" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q16_taches" (
+CREATE TABLE assistant_ia."ref_impact_tache_pro" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "taches" TEXT,
@@ -119,7 +154,7 @@ CREATE TABLE assistant_ia."ref_q16_taches" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q14_evolution_craintes" (
+CREATE TABLE assistant_ia."ref_evolution_crainte" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "evolutions" TEXT,
@@ -129,7 +164,7 @@ CREATE TABLE assistant_ia."ref_q14_evolution_craintes" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q13_facteurs_progression"(
+CREATE TABLE assistant_ia."ref_facteur_progression"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "facteurs" TEXT,
@@ -139,7 +174,7 @@ CREATE TABLE assistant_ia."ref_q13_facteurs_progression"(
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q10_principaux_freins" (
+CREATE TABLE assistant_ia."ref_frein_utilisation" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "freins" TEXT,
@@ -149,52 +184,8 @@ CREATE TABLE assistant_ia."ref_q10_principaux_freins" (
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q6_participation_programme" (
-  id_row bigint GENERATED ALWAYS AS IDENTITY,
-  "id" INTEGER,
-  "participation" TEXT,
-  import_timestamp TIMESTAMP NOT NULL,
-  snapshot_id UUID NOT NULL,
-  snapshot_id_parent UUID NULL,
-  PRIMARY KEY ("id_row", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q5_formation_suivie" (
-  id_row bigint GENERATED ALWAYS AS IDENTITY,
-  "id" INTEGER,
-  "formation_suivie" TEXT,
-  import_timestamp TIMESTAMP NOT NULL,
-  snapshot_id UUID NOT NULL,
-  snapshot_id_parent UUID NULL,
-  PRIMARY KEY ("id_row", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
-CREATE TABLE assistant_ia."ref_q3_niveau_2" (
-  id_row bigint GENERATED ALWAYS AS IDENTITY,
-  "id" INTEGER,
-  "niveau" TEXT,
-  import_timestamp TIMESTAMP NOT NULL,
-  snapshot_id UUID NOT NULL,
-  snapshot_id_parent UUID NULL,
-  PRIMARY KEY ("id_row", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
-CREATE TABLE assistant_ia."ref_q7_accords" (
-  id_row bigint GENERATED ALWAYS AS IDENTITY,
-  "id" INTEGER,
-  "reponses" TEXT,
-  import_timestamp TIMESTAMP NOT NULL,
-  snapshot_id UUID NOT NULL,
-  snapshot_id_parent UUID NULL,
-  PRIMARY KEY ("id_row", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
-
-/*
-   Référentiels questionnaire 2 bis
-*/
-
-CREATE TABLE assistant_ia."ref_raisons_non_utilisation" (
+CREATE TABLE assistant_ia."ref_raison_non_utilisation" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "raisons" TEXT,
@@ -208,28 +199,7 @@ CREATE TABLE assistant_ia."ref_raisons_non_utilisation" (
 /*
    Référentiels questionnaire 3
 */
-
-CREATE TABLE assistant_ia."ref_q6_formation_suivie"(
-  id_row bigint GENERATED ALWAYS AS IDENTITY,
-  "id" INTEGER,
-  "formation" TEXT,
-  import_timestamp TIMESTAMP NOT NULL,
-  snapshot_id UUID NOT NULL,
-  snapshot_id_parent UUID NULL,
-  PRIMARY KEY ("id_row", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
-CREATE TABLE assistant_ia."ref_q7_particip_programme"(
-  id_row bigint GENERATED ALWAYS AS IDENTITY,
-  "id" INTEGER,
-  "participation" TEXT,
-  import_timestamp TIMESTAMP NOT NULL,
-  snapshot_id UUID NOT NULL,
-  snapshot_id_parent UUID NULL,
-  PRIMARY KEY ("id_row", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
-CREATE TABLE assistant_ia."ref_q8_raisons_non_participation"(
+CREATE TABLE assistant_ia."ref_raison_non_participation"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "raisons" TEXT,
@@ -239,7 +209,7 @@ CREATE TABLE assistant_ia."ref_q8_raisons_non_participation"(
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q11_leviers_progressions"(
+CREATE TABLE assistant_ia."ref_levier_progression"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "leviers" TEXT,
@@ -249,7 +219,7 @@ CREATE TABLE assistant_ia."ref_q11_leviers_progressions"(
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q12_impacts_taches_pro"(
+CREATE TABLE assistant_ia."ref_impact_tache_pro"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "impacts" TEXT,
@@ -259,7 +229,7 @@ CREATE TABLE assistant_ia."ref_q12_impacts_taches_pro"(
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q14_taches_rebarbativ"(
+CREATE TABLE assistant_ia."ref_impact_tache_rebarbative"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "taches_rebarbatives" TEXT,
@@ -269,27 +239,7 @@ CREATE TABLE assistant_ia."ref_q14_taches_rebarbativ"(
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q17_autres_outils"(
-  id_row bigint GENERATED ALWAYS AS IDENTITY,
-  "id" INTEGER,
-  "autres_outils" TEXT,
-  import_timestamp TIMESTAMP NOT NULL,
-  snapshot_id UUID NOT NULL,
-  snapshot_id_parent UUID NULL,
-  PRIMARY KEY ("id_row", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
-CREATE TABLE assistant_ia."ref_q17_satisfaction_autre_outil"(
-  id_row bigint GENERATED ALWAYS AS IDENTITY,
-  "id" INTEGER,
-  "satisfaction_autres_outils" TEXT,
-  import_timestamp TIMESTAMP NOT NULL,
-  snapshot_id UUID NOT NULL,
-  snapshot_id_parent UUID NULL,
-  PRIMARY KEY ("id_row", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
-CREATE TABLE assistant_ia."ref_q18_comparaisons"(
+CREATE TABLE assistant_ia."ref_comparaison_autre_ia"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "comparaisons" TEXT,
@@ -299,7 +249,7 @@ CREATE TABLE assistant_ia."ref_q18_comparaisons"(
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q19_fonctionnalites"(
+CREATE TABLE assistant_ia."ref_autre_fonctionnalite"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "fonctionnalites" TEXT,
@@ -309,7 +259,7 @@ CREATE TABLE assistant_ia."ref_q19_fonctionnalites"(
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q21_risques_identifies"(
+CREATE TABLE assistant_ia."ref_risque"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "risques" TEXT,
@@ -319,7 +269,7 @@ CREATE TABLE assistant_ia."ref_q21_risques_identifies"(
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."ref_q25_besoins"(
+CREATE TABLE assistant_ia."ref_besoin"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "besoins" TEXT,
@@ -360,17 +310,17 @@ CREATE TABLE assistant_ia."quota_par_entite" (
     Experimentateurs
 */
 CREATE TABLE assistant_ia."experimentateurs"(
-    id_row bigint GENERATED ALWAYS AS IDENTITY,
-    "id" bigserial,
-    "no_id" text,
-    "entite" text,
-    "courriel" text,
-    "courriel_corrige" text,
-    "connecte_" text,
-    "reponse_au_questionnaire_1" text,
-    "reponse_au_questionnaire_2" text,
-    "reponse_au_questionnaire_3" text,
-    "parti" text,
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" int,
+  "no_id" text,
+  "entite" text,
+  "courriel" text,
+  "courriel_corrige" text,
+  "connecte_" text,
+  "reponse_au_questionnaire_1" text,
+  "reponse_au_questionnaire_2" text,
+  "reponse_au_questionnaire_3" text,
+  "parti" text,
   import_timestamp TIMESTAMP NOT NULL,
   snapshot_id UUID NOT NULL,
   snapshot_id_parent UUID NULL,
@@ -381,31 +331,31 @@ CREATE TABLE assistant_ia."experimentateurs"(
 /*
     Questionnaire 1 : Profil des expérimentateurs
 */
-DROP TABLE IF EXISTS assistant_ia."questionnaire_1" CASCADE;
-CREATE TABLE assistant_ia."questionnaire_1"(
-    id_row bigint GENERATED ALWAYS AS IDENTITY,
-    "id" bigserial,
-    "no_id" TEXT,
-    "id_direction" INTEGER,
-    "tranche_age" TEXT,
-    "categorie_emploi" TEXT,
-    "statut" TEXT,
-    "id_domaine_professionnel" INTEGER,
-    "metier" TEXT,
-    "situation_d_encadrement" TEXT,
-    "autres_experimentateurs" TEXT,
-    "id_niveau_d_utilisation_ia" INTEGER,
-    "usage_ia_perso_avant_expe" TEXT,
-    "usage_ia_pro_avant_expe" TEXT,
-    "craintes_usage_ia_pro" TEXT,
-    "raisons_des_craintes" TEXT,
-    "attentes_experimentation" TEXT,
-    "autres_cas_usage_transverse" TEXT,
-    "cas_d_usage_metier" TEXT,
-    "formation_suivie_usage_ia_" TEXT,
-    "autre_formation_suivie" TEXT,
-    "autre_besoin_accompagnement" TEXT,
-    "besoin_acculturation_encadrement" TEXT,
+DROP TABLE IF EXISTS assistant_ia."q1" CASCADE;
+CREATE TABLE assistant_ia."q1"(
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" int,
+  "no_id" TEXT,
+  "id_direction" INTEGER,
+  "tranche_age" TEXT,
+  "categorie_emploi" TEXT,
+  "statut" TEXT,
+  "id_domaine_professionnel" INTEGER,
+  "metier" TEXT,
+  "situation_d_encadrement" TEXT,
+  "autres_experimentateurs" TEXT,
+  "id_niveau_d_utilisation_ia" INTEGER,
+  "usage_ia_perso_avant_expe" TEXT,
+  "usage_ia_pro_avant_expe" TEXT,
+  "craintes_usage_ia_pro" TEXT,
+  "raisons_des_craintes" TEXT,
+  "attentes_experimentation" TEXT,
+  "autres_cas_usage_transverse" TEXT,
+  "cas_d_usage_metier" TEXT,
+  "formation_suivie_usage_ia_" TEXT,
+  "autre_formation_suivie" TEXT,
+  "autre_besoin_accompagnement" TEXT,
+  "besoin_acculturation_encadrement" TEXT,
   import_timestamp TIMESTAMP NOT NULL,
   snapshot_id UUID NOT NULL,
   snapshot_id_parent UUID NULL,
@@ -413,8 +363,8 @@ CREATE TABLE assistant_ia."questionnaire_1"(
 ) PARTITION BY RANGE (import_timestamp);
 
 ----  Table de liaison  cas d'usage envisagés--------------
-DROP TABLE IF EXISTS assistant_ia."questionnaire_1_cas_usage" CASCADE;
-CREATE TABLE assistant_ia."questionnaire_1_cas_usage"(
+DROP TABLE IF EXISTS assistant_ia."q1_cas_usage" CASCADE;
+CREATE TABLE assistant_ia."q1_cas_usage"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" bigserial,
   "no_id" text,
@@ -426,7 +376,7 @@ CREATE TABLE assistant_ia."questionnaire_1_cas_usage"(
   UNIQUE ("import_timestamp", "no_id", "id_cas_d_usage_envisages")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_1_besoins_accompagnement" (
+CREATE TABLE assistant_ia."q1_besoins_accompagnement" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" bigserial,
   "no_id" text,
@@ -443,60 +393,60 @@ CREATE TABLE assistant_ia."questionnaire_1_besoins_accompagnement" (
     Questionnaire 2 : Retour des expérimentateurs
 */
 
-DROP TABLE IF EXISTS assistant_ia."questionnaire_2" CASCADE;
-CREATE TABLE assistant_ia."questionnaire_2" (
-    id_row bigint GENERATED ALWAYS AS IDENTITY,
-    "id" bigserial,
-    "no_id" text,
-    "autres_types_d_interactions" TEXT,
-    "id_niveau_d_usage_ia_post_expe_" INTEGER,
-    "frequence_d_usage_assistant_ia" TEXT,
-    "autres_formation_ia" TEXT,
-    "raison_non_participation_rdv" TEXT,
-    "autre_besoin_accompagnement" TEXT,
-    "apprentissage_assistant_ia_ressenti_" TEXT,
-    "difficultes_techniques_rencontrees2" TEXT,
-    "autres_difficultes" TEXT,
-    "autres_freins" TEXT,
-    "id_recommandation_collegues_mef" INTEGER,
-    "id_sensation_montee_en_competences" INTEGER,
-    "autres_sources_de_progression" TEXT,
-    "id_evolution_des_craintes_initiales" INTEGER,
-    "id_utilite_metier_mef" INTEGER,
-    "autres_taches_realisees" TEXT,
-    "decouverte_d_usages_inattendus" TEXT,
-    "les_usages_inattendus" TEXT,
-    "mode_de_decouverte_usages" TEXT,
-    "autre_mode_de_decouverte" TEXT,
-    "id_diminution_d_usage_ia_non_souveraines" INTEGER,
-    "id_comparaison_autres_ia" INTEGER,
-    "frequence_des_erreurs" TEXT,
-    "autres_types_d_erreurs" TEXT,
-    "cas_usage_principal_teste" TEXT,
-    "temps_economise_par_semaine" TEXT,
-    "cu1_nombre_echanges_moyens_affinage_reponse" TEXT,
-    "id_taux_moyen_de_correction_rep_assistant" INTEGER,
-    "pertinence_assistant_ia" TEXT,
-    "commentaires" TEXT,
-    "deuxieme_cas_d_usage_teste" TEXT,
-    "cu2_temps_economise_par_semaine" TEXT,
-    "cu2_nombre_echanges_moyens" TEXT,
-    "id_cu2_taux_moyen_de_correction_rep_assistant" INTEGER,
-    "cu2_pertinence_assistant_ia" TEXT,
-    "commentaires2" TEXT,
-    "troisieme_cas_d_usage" TEXT,
-    "cu3_temps_economise_par_semaine" TEXT,
-    "cu3_nombre_echanges_moyens_affinage_reponse" TEXT,
-    "id_cu3_taux_moyen_de_correction_rep_assistant" INTEGER,
-    "cu3_pertinence_assistant_ia" TEXT,
-    "commentaires3" TEXT,
-    "autres_impacts_identifies" TEXT,
-    "autres_impacts_observes" TEXT,
-    "impact_sur_le_temps_de_travail" TEXT,
-    "estimation_globale_gain_de_temps" TEXT,
-    "id_raisons_perte_de_temps" INTEGER,
-    "autres_raisons" TEXT,
-    "id_ia_favorise_relations_humaines_" INTEGER,
+DROP TABLE IF EXISTS assistant_ia."q2" CASCADE;
+CREATE TABLE assistant_ia."q2" (
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" int,
+  "no_id" text,
+  "autres_types_d_interactions" TEXT,
+  "id_niveau_d_usage_ia_post_expe_" INTEGER,
+  "frequence_d_usage_assistant_ia" TEXT,
+  "autres_formation_ia" TEXT,
+  "raison_non_participation_rdv" TEXT,
+  "autre_besoin_accompagnement" TEXT,
+  "apprentissage_assistant_ia_ressenti_" TEXT,
+  "difficultes_techniques_rencontrees2" TEXT,
+  "autres_difficultes" TEXT,
+  "autres_freins" TEXT,
+  "id_recommandation_collegues_mef" INTEGER,
+  "id_sensation_montee_en_competences" INTEGER,
+  "autres_sources_de_progression" TEXT,
+  "id_evolution_des_craintes_initiales" INTEGER,
+  "id_utilite_metier_mef" INTEGER,
+  "autres_taches_realisees" TEXT,
+  "decouverte_d_usages_inattendus" TEXT,
+  "les_usages_inattendus" TEXT,
+  "mode_de_decouverte_usages" TEXT,
+  "autre_mode_de_decouverte" TEXT,
+  "id_diminution_d_usage_ia_non_souveraines" INTEGER,
+  "id_comparaison_autres_ia" INTEGER,
+  "frequence_des_erreurs" TEXT,
+  "autres_types_d_erreurs" TEXT,
+  "cas_usage_principal_teste" TEXT,
+  "temps_economise_par_semaine" TEXT,
+  "cu1_nombre_echanges_moyens_affinage_reponse" TEXT,
+  "id_taux_moyen_de_correction_rep_assistant" INTEGER,
+  "pertinence_assistant_ia" TEXT,
+  "commentaires" TEXT,
+  "deuxieme_cas_d_usage_teste" TEXT,
+  "cu2_temps_economise_par_semaine" TEXT,
+  "cu2_nombre_echanges_moyens" TEXT,
+  "id_cu2_taux_moyen_de_correction_rep_assistant" INTEGER,
+  "cu2_pertinence_assistant_ia" TEXT,
+  "commentaires2" TEXT,
+  "troisieme_cas_d_usage" TEXT,
+  "cu3_temps_economise_par_semaine" TEXT,
+  "cu3_nombre_echanges_moyens_affinage_reponse" TEXT,
+  "id_cu3_taux_moyen_de_correction_rep_assistant" INTEGER,
+  "cu3_pertinence_assistant_ia" TEXT,
+  "commentaires3" TEXT,
+  "autres_impacts_identifies" TEXT,
+  "autres_impacts_observes" TEXT,
+  "impact_sur_le_temps_de_travail" TEXT,
+  "estimation_globale_gain_de_temps" TEXT,
+  "id_raisons_perte_de_temps" INTEGER,
+  "autres_raisons" TEXT,
+  "id_ia_favorise_relations_humaines_" INTEGER,
   import_timestamp TIMESTAMP NOT NULL,
   snapshot_id UUID NOT NULL,
   snapshot_id_parent UUID NULL,
@@ -507,8 +457,8 @@ CREATE TABLE assistant_ia."questionnaire_2" (
 
 ----- Tables de liaisons du questionnaire 2--------------------
 
-DROP TABLE IF EXISTS assistant_ia."questionnaire_2_formation_suivie" CASCADE;
-CREATE TABLE assistant_ia."questionnaire_2_formation_suivie" (
+DROP TABLE IF EXISTS assistant_ia."q2_formation_suivie" CASCADE;
+CREATE TABLE assistant_ia."q2_formation_suivie" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -520,7 +470,7 @@ CREATE TABLE assistant_ia."questionnaire_2_formation_suivie" (
     UNIQUE ("import_timestamp", "no_id", "id_formation_ia_suivie_post_expe_" )
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_2_typologie_interaction" (
+CREATE TABLE assistant_ia."q2_typologie_interaction" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" bigserial,
   "no_id" text,
@@ -532,7 +482,7 @@ CREATE TABLE assistant_ia."questionnaire_2_typologie_interaction" (
   UNIQUE ("import_timestamp", "no_id", "types_d_interactions_mef")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_2_participation" (
+CREATE TABLE assistant_ia."q2_participation" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -544,7 +494,7 @@ CREATE TABLE assistant_ia."questionnaire_2_participation" (
     UNIQUE ("import_timestamp", "no_id","id_participation_programme_rdv")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_2_freins" (
+CREATE TABLE assistant_ia."q2_freins" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -556,7 +506,7 @@ CREATE TABLE assistant_ia."questionnaire_2_freins" (
     UNIQUE ("import_timestamp", "no_id","id_freins_a_l_utilisation")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_2_facteurs_progression" (
+CREATE TABLE assistant_ia."q2_facteurs_progression" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -568,7 +518,7 @@ CREATE TABLE assistant_ia."questionnaire_2_facteurs_progression" (
     UNIQUE ("import_timestamp", "no_id","id_facteurs_de_progression")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_2_taches" (
+CREATE TABLE assistant_ia."q2_taches" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -580,7 +530,7 @@ CREATE TABLE assistant_ia."questionnaire_2_taches" (
     UNIQUE ("import_timestamp", "no_id","id_taches_realisees_avec_ia")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_2_typologie_erreurs" (
+CREATE TABLE assistant_ia."q2_typologie_erreurs" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -592,7 +542,7 @@ CREATE TABLE assistant_ia."questionnaire_2_typologie_erreurs" (
     UNIQUE ("import_timestamp", "no_id","id_types_d_erreurs_frequentes2")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_2_impact_observe" (
+CREATE TABLE assistant_ia."q2_impact_observe" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -604,7 +554,7 @@ CREATE TABLE assistant_ia."questionnaire_2_impact_observe" (
     UNIQUE ("import_timestamp", "no_id","id_observations_des_impacts")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_2_impact_identifie" (
+CREATE TABLE assistant_ia."q2_impact_identifie" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -621,8 +571,8 @@ CREATE TABLE assistant_ia."questionnaire_2_impact_identifie" (
     Questionnaire 2_bis : Les agents jamais connectés
 */
 
-DROP TABLE IF EXISTS assistant_ia."questionnaire_2_bis" CASCADE;
-CREATE TABLE assistant_ia."questionnaire_2_bis" (
+DROP TABLE IF EXISTS assistant_ia."q2bis" CASCADE;
+CREATE TABLE assistant_ia."q2bis" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "courriel" TEXT,
     "avez_vous_deja_utilise_l_assistant_ia_" TEXT,
@@ -635,7 +585,7 @@ CREATE TABLE assistant_ia."questionnaire_2_bis" (
 ) PARTITION BY RANGE (import_timestamp);
 -- table de liasion
 
-CREATE TABLE assistant_ia."questionnaire_2_bis_raisons_non_utilisation" (
+CREATE TABLE assistant_ia."q2bis_raisons_non_utilisation" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "courriel" TEXT,
@@ -651,8 +601,8 @@ CREATE TABLE assistant_ia."questionnaire_2_bis_raisons_non_utilisation" (
    Questionnaire 3 : usages et ressentis
 */
 
-DROP TABLE IF EXISTS assistant_ia."questionnaire_3" CASCADE;
-CREATE TABLE assistant_ia."questionnaire_3" (
+DROP TABLE IF EXISTS assistant_ia."q3" CASCADE;
+CREATE TABLE assistant_ia."q3" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -700,7 +650,7 @@ CREATE TABLE assistant_ia."questionnaire_3" (
 
 ----- Tables de liaisons questionnaire_3
 
-CREATE TABLE assistant_ia."questionnaire_3_formation_suivie" (
+CREATE TABLE assistant_ia."q3_formation_suivie" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -712,7 +662,7 @@ CREATE TABLE assistant_ia."questionnaire_3_formation_suivie" (
     UNIQUE ("import_timestamp", "no_id", "id_formation_suivie" )
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_3_programme_rdv" (
+CREATE TABLE assistant_ia."q3_programme_rdv" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -724,7 +674,7 @@ CREATE TABLE assistant_ia."questionnaire_3_programme_rdv" (
     UNIQUE ("import_timestamp", "no_id", "id_programme_de_rdv")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_3_leviers_progression" (
+CREATE TABLE assistant_ia."q3_leviers_progression" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -736,7 +686,7 @@ CREATE TABLE assistant_ia."questionnaire_3_leviers_progression" (
     UNIQUE ("import_timestamp", "no_id", "id_leviers_progression")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_3_fonctionnalites" (
+CREATE TABLE assistant_ia."q3_fonctionnalites" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -748,7 +698,7 @@ CREATE TABLE assistant_ia."questionnaire_3_fonctionnalites" (
     UNIQUE ("import_timestamp", "no_id", "id_fonctionnalites" )
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_3_risques_identifies" (
+CREATE TABLE assistant_ia."q3_risques_identifies" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -760,7 +710,7 @@ CREATE TABLE assistant_ia."questionnaire_3_risques_identifies" (
     UNIQUE ("import_timestamp", "no_id", "id_risques_identifies" )
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_3_besoins_prioritaires" (
+CREATE TABLE assistant_ia."q3_besoins_prioritaires" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -772,7 +722,7 @@ CREATE TABLE assistant_ia."questionnaire_3_besoins_prioritaires" (
     UNIQUE ("import_timestamp", "no_id", "id_besoins_prioritaires" )
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE assistant_ia."questionnaire_3_besoins_moindres" (
+CREATE TABLE assistant_ia."q3_besoins_moindres" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
     "no_id" text,
@@ -782,4 +732,102 @@ CREATE TABLE assistant_ia."questionnaire_3_besoins_moindres" (
   snapshot_id_parent UUID NULL,
   PRIMARY KEY ("id_row", "import_timestamp"),
     UNIQUE ("import_timestamp", "no_id", "id_besoins_moindres" )
+) PARTITION BY RANGE (import_timestamp);
+
+
+/*
+  Table des dimensions
+*/
+
+CREATE TABLE assistant_ia."dim_experimentateurs"(
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" int,
+  "no_id" text,
+  "entite" text,
+  "courriel" text,
+  "courriel_corrige" text,
+  "connecte_" text,
+  "reponse_au_questionnaire_1" text,
+  "reponse_au_questionnaire_2" text,
+  "reponse_au_questionnaire_3" text,
+  "parti" text,
+  "id_direction" INTEGER,
+  "direction" TEXT,
+  "tranche_age" TEXT,
+  "categorie_emploi" TEXT,
+  "statut" TEXT,
+  "id_domaine_professionnel" INTEGER,
+  "domaine" TEXT,
+  "situation_d_encadrement" TEXT,
+  "autres_experimentateurs" TEXT,
+  "id_niveau_d_utilisation_ia" INTEGER,
+  "niveau_d_utilisation_ia" TEXT,
+  "usage_ia_perso_avant_expe" TEXT,
+  "usage_ia_pro_avant_expe" TEXT,
+  "craintes_usage_ia_pro" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  snapshot_id UUID NOT NULL,
+  snapshot_id_parent UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
+
+CREATE TABLE assistant_ia."factless_q2"(
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" int,
+  "no_id" text,
+  "id_niveau_d_usage_ia_post_expe_" INTEGER,
+  "niveau_usage_ia" TEXT,
+  "frequence_d_usage_assistant_ia" TEXT,
+  "autres_formation_ia" TEXT,
+  "raison_non_participation_rdv" TEXT,
+  "autre_besoin_accompagnement" TEXT,
+  "apprentissage_assistant_ia_ressenti_" TEXT,
+  "difficultes_techniques_rencontrees2" TEXT,
+  "id_recommandation_collegues_mef" INTEGER,
+
+  "id_sensation_montee_en_competences" INTEGER,
+
+  "id_evolution_des_craintes_initiales" INTEGER,
+
+  "id_utilite_metier_mef" INTEGER,
+
+  "decouverte_d_usages_inattendus" TEXT,
+  "mode_de_decouverte_usages" TEXT,
+  "id_diminution_d_usage_ia_non_souveraines" INTEGER,
+
+  "id_comparaison_autres_ia" INTEGER,
+
+  "frequence_des_erreurs" TEXT,
+  "temps_economise_par_semaine" TEXT,
+  "cu1_nombre_echanges_moyens_affinage_reponse" TEXT,
+  "id_taux_moyen_de_correction_rep_assistant" INTEGER,
+
+  "pertinence_assistant_ia" TEXT,
+  "commentaires" TEXT,
+  "deuxieme_cas_d_usage_teste" TEXT,
+  "cu2_temps_economise_par_semaine" TEXT,
+  "cu2_nombre_echanges_moyens" TEXT,
+  "id_cu2_taux_moyen_de_correction_rep_assistant" INTEGER,
+
+  "cu2_pertinence_assistant_ia" TEXT,
+  "commentaires2" TEXT,
+  "troisieme_cas_d_usage" TEXT,
+  "cu3_temps_economise_par_semaine" TEXT,
+  "cu3_nombre_echanges_moyens_affinage_reponse" TEXT,
+  "id_cu3_taux_moyen_de_correction_rep_assistant" INTEGER,
+
+  "cu3_pertinence_assistant_ia" TEXT,
+  "commentaires3" TEXT,
+  "impact_sur_le_temps_de_travail" TEXT,
+  "estimation_globale_gain_de_temps" TEXT,
+  "id_raisons_perte_de_temps" INTEGER,
+
+  "id_ia_favorise_relations_humaines_" INTEGER,
+
+  import_timestamp TIMESTAMP NOT NULL,
+  snapshot_id UUID NOT NULL,
+  snapshot_id_parent UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id")
 ) PARTITION BY RANGE (import_timestamp);
