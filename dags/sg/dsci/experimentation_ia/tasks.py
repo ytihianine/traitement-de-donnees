@@ -19,11 +19,11 @@ def referentiels() -> None:
         ),
         execution_options=config.execution_options,
     )
-    ref_accord = create_task(
+    ref_niveau_accord = create_task(
         pipeline=PipelineDescriptor(
-            input_datasets=(Dataset(name="ref_accord"),),
-            output_dataset=Dataset(name="ref_accord"),
-            operation=process.process_ref_accord,
+            input_datasets=(Dataset(name="ref_niveau_accord"),),
+            output_dataset=Dataset(name="ref_niveau_accord"),
+            operation=process.process_ref_niveau_accord,
         ),
         execution_options=config.execution_options,
     )
@@ -245,7 +245,7 @@ def referentiels() -> None:
     chain(
         [
             ref_niveau_appropriation(),
-            ref_accord(),
+            ref_niveau_accord(),
             ref_formation_suivie(),
             ref_participation_programme(),
             ref_direction(),
@@ -555,21 +555,6 @@ def tables_dimensions() -> None:
         ),
         execution_options=config.execution_options,
     )
-    dim_q1 = create_task(
-        pipeline=PipelineDescriptor(
-            input_datasets=(
-                Dataset(name="experimentateurs"),
-                Dataset(name="q1"),
-                Dataset(name="q3"),
-                Dataset(name="ref_direction"),
-                Dataset(name="ref_domaine_professionnel"),
-            ),
-            output_dataset=Dataset(name="dim_q1"),
-            operation=process.process_dim_q1,
-            use_input_results_as_operation_args=True,
-        ),
-        execution_options=config.execution_options,
-    )
     dim_q2 = create_task(
         pipeline=PipelineDescriptor(
             input_datasets=(
@@ -605,7 +590,6 @@ def tables_dimensions() -> None:
     chain(
         [
             dim_experimentateurs(),
-            dim_q1(),
             dim_q2(),
             dim_q3(),
         ]

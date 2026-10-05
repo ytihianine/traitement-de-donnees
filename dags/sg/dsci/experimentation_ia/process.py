@@ -12,13 +12,13 @@ from modules.infra.airflow.common_tasks.grist import generic_grist_processing
 def process_ref_niveau_appropriation(df: pd.DataFrame) -> pd.DataFrame:
     df = generic_grist_processing(
         df=df,
-        cols_to_keep=["id", "niveau_d_appropriation"],
-        txt_columns=["niveau_d_appropriation"],
+        cols_to_keep=["id", "niveau_d_appropriation", "niveau_appropriation_libelle_court"],
+        txt_columns=["niveau_d_appropriation", "niveau_appropriation_libelle_court"],
     )
     return df
 
 
-def process_ref_accord(df: pd.DataFrame) -> pd.DataFrame:
+def process_ref_niveau_accord(df: pd.DataFrame) -> pd.DataFrame:
     df = generic_grist_processing(
         df=df,
         cols_to_keep=["id", "niveau_accord"],
@@ -977,6 +977,7 @@ def process_dim_experimentateurs(
     df_q3: pd.DataFrame,
     df_ref_direction: pd.DataFrame,
     df_ref_domaine_professionnel: pd.DataFrame,
+    df_ref_niveau_appropriation: pd.DataFrame,
 ) -> pd.DataFrame:
     df_expe_clean = df_experimentateurs.drop(columns=METADATA_COLS)
     df_q1 = df_q1.loc[
@@ -988,6 +989,7 @@ def process_dim_experimentateurs(
             "categorie_emploi",
             "statut",
             "id_domaine_professionnel",
+            "id_niveau_d_utilisation_ia",
             "situation_d_encadrement",
             "usage_ia_perso_avant_expe",
             "usage_ia_pro_avant_expe",
@@ -997,34 +999,14 @@ def process_dim_experimentateurs(
     df_q3 = df_q3.loc[:, ["no_id", "temps_fonction_exercee", "genre", "frequence_utilisation", "evolution_usage"]]
     df_ref_direction = df_ref_direction.drop(columns=METADATA_COLS)
     df_ref_domaine_professionnel = df_ref_domaine_professionnel.drop(columns=METADATA_COLS)
+    df_ref_niveau_appropriation = df_ref_niveau_appropriation.drop(columns=METADATA_COLS)
 
     df = (
         df_expe_clean.merge(right=df_q1, how="left", left_on="no_id", right_on="no_id")
         .merge(right=df_q3, how="left", left_on="no_id", right_on="no_id")
         .merge(right=df_ref_direction, how="left", left_on="id_direction", right_on="id")
         .merge(right=df_ref_domaine_professionnel, how="left", left_on="id_domaine_professionnel", right_on="id")
-    )
-    return df
-
-
-def process_dim_q1(
-    df_q1: pd.DataFrame,
-    df_ref_direction: pd.DataFrame,
-    df_ref_domaine_professionnel: pd.DataFrame,
-    df_ref_cas_usage: pd.DataFrame,
-    df_ref_formation_suivie: pd.DataFrame,
-) -> pd.DataFrame:
-    df_q1 = df_q1.drop(columns=METADATA_COLS)
-    df_ref_direction = df_ref_direction.drop(columns=METADATA_COLS)
-    df_ref_domaine_professionnel = df_ref_domaine_professionnel.drop(columns=METADATA_COLS)
-    df_ref_cas_usage = df_ref_cas_usage.drop(columns=METADATA_COLS)
-    df_ref_formation_suivie = df_ref_formation_suivie.drop(columns=METADATA_COLS)
-
-    df = (
-        df_q1.merge(right=df_ref_direction, how="left", left_on="id_direction", right_on="id")
-        .merge(right=df_ref_domaine_professionnel, how="left", left_on="id_domaine_professionnel", right_on="id")
-        .merge(right=df_ref_cas_usage, how="left", left_on="id_cas_d_usage_envisages", right_on="id")
-        .merge(right=df_ref_formation_suivie, how="left", left_on="id_formation_ia_suivie_post_expe_", right_on="id")
+        .merge(right=df_ref_niveau_appropriation, how="left", left_on="id_niveau_d_utilisation_ia", right_on="id")
     )
     return df
 
