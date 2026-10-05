@@ -42,7 +42,7 @@ nom_projet = "Experimentation IA"
     catchup=False,
     params=create_dag_params(
         nom_projet=nom_projet,
-        dag_status=DagStatus.DEV,
+        dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="assistant_ia"),
         feature_flags=FeatureFlagsEnable(db=False, mail=False, s3=True, convert_files=False, download_grist_doc=True),
     ),
