@@ -4,9 +4,8 @@ from dags.sg.dsci.experimentation_ia.config import (
     execution_options,
 )
 from dags.sg.dsci.experimentation_ia.tasks import (
+    experimentations,
     referentiels,
-    repartition,
-    suivi_experimentateurs,
     suivi_questionnaire_1,
     suivi_questionnaire_2,
     suivi_questionnaire_2_bis,
@@ -63,12 +62,10 @@ def experimentation_ia_dag() -> None:
         create_projet_snapshot(),
         create_tmp_tables(
             execution_options=execution_options,
-            reset_id_seq=False,
         ),
         [
             referentiels(),
-            repartition(),
-            suivi_experimentateurs(),
+            experimentations(),
             suivi_questionnaire_1(),
             suivi_questionnaire_2(),
             suivi_questionnaire_2_bis(),
