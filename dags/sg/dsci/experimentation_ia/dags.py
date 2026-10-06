@@ -63,9 +63,9 @@ def experimentation_ia_dag() -> None:
         create_tmp_tables(
             execution_options=execution_options,
         ),
+        referentiels(),
+        experimentations(),
         [
-            referentiels(),
-            experimentations(),
             suivi_questionnaire_1(),
             suivi_questionnaire_2(),
             suivi_questionnaire_2_bis(),
