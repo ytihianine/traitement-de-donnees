@@ -1205,7 +1205,7 @@ def process_dim_q2_duckdb_prototype(
         con.close()
 
 
-def process_dim_q3(
+def process_factless_q3(
     df_q3: pd.DataFrame,
     df_ref_raison_non_participation: pd.DataFrame,
     df_ref_impacts_taches_pro: pd.DataFrame,
