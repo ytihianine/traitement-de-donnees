@@ -487,7 +487,7 @@ def process_q2(df: pd.DataFrame) -> pd.DataFrame:
             "utilite_metier_mef": "id_utilite_metier_mef",
             "diminution_d_usage_ia_non_souveraines": "id_diminution_d_usage_ia_non_souveraines",
             "comparaison_autres_ia": "id_comparaison_autres_ia",
-            "taux_moyen_de_correction_rep_assistant": "id_taux_moyen_de_correction_rep_assistant",
+            "taux_moyen_de_correction_rep_assistant": "id_cu1_taux_moyen_de_correction_rep_assistant",
             "cu2_taux_moyen_de_correction_assistant": "id_cu2_taux_moyen_de_correction_rep_assistant",
             "cu3_taux_moyen_de_correction_assistant": "id_cu3_taux_moyen_de_correction_rep_assistant",
             "raisons_perte_de_temps": "id_raisons_perte_de_temps",
@@ -1036,7 +1036,7 @@ def process_dim_experimentateurs(
     return df
 
 
-def process_dim_q1(
+def process_factless_q1(
     df_q1: pd.DataFrame,
     df_ref_direction: pd.DataFrame,
     df_ref_domaine_professionnel: pd.DataFrame,
@@ -1049,18 +1049,19 @@ def process_dim_q1(
 
     df = _left_merge_ref(df_q1, "id_direction", df_ref_direction, ["direction"])
     df = _left_merge_ref(df, "id_domaine_professionnel", df_ref_domaine_professionnel, ["domaine"])
-    df = df.rename(columns={"domaine": "domaine_professionnel"})
     df = _left_merge_ref(
         df,
         "id_niveau_d_utilisation_ia",
         df_ref_niveau_appropriation,
         ["niveau_appropriation_libelle_court"],
     )
-    df = df.rename(columns={"niveau_appropriation_libelle_court": "niveau_d_utilisation_ia"})
+    df = df.rename(
+        columns={"niveau_appropriation_libelle_court": "niveau_d_utilisation_ia", "domaine": "domaine_professionnel"}
+    )
     return df
 
 
-def process_dim_q2(
+def process_factless_q2(
     df_q2: pd.DataFrame,
     df_ref_niveau_appropriation: pd.DataFrame,
     df_ref_niveau_accord: pd.DataFrame,
@@ -1083,7 +1084,7 @@ def process_dim_q2(
         df_ref_niveau_appropriation,
         ["niveau_appropriation_libelle_court"],
     )
-    df = df.rename(columns={"niveau_appropriation_libelle_court": "niveau_d_usage_ia"})
+    df = df.rename(columns={"niveau_appropriation_libelle_court": "niveau_d_usage_ia_post_expe"})
     df = _left_merge_ref(df, "id_recommandation_collegues_mef", df_ref_niveau_accord, ["niveau_accord"])
     df = df.rename(columns={"niveau_accord": "recommandation_collegues_mef"})
     df = _left_merge_ref(df, "id_sensation_montee_en_competences", df_ref_niveau_accord, ["niveau_accord"])

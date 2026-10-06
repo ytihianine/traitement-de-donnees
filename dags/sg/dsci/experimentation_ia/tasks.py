@@ -538,60 +538,60 @@ def tables_dimensions() -> None:
         ),
         execution_options=config.execution_options,
     )
-    # dim_q1 = create_task(
-    #     pipeline=PipelineDescriptor(
-    #         input_datasets=(
-    #             Dataset(name="q1"),
-    #             Dataset(name="ref_direction"),
-    #             Dataset(name="ref_domaine_professionnel"),
-    #             Dataset(name="ref_niveau_appropriation"),
-    #         ),
-    #         output_dataset=Dataset(name="dim_q1"),
-    #         operation=process.process_dim_q1,
-    #         use_input_results_as_operation_args=True,
-    #     ),
-    #     execution_options=config.execution_options,
-    # )
-    # dim_q2 = create_task(
-    #     pipeline=PipelineDescriptor(
-    #         input_datasets=(
-    #             Dataset(name="q2"),
-    #             Dataset(name="ref_niveau_appropriation"),
-    #             Dataset(name="ref_niveau_accord"),
-    #             Dataset(name="ref_evolution_crainte"),
-    #             Dataset(name="ref_comparaison_autre_ia"),
-    #             Dataset(name="ref_taux_correction"),
-    #             Dataset(name="ref_raison_perte_temps"),
-    #         ),
-    #         output_dataset=Dataset(name="dim_q2"),
-    #         operation=process.process_dim_q2,
-    #         use_input_results_as_operation_args=True,
-    #     ),
-    #     execution_options=config.execution_options,
-    # )
-    # dim_q3 = create_task(
-    #     pipeline=PipelineDescriptor(
-    #         input_datasets=(
-    #             Dataset(name="q3"),
-    #             Dataset(name="ref_raison_non_participation"),
-    #             Dataset(name="ref_impact_tache_pro"),
-    #             Dataset(name="ref_impact_tache_rebarbative"),
-    #             Dataset(name="ref_comparaison_autre_ia"),
-    #             Dataset(name="ref_niveau_accord"),
-    #         ),
-    #         output_dataset=Dataset(name="dim_q3"),
-    #         operation=process.process_dim_q3,
-    #         use_input_results_as_operation_args=True,
-    #     ),
-    #     execution_options=config.execution_options,
-    # )
+    factless_q1 = create_task(
+        pipeline=PipelineDescriptor(
+            input_datasets=(
+                Dataset(name="q1"),
+                Dataset(name="ref_direction"),
+                Dataset(name="ref_domaine_professionnel"),
+                Dataset(name="ref_niveau_appropriation"),
+            ),
+            output_dataset=Dataset(name="factless_q1"),
+            operation=process.process_factless_q1,
+            use_input_results_as_operation_args=True,
+        ),
+        execution_options=config.execution_options,
+    )
+    factless_q2 = create_task(
+        pipeline=PipelineDescriptor(
+            input_datasets=(
+                Dataset(name="q2"),
+                Dataset(name="ref_niveau_appropriation"),
+                Dataset(name="ref_niveau_accord"),
+                Dataset(name="ref_evolution_crainte"),
+                Dataset(name="ref_comparaison_autre_ia"),
+                Dataset(name="ref_taux_correction"),
+                Dataset(name="ref_raison_perte_temps"),
+            ),
+            output_dataset=Dataset(name="factless_q2"),
+            operation=process.process_factless_q2,
+            use_input_results_as_operation_args=True,
+        ),
+        execution_options=config.execution_options,
+    )
+    factless_q3 = create_task(
+        pipeline=PipelineDescriptor(
+            input_datasets=(
+                Dataset(name="q3"),
+                Dataset(name="ref_raison_non_participation"),
+                Dataset(name="ref_impact_tache_pro"),
+                Dataset(name="ref_impact_tache_rebarbative"),
+                Dataset(name="ref_comparaison_autre_ia"),
+                Dataset(name="ref_niveau_accord"),
+            ),
+            output_dataset=Dataset(name="factless_q3"),
+            operation=process.process_factless_q3,
+            use_input_results_as_operation_args=True,
+        ),
+        execution_options=config.execution_options,
+    )
 
     # Ordre des tâches
     chain(
         [
             dim_experimentateurs(),
-            # dim_q1(),
-            # dim_q2(),
-            # dim_q3(),
+            factless_q1(),
+            factless_q2(),
+            factless_q3(),
         ]
     )
