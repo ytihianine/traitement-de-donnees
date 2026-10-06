@@ -44,7 +44,7 @@ nom_projet = "Experimentation IA"
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
         db_params=DBParams(prod_schema="assistant_ia"),
-        feature_flags=FeatureFlagsEnable(db=False, mail=False, s3=True, convert_files=False, download_grist_doc=True),
+        feature_flags=FeatureFlagsEnable(db=True, mail=False, s3=True, convert_files=False, download_grist_doc=True),
     ),
     on_failure_callback=create_send_mail_callback(
         mail_status=MailStatus.ERROR,
