@@ -1099,7 +1099,7 @@ def process_factless_q2(
     df = df.rename(columns={"comparaisons": "comparaison_autre_ia"})
     df = _left_merge_ref(
         df,
-        "id_taux_moyen_de_correction_rep_assistant",
+        "id_cu1_taux_moyen_de_correction_rep_assistant",
         df_ref_taux_correction,
         ["taux_de_correction"],
     )
@@ -1208,15 +1208,15 @@ def process_dim_q2_duckdb_prototype(
 def process_factless_q3(
     df_q3: pd.DataFrame,
     df_ref_raison_non_participation: pd.DataFrame,
-    df_ref_impacts_taches_pro: pd.DataFrame,
-    df_ref_impacts_taches_rebarbatives: pd.DataFrame,
+    df_ref_impact_tache_pro: pd.DataFrame,
+    df_ref_impact_tache_rebarbative: pd.DataFrame,
     df_ref_comparaison_autre_ia: pd.DataFrame,
     df_ref_niveau_accord: pd.DataFrame,
 ) -> pd.DataFrame:
     df_q3 = df_q3.drop(columns=METADATA_COLS)
     df_ref_raison_non_participation = df_ref_raison_non_participation.drop(columns=METADATA_COLS)
-    df_ref_impacts_taches_pro = df_ref_impacts_taches_pro.drop(columns=METADATA_COLS)
-    df_ref_impacts_taches_rebarbatives = df_ref_impacts_taches_rebarbatives.drop(columns=METADATA_COLS)
+    df_ref_impact_tache_pro = df_ref_impact_tache_pro.drop(columns=METADATA_COLS)
+    df_ref_impact_tache_rebarbative = df_ref_impact_tache_rebarbative.drop(columns=METADATA_COLS)
     df_ref_niveau_accord = df_ref_niveau_accord.drop(columns=METADATA_COLS)
     df_ref_comparaison_autre_ia = df_ref_comparaison_autre_ia.drop(columns=METADATA_COLS)
 
@@ -1227,12 +1227,12 @@ def process_factless_q3(
         ["raisons"],
     )
     df = df.rename(columns={"raisons": "raisons_non_participation"})
-    df = _left_merge_ref(df, "id_impacts_taches_pro", df_ref_impacts_taches_pro, ["impacts"])
+    df = _left_merge_ref(df, "id_impacts_taches_pro", df_ref_impact_tache_pro, ["impacts"])
     df = df.rename(columns={"impacts": "impacts_taches_pro"})
     df = _left_merge_ref(
         df,
         "id_impacts_taches_rebarbatives",
-        df_ref_impacts_taches_rebarbatives,
+        df_ref_impact_tache_rebarbative,
         ["taches_rebarbatives"],
     )
     df = df.rename(columns={"taches_rebarbatives": "impacts_taches_rebarbatives"})
