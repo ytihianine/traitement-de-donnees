@@ -107,7 +107,7 @@ CREATE TABLE assistant_ia."ref_impact_observation" (
 CREATE TABLE assistant_ia."ref_impact_identifie" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
-  "impacts" TEXT,
+  "impact" TEXT,
   import_timestamp TIMESTAMP NOT NULL,
   snapshot_id UUID NOT NULL,
   snapshot_id_parent UUID NULL,
@@ -127,7 +127,17 @@ CREATE TABLE assistant_ia."ref_taux_correction" (
 CREATE TABLE assistant_ia."ref_type_erreur_ia" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
-  "erreurs" TEXT,
+  "type_erreur" TEXT,
+  import_timestamp TIMESTAMP NOT NULL,
+  snapshot_id UUID NOT NULL,
+  snapshot_id_parent UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
+CREATE TABLE assistant_ia."ref_tache_realise" (
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" INTEGER,
+  "taches" TEXT,
   import_timestamp TIMESTAMP NOT NULL,
   snapshot_id UUID NOT NULL,
   snapshot_id_parent UUID NULL,
@@ -138,16 +148,6 @@ CREATE TABLE assistant_ia."ref_comparaison_autres_ia" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
   "comparaisons" TEXT,
-  import_timestamp TIMESTAMP NOT NULL,
-  snapshot_id UUID NOT NULL,
-  snapshot_id_parent UUID NULL,
-  PRIMARY KEY ("id_row", "import_timestamp")
-) PARTITION BY RANGE (import_timestamp);
-
-CREATE TABLE assistant_ia."ref_impact_tache_pro" (
-  id_row bigint GENERATED ALWAYS AS IDENTITY,
-  "id" INTEGER,
-  "taches" TEXT,
   import_timestamp TIMESTAMP NOT NULL,
   snapshot_id UUID NOT NULL,
   snapshot_id_parent UUID NULL,
@@ -331,7 +331,6 @@ CREATE TABLE assistant_ia."experimentateurs"(
 /*
     Questionnaire 1 : Profil des expérimentateurs
 */
-DROP TABLE IF EXISTS assistant_ia."q1" CASCADE;
 CREATE TABLE assistant_ia."q1"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" int,
@@ -363,7 +362,6 @@ CREATE TABLE assistant_ia."q1"(
 ) PARTITION BY RANGE (import_timestamp);
 
 ----  Table de liaison  cas d'usage envisagés--------------
-DROP TABLE IF EXISTS assistant_ia."q1_cas_usage" CASCADE;
 CREATE TABLE assistant_ia."q1_cas_usage"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" bigserial,
@@ -393,7 +391,6 @@ CREATE TABLE assistant_ia."q1_besoins_accompagnement" (
     Questionnaire 2 : Retour des expérimentateurs
 */
 
-DROP TABLE IF EXISTS assistant_ia."q2" CASCADE;
 CREATE TABLE assistant_ia."q2" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" int,
@@ -457,7 +454,6 @@ CREATE TABLE assistant_ia."q2" (
 
 ----- Tables de liaisons du questionnaire 2--------------------
 
-DROP TABLE IF EXISTS assistant_ia."q2_formation_suivie" CASCADE;
 CREATE TABLE assistant_ia."q2_formation_suivie" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
@@ -571,7 +567,6 @@ CREATE TABLE assistant_ia."q2_impact_identifie" (
     Questionnaire 2_bis : Les agents jamais connectés
 */
 
-DROP TABLE IF EXISTS assistant_ia."q2bis" CASCADE;
 CREATE TABLE assistant_ia."q2bis" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "courriel" TEXT,
@@ -601,7 +596,6 @@ CREATE TABLE assistant_ia."q2bis_raisons_non_utilisation" (
    Questionnaire 3 : usages et ressentis
 */
 
-DROP TABLE IF EXISTS assistant_ia."q3" CASCADE;
 CREATE TABLE assistant_ia."q3" (
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" bigserial,
@@ -741,6 +735,7 @@ CREATE TABLE assistant_ia."q3_besoins_moindres" (
 
 CREATE TABLE assistant_ia."dim_experimentateurs"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
+  /*
   "id" int,
   "no_id" text,
   "entite" text,
@@ -765,17 +760,18 @@ CREATE TABLE assistant_ia."dim_experimentateurs"(
   "usage_ia_perso_avant_expe" TEXT,
   "usage_ia_pro_avant_expe" TEXT,
   "craintes_usage_ia_pro" TEXT,
+  */
   import_timestamp TIMESTAMP NOT NULL,
   snapshot_id UUID NOT NULL,
   snapshot_id_parent UUID NULL,
   PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-
-CREATE TABLE assistant_ia."factless_q2"(
+CREATE TABLE assistant_ia."dim_q1"(
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" int,
   "no_id" text,
+  /*
   "id_niveau_d_usage_ia_post_expe_" INTEGER,
   "niveau_usage_ia" TEXT,
   "frequence_d_usage_assistant_ia" TEXT,
@@ -825,6 +821,132 @@ CREATE TABLE assistant_ia."factless_q2"(
 
   "id_ia_favorise_relations_humaines_" INTEGER,
 
+  */
+  import_timestamp TIMESTAMP NOT NULL,
+  snapshot_id UUID NOT NULL,
+  snapshot_id_parent UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id")
+) PARTITION BY RANGE (import_timestamp);
+
+
+CREATE TABLE assistant_ia."dim_q2"(
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" int,
+  "no_id" text,
+  /*
+  "id_niveau_d_usage_ia_post_expe_" INTEGER,
+  "niveau_usage_ia" TEXT,
+  "frequence_d_usage_assistant_ia" TEXT,
+  "autres_formation_ia" TEXT,
+  "raison_non_participation_rdv" TEXT,
+  "autre_besoin_accompagnement" TEXT,
+  "apprentissage_assistant_ia_ressenti_" TEXT,
+  "difficultes_techniques_rencontrees2" TEXT,
+  "id_recommandation_collegues_mef" INTEGER,
+
+  "id_sensation_montee_en_competences" INTEGER,
+
+  "id_evolution_des_craintes_initiales" INTEGER,
+
+  "id_utilite_metier_mef" INTEGER,
+
+  "decouverte_d_usages_inattendus" TEXT,
+  "mode_de_decouverte_usages" TEXT,
+  "id_diminution_d_usage_ia_non_souveraines" INTEGER,
+
+  "id_comparaison_autres_ia" INTEGER,
+
+  "frequence_des_erreurs" TEXT,
+  "temps_economise_par_semaine" TEXT,
+  "cu1_nombre_echanges_moyens_affinage_reponse" TEXT,
+  "id_taux_moyen_de_correction_rep_assistant" INTEGER,
+
+  "pertinence_assistant_ia" TEXT,
+  "commentaires" TEXT,
+  "deuxieme_cas_d_usage_teste" TEXT,
+  "cu2_temps_economise_par_semaine" TEXT,
+  "cu2_nombre_echanges_moyens" TEXT,
+  "id_cu2_taux_moyen_de_correction_rep_assistant" INTEGER,
+
+  "cu2_pertinence_assistant_ia" TEXT,
+  "commentaires2" TEXT,
+  "troisieme_cas_d_usage" TEXT,
+  "cu3_temps_economise_par_semaine" TEXT,
+  "cu3_nombre_echanges_moyens_affinage_reponse" TEXT,
+  "id_cu3_taux_moyen_de_correction_rep_assistant" INTEGER,
+
+  "cu3_pertinence_assistant_ia" TEXT,
+  "commentaires3" TEXT,
+  "impact_sur_le_temps_de_travail" TEXT,
+  "estimation_globale_gain_de_temps" TEXT,
+  "id_raisons_perte_de_temps" INTEGER,
+
+  "id_ia_favorise_relations_humaines_" INTEGER,
+
+  */
+  import_timestamp TIMESTAMP NOT NULL,
+  snapshot_id UUID NOT NULL,
+  snapshot_id_parent UUID NULL,
+  PRIMARY KEY ("id_row", "import_timestamp"),
+    UNIQUE ("import_timestamp", "no_id")
+) PARTITION BY RANGE (import_timestamp);
+
+CREATE TABLE assistant_ia."dim_q3"(
+  id_row bigint GENERATED ALWAYS AS IDENTITY,
+  "id" int,
+  "no_id" text,
+  /*
+  "id_niveau_d_usage_ia_post_expe_" INTEGER,
+  "niveau_usage_ia" TEXT,
+  "frequence_d_usage_assistant_ia" TEXT,
+  "autres_formation_ia" TEXT,
+  "raison_non_participation_rdv" TEXT,
+  "autre_besoin_accompagnement" TEXT,
+  "apprentissage_assistant_ia_ressenti_" TEXT,
+  "difficultes_techniques_rencontrees2" TEXT,
+  "id_recommandation_collegues_mef" INTEGER,
+
+  "id_sensation_montee_en_competences" INTEGER,
+
+  "id_evolution_des_craintes_initiales" INTEGER,
+
+  "id_utilite_metier_mef" INTEGER,
+
+  "decouverte_d_usages_inattendus" TEXT,
+  "mode_de_decouverte_usages" TEXT,
+  "id_diminution_d_usage_ia_non_souveraines" INTEGER,
+
+  "id_comparaison_autres_ia" INTEGER,
+
+  "frequence_des_erreurs" TEXT,
+  "temps_economise_par_semaine" TEXT,
+  "cu1_nombre_echanges_moyens_affinage_reponse" TEXT,
+  "id_taux_moyen_de_correction_rep_assistant" INTEGER,
+
+  "pertinence_assistant_ia" TEXT,
+  "commentaires" TEXT,
+  "deuxieme_cas_d_usage_teste" TEXT,
+  "cu2_temps_economise_par_semaine" TEXT,
+  "cu2_nombre_echanges_moyens" TEXT,
+  "id_cu2_taux_moyen_de_correction_rep_assistant" INTEGER,
+
+  "cu2_pertinence_assistant_ia" TEXT,
+  "commentaires2" TEXT,
+  "troisieme_cas_d_usage" TEXT,
+  "cu3_temps_economise_par_semaine" TEXT,
+  "cu3_nombre_echanges_moyens_affinage_reponse" TEXT,
+  "id_cu3_taux_moyen_de_correction_rep_assistant" INTEGER,
+
+  "cu3_pertinence_assistant_ia" TEXT,
+  "commentaires3" TEXT,
+  "impact_sur_le_temps_de_travail" TEXT,
+  "estimation_globale_gain_de_temps" TEXT,
+  "id_raisons_perte_de_temps" INTEGER,
+
+  "id_ia_favorise_relations_humaines_" INTEGER,
+
+  */
   import_timestamp TIMESTAMP NOT NULL,
   snapshot_id UUID NOT NULL,
   snapshot_id_parent UUID NULL,

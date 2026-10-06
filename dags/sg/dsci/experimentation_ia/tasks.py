@@ -140,14 +140,6 @@ def referentiels() -> None:
         ),
         execution_options=config.execution_options,
     )
-    ref_comparaison_autres_ia = create_task(
-        pipeline=PipelineDescriptor(
-            input_datasets=(Dataset(name="ref_comparaison_autres_ia"),),
-            output_dataset=Dataset(name="ref_comparaison_autres_ia"),
-            operation=process.process_ref_comparaison_autres_ia,
-        ),
-        execution_options=config.execution_options,
-    )
     ref_frein_utilisation = create_task(
         pipeline=PipelineDescriptor(
             input_datasets=(Dataset(name="ref_frein_utilisation"),),
@@ -197,14 +189,6 @@ def referentiels() -> None:
             input_datasets=(Dataset(name="ref_impact_tache_rebarbative"),),
             output_dataset=Dataset(name="ref_impact_tache_rebarbative"),
             operation=process.process_ref_impact_tache_rebarbative,
-        ),
-        execution_options=config.execution_options,
-    )
-    ref_autre_outil_ia = create_task(
-        pipeline=PipelineDescriptor(
-            input_datasets=(Dataset(name="ref_autre_outil_ia"),),
-            output_dataset=Dataset(name="ref_autre_outil_ia"),
-            operation=process.process_ref_autre_outil_ia,
         ),
         execution_options=config.execution_options,
     )
@@ -259,14 +243,12 @@ def referentiels() -> None:
             ref_tache_realise(),
             ref_facteur_progression(),
             ref_evolution_crainte(),
-            ref_comparaison_autres_ia(),
             ref_frein_utilisation(),
             ref_raison_non_utilisation(),
             ref_raison_non_participation(),
             ref_levier_progression(),
             ref_impact_tache_pro(),
             ref_impact_tache_rebarbative(),
-            ref_autre_outil_ia(),
             ref_comparaison_autre_ia(),
             ref_autre_fonctionnalite(),
             ref_risque(),
