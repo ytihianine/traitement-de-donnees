@@ -10,6 +10,7 @@ from dags.sg.dsci.experimentation_ia.tasks import (
     suivi_questionnaire_2,
     suivi_questionnaire_2_bis,
     suivi_questionnaire_3,
+    tables_dimensions,
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.grist import download_grist_doc_to_s3
@@ -71,6 +72,7 @@ def experimentation_ia_dag() -> None:
             suivi_questionnaire_2_bis(),
             suivi_questionnaire_3(),
         ],
+        tables_dimensions(),
         ensure_partition(
             execution_options=execution_options,
         ),
