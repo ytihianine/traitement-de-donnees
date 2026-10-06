@@ -2,9 +2,9 @@ from modules.domain.pipeline.model import ExecutionOptions
 
 execution_options = {
     "dim_experimentateurs": ExecutionOptions(),
-    "dim_q1": ExecutionOptions(),
-    "dim_q2": ExecutionOptions(),
-    "dim_q3": ExecutionOptions(),
+    "factless_q1": ExecutionOptions(),
+    "factless_q2": ExecutionOptions(),
+    "factless_q3": ExecutionOptions(),
     "experimentateurs": ExecutionOptions(),
     "grist_doc": ExecutionOptions(),
     "q1": ExecutionOptions(),
