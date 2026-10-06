@@ -19,7 +19,7 @@ CREATE TABLE assistant_ia."ref_niveau_appropriation" (
 CREATE TABLE assistant_ia."ref_niveau_accord" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "id" INTEGER,
-  "niveau" TEXT,
+  "niveau_accord" TEXT,
   import_timestamp TIMESTAMP NOT NULL,
   snapshot_id UUID NOT NULL,
   snapshot_id_parent UUID NULL,
@@ -609,10 +609,10 @@ CREATE TABLE assistant_ia."q3" (
     "id_raisons_non_participation" INTEGER,
     "id_impacts_taches_pro" INTEGER,
     "id_impacts_taches_rebarbatives" INTEGER,
-    "id_autres_outils" INTEGER,
-    "id_satisfaction_autre_outil" INTEGER,
     "id_comparaison_autres_ia" INTEGER,
     -- Réponses textuelles libres et commentaires
+    "autres_outils" TEXT,
+    "satisfaction_autre_outil" TEXT,
     "autres" TEXT,
     "evaluation_niveau_acculturation" TEXT,
     "evolution_sentiment" TEXT,

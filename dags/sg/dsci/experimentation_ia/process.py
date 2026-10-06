@@ -804,8 +804,6 @@ def process_q3(df: pd.DataFrame) -> pd.DataFrame:
             "raisons_non_participation": "id_raisons_non_participation",
             "impacts_taches_pro": "id_impacts_taches_pro",
             "impacts_taches_rebarbatives": "id_impacts_taches_rebarbatives",
-            "autres_outils": "id_autres_outils",
-            "satisfaction_autre_outil": "id_satisfaction_autre_outil",
             "comparaison_autres_ia": "id_comparaison_autres_ia",
         },
         txt_columns=[
@@ -825,13 +823,13 @@ def process_q3(df: pd.DataFrame) -> pd.DataFrame:
             "connexions",
             "autre_retour_libre",
             "retours_libres",
+            "autres_outils",
+            "satisfaction_autre_outil",
         ],
         ref_columns=[
             "id_raisons_non_participation",
             "id_impacts_taches_pro",
             "id_impacts_taches_rebarbatives",
-            "id_autres_outils",
-            "id_satisfaction_autre_outil",
             "id_comparaison_autres_ia",
         ],
     )
