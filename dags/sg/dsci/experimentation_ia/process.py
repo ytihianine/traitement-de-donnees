@@ -973,6 +973,19 @@ def process_q3_besoins_moindres(df: pd.DataFrame) -> pd.DataFrame:
 # =============================================================
 # Fonction de processing des référentiels communs à tous les questionnaires
 # =============================================================
+def _left_merge_ref(
+    df_left: pd.DataFrame,
+    left_key: str,
+    df_ref: pd.DataFrame,
+    ref_cols: list[str],
+) -> pd.DataFrame:
+    """Merge selected reference columns without leaking duplicate right-side id columns."""
+    ref_lookup = df_ref.loc[:, ["id", *ref_cols]].rename(columns={"id": "__ref_id__"})
+    return df_left.merge(right=ref_lookup, how="left", left_on=left_key, right_on="__ref_id__").drop(
+        columns=["__ref_id__"]
+    )
+
+
 def process_dim_experimentateurs(
     df_experimentateurs: pd.DataFrame,
     df_q1: pd.DataFrame,
@@ -1003,12 +1016,16 @@ def process_dim_experimentateurs(
     df_ref_domaine_professionnel = df_ref_domaine_professionnel.drop(columns=METADATA_COLS)
     df_ref_niveau_appropriation = df_ref_niveau_appropriation.drop(columns=METADATA_COLS)
 
-    df = (
-        df_expe_clean.merge(right=df_q1, how="left", left_on="no_id", right_on="no_id")
-        .merge(right=df_q3, how="left", left_on="no_id", right_on="no_id")
-        .merge(right=df_ref_direction, how="left", left_on="id_direction", right_on="id")
-        .merge(right=df_ref_domaine_professionnel, how="left", left_on="id_domaine_professionnel", right_on="id")
-        .merge(right=df_ref_niveau_appropriation, how="left", left_on="id_niveau_d_utilisation_ia", right_on="id")
+    df = df_expe_clean.merge(right=df_q1, how="left", left_on="no_id", right_on="no_id").merge(
+        right=df_q3, how="left", left_on="no_id", right_on="no_id"
+    )
+    df = _left_merge_ref(df, "id_direction", df_ref_direction, ["direction"])
+    df = _left_merge_ref(df, "id_domaine_professionnel", df_ref_domaine_professionnel, ["domaine"])
+    df = _left_merge_ref(
+        df,
+        "id_niveau_d_utilisation_ia",
+        df_ref_niveau_appropriation,
+        ["niveau_d_appropriation", "niveau_appropriation_libelle_court"],
     )
     return df
 
@@ -1024,13 +1041,16 @@ def process_dim_q1(
     df_ref_domaine_professionnel = df_ref_domaine_professionnel.drop(columns=METADATA_COLS)
     df_ref_niveau_appropriation = df_ref_niveau_appropriation.drop(columns=METADATA_COLS)
 
-    df = (
-        df_q1.merge(right=df_ref_direction, how="left", left_on="id_direction", right_on="id")
-        .merge(right=df_ref_domaine_professionnel, how="left", left_on="id_domaine_professionnel", right_on="id")
-        .rename(columns={"domaine": "domaine_professionnel"})
-        .merge(right=df_ref_niveau_appropriation, how="left", left_on="id_niveau_d_utilisation_ia", right_on="id")
-        .rename(columns={"niveau_appropriation_libelle_court": "niveau_d_utilisation_ia"})
+    df = _left_merge_ref(df_q1, "id_direction", df_ref_direction, ["direction"])
+    df = _left_merge_ref(df, "id_domaine_professionnel", df_ref_domaine_professionnel, ["domaine"])
+    df = df.rename(columns={"domaine": "domaine_professionnel"})
+    df = _left_merge_ref(
+        df,
+        "id_niveau_d_utilisation_ia",
+        df_ref_niveau_appropriation,
+        ["niveau_appropriation_libelle_court"],
     )
+    df = df.rename(columns={"niveau_appropriation_libelle_court": "niveau_d_utilisation_ia"})
     return df
 
 
@@ -1051,53 +1071,50 @@ def process_dim_q2(
     df_ref_taux_correction = df_ref_taux_correction.drop(columns=METADATA_COLS)
     df_ref_raison_perte_temps = df_ref_raison_perte_temps.drop(columns=METADATA_COLS)
 
-    df = (
-        df_q2.merge(
-            right=df_ref_niveau_appropriation, how="left", left_on="id_niveau_d_usage_ia_post_expe_", right_on="id"
-        )
-        .rename(columns={"niveau_appropriation_libelle_court": "niveau_d_usage_ia"})
-        .merge(right=df_ref_niveau_accord, how="left", left_on="id_recommandation_collegues_mef", right_on="id")
-        .rename(columns={"niveau_accord": "recommandation_collegues_mef"})
-        .merge(right=df_ref_niveau_accord, how="left", left_on="id_sensation_montee_en_competences", right_on="id")
-        .rename(columns={"niveau_accord": "sensation_montee_en_competences"})
-        .merge(
-            right=df_ref_evolution_crainte,
-            how="left",
-            left_on="id_sensation_montee_en_competences",
-            right_on="id",
-        )
-        .rename(columns={"evolutions": "evolution_des_craintes_initiales"})
-        .merge(right=df_ref_niveau_accord, how="left", left_on="id_utilite_metier_mef", right_on="id")
-        .rename(columns={"niveau_accord": "utilite_metier_mef"})
-        .merge(
-            right=df_ref_niveau_accord, how="left", left_on="id_diminution_d_usage_ia_non_souveraines", right_on="id"
-        )
-        .rename(columns={"niveau_accord": "diminution_d_usage_ia_non_souveraines"})
-        .merge(right=df_ref_comparaison_autre_ia, how="left", left_on="id_comparaison_autres_ia", right_on="id")
-        .rename(columns={"comparaisons": "comparaison_autre_ia"})
-        .merge(
-            right=df_ref_taux_correction, how="left", left_on="id_taux_moyen_de_correction_rep_assistant", right_on="id"
-        )
-        .rename(columns={"taux_de_correction": "cu1_taux_moyen_de_correction_rep_assistant"})
-        .merge(
-            right=df_ref_taux_correction,
-            how="left",
-            left_on="id_cu2_taux_moyen_de_correction_rep_assistant",
-            right_on="id",
-        )
-        .rename(columns={"taux_de_correction": "cu2_taux_moyen_de_correction_rep_assistant"})
-        .merge(
-            right=df_ref_taux_correction,
-            how="left",
-            left_on="id_cu3_taux_moyen_de_correction_rep_assistant",
-            right_on="id",
-        )
-        .rename(columns={"taux_de_correction": "cu3_taux_moyen_de_correction_rep_assistant"})
-        .merge(right=df_ref_raison_perte_temps, how="left", left_on="id_raisons_perte_de_temps", right_on="id")
-        .rename(columns={"raisons": "raisons_perte_de_temps"})
-        .merge(right=df_ref_niveau_accord, how="left", left_on="id_ia_favorise_relations_humaines_", right_on="id")
-        .rename(columns={"niveau_accord": "ia_favorise_relations_humaines"})
+    df = _left_merge_ref(
+        df_q2,
+        "id_niveau_d_usage_ia_post_expe_",
+        df_ref_niveau_appropriation,
+        ["niveau_appropriation_libelle_court"],
     )
+    df = df.rename(columns={"niveau_appropriation_libelle_court": "niveau_d_usage_ia"})
+    df = _left_merge_ref(df, "id_recommandation_collegues_mef", df_ref_niveau_accord, ["niveau_accord"])
+    df = df.rename(columns={"niveau_accord": "recommandation_collegues_mef"})
+    df = _left_merge_ref(df, "id_sensation_montee_en_competences", df_ref_niveau_accord, ["niveau_accord"])
+    df = df.rename(columns={"niveau_accord": "sensation_montee_en_competences"})
+    df = _left_merge_ref(df, "id_sensation_montee_en_competences", df_ref_evolution_crainte, ["evolutions"])
+    df = df.rename(columns={"evolutions": "evolution_des_craintes_initiales"})
+    df = _left_merge_ref(df, "id_utilite_metier_mef", df_ref_niveau_accord, ["niveau_accord"])
+    df = df.rename(columns={"niveau_accord": "utilite_metier_mef"})
+    df = _left_merge_ref(df, "id_diminution_d_usage_ia_non_souveraines", df_ref_niveau_accord, ["niveau_accord"])
+    df = df.rename(columns={"niveau_accord": "diminution_d_usage_ia_non_souveraines"})
+    df = _left_merge_ref(df, "id_comparaison_autres_ia", df_ref_comparaison_autre_ia, ["comparaisons"])
+    df = df.rename(columns={"comparaisons": "comparaison_autre_ia"})
+    df = _left_merge_ref(
+        df,
+        "id_taux_moyen_de_correction_rep_assistant",
+        df_ref_taux_correction,
+        ["taux_de_correction"],
+    )
+    df = df.rename(columns={"taux_de_correction": "cu1_taux_moyen_de_correction_rep_assistant"})
+    df = _left_merge_ref(
+        df,
+        "id_cu2_taux_moyen_de_correction_rep_assistant",
+        df_ref_taux_correction,
+        ["taux_de_correction"],
+    )
+    df = df.rename(columns={"taux_de_correction": "cu2_taux_moyen_de_correction_rep_assistant"})
+    df = _left_merge_ref(
+        df,
+        "id_cu3_taux_moyen_de_correction_rep_assistant",
+        df_ref_taux_correction,
+        ["taux_de_correction"],
+    )
+    df = df.rename(columns={"taux_de_correction": "cu3_taux_moyen_de_correction_rep_assistant"})
+    df = _left_merge_ref(df, "id_raisons_perte_de_temps", df_ref_raison_perte_temps, ["raisons"])
+    df = df.rename(columns={"raisons": "raisons_perte_de_temps"})
+    df = _left_merge_ref(df, "id_ia_favorise_relations_humaines_", df_ref_niveau_accord, ["niveau_accord"])
+    df = df.rename(columns={"niveau_accord": "ia_favorise_relations_humaines"})
     return df
 
 
@@ -1116,25 +1133,26 @@ def process_dim_q3(
     df_ref_niveau_accord = df_ref_niveau_accord.drop(columns=METADATA_COLS)
     df_ref_comparaison_autre_ia = df_ref_comparaison_autre_ia.drop(columns=METADATA_COLS)
 
-    df = (
-        df_q3.merge(
-            right=df_ref_raisons_non_participation, how="left", left_on="id_raisons_non_participation", right_on="id"
-        )
-        .rename(columns={"raisons": "raisons_non_participation"})
-        .merge(right=df_ref_impacts_taches_pro, how="left", left_on="id_impacts_taches_pro", right_on="id")
-        .rename(columns={"impacts": "impacts_taches_pro"})
-        .merge(
-            right=df_ref_impacts_taches_rebarbatives,
-            how="left",
-            left_on="id_impacts_taches_rebarbatives",
-            right_on="id",
-        )
-        .rename(columns={"taches_rebarbatives": "impacts_taches_rebarbatives"})
-        .merge(right=df_ref_comparaison_autre_ia, how="left", left_on="id_comparaison_autres_ia", right_on="id")
-        .rename(columns={"comparaisons": "comparaisons_autres_ia"})
-        .merge(right=df_ref_niveau_accord, how="left", left_on="id_utilisation_moindre", right_on="id")
-        .rename(columns={"niveau_accord": "utilisation_moindre"})
-        .merge(right=df_ref_niveau_accord, how="left", left_on="id_recommandations", right_on="id")
-        .rename(columns={"niveau_accord": "recommandations"})
+    df = _left_merge_ref(
+        df_q3,
+        "id_raisons_non_participation",
+        df_ref_raisons_non_participation,
+        ["raisons"],
     )
+    df = df.rename(columns={"raisons": "raisons_non_participation"})
+    df = _left_merge_ref(df, "id_impacts_taches_pro", df_ref_impacts_taches_pro, ["impacts"])
+    df = df.rename(columns={"impacts": "impacts_taches_pro"})
+    df = _left_merge_ref(
+        df,
+        "id_impacts_taches_rebarbatives",
+        df_ref_impacts_taches_rebarbatives,
+        ["taches_rebarbatives"],
+    )
+    df = df.rename(columns={"taches_rebarbatives": "impacts_taches_rebarbatives"})
+    df = _left_merge_ref(df, "id_comparaison_autres_ia", df_ref_comparaison_autre_ia, ["comparaisons"])
+    df = df.rename(columns={"comparaisons": "comparaisons_autres_ia"})
+    df = _left_merge_ref(df, "id_utilisation_moindre", df_ref_niveau_accord, ["niveau_accord"])
+    df = df.rename(columns={"niveau_accord": "utilisation_moindre"})
+    df = _left_merge_ref(df, "id_recommandations", df_ref_niveau_accord, ["niveau_accord"])
+    df = df.rename(columns={"niveau_accord": "recommandations"})
     return df

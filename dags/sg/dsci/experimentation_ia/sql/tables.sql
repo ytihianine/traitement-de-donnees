@@ -846,7 +846,6 @@ CREATE TABLE assistant_ia."dim_q2"(
   "cu3_nombre_echanges_moyens_affinage_reponse" TEXT,
   "id_cu3_taux_moyen_de_correction_rep_assistant" INTEGER,
   "cu3_taux_moyen_de_correction_rep_assistant" TEXT,
-  "cu3_taux_moyen_de_correction_rep_assistant" TEXT,
   "commentaires3" TEXT,
   "impact_sur_le_temps_de_travail" TEXT,
   "estimation_globale_gain_de_temps" TEXT,
