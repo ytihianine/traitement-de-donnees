@@ -1096,7 +1096,7 @@ def process_factless_q2(
     df = _left_merge_ref(df, "id_diminution_d_usage_ia_non_souveraines", df_ref_niveau_accord, ["niveau_accord"])
     df = df.rename(columns={"niveau_accord": "diminution_d_usage_ia_non_souveraines"})
     df = _left_merge_ref(df, "id_comparaison_autres_ia", df_ref_comparaison_autre_ia, ["comparaisons"])
-    df = df.rename(columns={"comparaisons": "comparaison_autre_ia"})
+    df = df.rename(columns={"comparaisons": "comparaison_autres_ia"})
     df = _left_merge_ref(
         df,
         "id_cu1_taux_moyen_de_correction_rep_assistant",
@@ -1237,7 +1237,7 @@ def process_factless_q3(
     )
     df = df.rename(columns={"taches_rebarbatives": "impacts_taches_rebarbatives"})
     df = _left_merge_ref(df, "id_comparaison_autres_ia", df_ref_comparaison_autre_ia, ["comparaisons"])
-    df = df.rename(columns={"comparaisons": "comparaisons_autres_ia"})
+    df = df.rename(columns={"comparaisons": "comparaison_autres_ia"})
     df = _left_merge_ref(df, "id_utilisation_moindre", df_ref_niveau_accord, ["niveau_accord"])
     df = df.rename(columns={"niveau_accord": "utilisation_moindre"})
     df = _left_merge_ref(df, "id_recommandations", df_ref_niveau_accord, ["niveau_accord"])
