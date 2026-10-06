@@ -1025,7 +1025,13 @@ def process_dim_experimentateurs(
         df,
         "id_niveau_d_utilisation_ia",
         df_ref_niveau_appropriation,
-        ["niveau_d_appropriation", "niveau_appropriation_libelle_court"],
+        ["niveau_appropriation_libelle_court"],
+    )
+    df = df.rename(
+        columns={
+            "domaine": "domaine_professionnel",
+            "niveau_appropriation_libelle_court": "niveau_d_utilisation_ia",
+        }
     )
     return df
 
@@ -1082,7 +1088,7 @@ def process_dim_q2(
     df = df.rename(columns={"niveau_accord": "recommandation_collegues_mef"})
     df = _left_merge_ref(df, "id_sensation_montee_en_competences", df_ref_niveau_accord, ["niveau_accord"])
     df = df.rename(columns={"niveau_accord": "sensation_montee_en_competences"})
-    df = _left_merge_ref(df, "id_sensation_montee_en_competences", df_ref_evolution_crainte, ["evolutions"])
+    df = _left_merge_ref(df, "id_evolution_des_craintes_initiales", df_ref_evolution_crainte, ["evolutions"])
     df = df.rename(columns={"evolutions": "evolution_des_craintes_initiales"})
     df = _left_merge_ref(df, "id_utilite_metier_mef", df_ref_niveau_accord, ["niveau_accord"])
     df = df.rename(columns={"niveau_accord": "utilite_metier_mef"})
@@ -1118,16 +1124,96 @@ def process_dim_q2(
     return df
 
 
+def process_dim_q2_duckdb_prototype(
+    df_q2: pd.DataFrame,
+    df_ref_niveau_appropriation: pd.DataFrame,
+    df_ref_niveau_accord: pd.DataFrame,
+    df_ref_evolution_crainte: pd.DataFrame,
+    df_ref_comparaison_autre_ia: pd.DataFrame,
+    df_ref_taux_correction: pd.DataFrame,
+    df_ref_raison_perte_temps: pd.DataFrame,
+) -> pd.DataFrame:
+    """Prototype DuckDB version of process_dim_q2 using explicit SQL joins."""
+    try:
+        import duckdb
+    except ImportError as exc:
+        raise ImportError("duckdb is required for process_dim_q2_duckdb_prototype") from exc
+
+    df_q2_clean = df_q2.drop(columns=METADATA_COLS)
+    ref_niveau_appropriation = df_ref_niveau_appropriation.drop(columns=METADATA_COLS)
+    ref_niveau_accord = df_ref_niveau_accord.drop(columns=METADATA_COLS)
+    ref_evolution_crainte = df_ref_evolution_crainte.drop(columns=METADATA_COLS)
+    ref_comparaison_autre_ia = df_ref_comparaison_autre_ia.drop(columns=METADATA_COLS)
+    ref_taux_correction = df_ref_taux_correction.drop(columns=METADATA_COLS)
+    ref_raison_perte_temps = df_ref_raison_perte_temps.drop(columns=METADATA_COLS)
+
+    con = duckdb.connect(database=":memory:")
+    try:
+        con.register("q2", df_q2_clean)
+        con.register("ref_niveau_appropriation", ref_niveau_appropriation)
+        con.register("ref_niveau_accord", ref_niveau_accord)
+        con.register("ref_evolution_crainte", ref_evolution_crainte)
+        con.register("ref_comparaison_autre_ia", ref_comparaison_autre_ia)
+        con.register("ref_taux_correction", ref_taux_correction)
+        con.register("ref_raison_perte_temps", ref_raison_perte_temps)
+
+        # Explicit aliases keep output columns deterministic and avoid suffix collisions.
+        query = """
+            SELECT
+                q2.*,
+                n_app.niveau_appropriation_libelle_court AS niveau_d_usage_ia,
+                acc_rec.niveau_accord AS recommandation_collegues_mef,
+                acc_sens.niveau_accord AS sensation_montee_en_competences,
+                evo.evolutions AS evolution_des_craintes_initiales,
+                acc_util.niveau_accord AS utilite_metier_mef,
+                acc_dim.niveau_accord AS diminution_d_usage_ia_non_souveraines,
+                comp.comparaisons AS comparaison_autre_ia,
+                tx1.taux_de_correction AS cu1_taux_moyen_de_correction_rep_assistant,
+                tx2.taux_de_correction AS cu2_taux_moyen_de_correction_rep_assistant,
+                tx3.taux_de_correction AS cu3_taux_moyen_de_correction_rep_assistant,
+                rtp.raisons AS raisons_perte_de_temps,
+                acc_hum.niveau_accord AS ia_favorise_relations_humaines
+            FROM q2
+            LEFT JOIN ref_niveau_appropriation n_app
+                ON q2.id_niveau_d_usage_ia_post_expe_ = n_app.id
+            LEFT JOIN ref_niveau_accord acc_rec
+                ON q2.id_recommandation_collegues_mef = acc_rec.id
+            LEFT JOIN ref_niveau_accord acc_sens
+                ON q2.id_sensation_montee_en_competences = acc_sens.id
+            LEFT JOIN ref_evolution_crainte evo
+                ON q2.id_evolution_des_craintes_initiales = evo.id
+            LEFT JOIN ref_niveau_accord acc_util
+                ON q2.id_utilite_metier_mef = acc_util.id
+            LEFT JOIN ref_niveau_accord acc_dim
+                ON q2.id_diminution_d_usage_ia_non_souveraines = acc_dim.id
+            LEFT JOIN ref_comparaison_autre_ia comp
+                ON q2.id_comparaison_autres_ia = comp.id
+            LEFT JOIN ref_taux_correction tx1
+                ON q2.id_taux_moyen_de_correction_rep_assistant = tx1.id
+            LEFT JOIN ref_taux_correction tx2
+                ON q2.id_cu2_taux_moyen_de_correction_rep_assistant = tx2.id
+            LEFT JOIN ref_taux_correction tx3
+                ON q2.id_cu3_taux_moyen_de_correction_rep_assistant = tx3.id
+            LEFT JOIN ref_raison_perte_temps rtp
+                ON q2.id_raisons_perte_de_temps = rtp.id
+            LEFT JOIN ref_niveau_accord acc_hum
+                ON q2.id_ia_favorise_relations_humaines_ = acc_hum.id
+        """
+        return con.execute(query).df()
+    finally:
+        con.close()
+
+
 def process_dim_q3(
     df_q3: pd.DataFrame,
-    df_ref_raisons_non_participation: pd.DataFrame,
+    df_ref_raison_non_participation: pd.DataFrame,
     df_ref_impacts_taches_pro: pd.DataFrame,
     df_ref_impacts_taches_rebarbatives: pd.DataFrame,
     df_ref_comparaison_autre_ia: pd.DataFrame,
     df_ref_niveau_accord: pd.DataFrame,
 ) -> pd.DataFrame:
     df_q3 = df_q3.drop(columns=METADATA_COLS)
-    df_ref_raisons_non_participation = df_ref_raisons_non_participation.drop(columns=METADATA_COLS)
+    df_ref_raison_non_participation = df_ref_raison_non_participation.drop(columns=METADATA_COLS)
     df_ref_impacts_taches_pro = df_ref_impacts_taches_pro.drop(columns=METADATA_COLS)
     df_ref_impacts_taches_rebarbatives = df_ref_impacts_taches_rebarbatives.drop(columns=METADATA_COLS)
     df_ref_niveau_accord = df_ref_niveau_accord.drop(columns=METADATA_COLS)
@@ -1136,7 +1222,7 @@ def process_dim_q3(
     df = _left_merge_ref(
         df_q3,
         "id_raisons_non_participation",
-        df_ref_raisons_non_participation,
+        df_ref_raison_non_participation,
         ["raisons"],
     )
     df = df.rename(columns={"raisons": "raisons_non_participation"})

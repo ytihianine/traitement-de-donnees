@@ -542,6 +542,7 @@ def tables_dimensions() -> None:
         pipeline=PipelineDescriptor(
             input_datasets=(
                 Dataset(name="q1"),
+                Dataset(name="ref_direction"),
                 Dataset(name="ref_domaine_professionnel"),
                 Dataset(name="ref_niveau_appropriation"),
             ),
