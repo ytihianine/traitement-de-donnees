@@ -750,7 +750,6 @@ CREATE TABLE assistant_ia."dim_experimentateurs"(
   "tranche_age" TEXT,
   "categorie_emploi" TEXT,
   "statut" TEXT,
-  "genre" TEXT,
   "id_domaine_professionnel" INTEGER,
   "domaine_professionnel" TEXT,
   "situation_d_encadrement" TEXT,
@@ -760,7 +759,10 @@ CREATE TABLE assistant_ia."dim_experimentateurs"(
   "usage_ia_perso_avant_expe" TEXT,
   "usage_ia_pro_avant_expe" TEXT,
   "craintes_usage_ia_pro" TEXT,
+  /* Questionnaire 3 */
   "temps_fonction_exercee" TEXT,
+  "genre" TEXT,
+  "frequence_utilisation" TEXT,
   "evolution_usage" TEXT,
   import_timestamp TIMESTAMP NOT NULL,
   snapshot_id UUID NOT NULL,
