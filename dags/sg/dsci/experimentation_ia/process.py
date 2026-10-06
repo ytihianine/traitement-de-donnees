@@ -525,7 +525,7 @@ def process_q2(df: pd.DataFrame) -> pd.DataFrame:
             "id_utilite_metier_mef",
             "id_diminution_d_usage_ia_non_souveraines",
             "id_comparaison_autres_ia",
-            "id_taux_moyen_de_correction_rep_assistant",
+            "id_cu1_taux_moyen_de_correction_rep_assistant",
             "id_cu2_taux_moyen_de_correction_rep_assistant",
             "id_cu3_taux_moyen_de_correction_rep_assistant",
             "id_raisons_perte_de_temps",
