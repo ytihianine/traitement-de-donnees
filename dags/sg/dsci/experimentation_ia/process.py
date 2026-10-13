@@ -1056,7 +1056,7 @@ def process_factless_q1(
     df_ref_domaine_professionnel = df_ref_domaine_professionnel.drop(columns=METADATA_COLS)
     df_ref_niveau_appropriation = df_ref_niveau_appropriation.drop(columns=METADATA_COLS)
 
-    df = _left_merge_ref(df_q1, "id_direction", df_ref_direction, ["direction"])
+    df = _left_merge_ref(df_q1, "id_direction", df_ref_direction, ["direction", "direction_regroupee"])
     df = _left_merge_ref(df, "id_domaine_professionnel", df_ref_domaine_professionnel, ["domaine"])
     df = _left_merge_ref(
         df,
@@ -1110,21 +1110,21 @@ def process_factless_q2(
         df,
         "id_cu1_taux_moyen_de_correction_rep_assistant",
         df_ref_taux_correction,
-        ["taux_de_correction"],
+        ["taux_de_correction", "taux_correction_simplifie"],
     )
     df = df.rename(columns={"taux_de_correction": "cu1_taux_moyen_de_correction_rep_assistant"})
     df = _left_merge_ref(
         df,
         "id_cu2_taux_moyen_de_correction_rep_assistant",
         df_ref_taux_correction,
-        ["taux_de_correction"],
+        ["taux_de_correction", "taux_correction_simplifie"],
     )
     df = df.rename(columns={"taux_de_correction": "cu2_taux_moyen_de_correction_rep_assistant"})
     df = _left_merge_ref(
         df,
         "id_cu3_taux_moyen_de_correction_rep_assistant",
         df_ref_taux_correction,
-        ["taux_de_correction"],
+        ["taux_de_correction", "taux_correction_simplifie"],
     )
     df = df.rename(columns={"taux_de_correction": "cu3_taux_moyen_de_correction_rep_assistant"})
     df = _left_merge_ref(df, "id_raisons_perte_de_temps", df_ref_raison_perte_temps, ["raisons"])
