@@ -338,11 +338,11 @@ def suivi_questionnaire_2() -> None:
         ),
         execution_options=config.execution_options,
     )
-    q2_participation = create_task(
+    q2_programme_rdv = create_task(
         pipeline=PipelineDescriptor(
-            input_datasets=(Dataset(name="q2_participation"),),
-            output_dataset=Dataset(name="q2_participation"),
-            operation=process.process_q2_participation,
+            input_datasets=(Dataset(name="q2_programme_rdv"),),
+            output_dataset=Dataset(name="q2_programme_rdv"),
+            operation=process.process_q2_programme_rdv,
         ),
         execution_options=config.execution_options,
     )
@@ -401,7 +401,7 @@ def suivi_questionnaire_2() -> None:
             q2(),
             q2_typologie_interaction(),
             q2_formation_suivie(),
-            q2_participation(),
+            q2_programme_rdv(),
             q2_freins(),
             q2_facteurs_progression(),
             q2_taches(),

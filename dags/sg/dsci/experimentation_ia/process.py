@@ -39,8 +39,8 @@ def process_ref_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
 def process_ref_participation_programme(df: pd.DataFrame) -> pd.DataFrame:
     df = generic_grist_processing(
         df=df,
-        cols_to_keep=["id", "participation"],
-        txt_columns=["participation"],
+        cols_to_keep=["id", "participation", "participation_simplifie"],
+        txt_columns=["participation", "participation_simplifie"],
     )
     return df
 
@@ -51,8 +51,8 @@ def process_ref_participation_programme(df: pd.DataFrame) -> pd.DataFrame:
 def process_ref_direction(df: pd.DataFrame) -> pd.DataFrame:
     df = generic_grist_processing(
         df=df,
-        cols_to_keep=["id", "direction"],
-        txt_columns=["direction"],
+        cols_to_keep=["id", "direction", "direction_regroupee"],
+        txt_columns=["direction", "direction_regroupee"],
     )
     return df
 
@@ -69,8 +69,8 @@ def process_ref_domaine_professionnel(df: pd.DataFrame) -> pd.DataFrame:
 def process_ref_cas_usage(df: pd.DataFrame) -> pd.DataFrame:
     df = generic_grist_processing(
         df=df,
-        cols_to_keep=["id", "cas_d_usage"],
-        txt_columns=["cas_d_usage"],
+        cols_to_keep=["id", "cas_d_usage", "cas_usage_simplifie"],
+        txt_columns=["cas_d_usage", "cas_usage_simplifie"],
     )
     return df
 
@@ -108,8 +108,8 @@ def process_ref_impact_identifie(df: pd.DataFrame) -> pd.DataFrame:
 def process_ref_taux_correction(df: pd.DataFrame) -> pd.DataFrame:
     df = generic_grist_processing(
         df=df,
-        cols_to_keep=["id", "taux_de_correction"],
-        txt_columns=["taux_de_correction"],
+        cols_to_keep=["id", "taux_de_correction", "taux_correction_simplifie"],
+        txt_columns=["taux_de_correction", "taux_correction_simplifie"],
     )
     return df
 
@@ -126,8 +126,8 @@ def process_ref_type_erreur_ia(df: pd.DataFrame) -> pd.DataFrame:
 def process_ref_tache_realise(df: pd.DataFrame) -> pd.DataFrame:
     df = generic_grist_processing(
         df=df,
-        cols_to_keep=["id", "taches"],
-        txt_columns=["taches"],
+        cols_to_keep=["id", "taches", "tache_simplifie"],
+        txt_columns=["taches", "tache_simplifie"],
     )
     return df
 
@@ -486,10 +486,15 @@ def process_q2(df: pd.DataFrame) -> pd.DataFrame:
             "evolution_des_craintes_initiales": "id_evolution_des_craintes_initiales",
             "utilite_metier_mef": "id_utilite_metier_mef",
             "diminution_d_usage_ia_non_souveraines": "id_diminution_d_usage_ia_non_souveraines",
+            "temps_economise_par_semaine": "cu1_temps_economise_par_semaine",
             "comparaison_autres_ia": "id_comparaison_autres_ia",
+            "pertinence_assistant_ia": "cu1_pertinence_assistant_ia",
+            "commentaires": "cu1_commentaires",
             "taux_moyen_de_correction_rep_assistant": "id_cu1_taux_moyen_de_correction_rep_assistant",
             "cu2_taux_moyen_de_correction_assistant": "id_cu2_taux_moyen_de_correction_rep_assistant",
+            "commentaires2": "cu2_commentaires",
             "cu3_taux_moyen_de_correction_assistant": "id_cu3_taux_moyen_de_correction_rep_assistant",
+            "commentaires3": "cu3_commentaires",
             "raisons_perte_de_temps": "id_raisons_perte_de_temps",
             "ia_favorise_relations_humaines_": "id_ia_favorise_relations_humaines_",
         },
@@ -508,11 +513,15 @@ def process_q2(df: pd.DataFrame) -> pd.DataFrame:
             "autre_mode_de_decouverte",
             "autres_types_d_erreurs",
             "cas_usage_principal_teste",
-            "commentaires",
+            "cu1_temps_economise_par_semaine",
+            "cu1_pertinence_assistant_ia",
+            "cu1_commentaires",
             "deuxieme_cas_d_usage_teste",
-            "commentaires2",
+            "cu2_pertinence_assistant_ia",
+            "cu2_commentaires",
             "troisieme_cas_d_usage",
-            "commentaires3",
+            "cu3_pertinence_assistant_ia",
+            "cu3_commentaires",
             "autres_impacts_identifies",
             "autres_impacts_observes",
             "autres_raisons",
@@ -559,7 +568,7 @@ def process_q2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
     df = generic_grist_processing(
         df=df,
         cols_mapping={
-            "formation_ia_suivie_post_expe_": "id_formation_ia_suivie_post_expe_",
+            "formation_ia_suivie_post_expe_": "id_formation_suivie",
         },
         cols_to_keep=["no_id", "formation_ia_suivie_post_expe_"],
         txt_columns=[
@@ -567,15 +576,15 @@ def process_q2_formation_suivie(df: pd.DataFrame) -> pd.DataFrame:
         ],
     )
     # Convertion
-    df = convert_str_of_list_to_list(df=df, col_to_convert="id_formation_ia_suivie_post_expe_")
-    df = df.explode(column="id_formation_ia_suivie_post_expe_")
-    df = df.dropna(subset=["id_formation_ia_suivie_post_expe_"])
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_formation_suivie")
+    df = df.explode(column="id_formation_suivie")
+    df = df.dropna(subset=["id_formation_suivie"])
     df = df.drop_duplicates()
 
     return df
 
 
-def process_q2_participation(df: pd.DataFrame) -> pd.DataFrame:
+def process_q2_programme_rdv(df: pd.DataFrame) -> pd.DataFrame:
     df = generic_grist_processing(
         df=df,
         cols_to_keep=["no_id", "participation_programme_rdv"],
