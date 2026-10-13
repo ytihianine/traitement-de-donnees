@@ -1,0 +1,15 @@
+sources:
+  - name: conf_projets
+    schema: "{{ target.schema }}"
+    tables:
+      - name: ref_direction
+      - name: ref_service
+      - name: ref_type_location
+      - name: ref_connexion
+      - name: projet
+      - name: projet_location
+      - name: projet_documentation
+      - name: projet_contact
+      - name: dataset
+      - name: dataset_location
+      - name: dataset_column_mapping

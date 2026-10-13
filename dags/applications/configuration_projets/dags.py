@@ -4,8 +4,6 @@ from dags.applications.configuration_projets.config import (
     execution_options,
 )
 from dags.applications.configuration_projets.tasks import (
-    dataset_dimension_tables,
-    projet_dimension_tables,
     source_grist,
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
@@ -64,8 +62,6 @@ def configuration_projets() -> None:
             reset_id_seq=False,
         ),
         source_grist(),
-        projet_dimension_tables(),
-        dataset_dimension_tables(),
         ensure_partition(execution_options=execution_options),
         copy_tmp_table_to_real_table(execution_options=execution_options),
         copy_s3_files(
