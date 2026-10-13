@@ -589,17 +589,17 @@ def process_q2_programme_rdv(df: pd.DataFrame) -> pd.DataFrame:
         df=df,
         cols_to_keep=["no_id", "participation_programme_rdv"],
         cols_mapping={
-            "participation_programme_rdv": "id_participation_programme_rdv",
+            "participation_programme_rdv": "id_programme_de_rdv",
         },
         txt_columns=[
             "no_id",
         ],
     )
     # Convertion
-    df = convert_str_of_list_to_list(df=df, col_to_convert="id_participation_programme_rdv")
-    df = df.explode(column="id_participation_programme_rdv")
+    df = convert_str_of_list_to_list(df=df, col_to_convert="id_programme_de_rdv")
+    df = df.explode(column="id_programme_de_rdv")
     # Nettoyage des lignes vides
-    df = df.dropna(subset=["id_participation_programme_rdv"])
+    df = df.dropna(subset=["id_programme_de_rdv"])
     df = df.drop_duplicates()
 
     return df
