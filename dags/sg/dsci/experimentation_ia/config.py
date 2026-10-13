@@ -16,7 +16,7 @@ execution_options = {
     "q2_freins": ExecutionOptions(),
     "q2_impact_identifie": ExecutionOptions(),
     "q2_impact_observe": ExecutionOptions(),
-    "q2_participation": ExecutionOptions(),
+    "q2_programme_rdv": ExecutionOptions(),
     "q2_taches": ExecutionOptions(),
     "q2_typologie_erreurs": ExecutionOptions(),
     "q2_typologie_interaction": ExecutionOptions(),

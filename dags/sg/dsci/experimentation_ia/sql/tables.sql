@@ -472,7 +472,7 @@ CREATE TABLE assistant_ia."q2_formation_suivie" (
   snapshot_id UUID NOT NULL,
   snapshot_id_parent UUID NULL,
   PRIMARY KEY ("id_row", "import_timestamp"),
-    UNIQUE ("import_timestamp", "no_id", "id_formation_ia_suivie_post_expe_" )
+    UNIQUE ("import_timestamp", "no_id", "id_formation_suivie" )
 ) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."q2_typologie_interaction" (
@@ -496,7 +496,7 @@ CREATE TABLE assistant_ia."q2_programme_rdv" (
   snapshot_id UUID NOT NULL,
   snapshot_id_parent UUID NULL,
   PRIMARY KEY ("id_row", "import_timestamp"),
-    UNIQUE ("import_timestamp", "no_id","id_participation_programme_rdv")
+    UNIQUE ("import_timestamp", "no_id","id_programme_de_rdv")
 ) PARTITION BY RANGE (import_timestamp);
 
 CREATE TABLE assistant_ia."q2_freins" (
