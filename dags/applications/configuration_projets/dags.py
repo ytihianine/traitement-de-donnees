@@ -1,14 +1,14 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 from dags.applications.configuration_projets.config import (
+    config_projet_subpath,
     execution_options,
 )
 from dags.applications.configuration_projets.tasks import (
-    dataset_dimension_tables,
-    projet_dimension_tables,
     source_grist,
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
+from modules.infra.airflow.common_tasks.dbt.tasks import dbt_build_models
 from modules.infra.airflow.common_tasks.grist import download_grist_doc_to_s3
 from modules.infra.airflow.common_tasks.sql import (
     copy_tmp_table_to_real_table,
@@ -59,11 +59,12 @@ def configuration_projets() -> None:
             reset_id_seq=False,
         ),
         source_grist(),
-        projet_dimension_tables(),
-        dataset_dimension_tables(),
         ensure_partition(execution_options=execution_options),
         copy_tmp_table_to_real_table(execution_options=execution_options),
         delete_tmp_tables(execution_options=execution_options),
+        dbt_build_models(
+            project_dir_subpath=config_projet_subpath,
+        ),
         update_projet_snapshot_status(),
     )
 

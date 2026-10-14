@@ -3,6 +3,7 @@
 import logging
 import os
 import sys
+from pathlib import Path
 
 import pytz
 
@@ -11,7 +12,10 @@ def get_root_folder() -> str:
     """Get root folder based on environment."""
     base_folder = os.getenv("AIRFLOW_HOME")
     if base_folder is None:
-        return "/home/onyxia/work/airflow-demo"
+        custom_logger.warning(
+            "AIRFLOW_HOME environment variable is not set. Using the script's directory as the root folder."
+        )
+        return str(Path(__file__).parent.parent)
     return os.path.join(base_folder, "dags", "repo")
 
 

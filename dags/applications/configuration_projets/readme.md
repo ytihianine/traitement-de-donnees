@@ -5,7 +5,7 @@
 | Fichier source     | `dags.py`     |
 | Description | Ce traitement permet de récupérer la configuration des projets depuis Grist. |
 | Fréquence d'exécution | Quotidienne |
-| Fonctionnement | Automatisé |
+| Fonctionnement | Automatisé, avec construction des tables de dimension par dbt |
 | Propriétaires des données | MEF - SG - DSCI |
 | Mise en place de la pipeline | MEF - SG - DSCI - LdT |
 
@@ -23,6 +23,9 @@
 | -------- | -------- |
 | Variables | grist_doc_id_gestion_interne |
 | Connexions | db_depose_fichier |
+
+Les dimensions sont définies dans `models/marts/` et construites dans le schéma temporaire
+avant leur copie vers le schéma de production.
 
 <br />
 

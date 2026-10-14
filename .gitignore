@@ -194,3 +194,11 @@ pyrightconfig.json
 .complexipy_cache
 complexipy_*.txt
 config.json
+
+
+# dbt
+target/
+dbt_packages/
+logs/
+.env
+.user.yml

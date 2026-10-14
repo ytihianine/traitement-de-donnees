@@ -1,0 +1,12 @@
+generic:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_DB_HOST') }}"
+      port: "{{ env_var('DBT_DB_PORT', '5432') | int }}"
+      dbname: "{{ env_var('DBT_DB_NAME') }}"
+      schema: "{{ env_var('DBT_DB_SCHEMA') }}"
+      user: "{{ env_var('DBT_DB_USER') }}"
+      pass: "{{ env_var('DBT_DB_PASSWORD') }}"
+      threads: 5
