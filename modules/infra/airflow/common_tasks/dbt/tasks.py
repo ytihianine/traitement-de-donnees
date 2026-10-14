@@ -36,11 +36,6 @@ def run_dbt_build(
     sys.stderr.write(result.stderr)
 
 
-profile_dir = Path(__file__).parent
-projet_repo = get_root_folder()
-config_projet_path = Path(projet_repo) / "dags" / "applications" / "configuration_projets" / "dbt"
-
-
 @task(task_id="build_dimension_models")
 def dbt_build_models(
     project_dir: Path,
@@ -66,7 +61,7 @@ def dbt_build_models(
     if missing_connection_values:
         raise ValueError(f"Missing database connection values required by dbt: {', '.join(missing_connection_values)}")
 
-    profile_dir = Path(get_root_folder()) / "dags" / "applications" / "dbt"
+    profile_dir = Path(get_root_folder()) / "modules" / "infra" / "airflow" / "common_tasks" / "dbt"
 
     run_dbt_build(
         profile_dir=profile_dir,
