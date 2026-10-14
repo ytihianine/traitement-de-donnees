@@ -1,6 +1,6 @@
+import logging
 import os
 import subprocess
-import sys
 from pathlib import Path
 
 from airflow.sdk import task
@@ -32,8 +32,8 @@ def run_dbt_build(
         env=_env,
         text=True,
     )
-    sys.stdout.write(result.stdout)
-    sys.stderr.write(result.stderr)
+    logging.info(result.stdout)
+    logging.error(result.stderr)
 
 
 @task(task_id="build_dimension_models")
@@ -71,6 +71,7 @@ def dbt_build_models(
 
     profile_dir = Path(get_root_folder()) / "modules" / "infra" / "airflow" / "common_tasks" / "dbt"
 
+    logging.info("Running dbt build for project directory: %s", project_dir_subpath)
     run_dbt_build(
         profile_dir=profile_dir,
         project_dir=Path(get_root_folder()) / project_dir_subpath,
