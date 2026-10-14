@@ -1,4 +1,3 @@
-import json
 import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -6,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import psycopg2
+import yaml
 from modules.constants import custom_logger
 from psycopg2 import extensions, sql
 from scripts.settings import get_settings
@@ -197,11 +197,11 @@ def drop_partitions(
 
 if __name__ == "__main__":
     dir = os.path.dirname(os.path.realpath(__file__))
-    config_path = Path(dir, "config.json")
+    config_path = Path(dir, "config.yaml")
 
     # Load config
     with open(file=config_path) as f:
-        _config = json.load(fp=f)
+        _config = yaml.safe_load(f)
         config = Config(
             dry_run=_config.get("dry_run", True),
             schema=_config.get("schema"),

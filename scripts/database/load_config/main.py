@@ -1,4 +1,3 @@
-import json
 import os
 import sqlite3
 import uuid
@@ -9,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import psycopg2
+import yaml
 from modules.generic_processing.structures import normalize_grist_dataframe
 from modules.infra.airflow.common_tasks.grist import generic_grist_processing
 from modules.logs import df_info
@@ -218,60 +218,6 @@ TBL_ORDERED = [
     },
 ]
 
-DIMENSION_TABLES = [
-    {
-        "tbl_name": "dim_projet",
-        "build_func": lambda tables: process.process_dim_projet(
-            df_projet=tables["projet"],
-            df_ref_direction=tables["ref_direction"],
-            df_ref_service=tables["ref_service"],
-            df_projet_location=tables["projet_location"],
-        ),
-    },
-    {
-        "tbl_name": "dim_projet_contact",
-        "build_func": lambda tables: process.process_dim_projet_contact(
-            df_projet=tables["projet"],
-            df_projet_contact=tables["projet_contact"],
-        ),
-    },
-    {
-        "tbl_name": "dim_projet_documentation",
-        "build_func": lambda tables: process.process_dim_projet_documentation(
-            df_projet=tables["projet"],
-            df_projet_documentation=tables["projet_documentation"],
-        ),
-    },
-    {
-        "tbl_name": "dim_dataset",
-        "build_func": lambda tables: process.process_dim_dataset(
-            df_projet=tables["projet"],
-            df_dataset=tables["dataset"],
-            df_ref_direction=tables["ref_direction"],
-            df_ref_service=tables["ref_service"],
-        ),
-    },
-    {
-        "tbl_name": "dim_dataset_location",
-        "build_func": lambda tables: process.process_dim_dataset_location(
-            # df_projet=tables["projet"],
-            # df_dataset=tables["dataset"],
-            df_dataset_location=tables["dataset_location"],
-            df_dim_dataset=tables["dim_dataset"],
-            df_ref_type_location=tables["ref_type_location"],
-            df_ref_connexion=tables["ref_connexion"],
-        ),
-    },
-    {
-        "tbl_name": "dim_dataset_column_mapping",
-        "build_func": lambda tables: process.process_dim_dataset_column_mapping(
-            df_projet=tables["projet"],
-            df_dataset=tables["dataset"],
-            df_dataset_column_mapping=tables["dataset_column_mapping"],
-        ),
-    },
-]
-
 
 def clear_tables(pg_cur, schema: str, tbl_names: list, dry_run: bool) -> None:
     """Supprime les données des tables si dry_run est désactivé."""
@@ -370,18 +316,18 @@ def insert_into_postgres(df: pd.DataFrame, tbl_desc: dict, schema: str, pg_cur, 
 
 if __name__ == "__main__":
     dir = os.path.dirname(os.path.realpath(__file__))
-    config_path = Path(dir, "config.json")
+    config_path = Path(dir, "config.yaml")
 
     # Load config
     with open(file=config_path) as f:
-        config = json.load(fp=f)
+        config = yaml.safe_load(f)
 
     # Variables
     dry_run = config["dry_run"]
     schema = config["db"]["dest_schema"]
     now = datetime.now()
     snapshot_id = uuid.uuid4()
-    add_metadata = True  # Peut être configuré dans le JSON si nécessaire
+    add_metadata = True  # Peut être configuré dans le YAML si nécessaire
 
     # Init db connections
     sqlite_conn = sqlite3.connect(config["grist"]["doc_path"])
@@ -395,7 +341,7 @@ if __name__ == "__main__":
     pg_cur = pg_conn.cursor()
 
     # Nettoyer les tables si dry_run est désactivé
-    tbl_names = [tbl["tbl_name"] for tbl in TBL_ORDERED] + [tbl["tbl_name"] for tbl in DIMENSION_TABLES]
+    tbl_names = [tbl["tbl_name"] for tbl in TBL_ORDERED]
     clear_tables(pg_cur=pg_cur, schema=schema, tbl_names=tbl_names, dry_run=dry_run)
 
     processed_tables = {}
@@ -422,36 +368,6 @@ if __name__ == "__main__":
             import_timestamp=now,
         )
         insert_into_postgres(df=df, tbl_desc=tbl_desc, schema=schema, pg_cur=pg_cur, dry_run=dry_run)
-
-    # Traiter chaque table de dimension calculée à partir des tables source
-    for i, tbl_desc in enumerate(DIMENSION_TABLES, start=1):
-        print("\n", "=" * 50)
-        print(f"[{i}/{len(DIMENSION_TABLES)}] [{tbl_desc['tbl_name']}] Début du traitement de la table")
-
-        df = tbl_desc["build_func"](processed_tables)
-        df = df.fillna(np.nan).replace([np.nan], [None])
-        if add_metadata:
-            df["snapshot_id"] = str(snapshot_id)
-            df["import_timestamp"] = now
-
-        # Keep computed dimensions available for subsequent dependent dimensions.
-        processed_tables[tbl_desc["tbl_name"]] = df
-
-        print(df.columns)
-        print(df.dtypes)
-        print(df.isnull().sum())
-        df_info(df=df, df_name=tbl_desc["tbl_name"])
-
-        create_partition(
-            pg_cur=pg_cur,
-            schema=schema,
-            tbl_name=tbl_desc["tbl_name"],
-            dry_run=dry_run,
-            import_timestamp=now,
-        )
-        insert_into_postgres(
-            df=df, tbl_desc={"tbl_name": tbl_desc["tbl_name"]}, schema=schema, pg_cur=pg_cur, dry_run=dry_run
-        )
 
     # Valider et fermer les connexions
     if not dry_run:

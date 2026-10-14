@@ -1,9 +1,9 @@
-import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
+import yaml
 from modules.infra.catalog.iceberg import IcebergCatalog, IcebergTableStatus, generate_catalog_properties
 from scripts.settings import get_settings
 
@@ -58,11 +58,11 @@ class Config:
 
 if __name__ == "__main__":
     dir = os.path.dirname(os.path.realpath(__file__))
-    config_path = Path(dir, "config.json")
+    config_path = Path(dir, "config.yaml")
 
     # Load config
     with open(file=config_path) as f:
-        _config = json.load(fp=f)
+        _config = yaml.safe_load(f)
         config = Config(
             CATALOG_URI=_config.get("CATALOG_URI"),
             CATALOG_WAREHOUSE=_config.get("CATALOG_WAREHOUSE"),

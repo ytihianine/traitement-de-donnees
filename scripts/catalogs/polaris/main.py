@@ -1,9 +1,9 @@
-import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
 
 import requests
+import yaml
 from modules.infra.catalog.polaris import PolarisCatalog
 from scripts.settings import get_settings
 
@@ -30,11 +30,11 @@ class Config:
 
 if __name__ == "__main__":
     dir = os.path.dirname(os.path.realpath(__file__))
-    config_path = Path(dir, "config.json")
+    config_path = Path(dir, "config.yaml")
 
     # Load config
     with open(file=config_path) as f:
-        _config = json.load(fp=f)
+        _config = yaml.safe_load(f)
         config = Config(
             POLARIS_URL=_config.get("POLARIS_URL"),
             POLARIS_REALM=_config.get("POLARIS_REALM"),

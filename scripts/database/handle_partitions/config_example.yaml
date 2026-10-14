@@ -1,0 +1,13 @@
+dry_run: true
+schema: ""
+table_to_include: []
+table_to_exclude: []
+id_projet: 0
+dates:
+  - current: "2026-08-13 12:15:00"
+    new: "2025-02-01 14:00:00"
+  - current: "2026-08-13 13:45:00"
+    new: "2025-07-01 14:00:00"
+run_create: true
+run_update: true
+run_delete: true

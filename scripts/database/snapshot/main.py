@@ -1,20 +1,20 @@
-import json
 import os
 from datetime import datetime
 from pathlib import Path
 
 import psycopg2
+import yaml
 from modules.constants import custom_logger
 from scripts.settings import get_settings
 
 if __name__ == "__main__":
     dir = os.path.dirname(os.path.realpath(__file__))
-    config_path = Path(dir, "config.json")
+    config_path = Path(dir, "config.yaml")
     settings = get_settings()
 
     # Load config
     with open(file=config_path) as f:
-        config = json.load(fp=f)
+        config = yaml.safe_load(f)
 
     # Init db connections
     pg_conn = psycopg2.connect(
