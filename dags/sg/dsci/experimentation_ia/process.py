@@ -1112,21 +1112,36 @@ def process_factless_q2(
         df_ref_taux_correction,
         ["taux_de_correction", "taux_correction_simplifie"],
     )
-    df = df.rename(columns={"taux_de_correction": "cu1_taux_moyen_de_correction_rep_assistant"})
+    df = df.rename(
+        columns={
+            "taux_de_correction": "cu1_taux_moyen_de_correction_rep_assistant",
+            "taux_correction_simplifie": "cu1_taux_moyen_correction_simplifie",
+        }
+    )
     df = _left_merge_ref(
         df,
         "id_cu2_taux_moyen_de_correction_rep_assistant",
         df_ref_taux_correction,
         ["taux_de_correction", "taux_correction_simplifie"],
     )
-    df = df.rename(columns={"taux_de_correction": "cu2_taux_moyen_de_correction_rep_assistant"})
+    df = df.rename(
+        columns={
+            "taux_de_correction": "cu2_taux_moyen_de_correction_rep_assistant",
+            "taux_correction_simplifie": "cu2_taux_moyen_correction_simplifie",
+        }
+    )
     df = _left_merge_ref(
         df,
         "id_cu3_taux_moyen_de_correction_rep_assistant",
         df_ref_taux_correction,
         ["taux_de_correction", "taux_correction_simplifie"],
     )
-    df = df.rename(columns={"taux_de_correction": "cu3_taux_moyen_de_correction_rep_assistant"})
+    df = df.rename(
+        columns={
+            "taux_de_correction": "cu3_taux_moyen_de_correction_rep_assistant",
+            "taux_correction_simplifie": "cu3_taux_moyen_correction_simplifie",
+        }
+    )
     df = _left_merge_ref(df, "id_raisons_perte_de_temps", df_ref_raison_perte_temps, ["raisons"])
     df = df.rename(columns={"raisons": "raisons_perte_de_temps"})
     df = _left_merge_ref(df, "id_ia_favorise_relations_humaines_", df_ref_niveau_accord, ["niveau_accord"])
