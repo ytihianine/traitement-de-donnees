@@ -23,4 +23,4 @@ execution_options = {
     "dim_dataset_location": ExecutionOptions(),
 }
 
-config_projet_subpath = Path("dags/applications/configuration_projets/dbt")
+config_projet_subpath = Path("dags/applications/configuration_projets")

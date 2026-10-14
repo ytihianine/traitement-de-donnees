@@ -1,5 +1,6 @@
 
 select distinct on (p.id_projet, documentation.type_documentation)
+    documentation.id_row,
     p.id_projet,
     p.projet,
     documentation.id_documentation,

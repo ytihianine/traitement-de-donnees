@@ -1,5 +1,6 @@
 
 select distinct on (p.id_projet, dataset.dataset, column_mapping.colname_source)
+    column_mapping.id_row,
     p.id_projet,
     p.projet,
     dataset.id_dataset,

@@ -1,6 +1,6 @@
-{{ config(alias='tmp_dim_projet') }}
 
 select distinct on (p.id_projet)
+    p.id_row,
     p.id_projet,
     p.projet,
     p.id_direction,

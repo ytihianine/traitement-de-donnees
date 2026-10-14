@@ -1,5 +1,6 @@
 
 select distinct on (p.id_projet, dataset.dataset)
+    dataset.id_row,
     p.id_projet,
     p.projet,
     p.id_direction,

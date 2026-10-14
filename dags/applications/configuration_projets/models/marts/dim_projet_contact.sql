@@ -1,5 +1,6 @@
 
 select distinct on (p.id_projet, contact.id_contact)
+    contact.id_row,
     p.id_projet,
     p.projet,
     contact.id_contact,
