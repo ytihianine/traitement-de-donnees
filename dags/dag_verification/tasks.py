@@ -130,12 +130,11 @@ def check_dataset(nom_projet: str, **context) -> None:
     )
 
 
-def _noop_operation(df) -> None:
-    return df
-
-
 @task_group
 def check_pipeline() -> None:
+    def _noop_operation(df) -> None:
+        return df
+
     @task
     def create_pipeline() -> None:
         pipeline_descriptor = PipelineDescriptor(
