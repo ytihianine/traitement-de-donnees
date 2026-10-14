@@ -194,6 +194,7 @@ pyrightconfig.json
 .complexipy_cache
 complexipy_*.txt
 config.json
+config.yaml
 
 
 # dbt
