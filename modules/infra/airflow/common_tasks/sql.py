@@ -190,16 +190,14 @@ def create_tmp_tables(
     Used to create temporary tables in the database.
     """
 
-    if should_skip_task(context=context):
+    if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
     if nom_projet is None:
         nom_projet = dag_repo.get_project_name(context=context)
 
     db_info = dag_repo.get_db_info(context=context)
-    prod_schema = db_info.prod_schema
     tmp_schema = db_info.tmp_schema
-    logging.info(msg=f"Prod schema: {prod_schema}, Tmp schema: {tmp_schema}")
 
     # Init vars
     db = create_db_handler(
@@ -220,14 +218,20 @@ def create_tmp_tables(
             logging.info(msg=f"Skipping DB tmp table creation for selecteur <{dataset_context.dataset_name}>")
             continue
 
-        tbl_name = parse_db_table(location=tmp_loc.validate_location)
+        dest_loc = dataset_context.dest_loc
+        if dest_loc.type_location != TypeLocation.DB:
+            logging.info(msg=f"Skipping DB tmp table creation for selecteur <{dataset_context.dataset_name}>")
+            continue
 
-        drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.tmp_{tbl_name};")
+        tbl_name = parse_db_table(location=dest_loc.validate_location)
+        schema = parse_db_schema(location=dest_loc.validate_location)
+
+        drop_queries.append(f"DROP TABLE IF EXISTS {tmp_schema}.{tbl_name};")
         create_queries.append(f"""CREATE TABLE
-                IF NOT EXISTS {tmp_schema}.tmp_{tbl_name}
-                ( LIKE {prod_schema}.{tbl_name} INCLUDING ALL);
+                IF NOT EXISTS {tmp_schema}.{tbl_name}
+                ( LIKE {schema}.{tbl_name} INCLUDING ALL);
             """)
-        alter_queries.append(f"ALTER SEQUENCE {tmp_schema}.tmp_{tbl_name}_id_seq RESTART WITH 1;")
+        alter_queries.append(f"ALTER SEQUENCE {tmp_schema}.{tbl_name}_id_seq RESTART WITH 1;")
 
     for drop_query in drop_queries:
         db.execute(query=drop_query)
@@ -333,7 +337,7 @@ def _generate_copy_query(
         load_strategy: Load strategy to use for copying data.
     """
     prod_table = f"{prod_schema}.{tbl_name}"
-    tmp_table = f"{tmp_schema}.tmp_{tbl_name}"
+    tmp_table = f"{tmp_schema}.{tbl_name}"
 
     col_list = db_handler.fetch_table_columns(
         schema=prod_schema,

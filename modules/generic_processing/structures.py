@@ -27,11 +27,22 @@ def normalize_grist_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def handle_grist_null_references(df: pd.DataFrame, columns: list[str], keep_zero: bool = False) -> pd.DataFrame:
+def handle_grist_nullable_int_columns(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     for col in columns:
         df[col] = pd.to_numeric(arg=df[col], errors="raise")
-        if not keep_zero:
-            df[col] = df[col].replace({0: pd.NA})  # type: ignore
+        invalid_int_mask = df[col].notna() & (df[col].mod(1) != 0)
+        if invalid_int_mask.any():
+            invalid_values = df.loc[invalid_int_mask, col].tolist()
+            raise ValueError(f"Column '{col}' contains non-integer numeric values: {invalid_values}")
+        df[col] = df[col].astype("Int64")
+    return df
+
+
+def handle_grist_null_references(df: pd.DataFrame, columns: list[str], keep_zero: bool = False) -> pd.DataFrame:
+    df = handle_grist_nullable_int_columns(df=df, columns=columns)
+    if not keep_zero:
+        for col in columns:
+            df[col] = df[col].replace({0: pd.NA})
     return df
 
 

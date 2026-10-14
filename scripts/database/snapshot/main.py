@@ -30,7 +30,7 @@ if __name__ == "__main__":
         # Récupérer l'id du projet
         query = f"""
             SELECT id_projet
-            FROM conf_projets.projet cpp
+            FROM conf_projet.projet cpp
             WHERE cpp.projet = '{item["nom_projet"]}'
             ORDER BY cpp.import_timestamp DESC
             LIMIT 1;

@@ -4,13 +4,13 @@ from dags.sg.dsci.experimentation_ia.config import (
     execution_options,
 )
 from dags.sg.dsci.experimentation_ia.tasks import (
+    experimentations,
     referentiels,
-    repartition,
-    suivi_experimentateurs,
     suivi_questionnaire_1,
     suivi_questionnaire_2,
     suivi_questionnaire_2_bis,
     suivi_questionnaire_3,
+    tables_dimensions,
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.grist import download_grist_doc_to_s3
@@ -36,7 +36,7 @@ nom_projet = "Experimentation IA"
 
 @dag(
     dag_id="experimentation_ia",
-    schedule="0 8-12,14-18 * * 1-5",
+    schedule="0 0 * * 1-5",
     default_args=create_default_args(),
     max_consecutive_failed_dag_runs=1,
     max_active_runs=1,
@@ -63,17 +63,16 @@ def experimentation_ia_dag() -> None:
         create_projet_snapshot(),
         create_tmp_tables(
             execution_options=execution_options,
-            reset_id_seq=False,
         ),
+        referentiels(),
+        experimentations(),
         [
-            referentiels(),
-            repartition(),
-            suivi_experimentateurs(),
             suivi_questionnaire_1(),
             suivi_questionnaire_2(),
             suivi_questionnaire_2_bis(),
             suivi_questionnaire_3(),
         ],
+        tables_dimensions(),
         ensure_partition(
             execution_options=execution_options,
         ),

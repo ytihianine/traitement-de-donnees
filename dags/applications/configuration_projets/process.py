@@ -1,6 +1,7 @@
 import pandas as pd
 from modules.domain.projet.model import TypeDocumentation
 from modules.generic_processing.structures import (
+    handle_grist_nullable_int_columns,
     validate_enum_column,
 )
 

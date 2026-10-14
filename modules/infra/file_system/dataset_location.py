@@ -1,3 +1,4 @@
+import io
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -167,20 +168,64 @@ class DbDatasetLocationProvider(DatasetLocationProvider):
         content: bytes,
         location: str,
     ) -> None:
-        """Write content to local filesystem first before bulk import it to Database"""
-        local_path = parse_local_path(location=location)
+        """Write parquet bytes to a local TSV file, then bulk insert with COPY."""
+        schema = parse_db_schema(location=location)
+        tbl_name = parse_db_table(location=location)
+
+        # DataFrame outputs are serialized as parquet bytes upstream.
+        dataframe = pd.read_parquet(path=io.BytesIO(initial_bytes=content))
+
+        # Pandas may represent integer-valued data as floats, e.g. 77480.0.
+        # PostgreSQL COPY does not accept "77480.0" for an integer column.
+        #
+        # Convert float columns containing only integer-valued data back to
+        # nullable integers. This is done generically, without knowing the
+        # PostgreSQL schema.
+        for column in dataframe.select_dtypes(include="floating").columns:
+            series = dataframe[column]
+
+            if series.dropna().mod(1).eq(0).all():  # pyright: ignore[reportGeneralTypeIssues]
+                dataframe[column] = series.astype("Int64")
+
+        local_dir = Path("/tmp")
+        local_path = local_dir / f"{schema}_{tbl_name}.tsv"
         local_handler = create_file_handler(
             handler_type=FileHandlerType.LOCAL,
             config=FSConfig(
-                base_path=parse_local_dir(location=location),
+                base_path=str(local_dir),
             ),
         )
+
+        tsv_content = dataframe.to_csv(
+            sep="\t",
+            index=False,
+            na_rep="NULL",
+        ).encode(encoding="utf-8")
+
         local_handler.write(
             file_path=local_path,
-            content=content,
+            content=tsv_content,
         )
 
-        raise NotImplementedError("Database bulk import is not implemented yet")
+        db_handler = create_db_handler(
+            db_type=DatabaseType.POSTGRES,
+            db_config=DbConfig(connection_id=self.conn_id),
+        )
+
+        copy_sql = f"""
+            COPY {schema}.{tbl_name} ({", ".join(dataframe.columns)})
+            FROM STDIN WITH (
+                FORMAT TEXT,
+                DELIMITER E'\\t',
+                HEADER TRUE,
+                NULL 'NULL'
+            )
+        """
+
+        db_handler.copy_expert(
+            sql=copy_sql,
+            filepath=str(local_path),
+        )
 
 
 @dataclass(frozen=True)

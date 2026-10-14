@@ -1,8 +1,9 @@
-from dags.applications.configuration_projets import config
 from dags.sg.siep.mmsi.oad_referentiel import process
 from modules.domain.dataset.model import Dataset
 from modules.domain.pipeline.model import PipelineDescriptor
 from modules.infra.airflow.task import create_task
+
+from dags.applications.configuration_projets import config
 
 ref_typologie = create_task(
     pipeline=PipelineDescriptor(

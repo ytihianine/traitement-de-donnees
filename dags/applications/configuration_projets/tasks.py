@@ -2,11 +2,12 @@ from functools import partial
 
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
-from dags.applications.configuration_projets import config, process
 from modules.domain.dataset.model import Dataset
 from modules.domain.pipeline.model import PipelineDescriptor
 from modules.infra.airflow.common_tasks.grist import generic_grist_processing
 from modules.infra.airflow.task import create_task
+
+from dags.applications.configuration_projets import config, process
 
 
 @task_group
@@ -165,6 +166,7 @@ def source_grist() -> None:
                 },
                 txt_columns=["contact_mail"],
                 ref_columns=["id_projet"],
+                int_columns=["id_contact"],
                 bool_columns=["is_mail_generic"],
                 custom_fn=process.process_projet_contact,
             ),
