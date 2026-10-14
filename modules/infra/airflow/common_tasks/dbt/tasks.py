@@ -42,7 +42,7 @@ config_projet_path = Path(projet_repo) / "dags" / "applications" / "configuratio
 
 
 @task(task_id="build_dimension_models")
-def run_dimension_models(
+def dbt_build_models(
     project_dir: Path,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     dag_repo: DagRepository = DEFAULT_DAG_REPO,
