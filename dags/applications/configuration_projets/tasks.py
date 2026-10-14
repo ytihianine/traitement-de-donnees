@@ -2,12 +2,11 @@ from functools import partial
 
 from airflow.sdk import task_group
 from airflow.sdk.bases.operator import chain
+from dags.applications.configuration_projets import config, process
 from modules.domain.dataset.model import Dataset
 from modules.domain.pipeline.model import PipelineDescriptor
 from modules.infra.airflow.common_tasks.grist import generic_grist_processing
 from modules.infra.airflow.task import create_task
-
-from dags.applications.configuration_projets import config, process
 
 
 @task_group
