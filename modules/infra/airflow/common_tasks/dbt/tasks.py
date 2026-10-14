@@ -38,12 +38,20 @@ def run_dbt_build(
 
 @task(task_id="build_dimension_models")
 def dbt_build_models(
-    project_dir: Path,
+    project_dir_subpath: Path,
     pg_conn_id: str = DEFAULT_PG_DATA_CONN_ID,
     dag_repo: DagRepository = DEFAULT_DAG_REPO,
     **context,
 ) -> None:
-    """Build the configuration project dimension models with dbt."""
+    """
+    Build the configuration project dimension models with dbt.
+
+    Args:
+        project_dir_subpath (Path): The sub-path to the dbt project directory.
+        pg_conn_id (str): The Postgres connection ID.
+        dag_repo (DagRepository): The DAG repository instance.
+        **context: Additional context passed by Airflow.
+    """
     if should_skip_task(context=context, feature_flag=FeatureFlags.DB):
         return
 
@@ -65,7 +73,7 @@ def dbt_build_models(
 
     run_dbt_build(
         profile_dir=profile_dir,
-        project_dir=project_dir,
+        project_dir=Path(get_root_folder()) / project_dir_subpath,
         db_host=str(required_connection_values["host"]),
         db_name=str(required_connection_values["dbname"]),
         db_schema=db_info.prod_schema,
