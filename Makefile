@@ -66,8 +66,8 @@ init-git: ## Initialiser la configuration git
 
 duplicate-examples: ## Dupliquer les fichiers de templates (example.env, *-example.yaml, etc.)
 	@echo "Initialisation des fichiers d'environnement"
-	@chmod +x ./scripts/init_env.bash
-	@./scripts/init_env.bash
+	@chmod +x ./scripts/duplicate_examples.bash
+	@./scripts/duplicate_examples.bash
 	@echo "Tous les fichiers .env créés à partir de example.env. Veuillez les personnaliser avec vos propres valeurs."
 
 setup-dev-env: duplicate-examples create-py-env install-packages install-pre-commit init-git ## Installer tout l'environnement de développement
