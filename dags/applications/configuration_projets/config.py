@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from modules.domain.pipeline.model import ExecutionOptions
 
 execution_options = {
@@ -20,3 +22,5 @@ execution_options = {
     "dim_dataset_column_mapping": ExecutionOptions(),
     "dim_dataset_location": ExecutionOptions(),
 }
+
+config_projet_subpath = Path("dags/applications/configuration_projets/dbt")
