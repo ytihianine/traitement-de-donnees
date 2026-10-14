@@ -25,12 +25,18 @@ def run_dbt_build(
             "DBT_DB_PASSWORD": db_password,
         }
     )
+    cmd = ["dbt", "build", "--profiles-dir", str(profile_dir), "--project-dir", str(project_dir), "--debug"]
+
+    logging.info("Executing dbt command: %s", cmd)
+    logging.info("dbt project directory: %s", project_dir)
+    logging.info("dbt profiles directory: %s", profile_dir)
+
     result = subprocess.run(
-        args=["dbt", "build", "--profiles-dir", str(profile_dir), "--project-dir", str(project_dir)],
-        capture_output=True,
+        args=cmd,
         check=False,
         env=_env,
         text=True,
+        cwd=str(project_dir),
     )
     if result.stdout:
         logging.info(result.stdout)
