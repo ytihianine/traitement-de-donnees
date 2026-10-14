@@ -32,8 +32,17 @@ def run_dbt_build(
         env=_env,
         text=True,
     )
-    logging.info(result.stdout)
-    logging.error(result.stderr)
+    if result.stdout:
+        logging.info(result.stdout)
+    if result.stderr:
+        logging.error(result.stderr)
+    if result.returncode != 0:
+        raise subprocess.CalledProcessError(
+            returncode=result.returncode,
+            cmd=result.args,
+            output=result.stdout,
+            stderr=result.stderr,
+        )
 
 
 @task(task_id="build_dimension_models")
