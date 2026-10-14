@@ -1028,7 +1028,7 @@ def process_dim_experimentateurs(
     df = df_expe_clean.merge(right=df_q1, how="left", left_on="no_id", right_on="no_id").merge(
         right=df_q3, how="left", left_on="no_id", right_on="no_id"
     )
-    df = _left_merge_ref(df, "id_direction", df_ref_direction, ["direction"])
+    df = _left_merge_ref(df, "id_direction", df_ref_direction, ["direction", "direction_regroupee"])
     df = _left_merge_ref(df, "id_domaine_professionnel", df_ref_domaine_professionnel, ["domaine"])
     df = _left_merge_ref(
         df,
