@@ -1,7 +1,5 @@
 
 # Variables
-PYTHON_VERSION := 3.12
-AIRFLOW_VERSION := 3.2.2
 ENV_NAME := env
 
 # OS detection
@@ -66,13 +64,13 @@ init-git: ## Initialiser la configuration git
 	@echo "Init git config"
 	git config --global credential.helper 'cache --timeout=360000'
 
-init-env-files: ## Initialiser les fichiers d'environnement des scripts
+duplicate-examples: ## Dupliquer les fichiers de templates (example.env, *-example.yaml, etc.)
 	@echo "Initialisation des fichiers d'environnement"
 	@chmod +x ./scripts/init_env.bash
 	@./scripts/init_env.bash
 	@echo "Tous les fichiers .env créés à partir de example.env. Veuillez les personnaliser avec vos propres valeurs."
 
-setup-dev-env: create-py-env install-packages install-pre-commit init-git ## Installer tout l'environnement de développement
+setup-dev-env: duplicate-examples create-py-env install-packages install-pre-commit init-git ## Installer tout l'environnement de développement
 
 # ===================================
 # Code quality
