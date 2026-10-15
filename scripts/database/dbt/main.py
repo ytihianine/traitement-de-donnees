@@ -10,8 +10,6 @@ import yaml
 from modules.constants import custom_logger, get_root_folder
 from modules.infra.airflow.common_tasks.dbt.tasks import run_dbt_build
 
-PROFILES_SUBPATH = Path("modules") / "infra" / "airflow" / "common_tasks" / "dbt"
-
 
 @dataclass(frozen=True)
 class DBTInfo:
@@ -42,15 +40,15 @@ def main() -> None:
     with open(file=config_path) as f:
         _config = yaml.safe_load(stream=f)
         config = Config(
-            db=_config.get("db"),
-            dbt=_config.get("dbt"),
+            db=DBInfo(**_config.get("db")),
+            dbt=DBTInfo(**_config.get("dbt", {})),
         )
 
     projet_schema = config.dbt.projet_schema
     project_subpath = config.dbt.projet_dir
     repo_dir = Path(get_root_folder())
     project_dir = repo_dir / project_subpath
-    profiles_dir = repo_dir / PROFILES_SUBPATH
+    profiles_dir = repo_dir / "modules" / "infra" / "airflow" / "common_tasks" / "dbt"
     tmp_dir = Path("/tmp") / project_subpath
 
     if not project_dir.is_dir():
@@ -64,6 +62,9 @@ def main() -> None:
     custom_logger.info(
         msg=f"Base de données: {config.db.user}@{config.db.host}:{config.db.port}/{config.db.name} (schema: {projet_schema})"
     )
+
+    # run_dbt_build appelle `dbt` présent dans le binaire courant
+    os.environ["PATH"] = f"{Path(sys.executable).parent}{os.pathsep}{os.environ.get('PATH', '')}"
 
     try:
         # run_dbt_build appelle `dbt` présent dans le binaire courant
