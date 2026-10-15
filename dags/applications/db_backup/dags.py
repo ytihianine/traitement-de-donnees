@@ -4,7 +4,7 @@ from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 from dags.applications.db_backup.config import execution_options
 from dags.applications.db_backup.tasks import export_databases
-from modules.domain.dag.model import DagStatus, FeatureFlagsEnable
+from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -28,7 +28,7 @@ nom_projet = "Sauvegarde databases"
     params=create_dag_params(
         nom_projet=nom_projet,
         dag_status=DagStatus.RUN,
-        db_params=None,
+        db_params=DBParams(prod_schema="unused"),
         feature_flags=FeatureFlagsEnable(db=True, mail=True, s3=True, convert_files=False, download_grist_doc=False),
     ),
     on_failure_callback=create_send_mail_callback(
