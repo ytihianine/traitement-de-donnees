@@ -1,5 +1,5 @@
 
-select distinct on (p.id_projet, dataset.dataset, dataset_location.stage, p.import_timestamp)
+select distinct on (p.id_projet, dataset.dataset, dataset_location.stage, dataset_location.import_timestamp)
     dataset_location.id_row,
     p.id_projet,
     p.projet,
