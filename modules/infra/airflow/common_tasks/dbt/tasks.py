@@ -138,7 +138,7 @@ def dbt_build_models(
 
     repo_dir = Path(get_root_folder())
     profile_dir = Path(get_root_folder()) / "modules" / "infra" / "airflow" / "common_tasks" / "dbt"
-    logs_path = repo_dir / project_dir_subpath / "logs" / "dbt_logs.txt"
+    logs_path = Path("/tmp") / project_dir_subpath / "logs" / "dbt_logs.txt"
 
     create_dbt_logs(logs_path=logs_path)
     run_dbt_build(
