@@ -1,5 +1,5 @@
 
-select distinct on (p.id_projet, dataset.dataset)
+select distinct on (p.id_projet, dataset.dataset, p.import_timestamp)
     dataset.id_row,
     p.id_projet,
     p.projet,
