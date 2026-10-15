@@ -49,7 +49,7 @@ def read_dbt_logs(logs_path: Path) -> None:
 def run_dbt_build(
     profile_dir: Path,
     project_dir: Path,
-    logs_path: Path,
+    tmp_dir: Path,
     db_host: str,
     db_name: str,
     db_schema: str,
@@ -66,7 +66,9 @@ def run_dbt_build(
             "DBT_DB_PASSWORD": db_password,
         }
     )
-    logs_dir_path = logs_path.parent
+    logs_dir_path = tmp_dir / "logs"
+    target_path = tmp_dir / "target"
+
     cmd = [
         "dbt",
         "build",
@@ -76,6 +78,8 @@ def run_dbt_build(
         str(project_dir),
         "--log-path",
         str(logs_dir_path),
+        "--target-path",
+        str(target_path),
         "--debug",
     ]
 
@@ -138,18 +142,18 @@ def dbt_build_models(
 
     repo_dir = Path(get_root_folder())
     profile_dir = Path(get_root_folder()) / "modules" / "infra" / "airflow" / "common_tasks" / "dbt"
-    logs_path = Path("/tmp") / project_dir_subpath / "logs" / "dbt_logs.txt"
+    tmp_dir = Path("/tmp") / project_dir_subpath
 
-    create_dbt_logs(logs_path=logs_path)
+    # create_dbt_logs(logs_path=logs_path)
     run_dbt_build(
         profile_dir=profile_dir,
         project_dir=repo_dir / project_dir_subpath,
-        logs_path=logs_path,
+        tmp_dir=tmp_dir,
         db_host=str(required_connection_values["host"]),
         db_name=str(required_connection_values["dbname"]),
         db_schema=db_info.prod_schema,
         db_user=str(required_connection_values["user"]),
         db_password=str(connection.get("password") or ""),
     )
-    read_dbt_logs(logs_path=logs_path)
-    delete_dbt_logs(logs_path=logs_path)
+    # read_dbt_logs(logs_path=logs_path)
+    # delete_dbt_logs(logs_path=logs_path)
