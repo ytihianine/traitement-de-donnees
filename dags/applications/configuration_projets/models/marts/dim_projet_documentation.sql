@@ -1,5 +1,5 @@
 
-select distinct on (p.id_projet, documentation.type_documentation, documentation.import_timestamp)
+select
     documentation.id_row,
     p.id_projet,
     p.projet,

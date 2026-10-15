@@ -1,5 +1,5 @@
 
-select distinct on (p.id_projet, p.import_timestamp)
+select
     p.id_row,
     p.id_projet,
     p.projet,
