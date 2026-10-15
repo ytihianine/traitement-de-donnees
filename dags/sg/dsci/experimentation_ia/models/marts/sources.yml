@@ -37,3 +37,13 @@ sources:
       - name: ref_raison_non_participation
       - name: ref_impact_tache_pro
       - name: ref_impact_tache_rebarbative
+      - name: ref_cas_usage
+      - name: ref_facteur_progression
+      - name: ref_frein_utilisation
+      - name: ref_formation_suivie
+      - name: ref_impact_identifie
+      - name: ref_impact_observation
+      - name: ref_levier_progression
+      - name: ref_participation_programme
+      - name: ref_tache_realise
+      - name: ref_type_erreur_ia
