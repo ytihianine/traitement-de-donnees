@@ -1,11 +1,8 @@
+from pathlib import Path
+
 from modules.domain.pipeline.model import ExecutionOptions
 
 execution_options = {
-    "dim_experimentateurs": ExecutionOptions(),
-    "factless_q1": ExecutionOptions(),
-    "factless_q2": ExecutionOptions(),
-    "factless_q3": ExecutionOptions(),
-    "experimentateurs": ExecutionOptions(),
     "grist_doc": ExecutionOptions(),
     "q1": ExecutionOptions(),
     "q1_besoins_accompagnement": ExecutionOptions(),
@@ -57,3 +54,5 @@ execution_options = {
     "ref_taux_correction": ExecutionOptions(),
     "ref_type_erreur_ia": ExecutionOptions(),
 }
+
+config_projet_subpath = Path("dags/sg/dsci/experimentation_ia")

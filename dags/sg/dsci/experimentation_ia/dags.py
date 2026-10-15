@@ -1,6 +1,7 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 from dags.sg.dsci.experimentation_ia.config import (
+    config_projet_subpath,
     execution_options,
 )
 from dags.sg.dsci.experimentation_ia.tasks import (
@@ -10,9 +11,9 @@ from dags.sg.dsci.experimentation_ia.tasks import (
     suivi_questionnaire_2,
     suivi_questionnaire_2_bis,
     suivi_questionnaire_3,
-    tables_dimensions,
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
+from modules.infra.airflow.common_tasks.dbt.tasks import dbt_build_models
 from modules.infra.airflow.common_tasks.grist import download_grist_doc_to_s3
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
@@ -72,7 +73,6 @@ def experimentation_ia_dag() -> None:
             suivi_questionnaire_2_bis(),
             suivi_questionnaire_3(),
         ],
-        tables_dimensions(),
         ensure_partition(
             execution_options=execution_options,
         ),
@@ -80,6 +80,9 @@ def experimentation_ia_dag() -> None:
         copy_s3_files(execution_options=execution_options),
         del_s3_files(execution_options=execution_options),
         delete_tmp_tables(execution_options=execution_options),
+        dbt_build_models(
+            project_dir_subpath=config_projet_subpath,
+        ),
         update_projet_snapshot_status(execution_options=execution_options),
     )
 
