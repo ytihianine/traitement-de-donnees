@@ -18,7 +18,7 @@ def create_dbt_logs(logs_path: Path) -> None:
     # Create dir if not exists
     dir_path = logs_path.parent
     logging.info(msg=f"Creating logs directory @ {dir_path}")
-    os.mkdir(path=dir_path)
+    dir_path.mkdir(parents=True, exist_ok=True)
 
     # Create file if not exists
     logging.info(msg="Creating logs file")
