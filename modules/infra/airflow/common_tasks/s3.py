@@ -105,8 +105,8 @@ def del_s3_files(
     datasets_context = dataset_context_repo.get_list(nom_projet=nom_projet)
     for dataset_context in datasets_context:
         # Delete src files
+        logging.info(msg=f"Deleting S3 files related to dataset {dataset_context.dataset.name}")
         src_loc = dataset_context.src_loc
-        logging.info(msg=f"{dataset_context.dataset.name}")
         if src_loc.type_location != TypeLocation.S3_FILE:
             logging.info(
                 msg=f"Source location for dataset {dataset_context.dataset.name} is not an S3 file ... skipping"

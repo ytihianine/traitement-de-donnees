@@ -12,8 +12,49 @@ from modules.infra.airflow.dag import should_skip_task
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 
 
+def create_dbt_logs(logs_path: Path) -> None:
+    logging.info(msg=f"Creating logs directory and file @ {logs_path}")
+
+    # Create dir if not exists
+    dir_path = logs_path.parent
+    logging.info(msg=f"Creating logs directory @ {dir_path}")
+    os.mkdir(path=dir_path)
+
+    # Create file if not exists
+    logging.info(msg="Creating logs file")
+    with open(file=logs_path, mode="w"):
+        pass
+
+
+def delete_dbt_logs(logs_path: Path) -> None:
+    logging.info(msg=f"Deleting logs file @ {logs_path}")
+    # Delete log file if exists
+    if os.path.exists(path=logs_path):
+        os.remove(path=logs_path)
+    else:
+        logging.info(msg="File does not exist ... Skipping")
+
+
+def read_dbt_logs(logs_path: Path) -> None:
+    logging.info(msg=f"Reading dbt logs @ {logs_path}")
+
+    with open(file=logs_path) as file:
+        # Read the content of the file
+        file_content = file.read()
+
+        # Print the content
+        logging.info(msg=f"{file_content}")
+
+
 def run_dbt_build(
-    profile_dir: Path, project_dir: Path, db_host: str, db_name: str, db_schema: str, db_user: str, db_password: str
+    profile_dir: Path,
+    project_dir: Path,
+    logs_path: Path,
+    db_host: str,
+    db_name: str,
+    db_schema: str,
+    db_user: str,
+    db_password: str,
 ) -> None:
     _env = os.environ.copy()
     _env.update(
@@ -25,11 +66,22 @@ def run_dbt_build(
             "DBT_DB_PASSWORD": db_password,
         }
     )
-    cmd = ["dbt", "build", "--profiles-dir", str(profile_dir), "--project-dir", str(project_dir), "--debug"]
+    logs_dir_path = logs_path.parent
+    cmd = [
+        "dbt",
+        "build",
+        "--profiles-dir",
+        str(profile_dir),
+        "--project-dir",
+        str(project_dir),
+        "--log-path",
+        str(logs_dir_path),
+        "--debug",
+    ]
 
-    logging.info("Executing dbt command: %s", cmd)
-    logging.info("dbt project directory: %s", project_dir)
-    logging.info("dbt profiles directory: %s", profile_dir)
+    logging.info(msg=f"Executing dbt command: {cmd}")
+    logging.info(msg=f"dbt project directory: {project_dir}")
+    logging.info(msg=f"dbt profiles directory: {profile_dir}")
 
     result = subprocess.run(
         args=cmd,
@@ -39,9 +91,9 @@ def run_dbt_build(
         cwd=str(project_dir),
     )
     if result.stdout:
-        logging.info(result.stdout)
+        logging.info(msg=result.stdout)
     if result.stderr:
-        logging.error(result.stderr)
+        logging.error(msg=result.stderr)
     if result.returncode != 0:
         raise subprocess.CalledProcessError(
             returncode=result.returncode,
@@ -85,14 +137,18 @@ def dbt_build_models(
         raise ValueError(f"Missing database connection values required by dbt: {', '.join(missing_connection_values)}")
 
     profile_dir = Path(get_root_folder()) / "modules" / "infra" / "airflow" / "common_tasks" / "dbt"
+    logs_path = project_dir_subpath / "dbt_logs.txt"
 
-    logging.info("Running dbt build for project directory: %s", project_dir_subpath)
+    create_dbt_logs(logs_path=logs_path)
     run_dbt_build(
         profile_dir=profile_dir,
         project_dir=Path(get_root_folder()) / project_dir_subpath,
+        logs_path=logs_path,
         db_host=str(required_connection_values["host"]),
         db_name=str(required_connection_values["dbname"]),
         db_schema=db_info.prod_schema,
         db_user=str(required_connection_values["user"]),
         db_password=str(connection.get("password") or ""),
     )
+    read_dbt_logs(logs_path=logs_path)
+    delete_dbt_logs(logs_path=logs_path)
