@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from modules.domain.pipeline.model import ExecutionOptions
 
 execution_options = {
@@ -48,3 +50,5 @@ execution_options = {
     "ref_type_accompagnement": ExecutionOptions(tbl_order=3),
     "ref_typologie_accompagnement": ExecutionOptions(tbl_order=1),
 }
+
+config_projet_subpath = Path("dags/sg/dsci/accompagnements_dsci")

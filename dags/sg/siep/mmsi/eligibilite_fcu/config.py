@@ -1,7 +1,10 @@
+from pathlib import Path
+
 from modules.domain.pipeline.model import ExecutionOptions, LoadStrategy
 
 dag_id_fcu = "eligibilite_fcu"
 nom_projet_fcu = "France Chaleur Urbaine (FCU)"
+config_projet_subpath = Path("dags/sg/siep/mmsi/eligibilite_fcu")
 
 execution_options = {
     "fcu": ExecutionOptions(),

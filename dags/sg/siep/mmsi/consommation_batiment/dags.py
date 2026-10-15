@@ -3,7 +3,12 @@ from datetime import timedelta
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-from dags.sg.siep.mmsi.consommation_batiment.config import dag_id_osfi, execution_options, nom_projet_osfi
+from dags.sg.siep.mmsi.consommation_batiment.config import (
+    config_projet_subpath,
+    dag_id_osfi,
+    execution_options,
+    nom_projet_osfi,
+)
 from dags.sg.siep.mmsi.consommation_batiment.tasks import (
     additionnal_files,
     convert_file_to_parquet,
@@ -12,6 +17,7 @@ from dags.sg.siep.mmsi.consommation_batiment.tasks import (
 from dags.sg.siep.mmsi.oad.config import nom_projet_oad
 from modules.containers import DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
+from modules.infra.airflow.common_tasks.dbt.tasks import dbt_build_models
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -79,6 +85,9 @@ def consommation_des_batiments() -> None:
         refresh_views(),
         copy_s3_files(),
         del_s3_files(execution_options=execution_options),
+        dbt_build_models(
+            project_dir_subpath=config_projet_subpath,
+        ),
         update_projet_snapshot_status(),
         delete_tmp_tables(execution_options=execution_options),
     )

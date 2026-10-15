@@ -1,0 +1,38 @@
+sources:
+  - name: activite_dsci
+    schema: "{{ target.schema }}"
+    tables:
+      - name: animateur_fac_certification
+      - name: animateur_fac
+      - name: ref_certification
+      - name: accompagnement_cci_opportunite
+      - name: accompagnement_dsci
+      - name: accompagnement_dsci_porteur
+      - name: effectif_dsci
+      - name: ref_direction
+      - name: accompagnement_mi
+      - name: accompagnement_mi_satisfaction
+      - name: ref_type_accompagnement
+      - name: ref_region
+      - name: correspondant_profil
+      - name: ref_profil_correspondant
+      - name: correspondant
+      - name: correspondant_competence_particuliere
+      - name: ref_competence_particuliere
+      - name: correspondant_connaissance_communaute
+      - name: bilaterale
+      - name: bilaterale_remontee
+      - name: ref_bureau
+      - name: ref_pole
+      - name: pleniere_quest_inscription
+      - name: animateur_externe
+      - name: animateur_interne
+      - name: charge_agent_cci
+      - name: ref_semainier
+      - name: accompagnement_dsci_equipe
+      - name: accompagnement_dsci_typologie
+      - name: ref_typologie_accompagnement
+  - name: commun
+    schema: "{{ target.schema }}"
+    tables:
+      - name: region_geojson

@@ -1,7 +1,10 @@
+from pathlib import Path
+
 from modules.domain.pipeline.model import ExecutionOptions, LoadStrategy
 
 nom_projet_oad = "Outil aide diagnostic"
 dag_id_oad = "outil_aide_diagnostic"
+config_projet_subpath = Path("dags/sg/siep/mmsi/oad")
 
 execution_options = {
     "accessibilite": ExecutionOptions(load_strategy=LoadStrategy.APPEND, tbl_order=2),

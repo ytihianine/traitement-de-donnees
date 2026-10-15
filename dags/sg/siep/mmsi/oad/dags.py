@@ -12,13 +12,14 @@ from dags.sg.siep.mmsi.oad.caracteristiques.tasks import (
     oad_carac_to_parquet,
     tasks_oad_caracteristiques,
 )
-from dags.sg.siep.mmsi.oad.config import dag_id_oad, execution_options, nom_projet_oad
+from dags.sg.siep.mmsi.oad.config import config_projet_subpath, dag_id_oad, execution_options, nom_projet_oad
 from dags.sg.siep.mmsi.oad.indicateurs.tasks import (
     oad_indic_to_parquet,
     tasks_oad_indicateurs,
 )
 from modules.containers import DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
+from modules.infra.airflow.common_tasks.dbt.tasks import dbt_build_models
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -120,6 +121,9 @@ def oad() -> None:
         del_s3_files(execution_options=execution_options),
         delete_tmp_tables(execution_options=execution_options),
         update_projet_snapshot_status(),
+        dbt_build_models(
+            project_dir_subpath=config_projet_subpath,
+        ),
         end_task,
         trigger_linked_dags(),
     )

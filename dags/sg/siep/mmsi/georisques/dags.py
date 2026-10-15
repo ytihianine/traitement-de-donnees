@@ -1,9 +1,15 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-from dags.sg.siep.mmsi.georisques.config import dag_id_georisque, execution_options, nom_projet_georisque
+from dags.sg.siep.mmsi.georisques.config import (
+    config_projet_subpath,
+    dag_id_georisque,
+    execution_options,
+    nom_projet_georisque,
+)
 from dags.sg.siep.mmsi.georisques.task import georisques_group
 from dags.sg.siep.mmsi.oad.config import nom_projet_oad
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
+from modules.infra.airflow.common_tasks.dbt.tasks import dbt_build_models
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
@@ -53,6 +59,9 @@ def bien_georisques() -> None:
         copy_tmp_table_to_real_table(execution_options=execution_options),
         copy_s3_files(),
         del_s3_files(execution_options=execution_options),
+        dbt_build_models(
+            project_dir_subpath=config_projet_subpath,
+        ),
         update_projet_snapshot_status(),
     )
 

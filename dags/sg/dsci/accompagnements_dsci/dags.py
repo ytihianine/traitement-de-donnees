@@ -1,6 +1,7 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
 from dags.sg.dsci.accompagnements_dsci.config import (
+    config_projet_subpath,
     execution_options,
 )
 from dags.sg.dsci.accompagnements_dsci.tasks import (
@@ -12,6 +13,7 @@ from dags.sg.dsci.accompagnements_dsci.tasks import (
     referentiels,
 )
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
+from modules.infra.airflow.common_tasks.dbt.tasks import dbt_build_models
 from modules.infra.airflow.common_tasks.grist import download_grist_doc_to_s3
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
@@ -78,6 +80,9 @@ def accompagnements_dsci_dag() -> None:
             execution_options=execution_options,
         ),
         delete_tmp_tables(execution_options=execution_options),
+        dbt_build_models(
+            project_dir_subpath=config_projet_subpath,
+        ),
         update_projet_snapshot_status(),
     )
 

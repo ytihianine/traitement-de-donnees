@@ -1,0 +1,10 @@
+sources:
+  - name: siep
+    schema: "{{ target.schema }}"
+    tables:
+      - name: bien_caracteristiques_complet_gestionnaire_vw
+      - name: bien_etat_de_sante
+      - name: bien_accessibilite_detail
+      - name: bien_bail
+      - name: bien_occupant
+      - name: bien_note

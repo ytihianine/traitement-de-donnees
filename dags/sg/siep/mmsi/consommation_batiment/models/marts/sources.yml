@@ -1,0 +1,10 @@
+sources:
+  - name: siep
+    schema: "{{ target.schema }}"
+    tables:
+      - name: bien_caracteristiques_complet_gestionnaire_vw
+      - name: conso_mensuelle
+      - name: conso_annuelle_unpivot
+      - name: conso_annuelle_unpivot_comparaison
+      - name: facture_annuelle_unpivot
+      - name: facture_annuelle_unpivot_comparaison

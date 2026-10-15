@@ -1,6 +1,9 @@
+from pathlib import Path
+
 from modules.domain.pipeline.model import ExecutionOptions
 
 dag_id_osfi = "consommation_des_batiments"
+config_projet_subpath = Path("dags/sg/siep/mmsi/consommation_batiment")
 nom_projet_osfi = "Consommation des bâtiments"
 
 execution_options = {
