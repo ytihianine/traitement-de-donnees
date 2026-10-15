@@ -136,13 +136,14 @@ def dbt_build_models(
     if missing_connection_values:
         raise ValueError(f"Missing database connection values required by dbt: {', '.join(missing_connection_values)}")
 
+    repo_dir = Path(get_root_folder())
     profile_dir = Path(get_root_folder()) / "modules" / "infra" / "airflow" / "common_tasks" / "dbt"
-    logs_path = project_dir_subpath / "dbt_logs.txt"
+    logs_path = repo_dir / project_dir_subpath / "dbt_logs.txt"
 
     create_dbt_logs(logs_path=logs_path)
     run_dbt_build(
         profile_dir=profile_dir,
-        project_dir=Path(get_root_folder()) / project_dir_subpath,
+        project_dir=repo_dir / project_dir_subpath,
         logs_path=logs_path,
         db_host=str(required_connection_values["host"]),
         db_name=str(required_connection_values["dbname"]),
