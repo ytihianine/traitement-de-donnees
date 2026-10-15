@@ -1,0 +1,10 @@
+dry_run: true
+db:
+  host: ""
+  port: "5432"
+  name: ""
+  user: ""
+  password: ""
+dbt:
+  projet_dir:
+  projet_schema:
