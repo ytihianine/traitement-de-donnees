@@ -43,7 +43,7 @@ airflow = [
 airflow-providers = [
     "apache-airflow-providers-amazon==9.37.0",
     "apache-airflow-providers-celery==3.25.0",
-    "apache-airflow-providers-common-compat==1.21.0",
+    "apache-airflow-providers-common-compat==1.22.0",
     "apache-airflow-providers-common-io==1.10.1",
     "apache-airflow-providers-common-messaging==2.1.2",
     "apache-airflow-providers-common-sql==2.3.0",
