@@ -1,6 +1,6 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-from dags.applications.superset.tasks import update_admin_ownership
+from dags.applications.superset.tasks import sync_dataset_columns, update_admin_ownership
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.validation import validate_dag_parameters
 from modules.infra.airflow.dag import create_dag_params, create_default_args
@@ -34,6 +34,7 @@ def superset_operations() -> None:
     chain(
         validate_dag_parameters(),
         update_admin_ownership(db_conn_id="db_config_superset"),
+        sync_dataset_columns(),
     )
 
 

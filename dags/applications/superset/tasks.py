@@ -1,7 +1,10 @@
 import logging
 
-from airflow.sdk import task
+from airflow.sdk import Variable, task
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
+from modules.infra.http_client.config import ClientConfig
+from modules.infra.http_client.factory import HttpHandlerType, create_http_client
+from modules.infra.superset.api import SupersetApiClient
 
 
 @task
@@ -49,3 +52,30 @@ def update_admin_ownership(db_conn_id: str) -> None:
     """
     db_handler.execute(query=query_tbl)
     logging.info(msg="Tous les tableaux de bord ont été mis à jour.")
+
+
+@task
+def sync_dataset_columns() -> None:
+    # Create the HTTP client for Superset API
+    client_config = ClientConfig()
+    http_client = create_http_client(config=client_config, client_type=HttpHandlerType.REQUEST)
+
+    # Initialize the Superset API client
+    superset_admin = Variable.get("chartsgouv_admin_username")
+    superset_password = Variable.get("chartsgouv_admin_password")
+    superset_api_client = SupersetApiClient(
+        http_client=http_client,
+        username=superset_admin,
+        password=superset_password,
+    )
+
+    # Get the user token
+    token = superset_api_client.get_user_token(
+        username=superset_api_client.username,
+        password=superset_api_client.password,
+    )
+
+    # Sync dataset columns for all datasets
+    dataset_ids = superset_api_client.list_datasets(token=token)
+    for dataset_id in dataset_ids:
+        superset_api_client.sync_dataset_columns(dataset_id=dataset_id, token=token)
