@@ -58,7 +58,7 @@ def update_admin_ownership(db_conn_id: str) -> None:
 @task
 def sync_dataset_columns() -> None:
     # Create the HTTP client for Superset API
-    client_config = ClientConfig()
+    client_config = ClientConfig(verify_ssl=False)
     http_client = create_http_client(config=client_config, client_type=HttpHandlerType.REQUEST)
 
     # Initialize the Superset API client
