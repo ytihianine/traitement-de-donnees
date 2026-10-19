@@ -32,7 +32,15 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   experimentation_ia:
     # Config indicated by + and applies to all files under models/example/
-    marts:
+    commun:
       +materialized: table
-    stg:
-      +materialized: view
+      schema: silver
+    commununaute:
+      +materialized: table
+      schema: silver
+    conseil:
+      +materialized: table
+      schema: silver
+    innovation:
+      +materialized: table
+      schema: silver
