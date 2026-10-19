@@ -36,7 +36,7 @@ select
   expe.frequence_utilisation,
   expe.evolution_usage
 from {{ source('assistant_ia', 'q2_taches') }} taches
-left join {{ ref('stg_dim_experimentateurs') }} expe
+left join {{ ref('dim_experimentateurs') }} expe
   on expe.no_id = taches.no_id
     and expe.snapshot_id = taches.snapshot_id
 left join {{ source('assistant_ia', 'ref_tache_realise') }} rtr

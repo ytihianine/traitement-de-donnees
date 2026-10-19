@@ -36,7 +36,7 @@ select
   expe.frequence_utilisation,
   expe.evolution_usage
 from {{ source('assistant_ia', 'q2_impact_observe') }} io
-left join {{ ref('stg_dim_experimentateurs') }} expe
+left join {{ ref('dim_experimentateurs') }} expe
   on expe.no_id = io.no_id
     and expe.snapshot_id = io.snapshot_id
 left join {{ source('assistant_ia', 'ref_impact_observation') }} rio

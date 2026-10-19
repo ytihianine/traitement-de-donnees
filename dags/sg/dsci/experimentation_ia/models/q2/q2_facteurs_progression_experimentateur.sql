@@ -36,7 +36,7 @@ select
   expe.frequence_utilisation,
   expe.evolution_usage
 from {{ source('assistant_ia', 'q2_facteurs_progression') }} fp
-left join {{ ref('stg_dim_experimentateurs') }} expe
+left join {{ ref('dim_experimentateurs') }} expe
   on expe.no_id = fp.no_id
     and expe.snapshot_id = fp.snapshot_id
 left join {{ source('assistant_ia', 'ref_facteur_progression') }} rfp

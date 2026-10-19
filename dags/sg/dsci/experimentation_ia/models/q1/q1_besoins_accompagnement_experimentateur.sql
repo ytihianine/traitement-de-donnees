@@ -34,7 +34,7 @@ select
   expe.frequence_utilisation,
   expe.evolution_usage
 from {{ source('assistant_ia', 'q1_besoins_accompagnement') }} ba
-left join {{ ref('stg_dim_experimentateurs') }} expe
+left join {{ ref('dim_experimentateurs') }} expe
   on expe.no_id = ba.no_id
     and expe.snapshot_id = ba.snapshot_id
 order by

@@ -68,8 +68,8 @@ select
   expe.genre,
   expe.frequence_utilisation,
   expe.evolution_usage
-from {{ ref('stg_fct_q3') }} q3
-left join {{ ref('stg_dim_experimentateurs') }} expe
+from {{ ref('fct_q3') }} q3
+left join {{ ref('dim_experimentateurs') }} expe
   on q3.no_id = expe.no_id
     and q3.import_timestamp = expe.import_timestamp
 order by

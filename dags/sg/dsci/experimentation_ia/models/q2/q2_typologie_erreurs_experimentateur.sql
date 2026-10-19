@@ -35,7 +35,7 @@ select
   expe.frequence_utilisation,
   expe.evolution_usage
 from {{ source('assistant_ia', 'q2_typologie_erreurs') }} te
-left join {{ ref('stg_dim_experimentateurs') }} expe
+left join {{ ref('dim_experimentateurs') }} expe
   on expe.no_id = te.no_id
     and expe.snapshot_id = te.snapshot_id
 left join {{ source('assistant_ia', 'ref_type_erreur_ia') }} rteia

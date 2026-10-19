@@ -35,7 +35,7 @@ select
   expe.frequence_utilisation,
   expe.evolution_usage
 from {{ source('assistant_ia', 'q3_programme_rdv') }} q3_rdv
-left join {{ ref('stg_dim_experimentateurs') }} expe
+left join {{ ref('dim_experimentateurs') }} expe
   on expe.no_id = q3_rdv.no_id
     and expe.snapshot_id = q3_rdv.snapshot_id
 left join {{ source('assistant_ia', 'ref_participation_programme') }} rpr

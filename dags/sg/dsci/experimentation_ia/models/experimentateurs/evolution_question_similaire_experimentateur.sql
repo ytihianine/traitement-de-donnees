@@ -34,14 +34,14 @@ select
   CONCAT('Q3 - ', COALESCE(NULLIF(TRIM(q3.frequence_utilisation), ''), 'Non répondu')) as frequence_usage_q3,
   CONCAT('Q2 - ', COALESCE(NULLIF(TRIM(q2.recommandation_collegues_mef), ''), 'Non répondu')) as recommandation_q2,
   CONCAT('Q3 - ', COALESCE(NULLIF(TRIM(q3.recommandations), ''), 'Non répondu')) as recommandation_q3
-from {{ ref('stg_dim_experimentateurs') }} dim_exp
-left join {{ ref('stg_fct_q1') }} q1
+from {{ ref('dim_experimentateurs') }} dim_exp
+left join {{ ref('fct_q1') }} q1
   on q1.no_id = dim_exp.no_id
     and q1.import_timestamp = dim_exp.import_timestamp
-left join {{ ref('stg_fct_q2') }} q2
+left join {{ ref('fct_q2') }} q2
   on q2.no_id = dim_exp.no_id
     and q2.import_timestamp = dim_exp.import_timestamp
-left join {{ ref('stg_fct_q3') }} q3
+left join {{ ref('fct_q3') }} q3
   on q3.no_id = dim_exp.no_id
     and q3.import_timestamp = dim_exp.import_timestamp
 order by

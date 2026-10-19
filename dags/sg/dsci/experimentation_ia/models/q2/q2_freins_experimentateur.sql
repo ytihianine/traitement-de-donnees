@@ -35,7 +35,7 @@ select
   expe.frequence_utilisation,
   expe.evolution_usage
 from {{ source('assistant_ia', 'q2_freins') }} frein
-left join {{ ref('stg_dim_experimentateurs') }} expe
+left join {{ ref('dim_experimentateurs') }} expe
   on expe.no_id = frein.no_id
     and expe.snapshot_id = frein.snapshot_id
 left join {{ source('assistant_ia', 'ref_frein_utilisation') }} rfu
