@@ -55,6 +55,9 @@ DEFAULT_POLARIS_CLIENT_SECRET = ENV_VAR.get("AIRFLOW_POLARIS_CLIENT_SECRET", "ro
 # S3
 DEFAULT_S3_ENDPOINT_URL = "https://minio.lab.incubateur.finances.rie.gouv.fr"
 
+# S3
+DEFAULT_SUPERSET_HOST = "https://chartsgouv-mef-sg.lab.incubateur.finances.rie.gouv.fr"
+
 # Trino
 DEFAULT_TRINO_HOST = "trino-mef-sg.lab.incubateur.finances.rie.gouv.fr"
 

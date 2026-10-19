@@ -1,6 +1,7 @@
 import logging
 
 from airflow.sdk import Variable, task
+from modules.constants import DEFAULT_SUPERSET_HOST
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 from modules.infra.http_client.config import ClientConfig
 from modules.infra.http_client.factory import HttpHandlerType, create_http_client
@@ -65,6 +66,7 @@ def sync_dataset_columns() -> None:
     superset_password = Variable.get("chartsgouv_admin_password")
     superset_api_client = SupersetApiClient(
         http_client=http_client,
+        host=DEFAULT_SUPERSET_HOST,
         username=superset_admin,
         password=superset_password,
     )

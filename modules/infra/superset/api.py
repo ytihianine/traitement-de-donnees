@@ -7,6 +7,7 @@ from modules.infra.http_client.base import HttpInterface
 @dataclass()
 class SupersetApiClient:
     http_client: HttpInterface
+    host: str
     username: str
     password: str
 
@@ -22,7 +23,7 @@ class SupersetApiClient:
             The user token as a string
         """
         response = self.http_client.post(
-            url="/api/v1/security/login",
+            url=f"{self.host}/api/v1/security/login",
             json={
                 "username": username,
                 "password": password,
@@ -43,7 +44,7 @@ class SupersetApiClient:
             A list of dataset IDs as integers
         """
         response = self.http_client.get(
-            url="/api/v1/dataset/",
+            url=f"{self.host}/api/v1/dataset/",
             headers={"Authorization": f"Bearer {token}"},
         )
         response.raise_for_status()
@@ -63,7 +64,7 @@ class SupersetApiClient:
         """
         logging.info(msg=f"Refreshing dataset columns for dataset_id={dataset_id}.")
         response = self.http_client.put(
-            url=f"/api/v1/dataset/{dataset_id}/refresh",
+            url=f"{self.host}/api/v1/dataset/{dataset_id}/refresh",
             headers={"Authorization": f"Bearer {token}"},
         )
         response.raise_for_status()
