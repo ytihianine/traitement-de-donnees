@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+from typing import Any
 
 from modules.infra.http_client.base import HttpInterface
 
@@ -33,23 +34,35 @@ class SupersetApiClient:
         response.raise_for_status()
         return response.json()["access_token"]
 
-    def list_datasets(self, token: str) -> list[int]:
+    def list_datasets(self, token: str, page_size: int = 100) -> list[dict[str, Any]]:
         """
-        List datasets in Superset.
+        List all datasets in Superset (handles pagination).
 
         Args:
             token: The user token for Superset
+            page_size: Number of items per page (default 100)
 
         Returns:
-            A list of dataset IDs as integers
+            A list of all dataset objects
         """
-        response = self.http_client.get(
-            url=f"{self.host}/api/v1/dataset/",
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        response.raise_for_status()
-        result = response.json()["result"]
-        return [dataset["id"] for dataset in result]
+        datasets: list[dict[str, Any]] = []
+        page = 1
+
+        while True:
+            response = self.http_client.get(
+                url=f"{self.host}/api/v1/dataset/",
+                params={"page": page, "page_size": page_size},
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            response.raise_for_status()
+            body = response.json()
+            datasets.extend(body["result"])
+
+            if len(datasets) >= body["count"] or not body["result"]:
+                break
+            page += 1
+
+        return datasets
 
     def sync_dataset_columns(self, dataset_id: int, token: str) -> None:
         """

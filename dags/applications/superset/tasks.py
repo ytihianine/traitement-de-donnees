@@ -78,6 +78,10 @@ def sync_dataset_columns() -> None:
     )
 
     # Sync dataset columns for all datasets
-    dataset_ids = superset_api_client.list_datasets(token=token)
-    for dataset_id in dataset_ids:
+    datasets = superset_api_client.list_datasets(token=token)
+    for i, dataset in enumerate(datasets):
+        dataset_id = dataset["id"]
+        logging.info(
+            msg=f"[{i+1} / {len(datasets)}] [ID {dataset_id}] Syncing dataset columns for '{dataset['table_name']}'."
+        )
         superset_api_client.sync_dataset_columns(dataset_id=dataset_id, token=token)
