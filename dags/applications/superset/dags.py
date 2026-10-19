@@ -29,7 +29,7 @@ nom_projet = "Superset opérations"
     ),
     on_success_callback=create_send_mail_callback(mail_status=MailStatus.SUCCESS),
 )
-def sauvegarde_database() -> None:
+def superset_operations() -> None:
     """Task order"""
     chain(
         validate_dag_parameters(),
@@ -37,4 +37,4 @@ def sauvegarde_database() -> None:
     )
 
 
-sauvegarde_database()
+superset_operations()

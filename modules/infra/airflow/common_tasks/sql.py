@@ -215,12 +215,12 @@ def create_tmp_tables(
 
         tmp_loc = dataset_context.tmp_loc
         if tmp_loc.type_location != TypeLocation.DB:
-            logging.info(msg=f"Skipping DB tmp table creation for selecteur <{dataset_context.dataset_name}>")
+            logging.info(msg="Skipping DB tmp table creation")
             continue
 
         dest_loc = dataset_context.dest_loc
         if dest_loc.type_location != TypeLocation.DB:
-            logging.info(msg=f"Skipping DB tmp table creation for selecteur <{dataset_context.dataset_name}>")
+            logging.info(msg="Skipping DB tmp table creation")
             continue
 
         tbl_name = parse_db_table(location=dest_loc.validate_location)

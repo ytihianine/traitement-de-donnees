@@ -12,40 +12,6 @@ from modules.infra.airflow.dag import should_skip_task
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler
 
 
-def create_dbt_logs(logs_path: Path) -> None:
-    logging.info(msg=f"Creating logs directory and file @ {logs_path}")
-
-    # Create dir if not exists
-    dir_path = logs_path.parent
-    logging.info(msg=f"Creating logs directory @ {dir_path}")
-    dir_path.mkdir(parents=True, exist_ok=True)
-
-    # Create file if not exists
-    logging.info(msg="Creating logs file")
-    with open(file=logs_path, mode="w"):
-        pass
-
-
-def delete_dbt_logs(logs_path: Path) -> None:
-    logging.info(msg=f"Deleting logs file @ {logs_path}")
-    # Delete log file if exists
-    if os.path.exists(path=logs_path):
-        os.remove(path=logs_path)
-    else:
-        logging.info(msg="File does not exist ... Skipping")
-
-
-def read_dbt_logs(logs_path: Path) -> None:
-    logging.info(msg=f"Reading dbt logs @ {logs_path}")
-
-    with open(file=logs_path) as file:
-        # Read the content of the file
-        file_content = file.read()
-
-        # Print the content
-        logging.info(msg=f"{file_content}")
-
-
 def run_dbt_build(
     profile_dir: Path,
     project_dir: Path,

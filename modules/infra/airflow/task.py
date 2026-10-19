@@ -39,12 +39,6 @@ def create_task(
 
     Returns:
         An Airflow task that performs the defined ETL steps
-
-    Note:
-        input_selecteurs:
-            - must be provided if any step requires reading data
-            - if there is a single input selector, the DataFrame will be passed as "df".
-            - if multiple input selectors, DataFrames will be passed as "df_{selecteur}"
     """
 
     @task(

@@ -8,15 +8,15 @@ Ce repo contient des scripts et dags permettant de traiter des données.
 .
 ├── dags: Contient l'ensemble des dags
 ├── docs: Contient toute la documentation du repo
-├── modules: Contient du conde réutilisable
-│   ├── common_tasks: tâches génériques réutilisables (S3, SQL, Grist, ...)
-│   ├── enums: enums transverses
+├── modules: Contient du code réutilisable
+│   ├── application: Orchestration des pipelines (PipelineRunner)
+│   ├── domain: Modèles métier (Datasets, DAGs, Projets, Pipeline)
+│   ├── generic_processing: Fonctions de traitement réutilisables (dates, textes, structures, nombres)
 │   ├── infra: Code pour interagir avec l'infrastructure / systèmes externes
-│   ├── types: types transverses
-│   ├── utils: fonctions réutilisable (fonctions de traitements, récupération des configs ...)
+│   ├── containers.py: Conteneurs et instances par défaut
+│   ├── logs.py: Utilitaires de logs
 │   └── constants.py: variables globales
 ├── scripts: Contient différents scripts utilitaires
-├── test: Contient tous les tests unitaires
 └── pyproject.toml: Contient la description du projet
 ```
 
@@ -35,8 +35,7 @@ L'ensemble de la documentation se trouve dans le dossier `docs/`.
 |    ├── convention.md
 |    ├── dags.md
 |    ├── grist.md
-|    ├── modules.infra.md
-|    └── utilitaires.md
+|    └── infra.md
 ```
 
 ## Mise en place de l'infrastructure
