@@ -12,4 +12,5 @@ select
 from {{ source('conf_projets', 'projet') }} as p
 left join {{ source('conf_projets', 'projet_documentation') }} as documentation
     on p.id_projet = documentation.id_projet
+        and p.import_timestamp = documentation.import_timestamp
 order by p.id_projet, documentation.type_documentation, p.id_row, documentation.id_row

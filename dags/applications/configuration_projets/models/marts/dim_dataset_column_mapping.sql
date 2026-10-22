@@ -16,9 +16,11 @@ select
 from {{ source('conf_projets', 'projet') }} as p
 left join {{ source('conf_projets', 'dataset') }} as dataset
     on p.id_projet = dataset.id_projet
+        and p.import_timestamp = dataset.import_timestamp
 left join {{ source('conf_projets', 'dataset_column_mapping') }} as column_mapping
     on p.id_projet = column_mapping.id_projet
     and dataset.id_dataset = column_mapping.id_dataset
+        and dataset.import_timestamp = column_mapping.import_timestamp
 order by
     p.id_projet,
     dataset.dataset,
