@@ -1,0 +1,24 @@
+sources:
+  - name: siep
+    schema: "{{ target.schema }}"
+    tables:
+      - name: bien
+      - name: bien_gestionnaire
+      - name: bien_occupant
+      - name: bien_information_complementaire
+      - name: bien_strategie
+      - name: bien_deet_energie_ges
+      - name: bien_proprietaire
+      - name: bien_reglementation
+      - name: bien_typologie
+      - name: gestionnaire
+      - name: ref_typologie
+      - name: bien_etat_de_sante
+      - name: bien_accessibilite_detail
+      - name: bien_bail
+      - name: bien_note
+      - name: bien_caracteristiques_complet_gestionnaire_vw
+  - name: versioning
+    schema: versioning
+    tables:
+      - name: snapshot
