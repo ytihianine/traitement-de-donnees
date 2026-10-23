@@ -1,15 +1,15 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-from dags.sg.siep.mmsi.eligibilite_fcu.config import (
+from dags.immobilier.eligibilite_fcu.config import (
     dag_id_fcu,
     execution_options,
     nom_projet_fcu,
 )
-from dags.sg.siep.mmsi.eligibilite_fcu.task import (
+from dags.immobilier.eligibilite_fcu.task import (
     bien_localisation,
     process_fcu_result,
 )
-from dags.sg.siep.mmsi.oad.config import nom_projet_oad
+from dags.immobilier.oad.config import nom_projet_oad
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,

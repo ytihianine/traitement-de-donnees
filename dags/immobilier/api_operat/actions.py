@@ -1,8 +1,8 @@
 import logging
 
 import pandas as pd
-from dags.sg.siep.mmsi.api_operat.config import ID_STRUCTURES
-from dags.sg.siep.mmsi.api_operat.types import ApiOperat
+from dags.immobilier.api_operat.config import ID_STRUCTURES
+from dags.immobilier.api_operat.types import ApiOperat
 from modules.constants import AGENT, PROXY
 from modules.infra.http_client.adapters import ClientConfig, HttpxClient
 

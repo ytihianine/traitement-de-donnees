@@ -1,4 +1,4 @@
-from dags.sg.siep.mmsi.eligibilite_fcu import actions, config, process
+from dags.immobilier.eligibilite_fcu import actions, config, process
 from modules.domain.dataset.model import Dataset
 from modules.domain.pipeline.model import PipelineDescriptor
 from modules.infra.airflow.task import (

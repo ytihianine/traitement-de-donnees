@@ -2,7 +2,7 @@ import functools
 
 import numpy as np
 import pandas as pd
-from dags.sg.siep.mmsi.consommation_batiment.enums import Statuts, TypeEnergie
+from dags.immobilier.consommation_batiment.enums import Statuts, TypeEnergie
 from modules.generic_processing.text import (
     convert_str_cols_to_date,
     normalize_whitespace_columns,

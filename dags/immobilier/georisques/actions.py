@@ -1,7 +1,7 @@
 import logging
 
 import pandas as pd
-from dags.sg.siep.mmsi.georisques.process import (
+from dags.immobilier.georisques.process import (
     format_query_param,
     format_risque_results,
 )

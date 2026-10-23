@@ -3,18 +3,18 @@ from datetime import timedelta
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-from dags.sg.siep.mmsi.consommation_batiment.config import (
+from dags.immobilier.consommation_batiment.config import (
     config_projet_subpath,
     dag_id_osfi,
     execution_options,
     nom_projet_osfi,
 )
-from dags.sg.siep.mmsi.consommation_batiment.tasks import (
+from dags.immobilier.consommation_batiment.tasks import (
     additionnal_files,
     convert_file_to_parquet,
     source_files,
 )
-from dags.sg.siep.mmsi.oad.config import nom_projet_oad
+from dags.immobilier.oad.config import nom_projet_oad
 from modules.containers import DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.dbt.tasks import dbt_build_models

@@ -2,10 +2,10 @@ import logging
 from typing import Any
 
 import pandas as pd
-from dags.sg.siep.mmsi.eligibilite_fcu.process import (
+from dags.immobilier.eligibilite_fcu.process import (
     get_eligibilite_fcu,
 )
-from dags.sg.siep.mmsi.oad.config import nom_projet_oad
+from dags.immobilier.oad.config import nom_projet_oad
 from modules.constants import AGENT, PROXY
 from modules.containers import DEFAULT_PROJET_REPO
 from modules.infra.database.factory import DatabaseType, DbConfig, create_db_handler

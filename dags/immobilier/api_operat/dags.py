@@ -2,9 +2,9 @@ from datetime import timedelta
 
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
-from dags.sg.siep.mmsi.api_operat.config import dag_id_operat, execution_options, nom_projet_operat
-from dags.sg.siep.mmsi.api_operat.task import output, source
-from dags.sg.siep.mmsi.oad.config import nom_projet_oad
+from dags.immobilier.api_operat.config import dag_id_operat, execution_options, nom_projet_operat
+from dags.immobilier.api_operat.task import output, source
+from dags.immobilier.oad.config import nom_projet_oad
 from modules.domain.dag.model import DagStatus, DBParams, FeatureFlagsEnable
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
