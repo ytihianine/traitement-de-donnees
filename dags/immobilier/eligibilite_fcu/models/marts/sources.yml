@@ -1,7 +1,0 @@
-sources:
-  - name: siep
-    schema: "{{ target.schema }}"
-    tables:
-      - name: bien_caracteristiques_complet_gestionnaire_vw
-      - name: conso_annuelle_unpivot
-      - name: bien_eligibilite_fcu
