@@ -1,7 +1,7 @@
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
+from dags.immobilier.config import config_projet_subpath
 from dags.immobilier.georisques.config import (
-    config_projet_subpath,
     dag_id_georisque,
     execution_options,
     nom_projet_georisque,

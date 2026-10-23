@@ -3,8 +3,8 @@ from datetime import timedelta
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from airflow.sdk import dag
 from airflow.sdk.bases.operator import chain
+from dags.immobilier.config import config_projet_subpath
 from dags.immobilier.consommation_batiment.config import (
-    config_projet_subpath,
     dag_id_osfi,
     execution_options,
     nom_projet_osfi,

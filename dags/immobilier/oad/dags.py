@@ -6,13 +6,14 @@ from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOpe
 from airflow.sdk import dag, task_group
 from airflow.sdk.bases.operator import chain
 from dags.immobilier.api_operat.config import dag_id_operat
+from dags.immobilier.config import config_projet_subpath
 from dags.immobilier.eligibilite_fcu.config import dag_id_fcu
 from dags.immobilier.georisques.config import dag_id_georisque
 from dags.immobilier.oad.caracteristiques.tasks import (
     oad_carac_to_parquet,
     tasks_oad_caracteristiques,
 )
-from dags.immobilier.oad.config import config_projet_subpath, dag_id_oad, execution_options, nom_projet_oad
+from dags.immobilier.oad.config import dag_id_oad, execution_options, nom_projet_oad
 from dags.immobilier.oad.indicateurs.tasks import (
     oad_indic_to_parquet,
     tasks_oad_indicateurs,
