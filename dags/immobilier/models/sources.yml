@@ -2,10 +2,10 @@ sources:
   - name: siep
     schema: "{{ target.schema }}"
     tables:
+      # OAD
       - name: bien
       - name: bien_gestionnaire
       - name: bien_occupant
-      - name: bien_information_complementaire
       - name: bien_strategie
       - name: bien_deet_energie_ges
       - name: bien_proprietaire
@@ -15,12 +15,19 @@ sources:
       - name: ref_typologie
       - name: bien_bail
       - name: bien_note
-      - name: bien_caracteristiques_complet_gestionnaire_vw
-      - name: bien_georisque
       - name: bien_etat_de_sante
       - name: bien_accessibilite_detail
+      # Consommation
+      - name: conso_mensuelle
+      - name: bien_information_complementaire
       - name: conso_annuelle_unpivot
+      - name: facture_annuelle_unpivot
+      - name: facture_annuelle_unpivot_comparaison
+      - name: conso_annuelle_unpivot_comparaison
+      # Réseau Franche Chaleur Urbaine (FCU)
       - name: bien_eligibilite_fcu
+      # Géorisque
+      - name: bien_georisque
   - name: versioning
     schema: versioning
     tables:
