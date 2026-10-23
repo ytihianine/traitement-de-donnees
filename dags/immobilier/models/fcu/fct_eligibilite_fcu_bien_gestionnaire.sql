@@ -1,10 +1,9 @@
 
-{{ config(materialized='view') }}
 
 with cte_conso_corr_agregee as (
     select
-        sbccg.code_bat_ter,
-        sbccg.gestionnaire_principal_libelle_simplifie,
+        dim_bgc.code_bat_ter,
+        dim_bgc.gestionnaire_principal_libelle_simplifie,
         scau.snapshot_id,
         scau.import_timestamp,
         sum(case when scau.fluide in ('gaz_pci') then scau.conso else 0 end) as conso_corr_gazpci,
@@ -12,11 +11,11 @@ with cte_conso_corr_agregee as (
         sum(case when scau.fluide in ('gaz_pci', 'fioul') then scau.conso else 0 end) as conso_corr_gazpci_fioul,
         sum(case when scau.fluide in ('RCU') then scau.conso else 0 end) as conso_corr_rcu
     from {{ source('siep', 'conso_annuelle_unpivot') }} as scau
-    left join {{ source('siep', 'bien_caracteristiques_complet_gestionnaire_vw') }} as sbccg
-        on scau.import_timestamp = sbccg.osfi_import_timestamp
-        and scau.code_bat_gestionnaire = sbccg.code_bat_gestionnaire
+    left join from {{ ref('dim_bien_gestionnaire_complet') }} as dim_bgc
+        on scau.import_timestamp = dim_bgc.osfi_import_timestamp
+        and scau.code_bat_gestionnaire = dim_bgc.code_bat_gestionnaire
     where scau.type_conso = 'CORRIGEE'
-    group by scau.snapshot_id, scau.import_timestamp, sbccg.code_bat_ter, sbccg.gestionnaire_principal_libelle_simplifie
+    group by scau.snapshot_id, scau.import_timestamp, dim_bgc.code_bat_ter, dim_bgc.gestionnaire_principal_libelle_simplifie
 )
 
 select
