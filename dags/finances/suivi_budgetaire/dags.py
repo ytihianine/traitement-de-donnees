@@ -14,6 +14,7 @@ from modules.infra.airflow.common_tasks.dbt.tasks import dbt_build_models
 from modules.infra.airflow.common_tasks.s3 import (
     copy_s3_files,
     del_s3_files,
+    looking_for_files,
 )
 from modules.infra.airflow.common_tasks.sql import (
     copy_tmp_table_to_real_table,
@@ -52,6 +53,7 @@ def suivi_budgetaire_dag() -> None:
     # Ordre des tâches
     chain(
         validate_dag_parameters(),
+        looking_for_files(nom_projet=projet_suivi_budgetaire),
         create_projet_snapshot(),
         create_tmp_tables(
             execution_options=execution_options,
