@@ -4,11 +4,14 @@ import logging
 from collections.abc import Mapping
 from typing import Any
 
-from airflow.sdk import get_current_context, task
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+from airflow.sdk import PokeReturnValue, get_current_context, task
 
 from modules.constants import (
     DEFAULT_POLARIS_CATALOG,
     DEFAULT_POLARIS_HOST,
+    DEFAULT_S3_BUCKET,
+    DEFAULT_S3_CONN_ID,
 )
 from modules.containers import DEFAULT_DAG_REPO, DEFAULT_DATASET_CONTEXT_REPO
 from modules.domain.dag.model import FeatureFlags
@@ -24,6 +27,38 @@ from modules.infra.file_system.dataset_location import (
     parse_s3_prefix,
 )
 from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
+from modules.infra.mails.default_smtp import MailStatus, create_send_mail_callback
+
+
+@task.sensor(
+    task_id="looking_for_files",
+    mode="reschedule",
+    poke_interval=30,
+    timeout=13 * 60,
+    soft_fail=True,
+    on_skipped_callback=create_send_mail_callback(mail_status=MailStatus.SKIP),
+    on_success_callback=create_send_mail_callback(mail_status=MailStatus.START),
+)
+def looking_for_files(
+    nom_projet: str,
+    dataset_context_repo: DatasetContextRepository = DEFAULT_DATASET_CONTEXT_REPO,
+    s3_conn_id: str = DEFAULT_S3_CONN_ID,
+    s3_bucket: str = DEFAULT_S3_BUCKET,
+) -> PokeReturnValue:
+    fs_hook = S3Hook(aws_conn_id=s3_conn_id)
+
+    bucket_name = s3_bucket
+    bucket_key = dataset_context_repo.get_list_source_fichier(nom_projet=nom_projet)
+
+    files_exist = all(
+        fs_hook.check_for_key(
+            key=key,
+            bucket_name=bucket_name,
+        )
+        for key in bucket_key
+    )
+
+    return PokeReturnValue(is_done=files_exist)
 
 
 @task
