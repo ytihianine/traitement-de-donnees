@@ -24,11 +24,11 @@ def sources() -> None:
         ),
         execution_options=config.execution_options,
     )
-    consommation_budgetaire = create_task(
+    execution_mensuelle = create_task(
         pipeline=PipelineDescriptor(
-            input_datasets=(Dataset(name="consommation_budgetaire"),),
-            output_dataset=Dataset(name="consommation_budgetaire"),
-            operation=process.process_consommation_budgetaire,
+            input_datasets=(Dataset(name="execution_mensuelle"),),
+            output_dataset=Dataset(name="execution_mensuelle"),
+            operation=process.process_execution_mensuelle,
         ),
         execution_options=config.execution_options,
     )
@@ -41,4 +41,4 @@ def sources() -> None:
         execution_options=config.execution_options,
     )
     # Ordre des tâches
-    chain([nomenclature(), programmation_budgetaire(), consommation_budgetaire(), lfi()])
+    chain([nomenclature(), programmation_budgetaire(), execution_mensuelle(), lfi()])
