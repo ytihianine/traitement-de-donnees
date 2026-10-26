@@ -3,7 +3,7 @@ CREATE SCHEMA IF NOT EXISTS suivi_budgetaire;
 
 
 /*
-    Référentiels commun
+  Tables sources
 */
 CREATE TABLE suivi_budgetaire."nomenclature" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
