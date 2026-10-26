@@ -8,7 +8,7 @@ execution_options = {
     "nomenclature": ExecutionOptions(),
     "programmation_budgetaire": ExecutionOptions(),
     "consommation_budgetaire": ExecutionOptions(),
-    "lfi": ExecutionOptions(),
+    "lfi": ExecutionOptions(read_options={"sheet_name": "LFI à la brique"}),
 }
 
 config_projet_subpath = Path("dags/finances/suivi_budgetaire")

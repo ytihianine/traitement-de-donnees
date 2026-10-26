@@ -72,7 +72,7 @@ def process_execution_mensuelle(df: pd.DataFrame) -> pd.DataFrame:
         id_vars=[col for col in rename.values() if col not in ["ae", "cp"]],
         value_vars=["ae", "cp"],
         var_name="type_montant",
-        value_name="montant",
+        value_name="montant_execution",
     )
 
     # Remove leading 0
