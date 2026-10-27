@@ -3,6 +3,6 @@ sources:
     schema: "{{ target.schema }}"
     tables:
       - name: nomenclature
-      - name: programmation
-      - name: consommation
+      - name: programmation_annuelle
+      - name: execution_mensuelle
       - name: lfi_brique

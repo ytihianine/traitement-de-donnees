@@ -32,6 +32,12 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   suivi_budgetaire:
     # Config indicated by + and applies to all files under models/example/
-    suivi_budgetaire:
+    dimensions:
+      +materialized: table
+      schema: silver
+    mensuel:
+      +materialized: table
+      schema: silver
+    annuel:
       +materialized: table
       schema: silver
