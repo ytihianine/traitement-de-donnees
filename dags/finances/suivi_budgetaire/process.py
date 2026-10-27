@@ -36,10 +36,52 @@ def process_nomenclature(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def process_programmation_budgetaire(df: pd.DataFrame) -> pd.DataFrame:
+def process_programmation_annuelle(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Process the programmation_budgetaire dataset.
+    Process the programmation_annuelle dataset.
     """
+    rename = {
+        "Exercice": "exercice",
+        "n°programme": "numero_programme",
+        "BOP": "bop",
+        "type": "type",
+        "brique": "brique",
+        "action": "action",
+        "code": "code",
+        "libellé": "libelle",
+        "AE": "execution_annee_precedente_ae",
+        "CP": "execution_annee_precedente_cp",
+        "AE.1": "repartition_ressource_ae",
+        "CP.1": "repartition_ressource_cp",
+        "AE.2": "execution_ae",
+        "CP.2": "execution_cp",
+        "CP.3": "depense_obligatoire_cp",
+        "AE.3": "depense_ineluctable_ae",
+        "CP.4": "depense_ineluctable_cp",
+        "CP.5": "depense_ineluctable_dont_rest_a_payer_cp",
+        "AE.4": "autres_depenses_ae",
+        "CP.6": "autres_depenses_cp",
+        "AE.5": "total_depenses_programmees_ae",
+        "CP.7": "total_depenses_programmees_cp",
+        "Type dépense": "type_depense",
+        "RDV Budgétaire": "rdv_budgetaire",
+    }
+    df = df.rename(columns=rename)
+
+    txt_columns = [
+        "bop",
+        "type",
+        "brique",
+        "action",
+        "code",
+        "libelle",
+        "type_depense",
+        "rdv_budgetaire",
+    ]
+    df = normalize_whitespace_columns(df, columns=txt_columns)
+
+    df["brique"] = df["brique"].str.split().str[-1]
+
     return df
 
 

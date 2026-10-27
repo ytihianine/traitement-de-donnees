@@ -16,11 +16,11 @@ def sources() -> None:
         ),
         execution_options=config.execution_options,
     )
-    programmation_budgetaire = create_task(
+    programmation_annuelle = create_task(
         pipeline=PipelineDescriptor(
-            input_datasets=(Dataset(name="programmation_budgetaire"),),
-            output_dataset=Dataset(name="programmation_budgetaire"),
-            operation=process.process_programmation_budgetaire,
+            input_datasets=(Dataset(name="programmation_annuelle"),),
+            output_dataset=Dataset(name="programmation_annuelle"),
+            operation=process.process_programmation_annuelle,
         ),
         execution_options=config.execution_options,
     )
@@ -41,4 +41,4 @@ def sources() -> None:
         execution_options=config.execution_options,
     )
     # Ordre des tâches
-    chain([nomenclature(), programmation_budgetaire(), execution_mensuelle(), lfi()])
+    chain([nomenclature(), programmation_annuelle(), execution_mensuelle(), lfi()])

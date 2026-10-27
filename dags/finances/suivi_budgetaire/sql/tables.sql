@@ -24,7 +24,7 @@ CREATE TABLE suivi_budgetaire."nomenclature" (
 ) PARTITION BY RANGE (import_timestamp);
 
 
-CREATE TABLE suivi_budgetaire."programmation_budgetaire" (
+CREATE TABLE suivi_budgetaire."programmation_annuelle" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
 
   import_timestamp TIMESTAMP NOT NULL,
