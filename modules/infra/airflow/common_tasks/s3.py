@@ -45,22 +45,23 @@ def looking_for_files(
     s3_conn_id: str = DEFAULT_S3_CONN_ID,
     s3_bucket: str = DEFAULT_S3_BUCKET,
 ) -> PokeReturnValue:
-    fs_hook = S3Hook(aws_conn_id=s3_conn_id)
+    logging.info(msg=f"Sensor config: mode=reschedule, poke_interval=30, timeout={13 * 60}")
 
-    bucket_name = s3_bucket
+    fs_hook = S3Hook(aws_conn_id=s3_conn_id)
     file_keys = dataset_context_repo.list_source_file_location(nom_projet=nom_projet)
 
-    logging.info(msg=f"Looking for files {len(file_keys)} in S3 bucket {bucket_name} with keys: {file_keys}")
-
-    files_exist = all(
-        fs_hook.check_for_key(
-            key=key,
-            bucket_name=bucket_name,
-        )
+    missing_keys = [
+        key
         for key in file_keys
-    )
+        if not fs_hook.check_for_key(
+            key=key,
+            bucket_name=s3_bucket,
+        )
+    ]
 
-    return PokeReturnValue(is_done=files_exist)
+    logging.info(msg=f"Missing S3 keys: {missing_keys}")
+
+    return PokeReturnValue(is_done=not missing_keys)
 
 
 @task
