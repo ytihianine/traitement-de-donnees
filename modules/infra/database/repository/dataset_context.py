@@ -162,6 +162,18 @@ class DbDatasetContextRepository(DatasetContextRepository):
         return [sf["source_fichier"] for sf in source_fichiers]
 
     @db_retry
+    def list_source_file_location(self, nom_projet: str) -> list[str]:
+        source_fichiers = self.db_client.fetch_all(
+            query=f"""
+                SELECT file_location
+                FROM {CONF_SCHEMA}.source_fichier
+                WHERE nom_projet = %s
+            """,
+            parameters=(nom_projet,),
+        )
+        return [sf["file_location"] for sf in source_fichiers]
+
+    @db_retry
     def get_list_column_mapping(self, nom_projet: str, dataset_name: str) -> Sequence[Mapping[str, Any]]:
         column_mappings = self.db_client.fetch_all(
             query=f"""

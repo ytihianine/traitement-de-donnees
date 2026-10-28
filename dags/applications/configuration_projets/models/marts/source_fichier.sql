@@ -13,7 +13,8 @@ select
     p.id_service,
     service.service,
     split_part(d_loc.location, '/', -1) as nom_source,
-    p_loc.fs_folder as s3_key_prefix
+    p_loc.fs_folder as s3_key_prefix,
+    d_loc.location as file_location
 from {{ source('conf_projets', 'projet') }} as p
 inner join latest_import_timestamp as latest
     on p.import_timestamp = latest.import_timestamp
