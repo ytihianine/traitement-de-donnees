@@ -48,7 +48,7 @@ def looking_for_files(
     fs_hook = S3Hook(aws_conn_id=s3_conn_id)
 
     bucket_name = s3_bucket
-    file_keys = dataset_context_repo.get_list_source_fichier(nom_projet=nom_projet)
+    file_keys = dataset_context_repo.list_source_file_location(nom_projet=nom_projet)
 
     logging.info(msg=f"Looking for files {len(file_keys)} in S3 bucket {bucket_name} with keys: {file_keys}")
 
