@@ -68,7 +68,7 @@ class S3DatasetLocationProvider(DatasetLocationProvider):
 
     def fs_config(self, location: str, conn_id: str) -> FSConfig:
         return FSConfig(
-            bucket=parse_s3_bucket(location=location),
+            bucket="dsci",
             connection_id=conn_id,
         )
 
