@@ -121,12 +121,17 @@ def should_skip_task(
     return False
 
 
-def create_default_args(retries: int = 0, retry_delay: timedelta | None = None, **kwargs) -> dict:
+def create_default_args(
+    start_date: pendulum.DateTime | None = None,
+    retries: int = 0,
+    retry_delay: timedelta | None = None,
+    **kwargs,
+) -> dict:
     """Create standard default_args for dags."""
     args = {
         "owner": DEFAULT_TASK_OWNER,
         "depends_on_past": False,
-        "start_date": pendulum.today(tz="UTC").add(days=-1),
+        "start_date": start_date or pendulum.datetime(year=2026, month=1, day=1, tz="UTC"),
         "email_on_failure": False,
         "email_on_retry": False,
         "retries": retries,

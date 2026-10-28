@@ -1,0 +1,8 @@
+sources:
+  - name: suivi_budgetaire
+    schema: "{{ target.schema }}"
+    tables:
+      - name: nomenclature
+      - name: programmation_annuelle
+      - name: execution_mensuelle
+      - name: lfi_brique
