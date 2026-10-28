@@ -83,7 +83,7 @@ class S3DatasetLocationProvider(DatasetLocationProvider):
         )
         df = read_dataframe(
             file_handler=fs_handler,
-            file_path=parse_s3_key(location),
+            file_path=location,
             read_options=read_options,
         )
         return df
