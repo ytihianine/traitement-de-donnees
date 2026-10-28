@@ -154,7 +154,7 @@ class DbDatasetContextRepository(DatasetContextRepository):
         source_fichiers = self.db_client.fetch_all(
             query=f"""
                 SELECT nom_source AS source_fichier
-                FROM {CONF_SCHEMA}.vue_source
+                FROM {CONF_SCHEMA}.source_fichier
                 WHERE nom_projet = %s
             """,
             parameters=(nom_projet,),
