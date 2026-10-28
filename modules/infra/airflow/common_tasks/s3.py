@@ -48,14 +48,16 @@ def looking_for_files(
     fs_hook = S3Hook(aws_conn_id=s3_conn_id)
 
     bucket_name = s3_bucket
-    bucket_key = dataset_context_repo.get_list_source_fichier(nom_projet=nom_projet)
+    file_keys = dataset_context_repo.get_list_source_fichier(nom_projet=nom_projet)
+
+    logging.info(msg=f"Looking for files {len(file_keys)} in S3 bucket {bucket_name} with keys: {file_keys}")
 
     files_exist = all(
         fs_hook.check_for_key(
             key=key,
             bucket_name=bucket_name,
         )
-        for key in bucket_key
+        for key in file_keys
     )
 
     return PokeReturnValue(is_done=files_exist)
