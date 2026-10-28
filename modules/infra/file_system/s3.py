@@ -6,7 +6,6 @@ import mimetypes
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, BinaryIO
-from urllib.parse import unquote_plus
 
 from modules.infra.file_system.base import FileMetadata, FSInterface
 
@@ -36,9 +35,9 @@ class S3FS(FSInterface):
         key = str(file_path)
         logging.info(msg=f"Reading file from {key}")
 
-        response = self.client.get_object(Bucket=self.bucket, Key=unquote_plus(string=key))
+        response = self.client.get_object(Bucket=self.bucket, Key=key)
         content = response["Body"].read()
-        return io.BytesIO(content)
+        return io.BytesIO(initial_bytes=content)
 
     def write(
         self,
