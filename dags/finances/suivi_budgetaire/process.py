@@ -22,7 +22,7 @@ def process_nomenclature(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns=rename)
 
     # Additional processing
-    df["brique"] = df["brique"].str.split().str[-1]
+    df["brique"] = df["brique"].str.split("-").str[-1]
 
     # Generic processing
     txt_columns = [
@@ -76,7 +76,7 @@ def process_programmation_annuelle(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns=rename)
 
     # Additional processing
-    df["brique"] = df["brique"].str.split().str[-1]
+    df["brique"] = df["brique"].str.split("-").str[-1]
 
     # Generic processing
     txt_columns = [
