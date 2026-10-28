@@ -6,6 +6,7 @@ import mimetypes
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, BinaryIO
+from urllib.parse import unquote_plus
 
 from modules.infra.file_system.base import FileMetadata, FSInterface
 
@@ -40,7 +41,7 @@ class S3FS(FSInterface):
         if not self.exists(key):
             raise FileNotFoundError(f"File not found in S3: {key}")
 
-        response = self.client.get_object(Bucket=self.bucket, Key=key)
+        response = self.client.get_object(Bucket=self.bucket, Key=unquote_plus(key))
         content = response["Body"].read()
         return io.BytesIO(content)
 
