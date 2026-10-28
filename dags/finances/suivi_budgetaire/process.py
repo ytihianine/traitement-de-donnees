@@ -185,7 +185,7 @@ def process_lfi(df: pd.DataFrame) -> pd.DataFrame:
     df["brique"] = df["brique"].str.lstrip("B")
 
     # Generic processing
-    txt_columns = ["programme", "libelle_programme", "brique", "libelle_brique", "type_montant"]
+    txt_columns = ["programme", "libelle_programme", "libelle_brique", "type_montant"]
     df = normalize_whitespace_columns(df, columns=txt_columns)
 
     num_columns = ["exercice", "programme", "brique", "montant_lfi"]
