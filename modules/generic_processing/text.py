@@ -137,16 +137,3 @@ def check_emails_format(text: str) -> list[str]:
     """
     email_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
     return re.findall(email_pattern, text)
-
-
-def check_empty_answer(df=pd.DataFrame, columns=list[str]) -> pd.DataFrame:
-    """It checks if a string is meaningful"""
-    for col in columns:
-        if col not in df.columns:
-            raise KeyError(f"Column {col} not found in DataFrame.")
-
-        if not isinstance(df.col, pd.Series):
-            raise TypeError(f"df[col] with column name {col} is of type {type(df[col])}. Must be a pd.Series.")
-
-        if len(df[col]) < 4:
-            df[col].loc[df[col].str.strip().str.len() == 0] = None
