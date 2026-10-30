@@ -2,7 +2,7 @@
 select
 	-- Programmation annuelle
 	prog_exec.exercice,
-	prog_exec.numero_programme,
+	prog_exec.programme,
 	prog_exec.bop,
 	prog_exec.type,
 	prog_exec.brique,
@@ -21,7 +21,7 @@ left join {{ ref('dim_brique') }} as dim_brique
     and prog_exec.import_timestamp = dim_brique.import_timestamp
 group by
 	prog_exec.exercice,
-	prog_exec.numero_programme,
+	prog_exec.programme,
 	prog_exec.bop,
 	prog_exec.type,
 	prog_exec.brique,
@@ -35,7 +35,7 @@ group by
 order by
     prog_exec.import_timestamp,
     prog_exec.exercice,
-    prog_exec.numero_programme,
+    prog_exec.programme,
 	prog_exec.brique,
 	prog_exec.rdv_budgetaire,
 	prog_exec.type_montant,

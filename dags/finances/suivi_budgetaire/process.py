@@ -49,7 +49,7 @@ def process_programmation_annuelle(df: pd.DataFrame) -> pd.DataFrame:
     """
     rename = {
         "Exercice": "exercice",
-        "n°programme": "numero_programme",
+        "n°programme": "programme",
         "BOP": "bop",
         "type": "type",
         "brique": "brique",
@@ -93,7 +93,7 @@ def process_programmation_annuelle(df: pd.DataFrame) -> pd.DataFrame:
 
     num_columns = [
         "exercice",
-        "numero_programme",
+        "programme",
         "brique",
         "execution_annee_precedente_ae",
         "execution_annee_precedente_cp",
