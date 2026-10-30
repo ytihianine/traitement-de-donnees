@@ -55,7 +55,7 @@ def normalize_whitespace_columns(df: pd.DataFrame, columns: list[str]) -> pd.Dat
 
 def convert_empty_string(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     """Convert empty string into a Nonetype"""
-    df_copy = df.copy()
+
     for col in columns:
         if col not in df.columns:
             raise KeyError(f"Column {col} not found in DataFrame.")
@@ -63,8 +63,7 @@ def convert_empty_string(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
         if not isinstance(df[col], pd.Series):
             raise TypeError(f"df[col] with column name {col} is of type {type(df[col])}. Must be a pd.Series.")
 
-        df_copy[col].loc[df_copy[col].str.strip().str.len() == 0] = None
-        # print(df[col])
+        df.loc[df[col] == "", col] = None
 
     return df
 
