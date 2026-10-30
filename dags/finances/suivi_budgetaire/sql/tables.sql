@@ -27,7 +27,7 @@ CREATE TABLE suivi_budgetaire."nomenclature" (
 CREATE TABLE suivi_budgetaire."programmation_annuelle" (
   id_row bigint GENERATED ALWAYS AS IDENTITY,
   "exercice" int,
-  "numero_programme" int,
+  "programme" int,
   "bop" text,
   "type" text,
   "brique" int,

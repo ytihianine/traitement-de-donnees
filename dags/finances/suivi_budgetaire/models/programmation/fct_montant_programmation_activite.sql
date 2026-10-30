@@ -2,7 +2,7 @@
 select
 	-- Programmation annuelle
 	prog_exec.exercice,
-	prog_exec.numero_programme,
+	prog_exec.programme,
 	prog_exec.bop,
 	prog_exec.type,
 	prog_exec.brique,

@@ -1,6 +1,6 @@
 select
     prog_ann_ae.exercice,
-    prog_ann_ae.numero_programme,
+    prog_ann_ae.programme,
     prog_ann_ae.bop,
     prog_ann_ae.type,
     prog_ann_ae.brique,
@@ -17,7 +17,7 @@ where
 union all
 select
     prog_ann_cp.exercice,
-    prog_ann_cp.numero_programme,
+    prog_ann_cp.programme,
     prog_ann_cp.bop,
     prog_ann_cp.type,
     prog_ann_cp.brique,
