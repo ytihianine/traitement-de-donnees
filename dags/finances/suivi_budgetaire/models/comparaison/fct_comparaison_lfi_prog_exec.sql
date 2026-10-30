@@ -20,7 +20,7 @@ left join {{ ref('fct_montant_annuel_lfi_brique') }} as lfi
 order by
 	prog_exec.import_timestamp,
 	prog_exec.exercice,
-	prog_exec.programme,
+	prog_exec.numero_programme,
 	prog_exec.brique,
 	prog_exec.type_montant,
 	prog_exec.montant_execution
