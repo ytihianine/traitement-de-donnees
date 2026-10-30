@@ -137,3 +137,18 @@ def check_emails_format(text: str) -> list[str]:
     """
     email_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
     return re.findall(email_pattern, text)
+
+
+def check_null_answers(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
+    """Look for non relevant responses"""
+
+    for col in columns:
+        if col not in df.columns:
+            raise KeyError(f"Column {col} not found in DataFrame.")
+
+        if not isinstance(df[col], pd.Series):
+            raise TypeError(f"df[col] with column name {col} is of type {type(df[col])}. Must be a pd.Series.")
+
+        df.loc[df[col].str.len() < 5, col] = None
+
+    return df
