@@ -9,11 +9,11 @@ def process_nomenclature(df: pd.DataFrame) -> pd.DataFrame:
     """
     rename = {
         "Exercice": "exercice",
-        "programme": "programme",
-        "brique": "brique",
-        "libellé brique": "libelle_brique",
-        "activité": "activite",
-        "libellé activité": "libelle_activite",
+        "programme": "programme_code",
+        "brique": "brique_code",
+        "libellé brique": "brique_libelle",
+        "activité": "activite_code",
+        "libellé activité": "activite_libelle",
         "Domaine fonctionnel": "domaine_fonctionnel",
         "Libellé DF": "libelle_df",
         "BOP": "bop",
@@ -22,14 +22,14 @@ def process_nomenclature(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns=rename)
 
     # Additional processing
-    df["brique"] = df["brique"].str.split("-").str[-1]
+    df["brique_code"] = df["brique_code"].str.split("-").str[-1]
 
     # Generic processing
     txt_columns = [
-        "brique",
-        "libelle_brique",
-        "activite",
-        "libelle_activite",
+        "brique_code",
+        "brique_libelle",
+        "activite_code",
+        "activite_libelle",
         "domaine_fonctionnel",
         "libelle_df",
         "bop",
@@ -37,7 +37,7 @@ def process_nomenclature(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = normalize_whitespace_columns(df, columns=txt_columns)
 
-    num_columns = ["exercice", "programme", "brique"]
+    num_columns = ["exercice", "programme_code", "brique_code"]
     df = convert_to_numeric(df, columns=num_columns, errors="coerce")
 
     return df
@@ -49,10 +49,10 @@ def process_programmation_annuelle(df: pd.DataFrame) -> pd.DataFrame:
     """
     rename = {
         "Exercice": "exercice",
-        "n°programme": "programme",
+        "n°programme": "programme_code",
         "BOP": "bop",
         "type": "type",
-        "brique": "brique",
+        "brique": "brique_code",
         "action": "action",
         "code": "code",
         "libellé": "libelle",
@@ -76,13 +76,13 @@ def process_programmation_annuelle(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns=rename)
 
     # Additional processing
-    df["brique"] = df["brique"].str.split("-").str[-1]
+    df["brique_code"] = df["brique_code"].str.split("-").str[-1]
 
     # Generic processing
     txt_columns = [
         "bop",
         "type",
-        "brique",
+        "brique_code",
         "action",
         "code",
         "libelle",
@@ -93,8 +93,8 @@ def process_programmation_annuelle(df: pd.DataFrame) -> pd.DataFrame:
 
     num_columns = [
         "exercice",
-        "programme",
-        "brique",
+        "programme_code",
+        "brique_code",
         "execution_annee_precedente_ae",
         "execution_annee_precedente_cp",
         "repartition_ressource_ae",
@@ -121,11 +121,11 @@ def process_execution_mensuelle(df: pd.DataFrame) -> pd.DataFrame:
     """
     rename = {
         "Exercice": "exercice",
-        "Programme": "programme",
+        "Programme": "programme_code",
         "BOP": "bop",
         "UO": "uo",
-        "n° activité": "numero_activite",
-        "Libellé activité": "libelle_activite",
+        "n° activité": "activite_code",
+        "Libellé activité": "activite_libelle",
         "Titre": "titre",
         "Domaine fonctionnel": "domaine_fonctionnel",
         "Fonds": "fonds",
@@ -136,7 +136,7 @@ def process_execution_mensuelle(df: pd.DataFrame) -> pd.DataFrame:
     }
     df = df.rename(columns=rename)
 
-    txt_columns = ["bop", "uo", "numero_activite", "libelle_activite", "titre", "domaine_fonctionnel", "fonds", "mois"]
+    txt_columns = ["bop", "uo", "activite_code", "activite_libelle", "titre", "domaine_fonctionnel", "fonds", "mois"]
     df = normalize_whitespace_columns(df, columns=txt_columns)
 
     # Unpivot
@@ -164,10 +164,10 @@ def process_lfi(df: pd.DataFrame) -> pd.DataFrame:
     """
     rename = {
         "Exercice": "exercice",
-        "Programme": "programme",
-        "Libellé programme": "libelle_programme",
-        "n° Brique": "brique",
-        "Libellé Brique": "libelle_brique",
+        "Programme": "programme_code",
+        "Libellé programme": "programme_libelle",
+        "n° Brique": "brique_code",
+        "Libellé Brique": "brique_libelle",
         "AE": "ae",
         "CP": "cp",
     }
@@ -182,13 +182,13 @@ def process_lfi(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Remove leading 0
-    df["brique"] = df["brique"].str.lstrip("B")
+    df["brique_code"] = df["brique_code"].str.lstrip("B")
 
     # Generic processing
-    txt_columns = ["libelle_programme", "libelle_brique", "type_montant"]
+    txt_columns = ["programme_libelle", "brique_libelle", "type_montant"]
     df = normalize_whitespace_columns(df, columns=txt_columns)
 
-    num_columns = ["exercice", "programme", "brique", "montant_lfi"]
+    num_columns = ["exercice", "programme_code", "brique_code", "montant_lfi"]
     df = convert_to_numeric(df, columns=num_columns, errors="coerce")
 
     return df

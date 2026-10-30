@@ -2,7 +2,7 @@
 select
 	-- Programmation annuelle
 	prog_exec.exercice,
-	prog_exec.numero_programme,
+	prog_exec.programme_code,
 	prog_exec.bop,
 	prog_exec.type,
 	prog_exec.brique,
@@ -28,5 +28,5 @@ left join {{ ref('fct_montant_annuel_execution_activite') }} as exec_annuelle
     and prog_exec.import_timestamp = exec_annuelle.import_timestamp
 left join {{ ref('dim_activite') }} as dim_activite
     on prog_exec.exercice = dim_activite.exercice
-    and prog_exec.numero_activite = dim_activite.numero_activite
+    and prog_exec.numero_activite = dim_activite.activite
     and prog_exec.import_timestamp = dim_activite.import_timestamp
