@@ -3,6 +3,7 @@ select
     -- Execution mensuelle
     exec_mens.exercice,
     exec_mens.date_execution,
+    concat(to_char(exec_mens.date_execution, 'MM'), '-', exec_mens.mois) as mois_label,
     exec_mens.programme,
     exec_mens.numero_activite,
     exec_mens.titre,

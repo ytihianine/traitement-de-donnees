@@ -1,4 +1,5 @@
 import pandas as pd
+from modules.generic_processing.number import convert_to_numeric
 from modules.generic_processing.text import normalize_whitespace_columns
 
 
@@ -20,6 +21,10 @@ def process_nomenclature(df: pd.DataFrame) -> pd.DataFrame:
     }
     df = df.rename(columns=rename)
 
+    # Additional processing
+    df["brique"] = df["brique"].str.split("-").str[-1]
+
+    # Generic processing
     txt_columns = [
         "brique",
         "libelle_brique",
@@ -32,7 +37,9 @@ def process_nomenclature(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = normalize_whitespace_columns(df, columns=txt_columns)
 
-    df["brique"] = df["brique"].str.split().str[-1]
+    num_columns = ["exercice", "programme", "brique"]
+    df = convert_to_numeric(df, columns=num_columns, errors="coerce")
+
     return df
 
 
@@ -68,6 +75,10 @@ def process_programmation_annuelle(df: pd.DataFrame) -> pd.DataFrame:
     }
     df = df.rename(columns=rename)
 
+    # Additional processing
+    df["brique"] = df["brique"].str.split("-").str[-1]
+
+    # Generic processing
     txt_columns = [
         "bop",
         "type",
@@ -80,7 +91,26 @@ def process_programmation_annuelle(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = normalize_whitespace_columns(df, columns=txt_columns)
 
-    df["brique"] = df["brique"].str.split().str[-1]
+    num_columns = [
+        "exercice",
+        "numero_programme",
+        "brique",
+        "execution_annee_precedente_ae",
+        "execution_annee_precedente_cp",
+        "repartition_ressource_ae",
+        "repartition_ressource_cp",
+        "execution_ae",
+        "execution_cp",
+        "depense_obligatoire_cp",
+        "depense_ineluctable_ae",
+        "depense_ineluctable_cp",
+        "depense_ineluctable_dont_rest_a_payer_cp",
+        "autres_depenses_ae",
+        "autres_depenses_cp",
+        "total_depenses_programmees_ae",
+        "total_depenses_programmees_cp",
+    ]
+    df = convert_to_numeric(df, columns=num_columns, errors="coerce")
 
     return df
 
@@ -143,9 +173,6 @@ def process_lfi(df: pd.DataFrame) -> pd.DataFrame:
     }
     df = df.rename(columns=rename)
 
-    txt_columns = ["programme", "libelle_programme", "brique", "libelle_brique"]
-    df = normalize_whitespace_columns(df, columns=txt_columns)
-
     # Unpivot
     df = df.melt(
         id_vars=[col for col in rename.values() if col not in ["ae", "cp"]],
@@ -156,5 +183,12 @@ def process_lfi(df: pd.DataFrame) -> pd.DataFrame:
 
     # Remove leading 0
     df["brique"] = df["brique"].str.lstrip("B")
+
+    # Generic processing
+    txt_columns = ["libelle_programme", "libelle_brique", "type_montant"]
+    df = normalize_whitespace_columns(df, columns=txt_columns)
+
+    num_columns = ["exercice", "programme", "brique", "montant_lfi"]
+    df = convert_to_numeric(df, columns=num_columns, errors="coerce")
 
     return df

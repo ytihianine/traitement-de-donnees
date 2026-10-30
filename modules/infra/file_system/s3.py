@@ -34,15 +34,10 @@ class S3FS(FSInterface):
         """Read file from S3."""
         key = str(file_path)
         logging.info(msg=f"Reading file from {key}")
-        if validate:
-            self.validate(key)
-
-        if not self.exists(key):
-            raise FileNotFoundError(f"File not found in S3: {key}")
 
         response = self.client.get_object(Bucket=self.bucket, Key=key)
         content = response["Body"].read()
-        return io.BytesIO(content)
+        return io.BytesIO(initial_bytes=content)
 
     def write(
         self,

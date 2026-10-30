@@ -64,12 +64,12 @@ def suivi_budgetaire_dag() -> None:
         ),
         copy_tmp_table_to_real_table(execution_options=execution_options),
         copy_s3_files(execution_options=execution_options),
-        del_s3_files(execution_options=execution_options),
-        delete_tmp_tables(execution_options=execution_options),
         dbt_build_models(
             project_dir_subpath=config_projet_subpath,
         ),
         update_projet_snapshot_status(execution_options=execution_options),
+        del_s3_files(execution_options=execution_options),
+        delete_tmp_tables(execution_options=execution_options),
     )
 
 
