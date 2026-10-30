@@ -21,7 +21,7 @@ from modules.generic_processing.structures import (
     handle_grist_nullable_int_columns,
     normalize_grist_dataframe,
 )
-from modules.generic_processing.text import normalize_whitespace_columns
+from modules.generic_processing.text import convert_empty_string, normalize_whitespace_columns
 from modules.infra.airflow.dag import should_skip_task
 from modules.infra.file_system.factory import FileHandlerType, FSConfig, create_file_handler
 from modules.infra.grist.client import GristClient
@@ -122,6 +122,7 @@ def generic_grist_processing(
     if txt_columns:
         logging.info(msg=f"Normalizing text columns to string: {txt_columns}")
         df = normalize_whitespace_columns(df=df, columns=txt_columns)
+        df = convert_empty_string(df, txt_columns)
     else:
         logging.info(msg="No text columns provided. Skipping ...")
 
