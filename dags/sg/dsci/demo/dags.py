@@ -32,7 +32,7 @@ from modules.infra.mails.default_smtp import MailStatus, create_send_mail_callba
     params=create_dag_params(
         nom_projet=projet_demo,
         dag_status=DagStatus.RUN,
-        db_params=DBParams(prod_schema="demo_traitement"),
+        db_params=DBParams(prod_schema="demo"),
         feature_flags=FeatureFlagsEnable(db=True, mail=False, s3=True, convert_files=False, download_grist_doc=True),
     ),
     on_failure_callback=create_send_mail_callback(
