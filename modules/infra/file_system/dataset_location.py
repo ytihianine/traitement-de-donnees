@@ -15,19 +15,19 @@ GRIST_SQLITE_PATH_READ_OPTION = "grist_sqlite_path"
 
 # Parsing functions for different dataset locations
 def parse_s3_bucket(location: str) -> str:
-    return location.split("/")[0]
+    return location.split(sep="/")[0]
 
 
 def parse_s3_prefix(location: str) -> str:
-    return "/".join(location.split("/")[1:-1])
+    return "/".join(location.split(sep="/")[:-1])
 
 
 def parse_s3_key(location: str) -> str:
-    return "/".join(location.split("/")[1:])
+    return "/".join(location.split(sep="/")[1:])
 
 
 def parse_s3_filename(location: str) -> str:
-    return location.split("/")[-1]
+    return location.split(sep="/")[-1]
 
 
 def parse_local_path(location: str) -> str:
@@ -35,31 +35,31 @@ def parse_local_path(location: str) -> str:
 
 
 def parse_local_dir(location: str) -> str:
-    return "/".join(location.split("/")[:-1])
+    return "/".join(location.split(sep="/")[:-1])
 
 
 def parse_db_schema(location: str) -> str:
-    return location.split(".")[0]
+    return location.split(sep=".")[0]
 
 
 def parse_db_table(location: str) -> str:
-    return location.split(".")[1]
+    return location.split(sep=".")[1]
 
 
 def parse_doc_id(location: str) -> str:
-    return location.split(".")[0]
+    return location.split(sep=".")[0]
 
 
 def parse_table_id(location: str) -> str:
-    return location.split(".")[1]
+    return location.split(sep=".")[1]
 
 
 def parse_iceberg_namespace(location: str) -> str:
-    return location.split(".")[0]
+    return location.split(sep=".")[0]
 
 
 def parse_iceberg_table(location: str) -> str:
-    return location.split(".")[1]
+    return location.split(sep=".")[1]
 
 
 @dataclass(frozen=True)
