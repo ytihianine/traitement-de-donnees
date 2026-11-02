@@ -3,6 +3,7 @@ from pathlib import Path
 from modules.domain.pipeline.model import ExecutionOptions
 
 execution_options = {
+    "grist_doc": ExecutionOptions(),
     "demande": ExecutionOptions(tbl_order=5),
     "equipe": ExecutionOptions(tbl_order=3),
     # Référentiels
