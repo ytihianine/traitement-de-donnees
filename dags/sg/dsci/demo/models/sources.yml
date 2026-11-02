@@ -1,0 +1,8 @@
+sources:
+  - name: demo
+    schema: "{{ target.schema }}"
+    tables:
+      - name: demande
+      - name: equipe
+      - name: ref_direction
+      - name: ref_type_demande

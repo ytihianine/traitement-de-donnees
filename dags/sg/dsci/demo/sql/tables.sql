@@ -1,10 +1,10 @@
-DROP SCHEMA IF EXISTS "demo_traitement" CASCADE;
-CREATE SCHEMA IF NOT EXISTS "demo_traitement";
+DROP SCHEMA IF EXISTS "demo" CASCADE;
+CREATE SCHEMA IF NOT EXISTS "demo";
 
 /*
      Referenciels
 */
-CREATE TABLE demo_traitement."ref_direction"(
+CREATE TABLE demo."ref_direction"(
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" INTEGER,
     "direction" TEXT,
@@ -14,10 +14,10 @@ CREATE TABLE demo_traitement."ref_direction"(
     PRIMARY KEY ("id_row", "import_timestamp")
 ) PARTITION BY RANGE (import_timestamp);
 
-CREATE TABLE demo_traitement."ref_intervention"(
+CREATE TABLE demo."ref_type_demande"(
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" INTEGER,
-    "typologie_d_intervention2" TEXT,
+    "type_demande" TEXT,
     import_timestamp TIMESTAMP NOT NULL,
     snapshot_id UUID NOT NULL,
     snapshot_id_parent UUID NULL,
@@ -25,22 +25,36 @@ CREATE TABLE demo_traitement."ref_intervention"(
 ) PARTITION BY RANGE (import_timestamp);
 
 /*
-     Activité
+    Activité
 */
 
-CREATE TABLE demo_traitement."accompagnement"(
+CREATE TABLE demo."demande"(
     id_row bigint GENERATED ALWAYS AS IDENTITY,
     "id" INTEGER,
     "id_direction" int,
-    "id_type_intervention" int,
-    "id_assignation" int,
-    "date_de_la_demande" date,
-    "accompagnement" text,
+    "id_type_demande" int,
+    "id_agent" int,
+    "objet" text,
     "statut" text,
+    "description" text,
     "niveau_de_complexite" text,
     "charge_estimee" numeric,
     "charge_consommee" numeric,
     "ecart_de_charge" numeric,
+    "mail_contact" text,
+    "date_creation" date,
+    "date_modification" date,
+    import_timestamp TIMESTAMP NOT NULL,
+    snapshot_id UUID NOT NULL,
+    snapshot_id_parent UUID NULL,
+    PRIMARY KEY ("id_row", "import_timestamp")
+) PARTITION BY RANGE (import_timestamp);
+
+
+CREATE TABLE demo."equipe"(
+    id_row bigint GENERATED ALWAYS AS IDENTITY,
+    "id" INTEGER,
+    "agent" text,
     import_timestamp TIMESTAMP NOT NULL,
     snapshot_id UUID NOT NULL,
     snapshot_id_parent UUID NULL,
