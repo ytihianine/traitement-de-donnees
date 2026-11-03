@@ -1,29 +1,23 @@
 
 select
     -- Execution mensuelle
-    exec_mens.exercice,
-    exec_mens.programme_code,
-    exec_mens.type_montant,
-    SUM(exec_mens.montant_execution) as montant_execution,
-    exec_mens.import_timestamp,
+    exec_mens_br.exercice,
+    exec_mens_br.programme_code,
+    exec_mens_br.type_montant,
+    SUM(exec_mens_br.montant_execution) as montant_execution,
+    exec_mens_br.import_timestamp,
     -- Dimension activite
-    dim_activite.programme_brique,
-    dim_activite.brique,
-    dim_activite.brique_libelle
-from {{ source('suivi_budgetaire', 'execution_mensuelle') }} as exec_mens
-left join {{ ref('dim_activite') }} as dim_activite
-    on exec_mens.programme_code = dim_activite.programme_code
-    and exec_mens.brique_code = dim_activite.brique_code
-    and exec_mens.import_timestamp = dim_activite.import_timestamp
+    exec_mens_br.programme_brique,
+    exec_mens_br.brique_libelle
+from {{ ref('fct_montant_mensuel_execution_brique') }} as exec_mens_br
 group by
-    exec_mens.exercice,
-    exec_mens.programme_code,
-    exec_mens.type_montant,
-    exec_mens.import_timestamp,
-    dim_activite.programme_brique,
-    dim_activite.brique,
-    dim_activite.brique_libelle
+    exec_mens_br.import_timestamp,
+    exec_mens_br.exercice,
+    exec_mens_br.programme_code,
+    exec_mens_br.programme_brique,
+    exec_mens_br.brique_libelle,
+    exec_mens_br.type_montant
 order by
-    exec_mens.exercice,
-    exec_mens.programme_code,
-    exec_mens.type_montant
+    exec_mens_br.exercice,
+    exec_mens_br.programme_code,
+    exec_mens_br.type_montant

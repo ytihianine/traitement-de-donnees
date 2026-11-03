@@ -9,7 +9,7 @@ select
     exec_mens.import_timestamp,
     -- Dimension activite
     dim_activite.programme_brique,
-    dim_activite.brique,
+    dim_activite.brique_code,
     dim_activite.brique_libelle,
     dim_activite.activite_libelle
 from {{ source('suivi_budgetaire', 'execution_mensuelle') }} as exec_mens
@@ -24,7 +24,7 @@ group by
     exec_mens.type_montant,
     exec_mens.import_timestamp,
     dim_activite.programme_brique,
-    dim_activite.brique,
+    dim_activite.brique_code,
     dim_activite.brique_libelle,
     dim_activite.activite_libelle
 order by
