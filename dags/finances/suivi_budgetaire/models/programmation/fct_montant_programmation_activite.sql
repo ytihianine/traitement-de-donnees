@@ -23,6 +23,7 @@ left join {{ ref('dim_activite') }} as dim_activite
 	and prog_exec.programme_code = dim_activite.programme_code
     and prog_exec.activite_code = dim_activite.activite_code
     and prog_exec.import_timestamp = dim_activite.import_timestamp
+where prog_exec.brique_code is not null
 order by
     prog_exec.import_timestamp,
     prog_exec.exercice,

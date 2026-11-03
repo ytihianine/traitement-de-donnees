@@ -3,11 +3,9 @@ select
 	-- Programmation annuelle
 	prog_exec.exercice,
 	prog_exec.programme_code,
-	prog_exec.type,
 	prog_exec.brique_code,
 	prog_exec.type_montant,
 	SUM(prog_exec.montant_prog_execution) as montant_prog_execution,
-	prog_exec.type_depense,
 	prog_exec.rdv_budgetaire,
 	prog_exec.import_timestamp,
 	-- Dimension activite
@@ -17,10 +15,8 @@ from {{ ref('fct_montant_programmation_activite') }} as prog_exec
 group by
 	prog_exec.exercice,
 	prog_exec.programme_code,
-	prog_exec.type,
 	prog_exec.brique_code,
 	prog_exec.type_montant,
-	prog_exec.type_depense,
 	prog_exec.rdv_budgetaire,
 	prog_exec.import_timestamp,
 	prog_exec.programme_brique,
