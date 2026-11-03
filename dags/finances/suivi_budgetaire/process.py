@@ -181,8 +181,8 @@ def process_lfi(df: pd.DataFrame) -> pd.DataFrame:
         value_name="montant_lfi",
     )
 
-    # Remove leading 0
-    df["brique_code"] = df["brique_code"].str.lstrip("B")
+    # Remove leading "B" from brique_code
+    df["brique_code"] = df["brique_code"].astype("string").str.extract(r"(\d+)", expand=False)
 
     # Generic processing
     txt_columns = ["programme_libelle", "brique_libelle", "type_montant"]
