@@ -8,29 +8,21 @@ from modules.infra.airflow.task import create_task
 
 @task_group(group_id="source_files")
 def source_files() -> None:
-    agent_carriere = create_task(
+    agent_info_carriere = create_task(
         pipeline=PipelineDescriptor(
-            input_datasets=(Dataset("agent_carriere"),),
-            output_dataset=Dataset("agent_carriere"),
+            input_datasets=(Dataset(name="agent_info_carriere"),),
+            output_dataset=Dataset(name="agent_info_carriere"),
             operation=process.process_agent_info_carriere,
         ),
         execution_options=config.execution_options,
     )
-    agent = create_task(
+    agent_remuneration = create_task(
         pipeline=PipelineDescriptor(
-            input_datasets=(Dataset("agent"),),
-            output_dataset=Dataset("agent"),
-            operation=process.process_agent_contrat,
-        ),
-        execution_options=config.execution_options,
-    )
-    agent_elem_rem = create_task(
-        pipeline=PipelineDescriptor(
-            input_datasets=(Dataset("agent_elem_rem"),),
-            output_dataset=Dataset("agent_elem_rem"),
-            operation=process.process_agent_r4,
+            input_datasets=(Dataset(name="agent_remuneration"),),
+            output_dataset=Dataset(name="agent_remuneration"),
+            operation=process.process_agent_remuneration,
         ),
         execution_options=config.execution_options,
     )
 
-    chain([agent_carriere(), agent(), agent_elem_rem()])
+    chain([agent_info_carriere(), agent_remuneration()])
